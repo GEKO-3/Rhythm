@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Page with useful links and resources.">
+    <title>My Links</title>
+    <style>
+        :root {
+            --primary-color: #FFC800;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #000;
+            --bg-opacity: rgba(31, 31, 31, 0.5);
+        }
+
+        body {
+            font-family: 'SF-Pro', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: url('Background.jpg') no-repeat center center;
+            background-size: cover;
+            color: var(--primary-color);
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            top: 100px;
+            max-width: 400px;
+            width: 100%; 
+            padding: 10px;
+            background: var(--bg-opacity);
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: scale(1.02);
+        }
+
+        .link-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 95%;
+            min-height: 30px;
+            height: auto;
+            padding: 10px;
+            margin: 10px 0;
+            text-decoration: none;
+            background-color: var(--primary-color);
+            text-align: center;
+            border-radius: 5px;
+            transition: transform 0.3s ease, background-color 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-button img {
+            display: block;
+
+            max-width: 120px;
+            object-fit: contain;
+        }
+
+        .link-button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .link-button:active {
+            background-color: var(--active-color);
+            transform: scale(0.95);
+        }
+
+        footer {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 14px;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="https://www.facebook.com/share/15pXtBHaRS/?mibextid=wwXIfr" target="_blank" class="link-button" aria-label="Visit Example Link 1">
+            <img src="Facebook.png" alt="Facebook">
+        </a>
+        <a href="https://www.instagram.com/rhythm_boduberu__?igsh=MTc2dHdhbmk3cGxhbQ%3D%3D&utm_source=qr" target="_blank" class="link-button" aria-label="Visit Example Link 2">
+            <img src="Instagram.png" alt="Instagram">
+        </a>
+        <a href="https://www.tiktok.com/@rhythm_boduberu_?_t=ZS-8t3wWH3Rura&_r=1" target="_blank" class="link-button" aria-label="Visit Example Link 3">
+            <img src="Tiktok.png" alt="Tiktok">
+        </a>
+        <a href="https://on.soundcloud.com/LfP2iNinYMio1oc3A" target="_blank" class="link-button" aria-label="Visit Example Link 4">
+            <img src="Soundcloud.png" alt="Soundcloud">
+        </a>
+        <a href="https://www.youtube.com/@rhythmboduberu" target="_blank" class="link-button" aria-label="Visit Example Link 5">
+            <img src="Youtube.png" alt="Youtube">
+        </a>
+    </div>
+    <footer>
+         Rhythm Boduberu <a href="https://example.com" target="_blank">- Phone: 9128889</a>
+    </footer>
+</body>
+</html>
