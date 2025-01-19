@@ -22,19 +22,10 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            background-color: #2b2b2b; /* Keep background color in body */
-            color: var(--primary-color);
-        }
-
-        .background-image {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 150%;
-            height: 150%;
+            background-color: #2b2b2b;
             background: url('Background.webp') no-repeat center center;
-            background-size: contain;
-            z-index: -1; /* Ensure it is behind other content */
+            background-size: cover;
+            color: var(--primary-color);
         }
 
         .image-container {
@@ -150,7 +141,6 @@
     </style>
 </head>
 <body>
-    <div class="background-image"></div>
     <div class="image-container">
         <img src="Rhytham Logo.webp" alt="Rhythm Boduberu">
     </div>
