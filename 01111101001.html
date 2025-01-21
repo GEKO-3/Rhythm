@@ -21,7 +21,7 @@
         body {
             font-family: 'SF-Pro', Arial, sans-serif;
             background-color: #2b2b2b;
-            background: url('Background.webp') no-repeat center center;
+            background: url('src/Background.webp') no-repeat center center;
             background-size: cover;
             color: var(--primary-color);
             display: flex;
@@ -31,25 +31,33 @@
             margin: 0;
             animation: fadeIn 1s ease-in-out;
             position: relative;
+            flex-direction: column;
         }
 
         .home-button {
             position: absolute;
-            top: 20px;
-            left: 20px;
+            top: 50px;
+            left: 50px;
             width: 50px;
             height: 50px;
-            background-color: var(--primary-color);
-            color: var(--text-color);
+            background-color: #2b2b2b;
+            outline-style: dashed;
+            outline-color: #f5d000;
+            outline-width: 0.01px;
             border: none;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 16px;
             transition: background-color 0.3s;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
+        }
+
+        .home-button img {
+            max-width: 50%;
+            max-height: 70%;
+            border-radius: 8px;
         }
 
         .home-button:hover {
@@ -97,13 +105,13 @@
     </style>
 </head>
 <body>
-    <a href="index.html" class="home-button">Home</a>
+    <a href="index.html" class="home-button"><img src="src/Home.png" alt="Home"></a>
     <div class="button-container">
-        <a href="link1.html" class="square-button"><img src="FacebookS.png" alt="Button 1"></a>
-        <a href="link2.html" class="square-button"><img src="InstagramS.png" alt="Button 2"></a>
-        <a href="link3.html" class="square-button"><img src="TiktokS.png" alt="Button 3"></a>
-        <a href="link4.html" class="square-button"><img src="Sound CloudS.png" alt="Button 4"></a>
-        <a href="link4.html" class="square-button"><img src="YoutubeS.png" alt="Button 4"></a>
+        <a href="link1.html" class="square-button"><img src="src/FacebookS.png" alt="Button 1"></a>
+        <a href="link2.html" class="square-button"><img src="src/InstagramS.png" alt="Button 2"></a>
+        <a href="link3.html" class="square-button"><img src="src/TiktokS.png" alt="Button 3"></a>
+        <a href="link4.html" class="square-button"><img src="src/SoundCloudS.png" alt="Button 4"></a>
+        <a href="link5.html" class="square-button"><img src="src/YoutubeS.png" alt="Button 5"></a>
     </div>
 </body>
 </html>
