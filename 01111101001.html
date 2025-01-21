@@ -80,6 +80,51 @@
             background-color: var(--active-color);
         }
 
+        .center-content {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+        }
+
+        .center-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+        }
+
+        .name-text {
+            font-family: 'SF-Pro', Arial, sans-serif;
+            font-weight: bold;
+            margin-top: 10px;
+            min-width: 150px;
+            max-width: 250px;
+            font-size: clamp(1.4rem, 2.5vw, 2rem);
+        }
+
+        .yellow-rectangle {
+            background-color: var(--primary-color);
+            padding: 5px 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            max-height: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .basic-text {
+            color: #2b2b2b;
+            margin: 0;
+        }
+
+        .rb-text {
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
         .button-container {
             display: flex;
             gap: 10px;
@@ -119,6 +164,14 @@
 <body>
     <div class="bar-image"></div>
     <a href="index.html" class="home-button"><img src="src/Home.png" alt="Home"></a>
+    <div class="center-content">
+        <img src="src/img/1018.png" alt="Centered Image" class="center-image">
+        <div class="name-text">Name</div>
+        <div class="yellow-rectangle">
+            <p class="basic-text">Basic</p>
+        </div>
+        <div class="rb-text">RB1018</div>
+    </div>
     <div class="button-container">
         <a href="link1.html" class="square-button"><img src="src/FacebookS.png" alt="Button 1"></a>
         <a href="link2.html" class="square-button"><img src="src/InstagramS.png" alt="Button 2"></a>
