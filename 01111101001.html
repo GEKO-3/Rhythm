@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Square Buttons</title>
+    <title>Rhythm</title>
     <style>
         :root {
             --primary-color: #f5d000;
@@ -90,6 +90,7 @@
         }
 
         .center-image {
+            min-width: 200px;
             max-width: 300px;
             max-height: 300px;
             border-radius: 8px;
@@ -210,22 +211,41 @@
     <a href="index.html" class="home-button"><img src="src/Home.png" alt="Home"></a>
     <div class="center-content">
         <div class="member-info">Member Info:</div>
-        <img src="src/img/1018.png" alt="Centered Image" class="center-image">
-        <div class="name-text">Name</div>
+        <img src="src/img/empty.png" alt="Centered Image" class="center-image" id="center-image">
+        <div class="name-text" id="name-text">Rhyth Boduberu</div>
         <div class="yellow-rectangle">
-            <p class="basic-text">Basic</p>
+            <p class="basic-text" id="basic-text">Position</p>
         </div>
-        <div class="rb-text">RB1018</div>
+        <div class="rb-text" id="rb-text">RB0000</div>
     </div>
     <div class="footer-line"></div>
     <div class="footer-text">CHECK US OUT ON</div>
     <div class="footer-arrow"></div>
     <div class="button-container">
-        <a href="link1.html" class="square-button"><img src="src/FacebookS.png" alt="Button 1"></a>
-        <a href="link2.html" class="square-button"><img src="src/InstagramS.png" alt="Button 2"></a>
-        <a href="link3.html" class="square-button"><img src="src/TiktokS.png" alt="Button 3"></a>
-        <a href="link4.html" class="square-button"><img src="src/SoundCloudS.png" alt="Button 4"></a>
-        <a href="link5.html" class="square-button"><img src="src/YoutubeS.png" alt="Button 5"></a>
+        <a href="https://www.facebook.com/share/15pXtBHaRS/?mibextid=wwXIfr" class="square-button"><img src="src/FacebookS.png" alt="Facebook"></a>
+        <a href="https://www.instagram.com/rhythm_boduberu__?igsh=MTc2dHdhbmk3cGxhbQ%3D%3D&utm_source=qr" class="square-button"><img src="src/InstagramS.png" alt="Instagram"></a>
+        <a href="https://www.tiktok.com/@rhythm_boduberu_?_t=ZS-8t3wWH3Rura&_r=1" class="square-button"><img src="src/TiktokS.png" alt="Tiktok"></a>
+        <a href="https://on.soundcloud.com/LfP2iNinYMio1oc3A" class="square-button"><img src="src/SoundCloudS.png" alt="Soundcloud"></a>
+        <a href="https://www.youtube.com/@rhythmboduberu" class="square-button"><img src="src/YoutubeS.png" alt="Youtube"></a>
     </div>
+    <script>
+        async function fetchData() {
+            const response = await fetch('data.csv');
+            const data = await response.text();
+            const rows = data.split('\n').slice(1);
+            const filename = window.location.pathname.split('/').pop();
+            const row = rows.find(row => row.startsWith(filename));
+            if (row) {
+                const [, name, basic, rb, image] = row.split(',');
+
+                document.getElementById('name-text').textContent = name;
+                document.getElementById('basic-text').textContent = basic;
+                document.getElementById('rb-text').textContent = rb;
+                document.getElementById('center-image').src = image;
+            }
+        }
+
+        fetchData();
+    </script>
 </body>
 </html>
