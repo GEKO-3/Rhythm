@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythm</title>
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #2b2b2b;
+            --bg-opacity: rgba(31, 31, 31, 0.0);
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        body {
+            font-family: 'SF-Pro', Arial, sans-serif;
+            background-color: #2b2b2b;
+            background: url('src/Background.webp') no-repeat center center;
+            background-size: cover;
+            color: var(--primary-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            animation: fadeIn 1s ease-in-out;
+            position: relative;
+            flex-direction: column;
+        }
+
+        .bar-image {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: url('src/Bar.png') no-repeat center center;
+            background-size: cover;
+            z-index: 1;
+        }
+
+        .home-button {
+            position: absolute;
+            top: 70px;
+            left: 50px;
+            width: 50px;
+            height: 50px;
+            background-color: #2b2b2b;
+            outline-style: dashed;
+            outline-color: #f5d000;
+            outline-width: 0.01px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            border-radius: 8px;
+            z-index: 2;
+        }
+
+        .home-button img {
+            max-width: 50%;
+            max-height: 70%;
+            border-radius: 8px;
+        }
+
+        .home-button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .home-button:active {
+            background-color: var(--active-color);
+        }
+
+        .center-content {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+        }
+
+        .center-image {
+            min-width: 200px;
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+        }
+
+        .member-info {
+            position: relative;
+            top: 20px;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            border: 1px dashed #f5d000;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .name-text {
+            font-family: 'SF-Pro', Arial, sans-serif;
+            font-weight: bold;
+            margin-top: 10px;
+            min-width: 150px;
+            max-width: 250px;
+            font-size: clamp(1.4rem, 2.5vw, 2rem);
+        }
+
+        .yellow-rectangle {
+            background-color: var(--primary-color);
+            padding: 5px 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            max-height: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .basic-text {
+            color: #2b2b2b;
+            margin: 0;
+        }
+
+        .rb-text {
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            position: absolute;
+            bottom: 130px;
+        }
+
+        .square-button {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-color);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .square-button img {
+            max-width: 70%;
+            max-height: 70%;
+            border-radius: 8px;
+        }
+
+        .square-button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .square-button:active {
+            background-color: var(--active-color);
+        }
+
+        .footer-line {
+            position: absolute;
+            bottom: 250px;
+            width: 100%;
+            border-top: 1px dashed var(--primary-color);
+        }
+        .footer-text {
+            font-weight: bold;
+            position: absolute;
+            bottom: 210px;
+            font-size: 1em;
+        }
+        .footer-arrow {
+            position: absolute;
+            bottom: 195px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid yellow;
+            border-radius: 2px;
+        }
+        .title-image {
+            position: absolute;
+            top: 40px;
+            display: block;
+            margin: 0 auto;
+            width: 60%;
+            max-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <img src="src/rythmtitle.png" alt="Rhythm Title" class="title-image">
+    <div class="bar-image"></div>
+    <a href="index.html" class="home-button"><img src="src/Home.png" alt="Home"></a>
+    <div class="center-content">
+        <div class="member-info">Member Info:</div>
+        <img src="src/img/empty.png" alt="Centered Image" class="center-image" id="center-image">
+        <div class="name-text" id="name-text">Rhyth Boduberu</div>
+        <div class="yellow-rectangle">
+            <p class="basic-text" id="basic-text">Position</p>
+        </div>
+        <div class="rb-text" id="rb-text">RB0000</div>
+    </div>
+    <div class="footer-line"></div>
+    <div class="footer-text">CHECK US OUT ON</div>
+    <div class="footer-arrow"></div>
+    <div class="button-container">
+        <a href="https://www.facebook.com/share/15pXtBHaRS/?mibextid=wwXIfr" class="square-button"><img src="src/FacebookS.png" alt="Facebook"></a>
+        <a href="https://www.instagram.com/rhythm_boduberu__?igsh=MTc2dHdhbmk3cGxhbQ%3D%3D&utm_source=qr" class="square-button"><img src="src/InstagramS.png" alt="Instagram"></a>
+        <a href="https://www.tiktok.com/@rhythm_boduberu_?_t=ZS-8t3wWH3Rura&_r=1" class="square-button"><img src="src/TiktokS.png" alt="Tiktok"></a>
+        <a href="https://on.soundcloud.com/LfP2iNinYMio1oc3A" class="square-button"><img src="src/SoundCloudS.png" alt="Soundcloud"></a>
+        <a href="https://www.youtube.com/@rhythmboduberu" class="square-button"><img src="src/YoutubeS.png" alt="Youtube"></a>
+    </div>
+    <script>
+        async function fetchData() {
+            const response = await fetch('data.csv');
+            const data = await response.text();
+            const rows = data.split('\n').slice(1);
+            const filename = window.location.pathname.split('/').pop();
+            const row = rows.find(row => row.startsWith(filename));
+            if (row) {
+                const [, name, basic, rb, image] = row.split(',');
+
+                document.getElementById('name-text').textContent = name;
+                document.getElementById('basic-text').textContent = basic;
+                document.getElementById('rb-text').textContent = rb;
+                document.getElementById('center-image').src = image;
+            }
+        }
+
+        fetchData();
+    </script>
+</body>
+</html>
