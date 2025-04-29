@@ -12,6 +12,8 @@
             --active-color: #E6B800;
             --text-color: #2b2b2b;
             --bg-opacity: rgba(31, 31, 31, 0.0);
+            --hover-color2: #3a3a3a;
+            --active-color2: #111111
         }
 
         @keyframes fadeIn {
@@ -144,6 +146,15 @@
 
         .link-button:active {
             background-color: var(--active-color);
+            transform: scale(0.95);
+        }
+
+        .link-button2:hover {
+            background-color: var(--hover-color2);
+        }
+
+        .link-button2:active {
+            background-color: var(--active-color2);
             transform: scale(0.95);
         }
 
