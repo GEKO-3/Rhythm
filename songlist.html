@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Songs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Add Montserrat font for English text -->
+  <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #f5d000;
+      --hover-color: #fced98;
+      --active-color: #E6B800;
+      --text-color: #2b2b2b;
+      --bg-opacity: rgba(31, 31, 31, 0.0);
+      --hover-color2: #3a3a3a;
+      --active-color2: #111111
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes slideIn {
+      0% { transform: translateY(10px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    body {
+      /* Use Montserrat for English text */
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #1f1f1f;
+      background-size: cover;
+      color: var(--primary-color);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .container {
+      text-align: center;
+      position: relative;
+      max-width: 600px;
+      width: 100%; 
+      padding: 20px;
+      background: var(--bg-opacity);
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+      animation: slideIn 0.5s ease-in-out;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+    .header-search-wrapper {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-radius: 10px 10px 0 0;
+      backdrop-filter: blur(2px);
+    }
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 0.5em;
+      margin-top: 0.5em;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    .search-container {
+      background: rgba(43,43,43,0.95);
+      border-radius: 8px;
+      padding: 16px 0 10px 0;
+      margin: 0 auto 18px auto;
+      width: 96%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 11;
+    }
+    #search-box {
+      width: 90%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #444;
+      margin-bottom: 0;
+      font-size: 1em;
+      background: #222;
+      color: var(--primary-color);
+      outline: none;
+      transition: border-color 0.2s;
+      margin-top: 0;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    #search-box:focus {
+      border-color: var(--primary-color);
+    }
+    ul#song-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    ul#song-list li {
+      cursor: pointer;
+      padding: 0.7em 0.5em;
+      border-bottom: 1px solid #1d1d1d;
+      transition: background 0.2s, color 0.2s;
+      color: var(--primary-color);
+      border-radius: 5px;
+      margin-bottom: 5px;
+      font-size: 1.1em;
+      background: rgba(43,43,43,0.7);
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    ul#song-list li:hover {
+      background: var(--hover-color);
+      color: var(--text-color);
+    }
+    @media (max-width: 700px) {
+      .container {
+        max-width: 95vw;
+        padding: 10px;
+      }
+      #search-box {
+        width: 98%;
+      }
+      .header-search-wrapper {
+        border-radius: 0;
+      }
+      .search-container {
+        width: 99%;
+        padding: 10px 0 8px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-search-wrapper">
+      <div class="search-container">
+        <input type="text" id="search-box" placeholder="Search songs..." />
+      </div>
+    </div>
+    <ul id="song-list"></ul>
+  </div>
+  <script src="songs.js"></script>
+  <script>
+    const songList = document.getElementById('song-list');
+    const searchBox = document.getElementById('search-box');
+
+    function renderList(filter = '') {
+      songList.innerHTML = '';
+      songs
+        .filter(song => song.name.toLowerCase().includes(filter.toLowerCase()))
+        .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
+        .forEach(song => {
+          const li = document.createElement('li');
+          li.textContent = song.name;
+          li.onclick = () => {
+            localStorage.setItem('selectedSongId', song.id);
+            window.location.href = 'lyrics.html';
+          };
+          songList.appendChild(li);
+        });
+    }
+
+    searchBox.addEventListener('input', e => {
+      renderList(e.target.value);
+    });
+
+    renderList();
+  </script>
+</body>
+</html>

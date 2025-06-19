@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="dv">
+<head>
+  <meta charset="UTF-8">
+  <title>Rhythm Lyrics</title>
+  <!-- Disable browser zooming completely -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <style>
+    html, body {
+      /* Allow scrolling, but prevent zoom gestures */
+      touch-action: pan-x pan-y;
+      overscroll-behavior: none;
+    }
+    input, textarea, select, button {
+      touch-action: manipulation;
+    }
+    :root {
+      --primary-color: #f5d000;
+      --hover-color: #fced98;
+      --active-color: #E6B800;
+      --text-color: #2b2b2b;
+      --bg-opacity: rgba(31, 31, 31, 0.0);
+      --hover-color2: #3a3a3a;
+      --active-color2: #111111
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes slideIn {
+      0% { transform: translateY(10px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    body {
+      /* Use Montserrat for English text */
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #1f1f1f;
+      background-size: cover;
+      color: var(--primary-color);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .container {
+      text-align: center;
+      position: relative;
+      max-width: 600px;
+      width: 100%; 
+      padding: 20px;
+      background: var(--bg-opacity);
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+      animation: slideIn 0.5s ease-in-out;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+    button {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 5px;
+      padding: 10px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background-color 0.3s, transform 0.2s;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    button:hover {
+      background-color: var(--hover-color);
+    }
+    button:active {
+      background-color: var(--active-color);
+      transform: scale(0.97);
+    }
+    .lyrics-template {
+      margin-top: 2em;
+      display: none;
+      direction: rtl;
+      font-size: 1.3em;
+      white-space: pre-line;
+      color: #FFFFFF;
+      background: rgba(43,43,43,0.7);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      text-align: right;
+      line-height: 2em;
+      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', Arial, sans-serif;
+    }
+    h2#song-title {
+      color: var(--primary-color);
+      text-align: center;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    .highlight-line {
+      color: #f5d000;
+    }
+    .section-nav-bar {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      z-index: 1000;
+      background: rgba(31,31,31,0.85);
+      box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 0 12px 0;
+      /* Prevent scaling and panning */
+      touch-action: none;
+      pointer-events: auto;
+      will-change: transform;
+    }
+    .section-nav-bar,
+    .section-nav-bar * {
+      /* Prevent zoom and scale on nav bar, but allow scrolling elsewhere */
+      touch-action: none !important;
+      user-select: none !important;
+      -webkit-user-drag: none !important;
+      -webkit-touch-callout: none !important;
+    }
+    .section-nav-bar button {
+      border: none;
+      border-radius: 0;
+      padding: 8px 14px;
+      margin: 0;
+      font-size: 0.95em;
+      cursor: pointer;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      text-align: left;
+      transition: background 0.2s;
+      white-space: nowrap;
+      outline: none;
+    }
+    .section-nav-bar .yellow-btn {
+      background: var(--primary-color);
+      color: var(--text-color);
+      border-radius: 0 5px 5px 0;
+      margin-bottom: 5px;
+    }
+    .section-nav-bar .yellow-btn:hover,
+    .section-nav-bar .yellow-btn.active {
+      background: var(--hover-color);
+    }
+    .section-nav-bar .white-btn {
+      background: #fff;
+      color: #222;
+      border-radius: 0 5px 5px 0;
+      margin-bottom: 5px;
+      margin-left: 0;
+    }
+    .section-nav-bar .white-btn:hover,
+    .section-nav-bar .white-btn.active {
+      background: #f5f5f5;
+    }
+    .section-block {
+      background: rgba(43,43,43,0.85);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      padding: 18px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      transition: background 0.3s;
+      position: relative;
+    }
+    .section-block.flash {
+      background: #464646 !important;
+      transition: background 0.5s;
+    }
+    .section-nav-bar .yellow-btn.flash {
+      background: #fffbe7 !important;
+      color: #2b2b2b !important;
+      transition: background 0.2s;
+    }
+    .section-nav-bar .white-btn.flash {
+      background: #f7f7f7 !important;
+      color: #222 !important;
+      transition: background 0.2s;
+    }
+    @media (max-width: 700px) {
+      .container {
+        max-width: 95vw;
+        padding: 10px;
+      }
+      .lyrics-template {
+        padding: 10px;
+      }
+      .section-nav-bar {
+        /* Show vertically on the left on mobile too */
+        top: 50%;
+        bottom: unset;
+        left: 0;
+        right: unset;
+        flex-direction: column;
+        transform: translateY(-50%);
+        border-radius: 0 8px 8px 0;
+        padding: 12px 0 12px 0;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+        overflow-x: unset;
+        background: rgba(31,31,31,0.85);
+      }
+      .section-nav-bar button {
+        border-radius: 0 5px 5px 0;
+        font-size: 0.95em;
+        padding: 8px 14px;
+        margin-bottom: 5px;
+      }
+      .section-nav-bar .yellow-btn,
+      .section-nav-bar .white-btn {
+        border-radius: 0 5px 5px 0;
+      }
+    }
+  </style>
+  <script>
+    // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (
+        e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0'
+      )) {
+        e.preventDefault();
+      }
+    });
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+    // Prevent double-tap zoom on mobile
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 350) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+    // Prevent pinch-zoom and gesture events on iOS/Safari
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gesturechange', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gestureend', function(e) {
+      e.preventDefault();
+    });
+  </script>
+</head>
+<body>
+  <div class="section-nav-bar" id="section-nav-bar"></div>
+  <div class="container">
+    <button onclick="window.location.href='songlist.html'">← Back</button>
+    <div id="lyrics-template" class="lyrics-template" dir="rtl">
+      <h2 id="song-title"></h2>
+      <div id="song-lyrics"></div>
+    </div>
+  </div>
+  <script src="songs.js"></script>
+  <script>
+    const songTitle = document.getElementById('song-title');
+    const songLyrics = document.getElementById('song-lyrics');
+    const lyricsTemplate = document.getElementById('lyrics-template');
+    const sectionNavBar = document.getElementById('section-nav-bar');
+    const selectedId = localStorage.getItem('selectedSongId');
+    const song = songs.find(s => String(s.id) === String(selectedId));
+    
+    function slugify(text) {
+      return text
+        .toString()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Remove accents
+        .replace(/[^a-zA-Z0-9]+/g, '-') // Replace non-alphanum with dash
+        .replace(/^-+|-+$/g, '') // Trim dashes
+        .replace(/-+/g, '-') // Collapse dashes
+        .toLowerCase();
+    }
+
+    function parseSections(lyrics) {
+      const lines = lyrics.split('\n');
+      const sectionsYellow = [];
+      const sectionsWhite = [];
+      let htmlSections = [];
+      let currentSection = null;
+      let yellowCount = 0;
+      let whiteCount = 0;
+      let sectionType = null;
+      let sectionId = null;
+      let sectionName = null;
+
+      function pushSection() {
+        if (currentSection) {
+          htmlSections.push(
+            `<div class="section-block" id="${sectionId}">${currentSection.join('<br>')}</div>`
+          );
+        }
+      }
+
+      lines.forEach((line, idx) => {
+        if (line.startsWith('#')) {
+          // New yellow section
+          pushSection();
+          sectionName = line.replace(/^#+/, '').trim();
+          sectionId = 'section-yellow-' + slugify(sectionName) + '-' + yellowCount;
+          sectionsYellow.push({ name: sectionName, id: sectionId });
+          currentSection = [];
+          sectionType = 'yellow';
+          yellowCount++;
+        } else if (line.startsWith('$')) {
+          // New white section
+          pushSection();
+          sectionName = line.replace(/^\$+/, '').trim();
+          sectionId = 'section-white-' + slugify(sectionName) + '-' + whiteCount;
+          sectionsWhite.push({ name: sectionName, id: sectionId });
+          currentSection = [];
+          sectionType = 'white';
+          whiteCount++;
+        } else {
+          if (!currentSection) {
+            // If lyrics start without a section, wrap in a default section
+            sectionName = 'Lyrics';
+            sectionId = 'section-yellow-default-0';
+            sectionsYellow.push({ name: sectionName, id: sectionId });
+            currentSection = [];
+            sectionType = 'yellow';
+            yellowCount++;
+          }
+          if (line.startsWith('*')) {
+            currentSection.push(`<span class="highlight-line">${line.slice(1)}</span>`);
+          } else {
+            currentSection.push(`<span>${line}</span>`);
+          }
+        }
+      });
+      pushSection();
+      return { html: htmlSections.join(''), sectionsYellow, sectionsWhite };
+    }
+
+    if (song) {
+      songTitle.textContent = song.name;
+      const { html, sectionsYellow, sectionsWhite } = parseSections(song.lyrics);
+      songLyrics.innerHTML = html;
+      lyricsTemplate.style.display = 'block';
+
+      // Render both yellow and white section buttons in the same bar
+      sectionNavBar.innerHTML = '';
+      // Yellow buttons first
+      sectionsYellow.forEach((section, idx) => {
+        const btn = document.createElement('button');
+        btn.textContent = section.name;
+        btn.className = 'yellow-btn';
+        btn.onclick = function() {
+          const sectionElem = document.getElementById(section.id);
+          if (sectionElem) {
+            sectionElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Flash effect
+            sectionElem.classList.add('flash');
+            btn.classList.add('flash');
+            setTimeout(() => {
+              sectionElem.classList.remove('flash');
+              btn.classList.remove('flash');
+            }, 350);
+          }
+          sectionNavBar.querySelectorAll('.yellow-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+        sectionNavBar.appendChild(btn);
+      });
+      // Then white buttons
+      sectionsWhite.forEach((section, idx) => {
+        const btn = document.createElement('button');
+        btn.textContent = section.name;
+        btn.className = 'white-btn';
+        btn.onclick = function() {
+          const sectionElem = document.getElementById(section.id);
+          if (sectionElem) {
+            sectionElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Flash effect
+            sectionElem.classList.add('flash');
+            btn.classList.add('flash');
+            setTimeout(() => {
+              sectionElem.classList.remove('flash');
+              btn.classList.remove('flash');
+            }, 350);
+          }
+          sectionNavBar.querySelectorAll('.white-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+        sectionNavBar.appendChild(btn);
+      });
+    } else {
+      songTitle.textContent = 'Error: Song not found.';
+      songLyrics.textContent = 'Error: Lyrics not found.';
+      lyricsTemplate.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
