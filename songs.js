@@ -1254,5 +1254,12 @@ lyrics: `#M
 ##
 `,
   },
-
-*/];
+*/
+      {
+    id: 96,
+    name: 'Handhuvaru',
+    lyrics: `#M
+##
+`,
+  },
+];
