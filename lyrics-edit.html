@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="dv">
+<head>
+  <meta charset="UTF-8">
+  <title>Lyrics Editor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <style>
+    html, body {
+      touch-action: pan-x pan-y;
+      overscroll-behavior: none;
+    }
+    input, textarea, select, button {
+      touch-action: manipulation;
+    }
+    :root {
+      --primary-color: #f5d000;
+      --hover-color: #fced98;
+      --active-color: #E6B800;
+      --text-color: #2b2b2b;
+      --bg-opacity: rgba(31, 31, 31, 0.0);
+      --hover-color2: #3a3a3a;
+      --active-color2: #111111
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes slideIn {
+      0% { transform: translateY(10px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    body {
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #1f1f1f;
+      background-size: cover;
+      color: var(--primary-color);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .container {
+      text-align: center;
+      position: relative;
+      max-width: 600px;
+      width: 100%; 
+      padding: 20px;
+      background: var(--bg-opacity);
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+      animation: slideIn 0.5s ease-in-out;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+    button {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 5px;
+      padding: 10px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background-color 0.3s, transform 0.2s;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    button:hover {
+      background-color: var(--hover-color);
+      font-weight: bold;
+    }
+    button:active {
+      background-color: var(--active-color);
+      transform: scale(0.97);
+    }
+    .section {
+      background: rgba(43,43,43,0.7);
+      border: 1px solid #313131;
+      box-shadow: 0 1px 4px #0001;
+      padding: 16px 14px 14px 14px;
+      margin-bottom: 28px;
+      border-radius: 8px;
+      position: relative;
+      text-align: right;
+      direction: rtl;
+    }
+    .section-title {
+      font-weight: 700;
+      font-size: 1.1em;
+      padding: 4px 0 8px 0;
+      border: none;
+      background: none;
+      width: 100%;
+      color: #ffffff;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #494949;
+      border-radius: 0;
+      outline: none;
+      transition: border-color 0.2s;
+      background: transparent;
+      direction: ltr;
+      font-family: 'Montserrat', Arial, sans-serif;
+      text-align: left;
+    }
+    .section-title:focus {
+      border-color: #E6B800;
+      background: #111111;
+    }
+    .line {
+      display: flex;
+      align-items: stretch;
+      margin-bottom: 10px;
+      direction: rtl;
+      flex-direction: row-reverse;
+      gap: 6px;
+    }
+    .line input[type="text"] {
+      flex: 1;
+      max-width: 500px;
+      width: 100%;
+      padding: 7px 12px 7px 5px;
+      border-radius: 5px;
+      border: 1px solid #535353;
+      background: #1b1b1b;
+      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', Arial, sans-serif;
+      direction: rtl;
+      font-size: 1.1em;
+      color: #ffffff;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      height: 38px;
+      box-sizing: border-box;
+    }
+    .line input[type="checkbox"] {
+      height: 90%;
+      width: 18px;
+      accent-color: #f5d000;
+      margin-left: 2px;
+      align-self: center;
+      display: flex;
+    }
+    .star-line-btn {
+      width: 26px;
+      height: 26px;
+      background: #222;
+      color: #f5d000;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 6px;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .star-line-btn:hover {
+      background: inherit !important;
+      color: inherit !important;
+    }
+    .star-line-btn.active {
+      background: #f5d000 !important;
+      color: #2b2b2b !important;
+      font-weight: bold;
+    }
+    .controls {
+      margin-top: 32px;
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+    }
+    .remove-section-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      background: #ff7920;
+      color: #2b2b2b;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.2s, color 0.2s;
+      z-index: 2;
+      box-shadow: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .remove-section-btn:hover {
+      background: #ff4f4f;
+      color: #fff;
+    }
+    .remove-line-btn {
+      height: 100%;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: #ff7920;
+      color: #2b2b2b;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 6px;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .remove-line-btn:hover {
+      background: #ff4f4f;
+      color: #fff;
+    }
+    .add-line-btn {
+      width: 28px;
+      height: 28px;
+      background: #f5d000;
+      color: #2b2b2b;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.2s, color 0.2s;
+      z-index: 2;
+      box-shadow: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .add-line-btn:hover {
+      background: #fced98;
+      color: #2b2b2b;
+    }
+    @media (max-width: 600px) {
+      html, body {
+        font-size: 18px;
+      }
+      .container {
+        padding: 12px 2vw 18px 2vw;
+        max-width: 98vw;
+        min-width: 0;
+      }
+      h2 {
+        font-size: 1.3em;
+      }
+      .section-title {
+        font-size: 1em;
+        padding: 6px 0 10px 0;
+      }
+      .line input[type="text"] {
+        font-size: 1em;
+        padding: 8px 8px 8px 4px;
+        min-width: 0;
+        max-width: 100%;
+      }
+      .controls {
+        flex-direction: column;
+        gap: 10px;
+      }
+      button, .remove-section-btn, .remove-line-btn {
+        font-size: 1em;
+        padding: 10px 0;
+        min-width: 0;
+      }
+    }
+  </style>
+  <script>
+    // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (
+        e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0'
+      )) {
+        e.preventDefault();
+      }
+    });
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+    // Prevent double-tap zoom on mobile
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 350) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+    // Prevent pinch-zoom and gesture events on iOS/Safari
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gesturechange', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gestureend', function(e) {
+      e.preventDefault();
+    });
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h2>Lyrics Editor</h2>
+    <div id="sections"></div>
+    <div class="controls">
+      <button onclick="addSection()">Add Section</button>
+      <button onclick="copyToClipboard()">Copy to Clipboard</button>
+      <button onclick="resetTool()">Reset</button>
+    </div>
+  </div>
+  <script>
+    let sectionCount = 0;
+    function transliterateToThaana(text) {
+      const map = {
+        'A': 'ާ', 'B': 'ޞ', 'C': 'ޝ', 'D': 'ޑ', 'E': 'ޭ', 'F': 'ﷲ', 'G': 'ޣ', 'H': 'ޙ', 'I': 'ީ', 'J': 'ޛ', 'K': 'ޚ', 'L': 'ޅ', 'M': 'ޟ', 'N': 'ޏ', 'O': 'ޯ', 'P': '÷', 'Q': 'ޤ', 'R': 'ޜ', 'S': 'ށ', 'T': 'ޓ', 'U': 'ޫ', 'V': 'ޥ', 'W': 'ޢ', 'X': 'ޘ', 'Y': 'ޠ', 'Z': 'ޡ',
+        'a': 'ަ', 'b': 'ބ', 'c': 'ޗ', 'd': 'ދ', 'e': 'ެ', 'f': 'ފ', 'g': 'ގ', 'h': 'ހ', 'i': 'ި', 'j': 'ޖ', 'k': 'ކ', 'l': 'ލ', 'm': 'މ', 'n': 'ނ', 'o': 'ޮ', 'p': 'ޕ', 'q': 'ް', 'r': 'ރ', 's': 'ސ', 't': 'ތ', 'u': 'ު', 'v': 'ވ', 'w': 'އ', 'x': '×', 'y': 'ޔ', 'z': 'ޒ'
+      };
+      return text.split('').map(ch => map[ch] || ch).join('');
+    }
+    function setupThaanaTransliteration(input) {
+      input.addEventListener('input', function(e) {
+        const caret = input.selectionStart;
+        const original = input.value;
+        const thaana = transliterateToThaana(original);
+        if (original !== thaana) {
+          input.value = thaana;
+          input.setSelectionRange(caret, caret);
+        }
+      });
+    }
+    function saveState() {
+      const data = [];
+      document.querySelectorAll('.section').forEach(section => {
+        const sectionTitle = section.querySelector('.section-title').value;
+        const lines = [];
+        section.querySelectorAll('.line').forEach(line => {
+          lines.push({
+            text: line.querySelector('input[type="text"]').value,
+            starred: line.querySelector('.star-line-btn').classList.contains('active')
+          });
+        });
+        data.push({ title: sectionTitle, lines });
+      });
+      localStorage.setItem('lyricsEditorData', JSON.stringify(data));
+    }
+    function setLineHighlight(lineDiv) {
+      const input = lineDiv.querySelector('input[type="text"]');
+      const starBtn = lineDiv.querySelector('.star-line-btn');
+      if (starBtn.classList.contains('active')) {
+        input.style.color = '#f5d000';
+      } else {
+        input.style.color = '#ffffff';
+      }
+    }
+    function loadState() {
+      const data = JSON.parse(localStorage.getItem('lyricsEditorData') || 'null');
+      if (!data) return false;
+      document.getElementById('sections').innerHTML = '';
+      sectionCount = 0;
+      data.forEach(sectionData => {
+        sectionCount++;
+        const sectionsDiv = document.getElementById('sections');
+        const section = document.createElement('div');
+        section.className = 'section';
+        section.dataset.sectionId = sectionCount;
+        section.innerHTML = `
+          <input type="text" class="section-title" placeholder="Section Name" />
+          <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
+          <div class="lines"></div>
+          <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
+        `;
+        sectionsDiv.appendChild(section);
+        const sectionTitleInput = section.querySelector('.section-title');
+        sectionTitleInput.value = sectionData.title;
+        const linesDiv = section.querySelector('.lines');
+        sectionData.lines.forEach(lineData => {
+          const lineDiv = document.createElement('div');
+          lineDiv.className = 'line';
+          lineDiv.innerHTML = `
+            <input type="text" placeholder="Enter text..." />
+            <button class="star-line-btn" title="Star this line">Z</button>
+            <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+          `;
+          linesDiv.appendChild(lineDiv);
+          const lineInput = lineDiv.querySelector('input[type="text"]');
+          lineInput.value = lineData.text;
+          setupThaanaTransliteration(lineInput);
+          setupInputNavigation(lineInput);
+          const starBtn = lineDiv.querySelector('.star-line-btn');
+          if (lineData.starred) starBtn.classList.add('active');
+          setLineHighlight(lineDiv);
+          starBtn.addEventListener('click', function() {
+            starBtn.classList.toggle('active');
+            setLineHighlight(lineDiv);
+            saveState();
+          });
+          lineInput.addEventListener('input', saveState);
+        });
+      });
+      return true;
+    }
+    function addSection() {
+      sectionCount++;
+      const sectionsDiv = document.getElementById('sections');
+      const section = document.createElement('div');
+      section.className = 'section';
+      section.dataset.sectionId = sectionCount;
+      section.innerHTML = `
+        <input type="text" class="section-title" placeholder="Section Name" />
+        <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
+        <div class="lines"></div>
+        <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
+      `;
+      sectionsDiv.appendChild(section);
+      addLine(section);
+      saveState();
+    }
+    function addLine(sectionDiv) {
+      const linesDiv = sectionDiv.querySelector('.lines');
+      const lineDiv = document.createElement('div');
+      lineDiv.className = 'line';
+      lineDiv.innerHTML = `
+        <input type="text" placeholder="Enter text..." />
+        <button class="star-line-btn" title="Star this line">Z</button>
+        <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+      `;
+      linesDiv.appendChild(lineDiv);
+      const lineInput = lineDiv.querySelector('input[type="text"]');
+      setupThaanaTransliteration(lineInput);
+      setupInputNavigation(lineInput);
+      const starBtn = lineDiv.querySelector('.star-line-btn');
+      setLineHighlight(lineDiv);
+      lineInput.addEventListener('input', saveState);
+      starBtn.addEventListener('click', function() {
+        starBtn.classList.toggle('active');
+        setLineHighlight(lineDiv);
+        saveState();
+      });
+      saveState();
+    }
+    function copyToClipboard() {
+      let output = '';
+      const sections = document.querySelectorAll('.section');
+      sections.forEach(section => {
+        const sectionTitle = section.querySelector('.section-title').value.trim();
+        if (sectionTitle) {
+          output += `${sectionTitle}\n`;
+        }
+        const lines = section.querySelectorAll('.line');
+        lines.forEach(line => {
+          const input = line.querySelector('input[type="text"]');
+          const starBtn = line.querySelector('.star-line-btn');
+          let text = input.value.trim();
+          if (text) {
+            if (starBtn.classList.contains('active')) text = '*' + text;
+            output += text + '\n';
+          }
+        });
+        output += '\n';
+      });
+      const finalText = output.trim();
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(finalText);
+      } else {
+        fallbackCopyTextToClipboard(finalText);
+      }
+    }
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.top = 0;
+      textArea.style.left = 0;
+      textArea.style.width = '2em';
+      textArea.style.height = '2em';
+      textArea.style.padding = 0;
+      textArea.style.border = 'none';
+      textArea.style.outline = 'none';
+      textArea.style.boxShadow = 'none';
+      textArea.style.background = 'transparent';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+      } catch (err) {
+        // Do nothing
+      }
+      document.body.removeChild(textArea);
+    }
+    function removeLine(lineDiv) {
+      lineDiv.remove();
+      saveState();
+    }
+    function removeSection(sectionDiv) {
+      sectionDiv.remove();
+      saveState();
+    }
+    function resetTool() {
+      localStorage.removeItem('lyricsEditorData');
+      document.getElementById('sections').innerHTML = '';
+      sectionCount = 0;
+      addSection();
+    }
+    document.addEventListener('input', function(e) {
+      if (e.target.classList && e.target.classList.contains('section-title')) {
+        saveState();
+      }
+    });
+    if (!loadState()) {
+      addSection();
+    }
+    function setupInputNavigation(lineInput) {
+      lineInput.addEventListener('keydown', function(e) {
+        const currentLine = lineInput.closest('.line');
+        const lines = Array.from(currentLine.parentNode.querySelectorAll('.line'));
+        const idx = lines.indexOf(currentLine);
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (idx < lines.length - 1) {
+            lines[idx + 1].querySelector('input[type="text"]').focus();
+          } else {
+            // Add new line and focus
+            addLine(currentLine.parentNode.parentNode);
+            setTimeout(() => {
+              const newLines = Array.from(currentLine.parentNode.querySelectorAll('.line'));
+              newLines[newLines.length - 1].querySelector('input[type="text"]').focus();
+            }, 0);
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (idx > 0) {
+            lines[idx - 1].querySelector('input[type="text"]').focus();
+          }
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          // Add new line below
+          const parentSection = currentLine.parentNode.parentNode;
+          const linesDiv = currentLine.parentNode;
+          const newLine = document.createElement('div');
+          newLine.className = 'line';
+          newLine.innerHTML = `
+            <input type="text" placeholder="Enter text..." />
+            <button class="star-line-btn" title="Star this line">Z</button>
+            <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+          `;
+          linesDiv.insertBefore(newLine, lines[idx + 1] || null);
+          const newInput = newLine.querySelector('input[type="text"]');
+          setupThaanaTransliteration(newInput);
+          setupInputNavigation(newInput);
+          const starBtn = newLine.querySelector('.star-line-btn');
+          setLineHighlight(newLine);
+          newInput.addEventListener('input', saveState);
+          starBtn.addEventListener('click', function() {
+            starBtn.classList.toggle('active');
+            setLineHighlight(newLine);
+            saveState();
+          });
+          saveState();
+          setTimeout(() => newInput.focus(), 0);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
