@@ -398,7 +398,7 @@
           lineDiv.className = 'line';
           lineDiv.innerHTML = `
             <input type="text" placeholder="Enter text..." />
-            <button class="star-line-btn" title="Star this line">Z</button>
+            <button class="star-line-btn" title="Star this line">N</button>
             <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
           `;
           linesDiv.appendChild(lineDiv);
@@ -407,10 +407,17 @@
           setupThaanaTransliteration(lineInput);
           setupInputNavigation(lineInput);
           const starBtn = lineDiv.querySelector('.star-line-btn');
-          if (lineData.starred) starBtn.classList.add('active');
+          if (lineData && lineData.starred) {
+            starBtn.classList.add('active');
+            starBtn.textContent = 'Z';
+          } else {
+            starBtn.textContent = 'N';
+          }
           setLineHighlight(lineDiv);
+          lineInput.addEventListener('input', saveState);
           starBtn.addEventListener('click', function() {
             starBtn.classList.toggle('active');
+            starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
             setLineHighlight(lineDiv);
             saveState();
           });
@@ -432,6 +439,19 @@
         <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
       `;
       sectionsDiv.appendChild(section);
+      const sectionTitleInput = section.querySelector('.section-title');
+      sectionTitleInput.focus();
+      sectionTitleInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          let firstLineInput = section.querySelector('.line input[type="text"]');
+          if (!firstLineInput) {
+            addLine(section);
+            firstLineInput = section.querySelector('.line input[type="text"]');
+          }
+          if (firstLineInput) firstLineInput.focus();
+        }
+      });
       addLine(section);
       saveState();
     }
@@ -441,7 +461,7 @@
       lineDiv.className = 'line';
       lineDiv.innerHTML = `
         <input type="text" placeholder="Enter text..." />
-        <button class="star-line-btn" title="Star this line">Z</button>
+        <button class="star-line-btn" title="Star this line">N</button>
         <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
       `;
       linesDiv.appendChild(lineDiv);
@@ -449,10 +469,12 @@
       setupThaanaTransliteration(lineInput);
       setupInputNavigation(lineInput);
       const starBtn = lineDiv.querySelector('.star-line-btn');
+      starBtn.textContent = 'N';
       setLineHighlight(lineDiv);
       lineInput.addEventListener('input', saveState);
       starBtn.addEventListener('click', function() {
         starBtn.classList.toggle('active');
+        starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
         setLineHighlight(lineDiv);
         saveState();
       });
@@ -553,31 +575,67 @@
             lines[idx - 1].querySelector('input[type="text"]').focus();
           }
         } else if (e.key === 'Enter') {
-          e.preventDefault();
-          // Add new line below
-          const parentSection = currentLine.parentNode.parentNode;
-          const linesDiv = currentLine.parentNode;
-          const newLine = document.createElement('div');
-          newLine.className = 'line';
-          newLine.innerHTML = `
-            <input type="text" placeholder="Enter text..." />
-            <button class="star-line-btn" title="Star this line">Z</button>
-            <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
-          `;
-          linesDiv.insertBefore(newLine, lines[idx + 1] || null);
-          const newInput = newLine.querySelector('input[type="text"]');
-          setupThaanaTransliteration(newInput);
-          setupInputNavigation(newInput);
-          const starBtn = newLine.querySelector('.star-line-btn');
-          setLineHighlight(newLine);
-          newInput.addEventListener('input', saveState);
-          starBtn.addEventListener('click', function() {
-            starBtn.classList.toggle('active');
+          if (e.shiftKey) {
+            e.preventDefault();
+            addSection();
+            setTimeout(() => {
+              const allSections = document.querySelectorAll('.section');
+              const lastSection = allSections[allSections.length - 1];
+              if (lastSection) {
+                const sectionTitleInput = lastSection.querySelector('.section-title');
+                if (sectionTitleInput) sectionTitleInput.focus();
+              }
+            }, 0);
+          } else {
+            e.preventDefault();
+            // Add new line below
+            const parentSection = currentLine.parentNode.parentNode;
+            const linesDiv = currentLine.parentNode;
+            const newLine = document.createElement('div');
+            newLine.className = 'line';
+            newLine.innerHTML = `
+              <input type="text" placeholder="Enter text..." />
+              <button class="star-line-btn" title="Star this line">N</button>
+              <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+            `;
+            linesDiv.insertBefore(newLine, lines[idx + 1] || null);
+            const newInput = newLine.querySelector('input[type="text"]');
+            setupThaanaTransliteration(newInput);
+            setupInputNavigation(newInput);
+            const starBtn = newLine.querySelector('.star-line-btn');
+            starBtn.textContent = 'N';
             setLineHighlight(newLine);
+            newInput.addEventListener('input', saveState);
+            starBtn.addEventListener('click', function() {
+              starBtn.classList.toggle('active');
+              starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+              setLineHighlight(newLine);
+              saveState();
+            });
             saveState();
-          });
+            setTimeout(() => newInput.focus(), 0);
+          }
+        } else if (e.key === 'PageDown') {
+          e.preventDefault();
+          const starBtn = currentLine.querySelector('.star-line-btn');
+          starBtn.classList.toggle('active');
+          starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+          setLineHighlight(currentLine);
           saveState();
-          setTimeout(() => newInput.focus(), 0);
+        } else if (e.key === 'Delete') {
+          e.preventDefault();
+          const lines = Array.from(currentLine.parentNode.querySelectorAll('.line'));
+          const idx = lines.indexOf(currentLine);
+          let focusInput = null;
+          if (lines.length > 1) {
+            if (idx < lines.length - 1) {
+              focusInput = lines[idx + 1].querySelector('input[type="text"]');
+            } else if (idx > 0) {
+              focusInput = lines[idx - 1].querySelector('input[type="text"]');
+            }
+          }
+          removeLine(currentLine);
+          if (focusInput) setTimeout(() => focusInput.focus(), 0);
         }
       });
     }
