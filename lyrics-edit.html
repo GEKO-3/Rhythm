@@ -252,6 +252,43 @@
       background: #fced98;
       color: #2b2b2b;
     }
+    .break-line {
+      width: 100%;
+      height: 6px;
+      background: #2196f3;
+      border-radius: 8px;
+      margin: 24px 0 24px 0;
+      display: flex;
+      align-items: center;
+      position: relative;
+      opacity: 0.85;
+    }
+    .remove-break-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      background: #ff7920;
+      color: #2b2b2b;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      z-index: 2;
+      box-shadow: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .remove-break-btn:hover {
+      background: #1976d2;
+      color: #fff;
+    }
     @media (max-width: 600px) {
       html, body {
         font-size: 18px;
@@ -324,6 +361,7 @@
     <div id="sections"></div>
     <div class="controls">
       <button onclick="addSection()">Add Section</button>
+      <button onclick="addBreak()">Add Break</button>
       <button onclick="copyToClipboard()">Copy to Clipboard</button>
       <button onclick="resetTool()">Reset</button>
     </div>
@@ -350,16 +388,22 @@
     }
     function saveState() {
       const data = [];
-      document.querySelectorAll('.section').forEach(section => {
-        const sectionTitle = section.querySelector('.section-title').value;
-        const lines = [];
-        section.querySelectorAll('.line').forEach(line => {
-          lines.push({
-            text: line.querySelector('input[type="text"]').value,
-            starred: line.querySelector('.star-line-btn').classList.contains('active')
+      const container = document.getElementById('sections');
+      const children = Array.from(container.children);
+      children.forEach(child => {
+        if (child.classList.contains('section')) {
+          const sectionTitle = child.querySelector('.section-title').value;
+          const lines = [];
+          child.querySelectorAll('.line').forEach(line => {
+            lines.push({
+              text: line.querySelector('input[type="text"]').value,
+              starred: line.querySelector('.star-line-btn').classList.contains('active')
+            });
           });
-        });
-        data.push({ title: sectionTitle, lines });
+          data.push({ type: 'section', title: sectionTitle, lines });
+        } else if (child.classList.contains('break-line')) {
+          data.push({ type: 'break' });
+        }
       });
       localStorage.setItem('lyricsEditorData', JSON.stringify(data));
     }
@@ -377,52 +421,60 @@
       if (!data) return false;
       document.getElementById('sections').innerHTML = '';
       sectionCount = 0;
-      data.forEach(sectionData => {
-        sectionCount++;
-        const sectionsDiv = document.getElementById('sections');
-        const section = document.createElement('div');
-        section.className = 'section';
-        section.dataset.sectionId = sectionCount;
-        section.innerHTML = `
-          <input type="text" class="section-title" placeholder="Section Name" />
-          <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
-          <div class="lines"></div>
-          <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
-        `;
-        sectionsDiv.appendChild(section);
-        const sectionTitleInput = section.querySelector('.section-title');
-        sectionTitleInput.value = sectionData.title;
-        const linesDiv = section.querySelector('.lines');
-        sectionData.lines.forEach(lineData => {
-          const lineDiv = document.createElement('div');
-          lineDiv.className = 'line';
-          lineDiv.innerHTML = `
-            <input type="text" placeholder="Enter text..." />
-            <button class="star-line-btn" title="Star this line">N</button>
-            <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+      data.forEach(item => {
+        if (item.type === 'section') {
+          sectionCount++;
+          const sectionsDiv = document.getElementById('sections');
+          const section = document.createElement('div');
+          section.className = 'section';
+          section.dataset.sectionId = sectionCount;
+          section.innerHTML = `
+            <input type="text" class="section-title" placeholder="Section Name" />
+            <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
+            <div class="lines"></div>
+            <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
           `;
-          linesDiv.appendChild(lineDiv);
-          const lineInput = lineDiv.querySelector('input[type="text"]');
-          lineInput.value = lineData.text;
-          setupThaanaTransliteration(lineInput);
-          setupInputNavigation(lineInput);
-          const starBtn = lineDiv.querySelector('.star-line-btn');
-          if (lineData && lineData.starred) {
-            starBtn.classList.add('active');
-            starBtn.textContent = 'Z';
-          } else {
-            starBtn.textContent = 'N';
-          }
-          setLineHighlight(lineDiv);
-          lineInput.addEventListener('input', saveState);
-          starBtn.addEventListener('click', function() {
-            starBtn.classList.toggle('active');
-            starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+          sectionsDiv.appendChild(section);
+          const sectionTitleInput = section.querySelector('.section-title');
+          sectionTitleInput.value = item.title;
+          const linesDiv = section.querySelector('.lines');
+          item.lines.forEach(lineData => {
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'line';
+            lineDiv.innerHTML = `
+              <input type="text" placeholder="Enter text..." />
+              <button class="star-line-btn" title="Star this line">N</button>
+              <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+            `;
+            linesDiv.appendChild(lineDiv);
+            const lineInput = lineDiv.querySelector('input[type="text"]');
+            lineInput.value = lineData.text;
+            setupThaanaTransliteration(lineInput);
+            setupInputNavigation(lineInput);
+            const starBtn = lineDiv.querySelector('.star-line-btn');
+            if (lineData && lineData.starred) {
+              starBtn.classList.add('active');
+              starBtn.textContent = 'Z';
+            } else {
+              starBtn.textContent = 'N';
+            }
             setLineHighlight(lineDiv);
-            saveState();
+            lineInput.addEventListener('input', saveState);
+            starBtn.addEventListener('click', function() {
+              starBtn.classList.toggle('active');
+              starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+              setLineHighlight(lineDiv);
+              saveState();
+            });
+            lineInput.addEventListener('input', saveState);
           });
-          lineInput.addEventListener('input', saveState);
-        });
+        } else if (item.type === 'break') {
+          const sectionsDiv = document.getElementById('sections');
+          const breakDiv = document.createElement('div');
+          breakDiv.className = 'break-line';
+          breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+          sectionsDiv.appendChild(breakDiv);
+        }
       });
       return true;
     }
@@ -480,25 +532,44 @@
       });
       saveState();
     }
+    function addBreak() {
+      // Find the currently focused section or default to last section
+      let activeSection = document.activeElement && document.activeElement.closest('.section');
+      if (!activeSection) {
+        const sections = document.querySelectorAll('.section');
+        if (sections.length > 0) activeSection = sections[sections.length - 1];
+      }
+      if (activeSection) {
+        const breakDiv = document.createElement('div');
+        breakDiv.className = 'break-line';
+        breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+        activeSection.parentNode.insertBefore(breakDiv, activeSection.nextSibling);
+      }
+    }
     function copyToClipboard() {
       let output = '';
-      const sections = document.querySelectorAll('.section');
-      sections.forEach(section => {
-        const sectionTitle = section.querySelector('.section-title').value.trim();
-        if (sectionTitle) {
-          output += `${sectionTitle}\n`;
-        }
-        const lines = section.querySelectorAll('.line');
-        lines.forEach(line => {
-          const input = line.querySelector('input[type="text"]');
-          const starBtn = line.querySelector('.star-line-btn');
-          let text = input.value.trim();
-          if (text) {
-            if (starBtn.classList.contains('active')) text = '*' + text;
-            output += text + '\n';
+      const container = document.getElementById('sections');
+      const children = Array.from(container.children);
+      children.forEach(child => {
+        if (child.classList.contains('section')) {
+          const sectionTitle = child.querySelector('.section-title').value.trim();
+          if (sectionTitle) {
+            output += `${sectionTitle}\n`;
           }
-        });
-        output += '\n';
+          const lines = child.querySelectorAll('.line');
+          lines.forEach(line => {
+            const input = line.querySelector('input[type="text"]');
+            const starBtn = line.querySelector('.star-line-btn');
+            let text = input.value.trim();
+            if (text) {
+              if (starBtn.classList.contains('active')) text = '*' + text;
+              output += text + '\n';
+            }
+          });
+          output += '\n';
+        } else if (child.classList.contains('break-line')) {
+          output += '-\n';
+        }
       });
       const finalText = output.trim();
       if (navigator.clipboard && window.isSecureContext) {

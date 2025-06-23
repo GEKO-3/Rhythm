@@ -185,15 +185,16 @@
       background: #464646 !important;
       transition: background 0.5s;
     }
-    .section-nav-bar .yellow-btn.flash {
-      background: #fffbe7 !important;
-      color: #2b2b2b !important;
-      transition: background 0.2s;
-    }
-    .section-nav-bar .white-btn.flash {
-      background: #f7f7f7 !important;
-      color: #222 !important;
-      transition: background 0.2s;
+    .break-line {
+      width: 100%;
+      height: 6px;
+      background: #2196f3;
+      border-radius: 8px;
+      margin: 24px 0 24px 0;
+      display: flex;
+      align-items: center;
+      position: relative;
+      opacity: 0.85;
     }
     @media (max-width: 700px) {
       .container {
@@ -329,6 +330,10 @@
           currentSection = [];
           sectionType = 'white';
           whiteCount++;
+        } else if (line.startsWith('-')) {
+          pushSection();
+          htmlSections.push('<div class="break-line"></div>');
+          currentSection = null;
         } else {
           if (!currentSection) {
             // If lyrics start without a section, wrap in a default section
