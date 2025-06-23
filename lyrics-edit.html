@@ -357,7 +357,8 @@
 </head>
 <body>
   <div class="container">
-    <input id="song-name-input" type="text" placeholder="Song Name" style="width:100%;max-width:600px;margin-bottom:18px;font-size:1.2em;padding:10px 12px;border-radius:7px;border:1px solid #aaa;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
+    <input id="song-name-input" type="text" placeholder="Song Name" autocomplete="off" list="song-names-list" style="width:100%;max-width:600px;margin-bottom:18px;font-size:1.2em;padding:10px 12px;border-radius:7px;border:1px solid #aaa;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
+    <datalist id="song-names-list"></datalist>
     <div id="sections"></div>
     <div class="controls">
       <button onclick="addSection()">Add Section</button>
@@ -373,7 +374,21 @@
         'A': 'ާ', 'B': 'ޞ', 'C': 'ޝ', 'D': 'ޑ', 'E': 'ޭ', 'F': 'ﷲ', 'G': 'ޣ', 'H': 'ޙ', 'I': 'ީ', 'J': 'ޛ', 'K': 'ޚ', 'L': 'ޅ', 'M': 'ޟ', 'N': 'ޏ', 'O': 'ޯ', 'P': '÷', 'Q': 'ޤ', 'R': 'ޜ', 'S': 'ށ', 'T': 'ޓ', 'U': 'ޫ', 'V': 'ޥ', 'W': 'ޢ', 'X': 'ޘ', 'Y': 'ޠ', 'Z': 'ޡ',
         'a': 'ަ', 'b': 'ބ', 'c': 'ޗ', 'd': 'ދ', 'e': 'ެ', 'f': 'ފ', 'g': 'ގ', 'h': 'ހ', 'i': 'ި', 'j': 'ޖ', 'k': 'ކ', 'l': 'ލ', 'm': 'މ', 'n': 'ނ', 'o': 'ޮ', 'p': 'ޕ', 'q': 'ް', 'r': 'ރ', 's': 'ސ', 't': 'ތ', 'u': 'ު', 'v': 'ވ', 'w': 'އ', 'x': '×', 'y': 'ޔ', 'z': 'ޒ'
       };
-      return text.split('').map(ch => map[ch] || ch).join('');
+      let thaana = text.split('').map(ch => map[ch] || ch).join('');
+      // Remove forbidden Thaana characters if directly after any forbidden
+      const forbidden = ['ާ','ަ','ް','ޭ','ެ','ޯ','ޮ','ީ','ި','ޫ','ު'];
+      let result = '';
+      for (let i = 0; i < thaana.length; i++) {
+        if (
+          i > 0 &&
+          forbidden.includes(thaana[i]) &&
+          forbidden.includes(thaana[i - 1])
+        ) {
+          continue; // skip if previous is forbidden
+        }
+        result += thaana[i];
+      }
+      return result;
     }
     function setupThaanaTransliteration(input) {
       input.addEventListener('input', function(e) {
@@ -739,6 +754,24 @@
     songNameInput.addEventListener('input', function() {
       localStorage.setItem('lyricsEditorSongName', songNameInput.value);
     });
+    // Populate song name suggestions from songs.js
+    function populateSongNameSuggestions() {
+      fetch('songs.js')
+        .then(response => response.text())
+        .then(jsText => {
+          // Try to extract song names from the JS file
+          const nameRegex = /name:\s*([`'"])(.*?)\1/g;
+          const datalist = document.getElementById('song-names-list');
+          datalist.innerHTML = '';
+          let match;
+          while ((match = nameRegex.exec(jsText)) !== null) {
+            const option = document.createElement('option');
+            option.value = match[2];
+            datalist.appendChild(option);
+          }
+        });
+    }
+    populateSongNameSuggestions();
   </script>
 </body>
 </html>
