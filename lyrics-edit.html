@@ -357,7 +357,7 @@
 </head>
 <body>
   <div class="container">
-    <input id="song-name-input" type="text" placeholder="Name" style="width:100%;max-width:600px;margin-bottom:18px;font-size:1.2em;padding:10px 12px;border-radius:7px;border:1px solid #aaa;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
+    <input id="song-name-input" type="text" placeholder="Song Name" style="width:100%;max-width:600px;margin-bottom:18px;font-size:1.2em;padding:10px 12px;border-radius:7px;border:1px solid #aaa;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
     <div id="sections"></div>
     <div class="controls">
       <button onclick="addSection()">Add Section</button>
@@ -429,7 +429,7 @@
           section.className = 'section';
           section.dataset.sectionId = sectionCount;
           section.innerHTML = `
-            <input type="text" class="section-title" placeholder="Section Name" />
+            <input type="text" class="section-title" placeholder="#M,#1,#2,#4 - $M,$1,$2,$4" />
             <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
             <div class="lines"></div>
             <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
@@ -442,8 +442,8 @@
             const lineDiv = document.createElement('div');
             lineDiv.className = 'line';
             lineDiv.innerHTML = `
-              <input type="text" placeholder="Enter text..." />
-              <button class="star-line-btn" title="Star this line">N</button>
+              <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
+              <button class="star-line-btn" title="Nagaa / Zuvaabu">N</button>
               <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
             `;
             linesDiv.appendChild(lineDiv);
@@ -632,8 +632,10 @@
     }
     function resetTool() {
       localStorage.removeItem('lyricsEditorData');
+      localStorage.removeItem('lyricsEditorSongName');
       document.getElementById('sections').innerHTML = '';
       sectionCount = 0;
+      document.getElementById('song-name-input').value = '';
       addSection();
     }
     document.addEventListener('input', function(e) {
