@@ -493,7 +493,7 @@
       });
       return true;
     }
-    function addSection() {
+    function addSection(sectionName, editable, skipInitialLine) {
       sectionCount++;
       const sectionsDiv = document.getElementById('sections');
       // Determine auto section name if not provided
@@ -555,7 +555,9 @@
           }
         });
       }
-      addLine(section);
+      if (!skipInitialLine) {
+        addLine(section);
+      }
       saveState();
       return section;
     }
@@ -851,7 +853,7 @@
             let label = match[2];
             sectionIndex = sectionOrder.indexOf(label);
             if (sectionIndex === -1) sectionIndex = 0;
-            currentSection = addSection(line, true);
+            currentSection = addSection(line, true, true); // skip initial line
             sectionCount++;
             return;
           }
@@ -861,53 +863,55 @@
             let label = line.trim().substring(1);
             sectionIndex = sectionOrder.indexOf(label);
             if (sectionIndex === -1) sectionIndex = 0;
-            currentSection = addSection(line, true);
+            currentSection = addSection(line, true, true); // skip initial line
             sectionCount++;
             return;
           }
           // If no section header, auto-add
           if (!currentSection) {
             let autoLabel = sectionPrefix + sectionOrder[sectionIndex];
-            currentSection = addSection(autoLabel, true);
+            currentSection = addSection(autoLabel, true, true); // skip initial line
             sectionCount++;
           }
           // Add line to current section as a new input
           if (currentSection) {
-            const linesDiv = currentSection.querySelector('.lines');
-            const lineDiv = document.createElement('div');
-            lineDiv.className = 'line';
-            lineDiv.innerHTML = `
-              <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
-              <button class="star-line-btn" title="Nagaa / Zuvaabu">N</button>
-              <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
-            `;
-            linesDiv.appendChild(lineDiv);
-            const lineInput = lineDiv.querySelector('input[type="text"]');
-            let text = line;
-            let starred = false;
-            if (text.startsWith('*')) {
-              starred = true;
-              text = text.slice(1);
-            }
-            lineInput.value = text;
-            setupThaanaTransliteration(lineInput);
-            setupInputNavigation(lineInput);
-            const starBtn = lineDiv.querySelector('.star-line-btn');
-            if (starred) {
-              starBtn.classList.add('active');
-              starBtn.textContent = 'Z';
-            } else {
-              starBtn.textContent = 'N';
-            }
-            setLineHighlight(lineDiv);
-            lineInput.addEventListener('input', saveState);
-            starBtn.addEventListener('click', function() {
-              starBtn.classList.toggle('active');
-              starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+            if (line.trim() !== '') { // Only add non-empty lines
+              const linesDiv = currentSection.querySelector('.lines');
+              const lineDiv = document.createElement('div');
+              lineDiv.className = 'line';
+              lineDiv.innerHTML = `
+                <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
+                <button class="star-line-btn" title="Nagaa / Zuvaabu">N</button>
+                <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+              `;
+              linesDiv.appendChild(lineDiv);
+              const lineInput = lineDiv.querySelector('input[type="text"]');
+              let text = line;
+              let starred = false;
+              if (text.startsWith('*')) {
+                starred = true;
+                text = text.slice(1);
+              }
+              lineInput.value = text;
+              setupThaanaTransliteration(lineInput);
+              setupInputNavigation(lineInput);
+              const starBtn = lineDiv.querySelector('.star-line-btn');
+              if (starred) {
+                starBtn.classList.add('active');
+                starBtn.textContent = 'Z';
+              } else {
+                starBtn.textContent = 'N';
+              }
               setLineHighlight(lineDiv);
-              saveState();
-            });
-            lineInput.addEventListener('input', saveState);
+              lineInput.addEventListener('input', saveState);
+              starBtn.addEventListener('click', function() {
+                starBtn.classList.toggle('active');
+                starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+                setLineHighlight(lineDiv);
+                saveState();
+              });
+              lineInput.addEventListener('input', saveState);
+            }
           }
           // If next line is a new section, increment index
           if (line.trim() === '') {
@@ -917,72 +921,6 @@
         });
       }
     });
-    function addSection(sectionName, editable) {
-      sectionCount++;
-      const sectionsDiv = document.getElementById('sections');
-      // Determine auto section name if not provided
-      if (!sectionName || !sectionName.trim()) {
-        // Find last section or break
-        const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
-        let prefix = '#';
-        let idx = 0;
-        const children = Array.from(sectionsDiv.children);
-        for (let i = children.length - 1; i >= 0; i--) {
-          const child = children[i];
-          if (child.classList.contains('break-line')) {
-            prefix = '$';
-            idx = 0;
-            break;
-          } else if (child.classList.contains('section')) {
-            const lastTitle = child.querySelector('.section-title').value.trim();
-            const match = lastTitle.match(/^(#|\$)([A-Za-z0-9]+)/);
-            if (match) {
-              prefix = match[1];
-              let label = match[2];
-              let lastIdx = sectionOrder.indexOf(label);
-              idx = lastIdx >= 0 ? lastIdx + 1 : 1;
-            }
-            break;
-          }
-        }
-        if (idx >= sectionOrder.length) idx = sectionOrder.length - 1;
-        sectionName = prefix + sectionOrder[idx];
-      }
-      const section = document.createElement('div');
-      section.className = 'section';
-      section.dataset.sectionId = sectionCount;
-      section.innerHTML = `
-        <input type="text" class="section-title" placeholder="#M,#1,#2,#4 - $M,$1,$2,$4" />
-        <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
-        <div class="lines"></div>
-        <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
-      `;
-      sectionsDiv.appendChild(section);
-      const sectionTitleInput = section.querySelector('.section-title');
-      if (sectionName) {
-        sectionTitleInput.value = sectionName;
-      }
-      if (editable === false) {
-        sectionTitleInput.disabled = true;
-        sectionTitleInput.style.background = '#333';
-      } else {
-        sectionTitleInput.focus();
-        sectionTitleInput.addEventListener('keydown', function(e) {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            let firstLineInput = section.querySelector('.line input[type="text"]');
-            if (!firstLineInput) {
-              addLine(section);
-              firstLineInput = section.querySelector('.line input[type="text"]');
-            }
-            if (firstLineInput) firstLineInput.focus();
-          }
-        });
-      }
-      addLine(section);
-      saveState();
-      return section;
-    }
   </script>
 </body>
 </html>
