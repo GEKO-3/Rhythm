@@ -832,11 +832,16 @@
         let afterBreak = false;
         const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
         lines.forEach(line => {
-          // Detect break and switch prefix
           if (/^[-]+$/.test(line.trim())) {
+            // Add break line
+            const breakDiv = document.createElement('div');
+            breakDiv.className = 'break-line';
+            breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+            document.getElementById('sections').appendChild(breakDiv);
             afterBreak = true;
             sectionPrefix = '$';
             sectionIndex = 0;
+            currentSection = null;
             return;
           }
           // Detect section header
@@ -866,10 +871,43 @@
             currentSection = addSection(autoLabel, true);
             sectionCount++;
           }
-          // Add line to current section
+          // Add line to current section as a new input
           if (currentSection) {
-            let textarea = currentSection.querySelector('textarea');
-            textarea.value += (textarea.value ? '\n' : '') + line;
+            const linesDiv = currentSection.querySelector('.lines');
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'line';
+            lineDiv.innerHTML = `
+              <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
+              <button class="star-line-btn" title="Nagaa / Zuvaabu">N</button>
+              <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+            `;
+            linesDiv.appendChild(lineDiv);
+            const lineInput = lineDiv.querySelector('input[type="text"]');
+            let text = line;
+            let starred = false;
+            if (text.startsWith('*')) {
+              starred = true;
+              text = text.slice(1);
+            }
+            lineInput.value = text;
+            setupThaanaTransliteration(lineInput);
+            setupInputNavigation(lineInput);
+            const starBtn = lineDiv.querySelector('.star-line-btn');
+            if (starred) {
+              starBtn.classList.add('active');
+              starBtn.textContent = 'Z';
+            } else {
+              starBtn.textContent = 'N';
+            }
+            setLineHighlight(lineDiv);
+            lineInput.addEventListener('input', saveState);
+            starBtn.addEventListener('click', function() {
+              starBtn.classList.toggle('active');
+              starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+              setLineHighlight(lineDiv);
+              saveState();
+            });
+            lineInput.addEventListener('input', saveState);
           }
           // If next line is a new section, increment index
           if (line.trim() === '') {
