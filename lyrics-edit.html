@@ -496,38 +496,75 @@
     function addSection() {
       sectionCount++;
       const sectionsDiv = document.getElementById('sections');
+      // Determine auto section name if not provided
+      if (!sectionName || !sectionName.trim()) {
+        // Find last section or break
+        const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
+        let prefix = '#';
+        let idx = 0;
+        const children = Array.from(sectionsDiv.children);
+        for (let i = children.length - 1; i >= 0; i--) {
+          const child = children[i];
+          if (child.classList.contains('break-line')) {
+            prefix = '$';
+            idx = 0;
+            break;
+          } else if (child.classList.contains('section')) {
+            const lastTitle = child.querySelector('.section-title').value.trim();
+            const match = lastTitle.match(/^(#|\$)([A-Za-z0-9]+)/);
+            if (match) {
+              prefix = match[1];
+              let label = match[2];
+              let lastIdx = sectionOrder.indexOf(label);
+              idx = lastIdx >= 0 ? lastIdx + 1 : 1;
+            }
+            break;
+          }
+        }
+        if (idx >= sectionOrder.length) idx = sectionOrder.length - 1;
+        sectionName = prefix + sectionOrder[idx];
+      }
       const section = document.createElement('div');
       section.className = 'section';
       section.dataset.sectionId = sectionCount;
       section.innerHTML = `
-        <input type="text" class="section-title" placeholder="Section Name" />
+        <input type="text" class="section-title" placeholder="#M,#1,#2,#4 - $M,$1,$2,$4" />
         <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
         <div class="lines"></div>
         <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
       `;
       sectionsDiv.appendChild(section);
       const sectionTitleInput = section.querySelector('.section-title');
-      sectionTitleInput.focus();
-      sectionTitleInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          let firstLineInput = section.querySelector('.line input[type="text"]');
-          if (!firstLineInput) {
-            addLine(section);
-            firstLineInput = section.querySelector('.line input[type="text"]');
+      if (sectionName) {
+        sectionTitleInput.value = sectionName;
+      }
+      if (editable === false) {
+        sectionTitleInput.disabled = true;
+        sectionTitleInput.style.background = '#333';
+      } else {
+        sectionTitleInput.focus();
+        sectionTitleInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            let firstLineInput = section.querySelector('.line input[type="text"]');
+            if (!firstLineInput) {
+              addLine(section);
+              firstLineInput = section.querySelector('.line input[type="text"]');
+            }
+            if (firstLineInput) firstLineInput.focus();
           }
-          if (firstLineInput) firstLineInput.focus();
-        }
-      });
+        });
+      }
       addLine(section);
       saveState();
+      return section;
     }
     function addLine(sectionDiv) {
       const linesDiv = sectionDiv.querySelector('.lines');
       const lineDiv = document.createElement('div');
       lineDiv.className = 'line';
       lineDiv.innerHTML = `
-        <input type="text" placeholder="Enter text..." />
+        <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް"/>
         <button class="star-line-btn" title="Star this line">N</button>
         <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
       `;
@@ -604,7 +641,7 @@
       });
       const lyricsEscaped = lyrics.trim().replace(/`/g, '\u0060');
       const output = `{
-  id: ${nextId},
+  id: ${loadedSongId ? loadedSongId : nextId},
   name: \`${songName.replace(/`/g, '\u0060')}\`,
   lyrics: \`${lyricsEscaped}\`
 },`;
@@ -703,7 +740,7 @@
             const newLine = document.createElement('div');
             newLine.className = 'line';
             newLine.innerHTML = `
-              <input type="text" placeholder="Enter text..." />
+              <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
               <button class="star-line-btn" title="Star this line">N</button>
               <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
             `;
@@ -755,23 +792,159 @@
       localStorage.setItem('lyricsEditorSongName', songNameInput.value);
     });
     // Populate song name suggestions from songs.js
+    let songIdMap = {};
     function populateSongNameSuggestions() {
       fetch('songs.js')
         .then(response => response.text())
         .then(jsText => {
-          // Try to extract song names from the JS file
-          const nameRegex = /name:\s*([`'"])(.*?)\1/g;
+          // Extract id and name pairs from the JS file
+          const songRegex = /{\s*id:\s*(\d+),\s*name:\s*([`'"])(.*?)\2,\s*lyrics:\s*([`'"])([\s\S]*?)\4/g;
           const datalist = document.getElementById('song-names-list');
           datalist.innerHTML = '';
+          songIdMap = {};
           let match;
-          while ((match = nameRegex.exec(jsText)) !== null) {
+          while ((match = songRegex.exec(jsText)) !== null) {
+            const id = match[1];
+            const name = match[3];
+            const lyrics = match[5];
             const option = document.createElement('option');
-            option.value = match[2];
+            option.value = `${id} - ${name}`;
             datalist.appendChild(option);
+            songIdMap[`${id} - ${name}`] = { id, name, lyrics };
           }
         });
     }
     populateSongNameSuggestions();
+
+    // Load lyrics into fields if user selects an existing song
+    let loadedSongId = null;
+    songNameInput.addEventListener('change', function() {
+      const song = songIdMap[songNameInput.value];
+      if (song) {
+        songNameInput.value = song.name;
+        loadedSongId = parseInt(song.id, 10);
+        document.getElementById('sections').innerHTML = '';
+        sectionCount = 0;
+        const lines = song.lyrics.split(/\r?\n/);
+        let currentSection = null;
+        let sectionPrefix = '#';
+        let sectionIndex = 0;
+        let afterBreak = false;
+        const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
+        lines.forEach(line => {
+          // Detect break and switch prefix
+          if (/^[-]+$/.test(line.trim())) {
+            afterBreak = true;
+            sectionPrefix = '$';
+            sectionIndex = 0;
+            return;
+          }
+          // Detect section header
+          let match = line.match(/^(#|\$)([A-Za-z0-9]+)/);
+          if (match) {
+            sectionPrefix = match[1];
+            let label = match[2];
+            sectionIndex = sectionOrder.indexOf(label);
+            if (sectionIndex === -1) sectionIndex = 0;
+            currentSection = addSection(line, true);
+            sectionCount++;
+            return;
+          }
+          // If line is a break section (e.g., $M, $1, etc.)
+          if (/^(\$[A-Za-z0-9]+)/.test(line.trim())) {
+            sectionPrefix = '$';
+            let label = line.trim().substring(1);
+            sectionIndex = sectionOrder.indexOf(label);
+            if (sectionIndex === -1) sectionIndex = 0;
+            currentSection = addSection(line, true);
+            sectionCount++;
+            return;
+          }
+          // If no section header, auto-add
+          if (!currentSection) {
+            let autoLabel = sectionPrefix + sectionOrder[sectionIndex];
+            currentSection = addSection(autoLabel, true);
+            sectionCount++;
+          }
+          // Add line to current section
+          if (currentSection) {
+            let textarea = currentSection.querySelector('textarea');
+            textarea.value += (textarea.value ? '\n' : '') + line;
+          }
+          // If next line is a new section, increment index
+          if (line.trim() === '') {
+            sectionIndex++;
+            currentSection = null;
+          }
+        });
+      }
+    });
+    function addSection(sectionName, editable) {
+      sectionCount++;
+      const sectionsDiv = document.getElementById('sections');
+      // Determine auto section name if not provided
+      if (!sectionName || !sectionName.trim()) {
+        // Find last section or break
+        const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
+        let prefix = '#';
+        let idx = 0;
+        const children = Array.from(sectionsDiv.children);
+        for (let i = children.length - 1; i >= 0; i--) {
+          const child = children[i];
+          if (child.classList.contains('break-line')) {
+            prefix = '$';
+            idx = 0;
+            break;
+          } else if (child.classList.contains('section')) {
+            const lastTitle = child.querySelector('.section-title').value.trim();
+            const match = lastTitle.match(/^(#|\$)([A-Za-z0-9]+)/);
+            if (match) {
+              prefix = match[1];
+              let label = match[2];
+              let lastIdx = sectionOrder.indexOf(label);
+              idx = lastIdx >= 0 ? lastIdx + 1 : 1;
+            }
+            break;
+          }
+        }
+        if (idx >= sectionOrder.length) idx = sectionOrder.length - 1;
+        sectionName = prefix + sectionOrder[idx];
+      }
+      const section = document.createElement('div');
+      section.className = 'section';
+      section.dataset.sectionId = sectionCount;
+      section.innerHTML = `
+        <input type="text" class="section-title" placeholder="#M,#1,#2,#4 - $M,$1,$2,$4" />
+        <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
+        <div class="lines"></div>
+        <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
+      `;
+      sectionsDiv.appendChild(section);
+      const sectionTitleInput = section.querySelector('.section-title');
+      if (sectionName) {
+        sectionTitleInput.value = sectionName;
+      }
+      if (editable === false) {
+        sectionTitleInput.disabled = true;
+        sectionTitleInput.style.background = '#333';
+      } else {
+        sectionTitleInput.focus();
+        sectionTitleInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            let firstLineInput = section.querySelector('.line input[type="text"]');
+            if (!firstLineInput) {
+              addLine(section);
+              firstLineInput = section.querySelector('.line input[type="text"]');
+            }
+            if (firstLineInput) firstLineInput.focus();
+          }
+        });
+      }
+      addLine(section);
+      saveState();
+      return section;
+    }
   </script>
 </body>
 </html>

@@ -293,40 +293,37 @@
 
     function parseSections(lyrics) {
       const lines = lyrics.split('\n');
-      const sectionsYellow = [];
-      const sectionsWhite = [];
+      // Store all sections in order of appearance
+      let orderedSections = [];
       let htmlSections = [];
       let currentSection = null;
-      let yellowCount = 0;
-      let whiteCount = 0;
       let sectionType = null;
       let sectionId = null;
       let sectionName = null;
+      let yellowCount = 0;
+      let whiteCount = 0;
 
       function pushSection() {
         if (currentSection) {
           htmlSections.push(
             `<div class="section-block" id="${sectionId}">${currentSection.join('<br>')}</div>`
           );
+          orderedSections.push({ name: sectionName, id: sectionId, type: sectionType });
         }
       }
 
       lines.forEach((line, idx) => {
         if (line.startsWith('#')) {
-          // New yellow section
           pushSection();
           sectionName = line.replace(/^#+/, '').trim();
           sectionId = 'section-yellow-' + slugify(sectionName) + '-' + yellowCount;
-          sectionsYellow.push({ name: sectionName, id: sectionId });
           currentSection = [];
           sectionType = 'yellow';
           yellowCount++;
         } else if (line.startsWith('$')) {
-          // New white section
           pushSection();
           sectionName = line.replace(/^\$+/, '').trim();
           sectionId = 'section-white-' + slugify(sectionName) + '-' + whiteCount;
-          sectionsWhite.push({ name: sectionName, id: sectionId });
           currentSection = [];
           sectionType = 'white';
           whiteCount++;
@@ -339,7 +336,6 @@
             // If lyrics start without a section, wrap in a default section
             sectionName = 'Lyrics';
             sectionId = 'section-yellow-default-0';
-            sectionsYellow.push({ name: sectionName, id: sectionId });
             currentSection = [];
             sectionType = 'yellow';
             yellowCount++;
@@ -352,22 +348,21 @@
         }
       });
       pushSection();
-      return { html: htmlSections.join(''), sectionsYellow, sectionsWhite };
+      return { html: htmlSections.join(''), orderedSections };
     }
 
     if (song) {
       songTitle.textContent = song.name;
-      const { html, sectionsYellow, sectionsWhite } = parseSections(song.lyrics);
+      const { html, orderedSections } = parseSections(song.lyrics);
       songLyrics.innerHTML = html;
       lyricsTemplate.style.display = 'block';
 
-      // Render both yellow and white section buttons in the same bar
+      // Render section buttons in the order they appear in the lyrics
       sectionNavBar.innerHTML = '';
-      // Yellow buttons first
-      sectionsYellow.forEach((section, idx) => {
+      orderedSections.forEach((section) => {
         const btn = document.createElement('button');
         btn.textContent = section.name;
-        btn.className = 'yellow-btn';
+        btn.className = section.type === 'yellow' ? 'yellow-btn' : 'white-btn';
         btn.onclick = function() {
           const sectionElem = document.getElementById(section.id);
           if (sectionElem) {
@@ -380,29 +375,8 @@
               btn.classList.remove('flash');
             }, 350);
           }
-          sectionNavBar.querySelectorAll('.yellow-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-        };
-        sectionNavBar.appendChild(btn);
-      });
-      // Then white buttons
-      sectionsWhite.forEach((section, idx) => {
-        const btn = document.createElement('button');
-        btn.textContent = section.name;
-        btn.className = 'white-btn';
-        btn.onclick = function() {
-          const sectionElem = document.getElementById(section.id);
-          if (sectionElem) {
-            sectionElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            // Flash effect
-            sectionElem.classList.add('flash');
-            btn.classList.add('flash');
-            setTimeout(() => {
-              sectionElem.classList.remove('flash');
-              btn.classList.remove('flash');
-            }, 350);
-          }
-          sectionNavBar.querySelectorAll('.white-btn').forEach(b => b.classList.remove('active'));
+          // Remove active from all buttons of the same type
+          sectionNavBar.querySelectorAll('.' + btn.className).forEach(b => b.classList.remove('active'));
           btn.classList.add('active');
         };
         sectionNavBar.appendChild(btn);
