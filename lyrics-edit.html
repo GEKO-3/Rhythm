@@ -601,6 +601,23 @@
       }
     }
     function copyToClipboard() {
+      const songName = document.getElementById('song-name-input').value.trim();
+      const container = document.getElementById('sections');
+      const children = Array.from(container.children);
+      let missingSections = [];
+      children.forEach(child => {
+        if (child.classList.contains('section')) {
+          const sectionTitle = child.querySelector('.section-title').value.trim();
+          if (!sectionTitle) missingSections.push(child);
+        }
+      });
+      if (!songName || missingSections.length > 0) {
+        let msg = '';
+        if (!songName) msg += 'Song name is empty.\n';
+        if (missingSections.length > 0) msg += 'One or more section names are empty.';
+        alert(msg);
+        return;
+      }
       // Get next available id from songs.js
       let nextId = 1;
       try {
@@ -616,10 +633,7 @@
           }
         }
       } catch (e) {}
-      const songName = document.getElementById('song-name-input').value.trim();
       let lyrics = '';
-      const container = document.getElementById('sections');
-      const children = Array.from(container.children);
       children.forEach(child => {
         if (child.classList.contains('section')) {
           const sectionTitle = child.querySelector('.section-title').value.trim();
@@ -791,6 +805,16 @@
     const songNameInput = document.getElementById('song-name-input');
     songNameInput.value = localStorage.getItem('lyricsEditorSongName') || '';
     songNameInput.addEventListener('input', function() {
+      // Capitalize first letter of every word as you type
+      let value = songNameInput.value;
+      value = value.replace(/\b\w+/g, function(word) {
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      });
+      if (songNameInput.value !== value) {
+        const pos = songNameInput.selectionStart;
+        songNameInput.value = value;
+        songNameInput.setSelectionRange(pos, pos);
+      }
       localStorage.setItem('lyricsEditorSongName', songNameInput.value);
     });
     // Populate song name suggestions from songs.js
