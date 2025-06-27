@@ -312,6 +312,13 @@
         }
       }
 
+      function highlightAmpersandParts(line, highlightColor) {
+        // Replace &...& with span of highlightColor
+        return line.replace(/&([^&]+)&/g, (match, p1) => {
+          return `<span style=\"color: ${highlightColor};\">${p1}</span>`;
+        });
+      }
+
       lines.forEach((line, idx) => {
         if (line.startsWith('#')) {
           pushSection();
@@ -341,9 +348,13 @@
             yellowCount++;
           }
           if (line.startsWith('*')) {
-            currentSection.push(`<span class="highlight-line">${line.slice(1)}</span>`);
+            // Highlighted line: *text
+            let content = line.slice(1);
+            content = highlightAmpersandParts(content, '#FFFFFF');
+            currentSection.push(`<span class=\"highlight-line\">${content}</span>`);
           } else {
-            currentSection.push(`<span>${line}</span>`);
+            let content = highlightAmpersandParts(line, '#f5d000');
+            currentSection.push(`<span>${content}</span>`);
           }
         }
       });
