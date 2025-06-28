@@ -1,0 +1,19 @@
+{
+  "name": "Rhythm Boduberu",
+  "short_name": "Rhythm",
+  "icons": [
+    {
+      "src": "favicons/icons-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "favicons/icons-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#f5d000",
+  "background_color": "#2b2b2b",
+  "display": "standalone"
+}
