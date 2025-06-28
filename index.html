@@ -1,65 +1,223 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Rhythm - Main Menu</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background: #1f1f1f;
-      color: #f5d000;
-      font-family: 'Montserrat', Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-    }
-    .menu-container {
-      background: rgba(43,43,43,0.7);
-      border-radius: 12px;
-      padding: 40px 32px;
-      box-shadow: 0 2px 12px #0002;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      align-items: center;
-    }
-    .menu-btn {
-      background: #f5d000;
-      color: #2b2b2b;
-      border: none;
-      border-radius: 7px;
-      padding: 16px 36px;
-      font-size: 1.2em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.2s, color 0.2s;
-      margin: 0 0 0 0;
-      width: 220px;
-    }
-    .menu-btn:hover {
-      background: #fced98;
-      color: #111;
-    }
-    @media (max-width: 600px) {
-      .menu-container {
-        padding: 24px 6vw;
-      }
-      .menu-btn {
-        width: 100%;
-        font-size: 1em;
-        padding: 14px 0;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Page with useful links and resources.">
+    <title>Rhythm Boduberu</title>
+    <!-- Add Montserrat font for English text -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #2b2b2b;
+            --bg-opacity: rgba(31, 31, 31, 0.0);
+            --hover-color2: #3a3a3a;
+            --active-color2: #111111
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(10px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        body {
+            /* Use Montserrat for English text */
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #2b2b2b;
+            background: url('src/Background.webp') no-repeat center center;
+            background-size: cover;
+            color: var(--primary-color);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .background-color {
+            position:absolute;
+            top: 50px;
+            left: 0;
+            bottom: 50px;
+            width: 100%;
+            height: 100%;
+            background-color: #2b2b2b; /* Same background color as body */
+            z-index: -1; 
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .image-container {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .image-container img {
+            max-width: 160px;
+            height: auto;
+            border-radius: 10px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            max-width: 250px;
+            width: 100%; 
+            padding: 10px;
+            background: var(--bg-opacity);
+            border-radius: 10px;
+            transition: transform 0.3s ease;
+            animation: slideIn 0.5s ease-in-out;
+        }
+
+        .container2 {
+            text-align: center;
+            position: relative;
+            max-width: 250px;
+            width: 100%; 
+            padding: 10px;
+            background: var(#242424);
+            border-radius: 10px;
+            transition: transform 0.2s ease;
+        }
+        .container:hover {
+            transform: scale(1.02);
+        }
+        .container2:hover {
+            transform: scale(1.02);
+        }
+
+        .link-button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 93%;
+            min-height: 30px;
+            height: auto;
+            padding: 10px;
+            margin: 10px 0;
+            text-decoration: none;
+            background-color: var(--primary-color);
+            text-align: center;
+            border-radius: 5px;
+            transition: transform 0.3s ease, background-color 0.3s;
+            position: relative;
+            overflow: hidden;
+            /* Use Montserrat for button text */
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+        }
+
+        .link-button2 {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 93%;
+            max-height: 30px;
+            height: auto;
+            padding: 10px;
+            margin: 10px 0;
+            text-decoration: none;
+            background-color: #292929;
+            outline-color: #f5d000;
+            outline-style: dashed;
+            outline-width: 00.01cap;
+            text-align: center;
+            border-radius: 5px;
+            transition: transform 0.3s ease, background-color 0.3s;
+            position: relative;
+            overflow: hidden;
+            /* Use Montserrat for button text */
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+        }
+
+        .link-button img, .link-button2 img {
+            display: block;
+            max-width: 120px;
+            object-fit: contain;
+        }
+
+        .link-button:hover {
+            background-color: var(--hover-color);
+        }
+
+        .link-button:active {
+            background-color: var(--active-color);
+            transform: scale(0.95);
+        }
+
+        .link-button2:hover {
+            background-color: var(--hover-color2);
+        }
+
+        .link-button2:active {
+            background-color: var(--active-color2);
+            transform: scale(0.95);
+        }
+
+        footer {
+            position: relative;
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 10px;
+            /* Use Montserrat for footer */
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-  <div class="menu-container">
-    <button class="menu-btn" onclick="location.href='button-links.html'">Button Links</button>
-    <button class="menu-btn" onclick="location.href='songlist.html'">Song List</button>
-    <button class="menu-btn" onclick="location.href='lyrics-edit.html'">Lyrics Editor</button>
-  </div>
+    <div class="image-container">
+        <img src="src/Rhytham Logo.webp" alt="Rhythm Boduberu">
+    </div>
+    <div class="container">
+        <a href="https://www.facebook.com/share/15pXtBHaRS/?mibextid=wwXIfr" target="_blank" class="link-button" aria-label="Visit Example Link 1">
+            <img src="src/Facebook.png" alt="Facebook">
+        </a>
+        <a href="https://www.instagram.com/rhythm_boduberu__?igsh=MTc2dHdhbmk3cGxhbQ%3D%3D&utm_source=qr" target="_blank" class="link-button" aria-label="Visit Example Link 2">
+            <img src="src/Instagram.png" alt="Instagram">
+        </a>
+        <a href="https://www.tiktok.com/@rhythm_boduberu_?_t=ZS-8t3wWH3Rura&_r=1" target="_blank" class="link-button" aria-label="Visit Example Link 3">
+            <img src="src/Tiktok.png" alt="Tiktok">
+        </a>
+        <a href="https://soundcloud.com/rhythm-boduberu" target="_blank" class="link-button" aria-label="Visit Example Link 4">
+            <img src="src/Soundcloud.png" alt="Soundcloud">
+        </a>
+        <a href="https://www.youtube.com/@rhythmboduberu" target="_blank" class="link-button" aria-label="Visit Example Link 5">
+            <img src="src/Youtube.png" alt="Youtube">
+        </a>
+    </div>
+    <div class="container2">
+        <a href="https://invite.viber.com/?g2=AQBr7RgqaOJOp1SaLAlHeZH%2BrPk4S3rwDdiOGwLstgf9PWiKNB9kWaZS3SSn%2Bw1o" class="link-button2" aria-label="Join Our Viber Community">
+            <img src="src/Viber.png" alt="Join Our Viber Community">
+        </a>
+        <a href="tel:+9607576784" class="link-button2" aria-label="Call Now">
+            <img src="src/Call.png" alt="Call Now">
+        </a>
+    </div>
+    <footer>
+         Rhythm Boduberu <a href="https://rhythmboduberu.com" target="_blank">- Phone: 7576784 / 9128889</a>
+    </footer>
 </body>
 </html>
