@@ -135,6 +135,14 @@ const specialCases = [
     { input: 'veymeyey', output: 'ވޭމެޔޭ' },
     { input: 'nethihey', output: 'ނެތިހޭ' },
     { input: 'ehvedhee', output: 'އެއްވެދީ' },
+    { input: 'hiyyvaru', output: 'ހިތްވަރު' },
+    { input: 'hiyvaru', output: 'ހިތްވަރު' },
+    { input: 'hihvaru', output: 'ހިތްވަރު' },
+    { input: 'loayybaa', output: 'ލޯތްބާ' },
+    { input: 'loaiybaa', output: 'ލޯތްބާ' },
+    { input: 'loaiibaa', output: 'ލޯތްބާ' },
+    { input: 'saabahey', output: 'ސާބަހޭ' },
+    { input: 'nuveyhey', output: 'ނުވޭހޭ' },
     { input: 'ohsemun', output: 'އޮއްސެމުން' },
     { input: 'ohsumun', output: 'އޮއްސުމުން' },
     { input: 'haqeeqayy', output: 'ހަޤީގަތް' },
@@ -174,9 +182,14 @@ const specialCases = [
     { input: 'gahanaa', output: 'ގަހަނާ' },
     { input: 'udhuhey', output: 'އުދުހޭ' },
     { input: 'hurihaa', output: 'ހުރިހާ' },
+    { input: 'loiybaa', output: 'ލޯތްބާ' },
+    { input: 'loyybaa', output: 'ލޯތްބާ' },
+    { input: 'loiibaa', output: 'ލޯތްބާ' },
     { input: 'shahii', output: 'ޝާހީ' },
     { input: 'mihiyy', output: 'މިހިތް' },
     { input: 'eyaaru', output: 'އެޔާރު' },
+    { input: 'saabas', output: 'ސާބަސް' },
+    { input: 'veyhey', output: 'ވޭހޭ' },
     { input: 'henney', output: 'ހެންނޭ' },
     { input: 'thihih', output: 'ތިހިތް' },
     { input: 'thihiy', output: 'ތިހިތް' },
@@ -635,6 +648,22 @@ function performTransliteration(latinText) {
         if (processText.substring(i, i + 3) === 'thw') {
             dhivehiText += 'ތޯ';
             i += 3; // Skip all 3 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "dhw" pattern anywhere in the text
+        if (processText.substring(i, i + 3) === 'dhw') {
+            dhivehiText += 'ދޯ';
+            i += 3; // Skip all 3 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "veyey" pattern anywhere in the text
+        if (processText.substring(i, i + 5) === 'veyey') {
+            dhivehiText += 'ވެޔޭ';
+            i += 5; // Skip all 5 characters
             matched = true;
             continue;
         }

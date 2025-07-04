@@ -948,6 +948,122 @@
         });
       }
     });
+    
+    // Handle imported text from transliteration tool
+    function handleImportedText() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const importedText = urlParams.get('import');
+      
+      if (importedText) {
+        try {
+          const decodedText = decodeURIComponent(importedText);
+          importTextToLyrics(decodedText);
+          
+          // Clean up URL to remove import parameter
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
+        } catch (error) {
+          console.error('Error processing imported text:', error);
+          alert('Error processing imported text. Please try again.');
+        }
+      }
+    }
+    
+    // Function to import text and create sections/lines
+    function importTextToLyrics(text) {
+      // Clear existing sections first
+      resetTool();
+      
+      // Split text into lines and filter out completely empty content
+      const lines = text.split(/\r?\n/);
+      let currentSection = null;
+      let importSectionCount = 0;
+      let hasContent = false;
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // If it's an empty line, mark end of current section
+        if (line === '') {
+          currentSection = null;
+          continue;
+        }
+        
+        hasContent = true;
+        
+        // If we don't have a current section, create one
+        if (!currentSection) {
+          importSectionCount++;
+          let sectionName;
+          
+          // Use standard section naming convention: #M for first, then #1, #2, etc.
+          if (importSectionCount === 1) {
+            sectionName = '#M';
+          } else {
+            sectionName = `#${importSectionCount - 1}`;
+          }
+          
+          currentSection = addSection(sectionName, true, true);
+        }
+        
+        // Add the line to the current section
+        addLineToSection(currentSection, line);
+      }
+      
+      // If no content was found, create at least one empty section
+      if (!hasContent) {
+        addSection();
+      }
+      
+      // Save the state and show success message
+      saveState();
+      
+      // Optional: Show a brief success message
+      setTimeout(() => {
+        const firstInput = document.querySelector('.line input[type="text"]');
+        if (firstInput) {
+          firstInput.focus();
+        }
+      }, 100);
+    }
+    
+    // Helper function to add a line to a specific section
+    function addLineToSection(section, text) {
+      const linesDiv = section.querySelector('.lines');
+      const lineDiv = document.createElement('div');
+      lineDiv.className = 'line';
+      lineDiv.innerHTML = `
+        <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް"/>
+        <button class="star-line-btn" title="Star this line">N</button>
+        <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+      `;
+      linesDiv.appendChild(lineDiv);
+      
+      const lineInput = lineDiv.querySelector('input[type="text"]');
+      const starBtn = lineDiv.querySelector('.star-line-btn');
+      
+      // Set the text value
+      lineInput.value = text;
+      
+      // Set up transliteration and navigation
+      setupThaanaTransliteration(lineInput);
+      setupInputNavigation(lineInput);
+      
+      // Set up line highlighting
+      setLineHighlight(lineDiv);
+      
+      // Add event listeners
+      lineInput.addEventListener('input', saveState);
+      starBtn.addEventListener('click', function() {
+        starBtn.classList.toggle('active');
+        starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+        setLineHighlight(lineDiv);
+        saveState();
+      });
+    }
+    
+    // Call handleImportedText when page loads
+    document.addEventListener('DOMContentLoaded', handleImportedText);
   </script>
 </body>
 </html>
