@@ -979,9 +979,23 @@
       let currentSection = null;
       let importSectionCount = 0;
       let hasContent = false;
+      const sectionsDiv = document.getElementById('sections');
       
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
+        
+        // Check if line is a break indicator (just a dash or multiple dashes)
+        if (/^-+$/.test(line)) {
+          hasContent = true;
+          currentSection = null;
+          
+          // Add a break line
+          const breakDiv = document.createElement('div');
+          breakDiv.className = 'break-line';
+          breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+          sectionsDiv.appendChild(breakDiv);
+          continue;
+        }
         
         // If it's an empty line, mark end of current section
         if (line === '') {
