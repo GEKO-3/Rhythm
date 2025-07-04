@@ -16,6 +16,8 @@
 // - Vowels at the start of words get consonant forms (with alif)
 // - Vowels after consonants get diacritic forms
 // - 'r' at the end of words after vowels becomes 'ރު'
+// - Apostrophes (') are completely removed from input text
+// - Commas (,) are ignored in input text
 // ==================================================================
 
 // Dhivehi Latin to Thaana transliteration logic
@@ -69,18 +71,30 @@ const specialCases = [
     // Order matters: longer strings first to avoid partial matches
     { input: 'masthukohlaafaaneyey', output: 'މަސްތުކޮށްލާ ފާނެޔޭ' },
     { input: 'kulhadhunvantha', output: 'ކުޅަދުންވަންތަ' },
+    { input: 'dhirihurihaa', output: 'ދިރިހުރިހާ' },
+    { input: 'ihusaasveemaa', output: 'އިހުސާސްވީމާ' },
+    { input: 'oiygoiyves', output: 'އޮތްގޮތްވެސް' },
+    { input: 'oyygoiyves', output: 'އޮތްގޮތްވެސް' },
+    { input: 'oyygoyyves', output: 'އޮތްގޮތްވެސް' },
+    { input: 'oiygoyyves', output: 'އޮތްގޮތްވެސް' },
+    { input: 'dheynveebaa', output: 'ދޭންވީބާ' },
     { input: 'nuruhihjeyey', output: 'ނުރުހިއްޖެޔޭ' },
     { input: 'neyngeyneyey', output: 'ނޭންގޭނެޔޭ' },
     { input: 'nuveveyneyey', output: 'ނުވެވޭނެޔޭ' },
     { input: 'dhaagoiyvey', output: 'ދާގޮތްވޭ' },
     { input: 'hureveynehey', output: 'ހުރެވޭނެހޭ' },
     { input: 'kuruvaifiyey', output: 'ކުރުވައިފިޔޭ' },
+    { input: 'dhirihuri', output: 'ދިރިހުރި' },
+    { input: 'vaahithun', output: 'ވާހިތުން' },
+    { input: 'mihithuge', output: 'މިހިތުގެ' },
+    { input: 'ihusaasvee', output: 'އިހުސާސްވީ' },
     { input: 'vaagoiyvey', output: 'ވާގޮތްވޭ' },
     { input: 'dhehithugaa', output: 'ދެހިތުގާ' },
     { input: 'fathihashi', output: 'ފަތިހަށި' },
     { input: 'hiyaalugaa', output: 'ހިޔާލުގާ' },
     { input: 'dhehithuga', output: 'ދެހިތުގަ' },
     { input: 'hedhihuri', output: 'ހެދިހުރި' },
+    { input: 'edhihuri', output: 'އެދިހުރި' },
     { input: 'jehilunve', output: 'ޖެހިލުންވެ' },
     { input: 'libihuri', output: 'ލިބިހުރި' },
     { input: 'vaagoiyve', output: 'ވާގޮތްވެ' },
@@ -93,10 +107,17 @@ const specialCases = [
     { input: 'roa lumun', output: 'ރޯލުމުން' },
     { input: 'roa lumum', output: 'ރޯލުމުން' },
     { input: 'haadhahaa', output: 'ހާދަހާ' },
+    { input: 'ihusaas', output: 'އިހުސާސް' },
     { input: 'goiyvey', output: 'ގޮތްވޭ' },
     { input: 'janbekey', output: 'ޖަންބެކޭ' },
     { input: 'janbeke', output: 'ޖަންބެކެ' },
     { input: 'vaagoiy', output: 'ވާގޮތް' },
+    { input: 'oiygoiy', output: 'އޮތްގޮތް' },
+    { input: 'oiygoyy', output: 'އޮތްގޮތް' },
+    { input: 'oyygoiy', output: 'އޮތްގޮތް' },
+    { input: 'oyygoyy', output: 'އޮތްގޮތް' },
+    { input: 'raahathu', output: 'ރާހަތު' },
+    { input: 'raahath', output: 'ރާހަތު' },
     { input: 'feneyey', output: 'ފެނެޔޭ' },
     { input: 'handhaa', output: 'ހަނދާ' },
     { input: 'ehindhun', output: 'އެހިނދުން' },
@@ -105,6 +126,8 @@ const specialCases = [
     { input: 'kiiwehey', output: 'ކީއްވެހޭ' },
     { input: 'roalumun', output: 'ރޯލުމުން' },
     { input: 'roalumum', output: 'ރޯލުމުން' },
+    { input: 'raahayy', output: 'ރާހަތް' },
+    { input: 'raahaiy', output: 'ރާހަތް' },
     { input: 'handhu', output: 'ހަނދު' },
     { input: 'feney', output: 'ފެނޭ' },
     { input: 'janbu', output: 'ޖަންބު' },
@@ -113,8 +136,10 @@ const specialCases = [
     { input: 'edheny', output: 'އެދެނީ' },
     { input: 'asarr', output: 'އަސަރު' },
     { input: 'asaru', output: 'އަސަރު' },
+    { input: 'igraar', output: 'އިގުރާރު' },
     { input: 'kiyaa', output: 'ކިޔާ' },
     { input: 'jahaa', output: 'ޖަހާ' },
+    { input: 'yagyn', output: 'ޔަގީން' },
     { input: 'kihaa', output: 'ކިހާ' },
     { input: 'ruhey', output: 'ރުހޭ' },
     { input: 'mihen', output: 'މިހެން' },
@@ -126,6 +151,10 @@ const specialCases = [
     { input: 'lhen', output: 'ޅެން' },
     { input: 'dhon', output: 'ދޮން' },
     { input: 'rooh', output: 'ރޫހު' },
+    { input: 'ishq', output: 'އިޝްޤު' },
+    { input: 'lwbyge', output: 'ލޯބީގެ' },
+    { input: 'lwbin', output: 'ލޯބިން' },
+    { input: 'lwbi', output: 'ލޯބި' },
     { input: 'asar', output: 'އަސަރު' },
     { input: 'hih', output: 'ހިތް' }
 ];
@@ -140,6 +169,16 @@ function isVowel(char) {
 }
 
 function isVowelSound(str, index) {
+    // Special case: treat "aaaa" as "aa" (check longest first)
+    if (str.substring(index, index + 4) === 'aaaa') {
+        return 'aa';
+    }
+    
+    // Special case: treat "aaa" as "aa"
+    if (str.substring(index, index + 3) === 'aaa') {
+        return 'aa';
+    }
+    
     // Check for multi-character vowels first
     const vowels = ['aa', 'ii', 'uu', 'ey', 'oa', 'ee', 'oo'];
     for (let vowel of vowels) {
@@ -147,6 +186,7 @@ function isVowelSound(str, index) {
             return vowel;
         }
     }
+    
     // Check single character vowels
     if ('aiueo'.includes(str[index])) {
         return str[index];
@@ -160,8 +200,8 @@ function performTransliteration(latinText) {
         return '';
     }
     
-    // Convert to lowercase for processing
-    let processText = latinText.toLowerCase();
+    // Convert to lowercase and remove all apostrophes and periods completely
+    let processText = latinText.toLowerCase().replace(/['.]/g, '');
     
     let dhivehiText = '';
     let i = 0;
@@ -169,10 +209,10 @@ function performTransliteration(latinText) {
     while (i < processText.length) {
         let matched = false;
         
-        // Skip spaces, line breaks, punctuation, asterisks, and apostrophes
-        if (processText[i] === ' ' || processText[i] === '\n' || processText[i] === '\r' || /[.,!?;:]/.test(processText[i]) || processText[i] === '*' || processText[i] === "'") {
-            // Skip asterisks and apostrophes entirely, but include other characters
-            if (processText[i] !== '*' && processText[i] !== "'") {
+        // Skip spaces, line breaks, punctuation, asterisks, commas, numbers, and #
+        if (processText[i] === ' ' || processText[i] === '\n' || processText[i] === '\r' || /[.,!?;:]/.test(processText[i]) || processText[i] === '*' || processText[i] === ',' || /[0-9]/.test(processText[i]) || processText[i] === '#') {
+            // Skip asterisks, commas, numbers, and # entirely, but include other characters
+            if (processText[i] !== '*' && processText[i] !== ',' && !/[0-9]/.test(processText[i]) && processText[i] !== '#') {
                 dhivehiText += processText[i];
             }
             i++;
@@ -189,8 +229,8 @@ function performTransliteration(latinText) {
                 if (i > 0) {
                     const charBefore = processText[i - 1];
                     if (charBefore !== ' ' && charBefore !== '\t' && charBefore !== '\n' && 
-                        charBefore !== '\r' && charBefore !== "'" && charBefore !== '*' && 
-                        !/[.,!?;:]/.test(charBefore)) {
+                        charBefore !== '\r' && charBefore !== '*' && 
+                        charBefore !== ',' && charBefore !== '#' && !/[0-9]/.test(charBefore) && !/[.,!?;:]/.test(charBefore)) {
                         isWholeWord = false;
                     }
                 }
@@ -199,8 +239,8 @@ function performTransliteration(latinText) {
                 if (isWholeWord && i + specialCase.input.length < processText.length) {
                     const charAfter = processText[i + specialCase.input.length];
                     if (charAfter !== ' ' && charAfter !== '\t' && charAfter !== '\n' && 
-                        charAfter !== '\r' && charAfter !== "'" && charAfter !== '*' && 
-                        !/[.,!?;:]/.test(charAfter)) {
+                        charAfter !== '\r' && charAfter !== '*' && 
+                        charAfter !== ',' && charAfter !== '#' && !/[0-9]/.test(charAfter) && !/[.,!?;:]/.test(charAfter)) {
                         isWholeWord = false;
                     }
                 }
@@ -216,6 +256,93 @@ function performTransliteration(latinText) {
         
         if (matched) continue;
         
+        // Special case: check for "jahaalaa" variations anywhere in the text (as substrings)
+        const jahaalaaVariations = [
+            { pattern: 'jahaaalaaa', output: 'ޖަހާލާ', length: 10 },
+            { pattern: 'jahaalaaa', output: 'ޖަހާލާ', length: 9 },
+            { pattern: 'jahaaalaa', output: 'ޖަހާލާ', length: 9 },
+            { pattern: 'jahaalaa', output: 'ޖަހާލާ', length: 8 }
+        ];
+        
+        for (let variation of jahaalaaVariations) {
+            if (processText.substring(i, i + variation.length) === variation.pattern) {
+                dhivehiText += variation.output;
+                i += variation.length;
+                matched = true;
+                break;
+            }
+        }
+        
+        if (matched) continue;
+        
+        // Special case: check for specific "hithuga" variations anywhere in the text (as substrings)
+        const hithugaVariations = [
+            { pattern: 'thihithugaaa', output: 'ތިހިތުގާ', length: 12 },
+            { pattern: 'thihithugaa', output: 'ތިހިތުގާ', length: 11 },
+            { pattern: 'mihithugaaa', output: 'މިހިތުގާ', length: 11 },
+            { pattern: 'ehithugaaa', output: 'އެހިތުގާ', length: 10 },
+            { pattern: 'mihithugaa', output: 'މިހިތުގާ', length: 10 },
+            { pattern: 'ehithugaa', output: 'އެހިތުގާ', length: 9 },
+            { pattern: 'hithugaaa', output: 'ހިތުގާ', length: 9 },
+            { pattern: 'hithugaa', output: 'ހިތުގާ', length: 8 }
+        ];
+        
+        for (let variation of hithugaVariations) {
+            if (processText.substring(i, i + variation.length) === variation.pattern) {
+                dhivehiText += variation.output;
+                i += variation.length;
+                matched = true;
+                break;
+            }
+        }
+        
+        if (matched) continue;
+        
+        // Special case: check for "harakaa" variations anywhere in the text (as substrings)
+        const harakaaVariations = [
+            { pattern: 'harakaaai', output: 'ހަރަކާތް', length: 9 },
+            { pattern: 'harakaaii', output: 'ހަރަކާތް', length: 9 },
+            { pattern: 'harakaii', output: 'ހަރަކާތް', length: 8 },
+            { pattern: 'harakaay', output: 'ހަރަކާތް', length: 8 },
+            { pattern: 'harakayy', output: 'ހަރަކާތް', length: 8 },
+            { pattern: 'harakaai', output: 'ހަރަކާތް', length: 8 }
+        ];
+        
+        for (let variation of harakaaVariations) {
+            if (processText.substring(i, i + variation.length) === variation.pattern) {
+                dhivehiText += variation.output;
+                i += variation.length;
+                matched = true;
+                break;
+            }
+        }
+        
+        if (matched) continue;
+        
+        // Special case: check for "jehi" pattern anywhere in the text (as substring)
+        if (processText.substring(i, i + 4) === 'jehi') {
+            dhivehiText += 'ޖެހި';
+            i += 4; // Skip all 4 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "maahe" pattern anywhere in the text
+        if (processText.substring(i, i + 5) === 'maahe') {
+            dhivehiText += 'މާހެ';
+            i += 5; // Skip all 5 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "thw" pattern anywhere in the text
+        if (processText.substring(i, i + 3) === 'thw') {
+            dhivehiText += 'ތޯ';
+            i += 3; // Skip all 3 characters
+            matched = true;
+            continue;
+        }
+        
         // Now check for regular multi-character consonants (sh, th, dh, etc.)
         for (let len = 3; len >= 2; len--) {
             if (i + len <= processText.length) {
@@ -226,12 +353,14 @@ function performTransliteration(latinText) {
                         // Check if this 'ny' is at the end of a word
                         let isEndOfWord = false;
                         
-                        // Check if next character is space, punctuation, line break, apostrophe, or end of text
+                        // Check if next character is space, punctuation, line break, comma, number, #, or end of text
                         if (i + len >= processText.length || 
                             processText[i + len] === ' ' || 
                             processText[i + len] === '\n' ||
                             processText[i + len] === '\r' ||
-                            processText[i + len] === "'" ||
+                            processText[i + len] === ',' ||
+                            processText[i + len] === '#' ||
+                            /[0-9]/.test(processText[i + len]) ||
                             /[.,!?;:]/.test(processText[i + len])) {
                             isEndOfWord = true;
                         }
@@ -252,6 +381,55 @@ function performTransliteration(latinText) {
         }
         
         if (matched) continue;
+        
+        // Special case: 'ss' at end of word should be treated as 's' (check before doubled consonant logic)
+        if (processText.substring(i, i + 2) === 'ss') {
+            // Check if this 'ss' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 2 >= processText.length || 
+                processText[i + 2] === ' ' || 
+                processText[i + 2] === '\n' ||
+                processText[i + 2] === '\r' ||
+                processText[i + 2] === ',' ||
+                processText[i + 2] === '#' ||
+                /[0-9]/.test(processText[i + 2]) ||
+                /[.,!?;:]/.test(processText[i + 2])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                // Check if there's a vowel before this 'ss' to determine if it should have sukun
+                let isAfterVowel = false;
+                if (i > 0) {
+                    let prevVowel = isVowelSound(processText, i - 1);
+                    if (prevVowel) {
+                        isAfterVowel = true;
+                    } else {
+                        // Check for longer vowels before this position
+                        for (let vowelLen = 4; vowelLen >= 2; vowelLen--) {
+                            if (i - vowelLen >= 0) {
+                                let prevVowelLong = isVowelSound(processText, i - vowelLen);
+                                if (prevVowelLong && prevVowelLong.length === vowelLen && i - vowelLen + vowelLen === i) {
+                                    isAfterVowel = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (isAfterVowel) {
+                    dhivehiText += 'ސް'; // seenu + sukun when 'ss' at end of word after vowel
+                } else {
+                    dhivehiText += 'ސ'; // regular seenu when 'ss' at end of word not after vowel
+                }
+                i += 2; // Skip both 's' characters
+                matched = true;
+                continue;
+            }
+        }
         
         // Special case: doubled consonants should be އް + consonant (gemination)
         // Check if current position has a repeated consonant
@@ -288,17 +466,44 @@ function performTransliteration(latinText) {
         
         if (matched) continue;
         
+        // Special case: 'koh' at end of word should be 'ކޮށް'
+        if (processText.substring(i, i + 3) === 'koh') {
+            // Check if this 'koh' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 3 >= processText.length || 
+                processText[i + 3] === ' ' || 
+                processText[i + 3] === '\n' ||
+                processText[i + 3] === '\r' ||
+                processText[i + 3] === ',' ||
+                processText[i + 3] === '#' ||
+                /[0-9]/.test(processText[i + 3]) ||
+                /[.,!?;:]/.test(processText[i + 3])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ކޮށް'; // kaf + o vowel + shaviyani + sukun for word-final 'koh'
+                i += 3;
+                matched = true;
+                continue;
+            }
+        }
+        
         // Special case: 'y' at end of word should be 'ީ' instead of 'ޔ' (check after multi-char consonants)
         if (processText[i] === 'y') {
             // Check if this 'y' is at the end of a word
             let isEndOfWord = false;
             
-            // Check if next character is space, punctuation, line break, apostrophe, or end of text
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
             if (i + 1 >= processText.length || 
                 processText[i + 1] === ' ' || 
                 processText[i + 1] === '\n' ||
                 processText[i + 1] === '\r' ||
-                processText[i + 1] === "'" ||
+                processText[i + 1] === ',' ||
+                processText[i + 1] === '#' ||
+                /[0-9]/.test(processText[i + 1]) ||
                 /[.,!?;:]/.test(processText[i + 1])) {
                 isEndOfWord = true;
             }
@@ -331,7 +536,9 @@ function performTransliteration(latinText) {
                         processText[i + sukunSound.length] === ' ' || 
                         processText[i + sukunSound.length] === '\n' ||
                         processText[i + sukunSound.length] === '\r' ||
-                        processText[i + sukunSound.length] === "'" ||
+                        processText[i + sukunSound.length] === ',' ||
+                        processText[i + sukunSound.length] === '#' ||
+                        /[0-9]/.test(processText[i + sukunSound.length]) ||
                         /[.,!?;:]/.test(processText[i + sukunSound.length])) {
                         isEndOfWord = true;
                     }
@@ -426,6 +633,14 @@ function performTransliteration(latinText) {
         // Check if current position is a vowel sound
         let vowelSound = isVowelSound(processText, i);
         if (vowelSound) {
+            // Special handling for "aaaa" and "aaa" -> "aa" cases
+            let skipLength = vowelSound.length;
+            if (processText.substring(i, i + 4) === 'aaaa' && vowelSound === 'aa') {
+                skipLength = 4; // Skip all 4 'a's but treat as 'aa'
+            } else if (processText.substring(i, i + 3) === 'aaa' && vowelSound === 'aa') {
+                skipLength = 3; // Skip all 3 'a's but treat as 'aa'
+            }
+            
             // Determine if this vowel should be a consonant (alif) or diacritic
             let useAsConsonant = false;
             
@@ -434,12 +649,16 @@ function performTransliteration(latinText) {
             // 2. After a space (start of word)
             // 3. After punctuation
             // 4. After line breaks
-            // 5. After apostrophes
+            // 5. After commas
+            // 6. After numbers
+            // 7. After #
             if (i === 0 || 
                 processText[i-1] === ' ' || 
                 processText[i-1] === '\n' ||
                 processText[i-1] === '\r' ||
-                processText[i-1] === "'" ||
+                processText[i-1] === ',' ||
+                processText[i-1] === '#' ||
+                /[0-9]/.test(processText[i-1]) ||
                 /[.,!?;:]/.test(processText[i-1])) {
                 useAsConsonant = true;
             }
@@ -497,7 +716,7 @@ function performTransliteration(latinText) {
                 dhivehiText += vowelConsonants[vowelSound] || vowelDiacritics[vowelSound];
             }
             
-            i += vowelSound.length;
+            i += skipLength; // Use skipLength instead of vowelSound.length
             matched = true;
             continue;
         }
@@ -567,7 +786,9 @@ function performTransliteration(latinText) {
                     processText[i + 1] === ' ' || 
                     processText[i + 1] === '\n' ||
                     processText[i + 1] === '\r' ||
-                    processText[i + 1] === "'" ||
+                    processText[i + 1] === ',' ||
+                    processText[i + 1] === '#' ||
+                    /[0-9]/.test(processText[i + 1]) ||
                     /[.,!?;:]/.test(processText[i + 1])) {
                     // Check if there's a vowel before this 's'
                     if (i > 0) {
@@ -600,12 +821,14 @@ function performTransliteration(latinText) {
                 // Check if this 'n' is at the end of a word
                 let isEndOfWord = false;
                 
-                // Check if next character is space, punctuation, line break, apostrophe, or end of text
+                // Check if next character is space, punctuation, line break, comma, number, #, or end of text
                 if (i + 1 >= processText.length || 
                     processText[i + 1] === ' ' || 
                     processText[i + 1] === '\n' ||
                     processText[i + 1] === '\r' ||
-                    processText[i + 1] === "'" ||
+                    processText[i + 1] === ',' ||
+                    processText[i + 1] === '#' ||
+                    /[0-9]/.test(processText[i + 1]) ||
                     /[.,!?;:]/.test(processText[i + 1])) {
                     isEndOfWord = true;
                 }
@@ -621,12 +844,14 @@ function performTransliteration(latinText) {
                 // Check if this 'r' is at the end of a word
                 let isEndOfWord = false;
                 
-                // Check if next character is space, punctuation, line break, apostrophe, or end of text
+                // Check if next character is space, punctuation, line break, comma, number, #, or end of text
                 if (i + 1 >= processText.length || 
                     processText[i + 1] === ' ' || 
                     processText[i + 1] === '\n' ||
                     processText[i + 1] === '\r' ||
-                    processText[i + 1] === "'" ||
+                    processText[i + 1] === ',' ||
+                    processText[i + 1] === '#' ||
+                    /[0-9]/.test(processText[i + 1]) ||
                     /[.,!?;:]/.test(processText[i + 1])) {
                     isEndOfWord = true;
                 }
