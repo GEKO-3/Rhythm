@@ -16,6 +16,7 @@
 // - Vowels at the start of words get consonant forms (with alif)
 // - Vowels after consonants get diacritic forms
 // - 'r' at the end of words after vowels becomes 'ރު'
+// - 'n' uses sukun (ން) when followed by consonant or at end of word, except in "hus noonu" patterns where it uses regular ނ
 // - Apostrophes (') are completely removed from input text
 // - Commas (,) are ignored in input text
 // ==================================================================
@@ -69,10 +70,97 @@ const vowelConsonants = {
 // Special cases mapping - words that need exact transliteration
 const specialCases = [
     // Order matters: longer strings first to avoid partial matches
+    { input: 'maraatheehey', output: 'މަރާތީހޭ' },
+    { input: 'vaatheehey', output: 'ވާތީހޭ' },
+    { input: 'neyngeyhen', output: 'ނޭންގޭހެން' },
+    { input: 'fohelaafaa', output: 'ފޮހެލާފާ' },
+    { input: 'baddhalu', output: 'ބައްދަލު' },
+    { input: 'dhelolah', output: 'ދެލޮލަށް' },
+    { input: 'ohsemun', output: 'އޮއްސެމުން' },
+    { input: 'ohsumun', output: 'އޮއްސުމުން' },
+    { input: 'haqeeqayy', output: 'ހަޤީގަތް' },
+    { input: 'haqeeqaiy', output: 'ހަޤީގަތް' },
+    { input: 'haqeeqaii', output: 'ހަޤީގަތް' },
+    { input: 'haqeegayy', output: 'ހަޤީގަތް' },
+    { input: 'haqeegaiy', output: 'ހަޤީގަތް' },
+    { input: 'haqeegaii', output: 'ހަޤީގަތް' },
+    { input: 'hageegayy', output: 'ހަޤީގަތް' },
+    { input: 'hageegaiy', output: 'ހަޤީގަތް' },
+    { input: 'hageegaii', output: 'ހަޤީގަތް' },
+    { input: 'hageeqayy', output: 'ހަޤީގަތް' },
+    { input: 'hageeqaiy', output: 'ހަޤީގަތް' },
+    { input: 'hageeqaii', output: 'ހަޤީގަތް' },
+    { input: 'mihaaru', output: 'މިހާރު' },
+    { input: 'kihineii', output: 'ކިހިނެތް' },
+    { input: 'kihineiy', output: 'ކިހިނެތް' },
+    { input: 'kihineyy', output: 'ކިހިނެތް' },
+    { input: 'kihineh', output: 'ކިހިނެތް' },
+    { input: 'keheynii', output: 'ކެހޭނީ' },
+    { input: 'keheynee', output: 'ކެހޭނީ' },
+    { input: 'keheyny', output: 'ކެހޭނީ' },
+    { input: 'keheyni', output: 'ކެހޭނީ' },
+    { input: 'rihumaa', output: 'ރިހުމާ' },
+    { input: 'shaahee', output: 'ޝާހީ' },
+    { input: 'gahanaa', output: 'ގަހަނާ' },
+    { input: 'udhuhey', output: 'އުދުހޭ' },
+    { input: 'hurihaa', output: 'ހުރިހާ' },
+    { input: 'shahii', output: 'ޝާހީ' },
+    { input: 'mihiyy', output: 'މިހިތް' },
+    { input: 'kihen', output: 'ކިހެން' },
+    { input: 'ahen', output: 'އަހެން' },
+    { input: 'ehen', output: 'އެހެން' },
+    { input: 'ihen', output: 'އިހެން' },
+    { input: 'ohen', output: 'އޮހެން' },
+    { input: 'uhen', output: 'އުހެން' },
+    { input: 'eyhen', output: 'އޭހެން' },
+    { input: 'eyhey', output: 'އޭހޭ' },
+    { input: 'ahey', output: 'އަހޭ' },
+    { input: 'ehey', output: 'އެހޭ' },
+    { input: 'ihey', output: 'އިހޭ' },
+    { input: 'ohey', output: 'އޮހޭ' },
+    { input: 'uhey', output: 'އުހޭ' },
+    { input: 'shahy', output: 'ޝާހީ' },
+    { input: 'mihiy', output: 'މިހިތް' },
+    { input: 'mihih', output: 'މިހިތް' },
+    { input: 'aalam', output: 'އާލަމް' },
+    { input: 'lolah', output: 'ލޮލަށް' },
+    { input: 'ohsi', output: 'އޮއްސި' },
+    { input: 'haal', output: 'ހާލު' },
     { input: 'masthukohlaafaaneyey', output: 'މަސްތުކޮށްލާ ފާނެޔޭ' },
     { input: 'kulhadhunvantha', output: 'ކުޅަދުންވަންތަ' },
+    { input: 'medhutherean', output: 'މެދުތެރޭން' },
+    { input: 'enkeyolhubey', output: 'އެންކެޔޮޅުބޭ' },
+    { input: 'enkeyolhube', output: 'އެންކެޔޮޅުބެ' },
     { input: 'dhirihurihaa', output: 'ދިރިހުރިހާ' },
     { input: 'ihusaasveemaa', output: 'އިހުސާސްވީމާ' },
+    { input: 'kuranvvyy', output: 'ކުރަންވީ' },
+    { input: 'kuranvvy', output: 'ކުރަންވީ' },
+    { input: 'kuranvyy', output: 'ކުރަންވީ' },
+    { input: 'kuranvvii', output: 'ކުރަންވީ' },
+    { input: 'kuranvvee', output: 'ކުރަންވީ' },
+    { input: 'kuranvee', output: 'ކުރަންވީ' },
+    { input: 'kuranvvi', output: 'ކުރަންވީ' },
+    { input: 'kuranvy', output: 'ކުރަންވީ' },
+    { input: 'kuranvi', output: 'ކުރަންވީ' },
+    { input: 'furanvvyy', output: 'ފުރަންވީ' },
+    { input: 'furanvvy', output: 'ފުރަންވީ' },
+    { input: 'furanvyy', output: 'ފުރަންވީ' },
+    { input: 'furanvvii', output: 'ފުރަންވީ' },
+    { input: 'furanvvee', output: 'ފުރަންވީ' },
+    { input: 'furanvee', output: 'ފުރަންވީ' },
+    { input: 'furanvvi', output: 'ފުރަންވީ' },
+    { input: 'furanvy', output: 'ފުރަންވީ' },
+    { input: 'furanvi', output: 'ފުރަންވީ' },
+    { input: 'halheylyy', output: 'ހަޅޭލީ' },
+    { input: 'halheylii', output: 'ހަޅޭލީ' },
+    { input: 'halheylee', output: 'ހަޅޭލީ' },
+    { input: 'halheyly', output: 'ހަޅޭލީ' },
+    { input: 'jahaalyy', output: 'ޖަހާލީ' },
+    { input: 'jahaalii', output: 'ޖަހާލީ' },
+    { input: 'jahaalee', output: 'ޖަހާލީ' },
+    { input: 'jahaaly', output: 'ޖަހާލީ' },
+    { input: 'keyolhubey', output: 'ކެޔޮޅުބޭ' },
+    { input: 'keyolhube', output: 'ކެޔޮޅުބެ' },
     { input: 'oiygoiyves', output: 'އޮތްގޮތްވެސް' },
     { input: 'oyygoiyves', output: 'އޮތްގޮތްވެސް' },
     { input: 'oyygoyyves', output: 'އޮތްގޮތްވެސް' },
@@ -100,6 +188,13 @@ const specialCases = [
     { input: 'vaagoiyve', output: 'ވާގޮތްވެ' },
     { input: 'handhaaey', output: 'ހަނދާއޭ' },
     { input: 'reethihaa', output: 'ރީތިހާ' },
+    { input: 'nerenyy', output: 'ނެރެނީ' },
+    { input: 'nereny', output: 'ނެރެނީ' },
+    { input: 'alhanyy', output: 'އަޅަނީ' },
+    { input: 'alhany', output: 'އަޅަނީ' },
+    { input: 'keyolhaa', output: 'ކެޔޮޅާ' },
+    { input: 'keyolhu', output: 'ކެޔޮޅު' },
+    { input: 'fathihu', output: 'ފަތިހު' },
     { input: 'loaiyhbey', output: 'ލޯތްބޭ' },
     { input: 'kiivvehey', output: 'ކީއްވެހޭ' },
     { input: 'keehvehey', output: 'ކީއްވެހޭ' },
@@ -143,17 +238,31 @@ const specialCases = [
     { input: 'kihaa', output: 'ކިހާ' },
     { input: 'ruhey', output: 'ރުހޭ' },
     { input: 'mihen', output: 'މިހެން' },
+    { input: 'mahah', output: 'މަހަށް' },
+    { input: 'adah', output: 'އަޑަށް' },
     { input: 'goyy', output: 'ގޮތް' },
     { input: 'goiy', output: 'ގޮތް' },
     { input: 'goih', output: 'ގޮތް' },
     { input: 'hiyy', output: 'ހިތް' },
     { input: 'hiyh', output: 'ހިތް' },
     { input: 'lhen', output: 'ޅެން' },
+    { input: 'enn', output: 'އެން' },
+    { input: 'en', output: 'އެން' },
     { input: 'dhon', output: 'ދޮން' },
     { input: 'rooh', output: 'ރޫހު' },
     { input: 'ishq', output: 'އިޝްޤު' },
+    { input: 'javaahiruge', output: 'ޖަވާހިރުގެ' },
+    { input: 'fahathugaaa', output: 'ފަހަތުގާ' },
+    { input: 'fahathugaa', output: 'ފަހަތުގާ' },
+    { input: 'javaahiru', output: 'ޖަވާހިރު' },
+    { input: 'javaahir', output: 'ޖަވާހިރު' },
+    { input: 'fahathun', output: 'ފަހަތުން' },
     { input: 'lwbyge', output: 'ލޯބީގެ' },
+    { input: 'fahathu', output: 'ފަހަތު' },
     { input: 'lwbin', output: 'ލޯބިން' },
+    { input: 'fahayy', output: 'ފަހަތް' },
+    { input: 'fahaiy', output: 'ފަހަތް' },
+    { input: 'fahaii', output: 'ފަހަތް' },
     { input: 'lwbi', output: 'ލޯބި' },
     { input: 'asar', output: 'އަސަރު' },
     { input: 'hih', output: 'ހިތް' }
@@ -209,6 +318,78 @@ function performTransliteration(latinText) {
     while (i < processText.length) {
         let matched = false;
         
+        // Special case: check for "hen" at end of word FIRST (before any other processing)
+        if (processText.substring(i, i + 3) === 'hen') {
+            // Check if this 'hen' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 3 >= processText.length || 
+                processText[i + 3] === ' ' || 
+                processText[i + 3] === '\n' ||
+                processText[i + 3] === '\r' ||
+                processText[i + 3] === ',' ||
+                processText[i + 3] === '#' ||
+                /[0-9]/.test(processText[i + 3]) ||
+                /[.,!?;:]/.test(processText[i + 3])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ހެން'; // special transliteration for word-final 'hen'
+                i += 3; // Skip all 3 characters
+                continue;
+            }
+        }
+        
+        // Special case: check for "hey" at end of word
+        if (processText.substring(i, i + 3) === 'hey') {
+            // Check if this 'hey' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 3 >= processText.length || 
+                processText[i + 3] === ' ' || 
+                processText[i + 3] === '\n' ||
+                processText[i + 3] === '\r' ||
+                processText[i + 3] === ',' ||
+                processText[i + 3] === '#' ||
+                /[0-9]/.test(processText[i + 3]) ||
+                /[.,!?;:]/.test(processText[i + 3])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ހޭ'; // special transliteration for word-final 'hey'
+                i += 3; // Skip all 3 characters
+                continue;
+            }
+        }
+        
+        // Special case: check for "theehey" at end of word
+        if (processText.substring(i, i + 8) === 'theehey') {
+            // Check if this 'theehey' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 8 >= processText.length || 
+                processText[i + 8] === ' ' || 
+                processText[i + 8] === '\n' ||
+                processText[i + 8] === '\r' ||
+                processText[i + 8] === ',' ||
+                processText[i + 8] === '#' ||
+                /[0-9]/.test(processText[i + 8]) ||
+                /[.,!?;:]/.test(processText[i + 8])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ތީހޭ'; // special transliteration for word-final 'theehey'
+                i += 8; // Skip all 8 characters
+                continue;
+            }
+        }
+        
         // Skip spaces, line breaks, punctuation, asterisks, commas, numbers, and #
         if (processText[i] === ' ' || processText[i] === '\n' || processText[i] === '\r' || /[.,!?;:]/.test(processText[i]) || processText[i] === '*' || processText[i] === ',' || /[0-9]/.test(processText[i]) || processText[i] === '#') {
             // Skip asterisks, commas, numbers, and # entirely, but include other characters
@@ -251,6 +432,29 @@ function performTransliteration(latinText) {
                     matched = true;
                     break;
                 }
+            }
+        }
+        
+        if (matched) continue;
+        
+        // Special case: check for "hen" at end of word (before other patterns)
+        if (processText.substring(i, i + 3) === 'hen') {
+            // Check if this 'hen' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 3 >= processText.length || 
+                processText[i + 3] === ' ' || 
+                processText[i + 3] === '\n' ||
+                processText[i + 3] === '\r' ||
+                processText[i + 3] === ',' ||
+                processText[i + 3] === '#' ||
+                /[0-9]/.test(processText[i + 3]) ||
+                /[.,!?;:]/.test(processText[i + 3])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
             }
         }
         
@@ -342,6 +546,60 @@ function performTransliteration(latinText) {
             matched = true;
             continue;
         }
+        
+        // Special case: "hus noonu" patterns - n without sukun in specific combinations
+        const husNoonuPatterns = [
+            // 7-letter patterns
+            { pattern: 'lhindhu', output: 'ޅިނދު', length: 7 },
+            
+            // 6-letter patterns
+            { pattern: 'dhandu', output: 'ދަނޑު', length: 6 },
+            { pattern: 'dhanbu', output: 'ދަނބު', length: 6 },
+            { pattern: 'dhandi', output: 'ދަނޑި', length: 6 },
+            { pattern: 'thandi', output: 'ތަނޑި', length: 6 },
+            { pattern: 'thanbu', output: 'ތަނބު', length: 6 },
+            { pattern: 'kandhi', output: 'ކަނދި', length: 6 },
+            { pattern: 'bandhi', output: 'ބަނދި', length: 6 },
+            { pattern: 'handhi', output: 'ހަނދި', length: 6 },
+            { pattern: 'handhu', output: 'ހަނދު', length: 6 },
+            { pattern: 'sandhu', output: 'ސަނދު', length: 6 },
+            { pattern: 'kandhu', output: 'ކަނދު', length: 6 },
+            { pattern: 'hindhu', output: 'ހިނދު', length: 6 },
+            { pattern: 'rindhu', output: 'ރިނދު', length: 6 },
+            { pattern: 'bindhu', output: 'ބިނދު', length: 6 },
+            { pattern: 'findhu', output: 'ފިނދު', length: 6 },
+            { pattern: 'hingaa', output: 'ހިނގާ', length: 6 },
+            
+            // 5-letter patterns
+            { pattern: 'kandu', output: 'ކަނޑު', length: 5 },
+            { pattern: 'fandu', output: 'ފަނޑު', length: 5 },
+            { pattern: 'landu', output: 'ލަނޑު', length: 5 },
+            { pattern: 'bandu', output: 'ބަނޑު', length: 5 },
+            { pattern: 'gandu', output: 'ގަނޑު', length: 5 },
+            { pattern: 'randu', output: 'ރަނޑު', length: 5 },
+            { pattern: 'kanbu', output: 'ކަނބު', length: 5 },
+            { pattern: 'banbu', output: 'ބަނބު', length: 5 },
+            { pattern: 'fanbu', output: 'ފަނބު', length: 5 },
+            { pattern: 'bandi', output: 'ބަނޑި', length: 5 },
+            { pattern: 'kandi', output: 'ކަނޑި', length: 5 },
+            { pattern: 'hinga', output: 'ހިނގަ', length: 5 },
+            { pattern: 'engey', output: 'އެނގޭ', length: 5 },
+            { pattern: 'ingey', output: 'އިނގޭ', length: 5 },
+            
+            // 4-letter patterns
+            { pattern: 'anbu', output: 'އަނބު', length: 4 }
+        ];
+        
+        for (let husPattern of husNoonuPatterns) {
+            if (processText.substring(i, i + husPattern.pattern.length) === husPattern.pattern) {
+                dhivehiText += husPattern.output;
+                i += husPattern.pattern.length;
+                matched = true;
+                break;
+            }
+        }
+        
+        if (matched) continue;
         
         // Now check for regular multi-character consonants (sh, th, dh, etc.)
         for (let len = 3; len >= 2; len--) {
@@ -530,6 +788,25 @@ function performTransliteration(latinText) {
         } else {
             for (let sukunSound of sukunSounds) {
                 if (processText.substring(i, i + sukunSound.length) === sukunSound) {
+                    // Special check: don't match "eh" if it's part of "hen" at end of word
+                    if (sukunSound === 'eh' && processText.substring(i, i + 3) === 'hen') {
+                        // Check if this 'hen' is at the end of a word
+                        let isEndOfWord = false;
+                        if (i + 3 >= processText.length || 
+                            processText[i + 3] === ' ' || 
+                            processText[i + 3] === '\n' ||
+                            processText[i + 3] === '\r' ||
+                            processText[i + 3] === ',' ||
+                            processText[i + 3] === '#' ||
+                            /[0-9]/.test(processText[i + 3]) ||
+                            /[.,!?;:]/.test(processText[i + 3])) {
+                            isEndOfWord = true;
+                        }
+                        if (isEndOfWord) {
+                            continue; // Skip this sukun match, let "hen" be handled elsewhere
+                        }
+                    }
+                    
                     // Check if this sukun sound is at the end of a word
                     let isEndOfWord = false;
                     if (i + sukunSound.length >= processText.length || 
@@ -816,7 +1093,7 @@ function performTransliteration(latinText) {
                     dhivehiText += transliterationMap[processText[i]]; // regular seenu
                 }
             }
-            // Special case: 'n' at end of word should be 'ން' instead of 'ނ'
+            // Special case: 'n' uses sukun only when followed by consonant or at end of word
             else if (processText[i] === 'n') {
                 // Check if this 'n' is at the end of a word
                 let isEndOfWord = false;
@@ -833,10 +1110,33 @@ function performTransliteration(latinText) {
                     isEndOfWord = true;
                 }
                 
-                if (isEndOfWord) {
-                    dhivehiText += 'ން'; // sukun + nun for word-final 'n'
+                // Check if this 'n' is followed by a consonant
+                let isFollowedByConsonant = false;
+                
+                if (i + 1 < processText.length && !isEndOfWord) {
+                    let nextChar = processText[i + 1];
+                    
+                    // Check if next character is a consonant (single or start of multi-char)
+                    if (transliterationMap[nextChar]) {
+                        isFollowedByConsonant = true;
+                    } else {
+                        // Check if it's the start of a multi-character consonant
+                        for (let len = 3; len >= 2; len--) {
+                            if (i + 1 + len <= processText.length) {
+                                let nextSubstring = processText.substring(i + 1, i + 1 + len);
+                                if (transliterationMap[nextSubstring]) {
+                                    isFollowedByConsonant = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (isEndOfWord || isFollowedByConsonant) {
+                    dhivehiText += 'ން'; // sukun + nun when at end of word or followed by consonant
                 } else {
-                    dhivehiText += transliterationMap[processText[i]]; // regular nun
+                    dhivehiText += transliterationMap[processText[i]]; // regular nun when followed by vowel
                 }
             }
             // Special case: 'r' at end of word after vowel should be 'ރު' instead of 'ރ'
