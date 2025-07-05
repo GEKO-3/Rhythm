@@ -953,13 +953,24 @@
     function handleImportedText() {
       const urlParams = new URLSearchParams(window.location.search);
       const importedText = urlParams.get('import');
+      const songName = urlParams.get('songName');
       
       if (importedText) {
         try {
           const decodedText = decodeURIComponent(importedText);
+          const decodedSongName = songName ? decodeURIComponent(songName) : null;
+          
+          // Import text and lyrics (this will call resetTool internally)
           importTextToLyrics(decodedText);
           
-          // Clean up URL to remove import parameter
+          // Set song name AFTER importTextToLyrics (which calls resetTool)
+          if (decodedSongName) {
+            const songNameInput = document.getElementById('song-name-input');
+            songNameInput.value = decodedSongName;
+            localStorage.setItem('lyricsEditorSongName', decodedSongName);
+          }
+          
+          // Clean up URL to remove import parameters
           const newUrl = window.location.pathname;
           window.history.replaceState({}, document.title, newUrl);
         } catch (error) {
@@ -971,8 +982,11 @@
     
     // Function to import text and create sections/lines
     function importTextToLyrics(text) {
-      // Clear existing sections first
-      resetTool();
+      // Clear existing sections without adding a default empty section
+      localStorage.removeItem('lyricsEditorData');
+      document.getElementById('sections').innerHTML = '';
+      sectionCount = 0;
+      document.getElementById('song-name-input').value = '';
       
       // Split text into lines and filter out completely empty content
       const lines = text.split(/\r?\n/);

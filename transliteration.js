@@ -70,6 +70,8 @@ const vowelConsonants = {
 // Special cases mapping - words that need exact transliteration
 const specialCases = [
     // Order matters: longer strings first to avoid partial matches
+    { input: 'meehunaaeku', output: 'މީހުނާއެކު' },
+    { input: 'meehakaaeku', output: 'މީހަކާއެކު' },
     { input: 'zeenaiytherikan', output: 'ޒީނަތްތެރިކަން' },
     { input: 'zeenayytherikan', output: 'ޒީނަތްތެރިކަން' },
     { input: 'zeenaiitherikan', output: 'ޒީނަތްތެރިކަން' },
@@ -105,6 +107,10 @@ const specialCases = [
     { input: 'zahamvee', output: 'ޒަޚަމުވީ' },
     { input: 'zahamvi', output: 'ޒަޚަމުވީ' },
     { input: 'zahamvii', output: 'ޒަޚަމުވީ' },
+    { input: 'meehunaa', output: 'މީހުނާ' },
+    { input: 'meehakaa', output: 'މީހަކާ' },
+    { input: 'meehekey', output: 'މީހެކޭ' },
+    { input: 'shaairu', output: 'ޝާއިރު' },
     { input: 'furihama', output: 'ފުރިހަމަ' },
     { input: 'leyaaeku', output: 'ލެޔާއެކު' },
     { input: 'dhehithuge', output: 'ދެހިތުގެ' },
@@ -174,6 +180,10 @@ const specialCases = [
     { input: 'keheynee', output: 'ކެހޭނީ' },
     { input: 'keheyny', output: 'ކެހޭނީ' },
     { input: 'keheyni', output: 'ކެހޭނީ' },
+    { input: 'meehaku', output: 'މީހަކު' },
+    { input: 'shaair', output: 'ޝާއިރު' },
+    { input: 'meehun', output: 'މީހުން' },
+    { input: 'meeheh', output: 'މީހެއް' },
     { input: 'rihumaa', output: 'ރިހުމާ' },
     { input: 'shaahee', output: 'ޝާހީ' },
     { input: 'jahany', output: 'ޖަހާނީ' },
@@ -280,6 +290,7 @@ const specialCases = [
     { input: 'oiygoyyves', output: 'އޮތްގޮތްވެސް' },
     { input: 'dheynveebaa', output: 'ދޭންވީބާ' },
     { input: 'nuruhihjeyey', output: 'ނުރުހިއްޖެޔޭ' },
+    { input: 'fenijjeyey', output: 'ފެނިއްޖެޔޭ' },
     { input: 'neyngeyneyey', output: 'ނޭންގޭނެޔޭ' },
     { input: 'nuveveyneyey', output: 'ނުވެވޭނެޔޭ' },
     { input: 'dhaagoiyvey', output: 'ދާގޮތްވޭ' },
@@ -364,6 +375,8 @@ const specialCases = [
     { input: 'dhon', output: 'ދޮން' },
     { input: 'rooh', output: 'ރޫހު' },
     { input: 'ishq', output: 'އިޝްޤު' },
+    { input: 'javaahirahves', output: 'ޖަވާހިރައްވެސް' },
+    { input: 'javaahirah', output: 'ޖަވާހިރަށް' },
     { input: 'javaahiruge', output: 'ޖަވާހިރުގެ' },
     { input: 'fahathugaaa', output: 'ފަހަތުގާ' },
     { input: 'fahathugaa', output: 'ފަހަތުގާ' },
@@ -486,6 +499,15 @@ const specialCases = [
     { input: 'zindhaqi', output: 'ޒިންދަގީ' },
     { input: 'zindhaqii', output: 'ޒިންދަގީ' },
     { input: 'zindhaqiy', output: 'ޒިންދަގީ' },
+    { input: 'handhaanunney', output: 'ހަނދާނުންނޭ' },
+    { input: 'handhaanuney', output: 'ހަނދާނުނޭ' },
+    { input: 'handhaanvey', output: 'ހަނދާންވޭ' },
+    { input: 'handhaanun', output: 'ހަނދާނުން' },
+    { input: 'handhaaney', output: 'ހަނދާނޭ' },
+    { input: 'vedhaane', output: 'ވެދާނެ' },
+    { input: 'farihi', output: 'ފަރިހި' },
+    { input: 'handhaan', output: 'ހަނދާން' },
+    { input: 'ah', output: 'އަށް' },
     { input: 'eyy', output: 'އޭ' }
 ];
 
@@ -560,6 +582,84 @@ function performTransliteration(latinText) {
                 // Replace "nnuvaa" with "ންނުވާ"
                 dhivehiText += 'ންނުވާ';
                 i += 6; // Skip all 6 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "neyey" at end of word EARLY (before other processing)
+        if (processText.substring(i, i + 5) === 'neyey') {
+            // Check if this 'neyey' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 5 >= processText.length || 
+                processText[i + 5] === ' ' || 
+                processText[i + 5] === '\n' ||
+                processText[i + 5] === '\r' ||
+                processText[i + 5] === ',' ||
+                processText[i + 5] === '#' ||
+                /[0-9]/.test(processText[i + 5]) ||
+                /[.,!?;:]/.test(processText[i + 5])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                // Simply replace "neyey" with the Thaana equivalent
+                dhivehiText += 'ނެޔޭ';
+                i += 5; // Skip all 5 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "jehey" at end of word EARLY (before other processing)
+        if (processText.substring(i, i + 5) === 'jehey') {
+            // Check if this 'jehey' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 5 >= processText.length || 
+                processText[i + 5] === ' ' || 
+                processText[i + 5] === '\n' ||
+                processText[i + 5] === '\r' ||
+                processText[i + 5] === ',' ||
+                processText[i + 5] === '#' ||
+                /[0-9]/.test(processText[i + 5]) ||
+                /[.,!?;:]/.test(processText[i + 5])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                // Simply replace "jehey" with the Thaana equivalent
+                dhivehiText += 'ޖެހޭ';
+                i += 5; // Skip all 5 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "jeyey" at end of word EARLY (before other processing)
+        if (processText.substring(i, i + 5) === 'jeyey') {
+            // Check if this 'jeyey' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 5 >= processText.length || 
+                processText[i + 5] === ' ' || 
+                processText[i + 5] === '\n' ||
+                processText[i + 5] === '\r' ||
+                processText[i + 5] === ',' ||
+                processText[i + 5] === '#' ||
+                /[0-9]/.test(processText[i + 5]) ||
+                /[.,!?;:]/.test(processText[i + 5])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                // Simply replace "jeyey" with the Thaana equivalent
+                dhivehiText += 'ޖެޔޭ';
+                i += 5; // Skip all 5 characters
                 matched = true;
                 continue;
             }
@@ -1354,34 +1454,54 @@ function performTransliteration(latinText) {
         // Check single character consonants
         if (transliterationMap[processText[i]]) {
             // Special case: 'l' followed by consonant should be 'ލް' instead of 'ލ'
+            // Also: 'l' at end of word should be 'ލު' instead of 'ލ'
             if (processText[i] === 'l') {
-                // Check if this 'l' is followed by a consonant
-                let isFollowedByConsonant = false;
+                // Check if this 'l' is at the end of a word
+                let isEndOfWord = false;
                 
-                if (i + 1 < processText.length) {
-                    let nextChar = processText[i + 1];
+                // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+                if (i + 1 >= processText.length || 
+                    processText[i + 1] === ' ' || 
+                    processText[i + 1] === '\n' ||
+                    processText[i + 1] === '\r' ||
+                    processText[i + 1] === ',' ||
+                    processText[i + 1] === '#' ||
+                    /[0-9]/.test(processText[i + 1]) ||
+                    /[.,!?;:]/.test(processText[i + 1])) {
+                    isEndOfWord = true;
+                }
+                
+                if (isEndOfWord) {
+                    dhivehiText += 'ލު'; // laamal + damma when at end of word
+                } else {
+                    // Check if this 'l' is followed by a consonant
+                    let isFollowedByConsonant = false;
                     
-                    // Check if next character is a consonant (single or start of multi-char)
-                    if (transliterationMap[nextChar]) {
-                        isFollowedByConsonant = true;
-                    } else {
-                        // Check if it's the start of a multi-character consonant
-                        for (let len = 3; len >= 2; len--) {
-                            if (i + 1 + len <= processText.length) {
-                                let nextSubstring = processText.substring(i + 1, i + 1 + len);
-                                if (transliterationMap[nextSubstring]) {
-                                    isFollowedByConsonant = true;
-                                    break;
+                    if (i + 1 < processText.length) {
+                        let nextChar = processText[i + 1];
+                        
+                        // Check if next character is a consonant (single or start of multi-char)
+                        if (transliterationMap[nextChar]) {
+                            isFollowedByConsonant = true;
+                        } else {
+                            // Check if it's the start of a multi-character consonant
+                            for (let len = 3; len >= 2; len--) {
+                                if (i + 1 + len <= processText.length) {
+                                    let nextSubstring = processText.substring(i + 1, i + 1 + len);
+                                    if (transliterationMap[nextSubstring]) {
+                                        isFollowedByConsonant = true;
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-                
-                if (isFollowedByConsonant) {
-                    dhivehiText += 'ލް'; // laamal + sukun when followed by consonant
-                } else {
-                    dhivehiText += transliterationMap[processText[i]]; // regular laamal
+                    
+                    if (isFollowedByConsonant) {
+                        dhivehiText += 'ލް'; // laamal + sukun when followed by consonant
+                    } else {
+                        dhivehiText += transliterationMap[processText[i]]; // regular laamal
+                    }
                 }
             }
             // Special case: 's' followed by consonant should be 'ސް' instead of 'ސ'

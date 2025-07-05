@@ -894,11 +894,21 @@
             this.textContent = 'Opening...';
             this.style.background = '#218838';
             
+            // Get first 3 words from input field for song name
+            const inputText = document.getElementById('inputDisplay').value.trim();
+            const words = inputText.split(/\s+/);
+            const songName = words.slice(0, 3)
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+            
             // Prepare the text for import
             const textToImport = encodeURIComponent(output.value);
             
-            // Open lyrics editor with imported text
-            const url = `lyrics-edit.html?import=${textToImport}`;
+            // Open lyrics editor with imported text and song name
+            let url = `lyrics-edit.html?import=${textToImport}`;
+            if (songName) {
+                url += `&songName=${encodeURIComponent(songName)}`;
+            }
             window.open(url, '_blank');
             
             // Reset button
