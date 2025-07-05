@@ -6,11 +6,15 @@
       <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
 <link rel="manifest" href="favicons/manifest.webmanifest">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Faruma&display=swap" rel="stylesheet">
     <title>Dhivehi Transliteration Tool</title>
     <style>
         /* --- Begin: Style updated to match lyrics.html --- */
         body {
-            font-family: 'Segoe UI', 'Arial', sans-serif;
+            font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
             background: #232323;
             color: #fff;
             margin: 0;
@@ -252,6 +256,27 @@
             background: #232323;
             color: #ffe066;
         }
+        
+        /* Input text (English) - Use Montserrat */
+        #inputDisplay, #inputLines {
+            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            font-size: 0.95rem;
+        }
+        
+        /* Output text (Dhivehi) - Use Faruma */
+        #dhivehiOutput, #dhivehiLines {
+            font-family: 'Faruma', 'MV Boli', Tahoma, sans-serif;
+        }
+        
+        /* Line view text elements */
+        #inputLines .line-text {
+            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            font-size: 0.95rem !important;
+        }
+        
+        #dhivehiLines .line-text {
+            font-family: 'Faruma', 'MV Boli', Tahoma, sans-serif;
+        }
         button {
             background-color: #f5d000;
             color: #232323;
@@ -346,7 +371,7 @@
                         <span id="syncIndicator" style="font-size: 0.85rem; color: #f5d000; font-weight: 500;">🔗 Sync enabled</span>
                     </div>
                 </h3>
-                <textarea id="inputDisplay" placeholder="e.g., dhivehi, raajje, assalaamu alaikum..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="direction: ltr; font-family: Arial, sans-serif; display: block;"></textarea>
+                <textarea id="inputDisplay" placeholder="e.g., dhivehi, raajje, assalaamu alaikum..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="direction: ltr; font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; display: block;"></textarea>
                 <div id="inputLines" style="display: none; height: 550px; overflow-y: auto; background: #232323; border: 2px solid #444; border-radius: 7px; padding: 13px; direction: ltr;"></div>
             </div>
             
@@ -950,6 +975,7 @@
                 
                 const lineText = document.createElement('div');
                 lineText.textContent = line;
+                lineText.className = 'line-text'; // Add class for font styling
                 lineText.style.cssText = `
                     flex: 1;
                     font-size: 1.08rem;
@@ -958,6 +984,7 @@
                     text-align: right;
                     margin-right: 10px;
                     word-wrap: break-word;
+                    font-family: 'Faruma', 'MV Boli', Tahoma, sans-serif;
                 `;
                 
                 const copyButton = document.createElement('button');
@@ -1058,14 +1085,16 @@
                 
                 const lineText = document.createElement('div');
                 lineText.textContent = line;
+                lineText.className = 'line-text'; // Add class for font styling
                 lineText.style.cssText = `
                     flex: 1;
-                    font-size: 1.08rem;
+                    font-size: 0.95rem;
                     color: #fff;
                     direction: ltr;
                     text-align: left;
                     margin-right: 10px;
                     word-wrap: break-word;
+                    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
                 `;
                 
                 const copyButton = document.createElement('button');

@@ -145,6 +145,8 @@ const specialCases = [
     { input: 'nuveyhey', output: 'ނުވޭހޭ' },
     { input: 'ohsemun', output: 'އޮއްސެމުން' },
     { input: 'ohsumun', output: 'އޮއްސުމުން' },
+    { input: 'ruheynuhey', output: 'ރުހޭނުހޭ' },
+    { input: 'dholhuhaas', output: 'ދޮޅުހާސް' },
     { input: 'haqeeqayy', output: 'ހަޤީގަތް' },
     { input: 'haqeeqaiy', output: 'ހަޤީގަތް' },
     { input: 'haqeeqaii', output: 'ހަޤީގަތް' },
@@ -157,7 +159,13 @@ const specialCases = [
     { input: 'hageeqayy', output: 'ހަޤީގަތް' },
     { input: 'hageeqaiy', output: 'ހަޤީގަތް' },
     { input: 'hageeqaii', output: 'ހަޤީގަތް' },
+    { input: 'haahekey', output: 'ހާހެކޭ' },
     { input: 'mihaaru', output: 'މިހާރު' },
+    { input: 'aharen', output: 'އަހަރެން' },
+    { input: 'ahuren', output: 'އަހުރެން' },
+    { input: 'million', output: 'މިލިއަން' },
+    { input: 'billion', output: 'ބިލިއަން' },
+    { input: 'jehumah', output: 'ޖެހުމަށް' },
     { input: 'kihineii', output: 'ކިހިނެތް' },
     { input: 'kihineiy', output: 'ކިހިނެތް' },
     { input: 'kihineyy', output: 'ކިހިނެތް' },
@@ -177,7 +185,14 @@ const specialCases = [
     { input: 'zeenaii', output: 'ޒީނަތް' },
     { input: 'zeenai', output: 'ޒީނަތް' },
     { input: 'zeenay', output: 'ޒީނަތް' },
+    { input: 'haaheh', output: 'ހާހެއް' },
+    { input: 'innan', output: 'އިންނަން' },
+    { input: 'hajjah', output: 'ހައްޖަށް' },
+    { input: 'aharun', output: 'އަހަރުން' },
     { input: 'leyaai', output: 'ލެޔާއި' },
+    { input: 'haas', output: 'ހާސް' },
+    { input: 'euro', output: 'ޔޫރޯ' },
+    { input: 'miee', output: 'މިއީ' },
     { input: 'zakham', output: 'ޒަޚަމު' },
     { input: 'gahanaa', output: 'ގަހަނާ' },
     { input: 'udhuhey', output: 'އުދުހޭ' },
@@ -370,7 +385,108 @@ const specialCases = [
     { input: 'ehy', output: 'އެހީ' },
     { input: 'goy', output: 'ގޮތް' },
     { input: 'lo', output: 'ލޯ' },
-    { input: 'hih', output: 'ހިތް' }
+    { input: 'hih', output: 'ހިތް' },
+    { input: 'kerihure', output: 'ކެރިހުރެ' },
+    { input: 'bahaarekey', output: 'ބަހާރެކޭ' },
+    { input: 'bahaarun', output: 'ބަހާރުން' },
+    { input: 'bahaaru', output: 'ބަހާރު' },
+    { input: 'bahaar', output: 'ބަހާރު' },
+    { input: 'dhivehi', output: 'ދިވެހި' },
+    { input: 'raajje', output: 'ރާއްޖެ' },
+    { input: 'rajje', output: 'ރާއްޖެ' },
+    { input: 'raahje', output: 'ރާއްޖެ' },
+    { input: 'rahje', output: 'ރާއްޖެ' },
+    { input: 'rihiveli', output: 'ރިހިވެލި' },
+    { input: 'fekikan', output: 'ފެހިކަން' },
+    { input: 'fehikula', output: 'ފެހިކުލަ' },
+    { input: 'fehi', output: 'ފެހި' },
+    { input: 'hurumah', output: 'ހުރުމަށް' },
+    { input: 'shabaabugaa', output: 'ޝަބާބުގާ' },
+    { input: 'shabaabuga', output: 'ޝަބާބުގަ' },
+    { input: 'shabaabun', output: 'ޝަބާބުން' },
+    { input: 'shabunam', output: 'ޝަބުނަމު' },
+    { input: 'shabaab', output: 'ޝަބާބު' },
+    { input: 'shabaabu', output: 'ޝަބާބު' },
+    { input: 'nuhurumah', output: 'ނުހުރުމަށް' },
+    { input: 'nishaanuga', output: 'ނިޝާނުގަ' },
+    { input: 'nishaanga', output: 'ނިޝާނުގަ' },
+    { input: 'nishaanun', output: 'ނިޝާނުން' },
+    { input: 'nishaanaa', output: 'ނިޝާނާ' },
+    { input: 'nishan', output: 'ނިޝާން' },
+    { input: 'vaheh', output: 'ވަހެއް' },
+    { input: 'roohudhey', output: 'ރޫހުދޭ' },
+    { input: 'roohdhey', output: 'ރޫހުދޭ' },
+    { input: 'aashiqeegaa', output: 'އާޝިޤީގާ' },
+    { input: 'aashiqygaa', output: 'އާޝިޤީގާ' },
+    { input: 'aashiqigaa', output: 'އާޝިޤީގާ' },
+    { input: 'aashiqiigaa', output: 'އާޝިޤީގާ' },
+    { input: 'aashiqiygaa', output: 'އާޝިޤީގާ' },
+    { input: 'ashiqeegaa', output: 'އާޝިޤީގާ' },
+    { input: 'ashiqygaa', output: 'އާޝިޤީގާ' },
+    { input: 'ashiqigaa', output: 'އާޝިޤީގާ' },
+    { input: 'ashiqiigaa', output: 'އާޝިޤީގާ' },
+    { input: 'ashiqiygaa', output: 'އާޝިޤީގާ' },
+    { input: 'zindhageegaa', output: 'ޒިންދަގީގާ' },
+    { input: 'zindhagygaa', output: 'ޒިންދަގީގާ' },
+    { input: 'zindhagigaa', output: 'ޒިންދަގީގާ' },
+    { input: 'zindhagiigaa', output: 'ޒިންދަގީގާ' },
+    { input: 'zindhagiygaa', output: 'ޒިންދަގީގާ' },
+    { input: 'zindhaqeegaa', output: 'ޒިންދަގީގާ' },
+    { input: 'zindhaqygaa', output: 'ޒިންދަގީގާ' },
+    { input: 'zindhaqigaa', output: 'ޒިންދަގީގާ' },
+    { input: 'zindhaqiigaa', output: 'ޒިންދަގީގާ' },
+    { input: 'zindhaqiygaa', output: 'ޒިންދަގީގާ' },
+    { input: 'aashiqeega', output: 'އާޝިޤީގަ' },
+    { input: 'aashiqyga', output: 'އާޝިޤީގަ' },
+    { input: 'aashiqiga', output: 'އާޝިޤީގަ' },
+    { input: 'aashiqiiga', output: 'އާޝިޤީގަ' },
+    { input: 'aashiqiyga', output: 'އާޝިޤީގަ' },
+    { input: 'ashiqeega', output: 'އާޝިޤީގަ' },
+    { input: 'ashiqyga', output: 'އާޝިޤީގަ' },
+    { input: 'ashiqiga', output: 'އާޝިޤީގަ' },
+    { input: 'ashiqiiga', output: 'އާޝިޤީގަ' },
+    { input: 'ashiqiyga', output: 'އާޝިޤީގަ' },
+    { input: 'zindhageega', output: 'ޒިންދަގީގަ' },
+    { input: 'zindhagyga', output: 'ޒިންދަގީގަ' },
+    { input: 'zindhagiga', output: 'ޒިންދަގީގަ' },
+    { input: 'zindhagiiga', output: 'ޒިންދަގީގަ' },
+    { input: 'zindhagiyga', output: 'ޒިންދަގީގަ' },
+    { input: 'zindhaqeega', output: 'ޒިންދަގީގަ' },
+    { input: 'zindhaqyga', output: 'ޒިންދަގީގަ' },
+    { input: 'zindhaqiga', output: 'ޒިންދަގީގަ' },
+    { input: 'zindhaqiiga', output: 'ޒިންދަގީގަ' },
+    { input: 'zindhaqiyga', output: 'ޒިންދަގީގަ' },
+    { input: 'roohdhee', output: 'ރޫހުދީ' },
+    { input: 'roohdhy', output: 'ރޫހުދީ' },
+    { input: 'roohdhii', output: 'ރޫހުދީ' },
+    { input: 'roohdhi', output: 'ރޫހުދީ' },
+    { input: 'roohdhiy', output: 'ރޫހުދީ' },
+    { input: 'roohudhee', output: 'ރޫހުދީ' },
+    { input: 'roohudhy', output: 'ރޫހުދީ' },
+    { input: 'roohudhii', output: 'ރޫހުދީ' },
+    { input: 'roohudhi', output: 'ރޫހުދީ' },
+    { input: 'roohudhiy', output: 'ރޫހުދީ' },
+    { input: 'aashiqee', output: 'އާޝިޤީ' },
+    { input: 'aashiqy', output: 'އާޝިޤީ' },
+    { input: 'aashiqi', output: 'އާޝިޤީ' },
+    { input: 'aashiqii', output: 'އާޝިޤީ' },
+    { input: 'aashiqiy', output: 'އާޝިޤީ' },
+    { input: 'ashiqee', output: 'އާޝިޤީ' },
+    { input: 'ashiqy', output: 'އާޝިޤީ' },
+    { input: 'ashiqi', output: 'އާޝިޤީ' },
+    { input: 'ashiqii', output: 'އާޝިޤީ' },
+    { input: 'ashiqiy', output: 'އާޝިޤީ' },
+    { input: 'zindhagee', output: 'ޒިންދަގީ' },
+    { input: 'zindhagy', output: 'ޒިންދަގީ' },
+    { input: 'zindhagi', output: 'ޒިންދަގީ' },
+    { input: 'zindhagii', output: 'ޒިންދަގީ' },
+    { input: 'zindhagiy', output: 'ޒިންދަގީ' },
+    { input: 'zindhaqee', output: 'ޒިންދަގީ' },
+    { input: 'zindhaqy', output: 'ޒިންދަގީ' },
+    { input: 'zindhaqi', output: 'ޒިންދަގީ' },
+    { input: 'zindhaqii', output: 'ޒިންދަގީ' },
+    { input: 'zindhaqiy', output: 'ޒިންދަގީ' },
+    { input: 'eyy', output: 'އޭ' }
 ];
 
 // Helper functions
@@ -422,6 +538,59 @@ function performTransliteration(latinText) {
     
     while (i < processText.length) {
         let matched = false;
+        
+        // Special case: check for "nnuvaa" at end of word EARLY (before other processing)
+        if (processText.substring(i, i + 6) === 'nnuvaa') {
+            // Check if this 'nnuvaa' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 6 >= processText.length || 
+                processText[i + 6] === ' ' || 
+                processText[i + 6] === '\n' ||
+                processText[i + 6] === '\r' ||
+                processText[i + 6] === ',' ||
+                processText[i + 6] === '#' ||
+                /[0-9]/.test(processText[i + 6]) ||
+                /[.,!?;:]/.test(processText[i + 6])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                // Replace "nnuvaa" with "ންނުވާ"
+                dhivehiText += 'ންނުވާ';
+                i += 6; // Skip all 6 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "nuvaa" at end of word EARLY (before other processing)
+        if (processText.substring(i, i + 5) === 'nuvaa') {
+            // Check if this 'nuvaa' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 5 >= processText.length || 
+                processText[i + 5] === ' ' || 
+                processText[i + 5] === '\n' ||
+                processText[i + 5] === '\r' ||
+                processText[i + 5] === ',' ||
+                processText[i + 5] === '#' ||
+                /[0-9]/.test(processText[i + 5]) ||
+                /[.,!?;:]/.test(processText[i + 5])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                // Simply replace "nuvaa" with the Thaana equivalent
+                // The prefix has already been processed by the normal loop
+                dhivehiText += 'ނުވާ';
+                i += 5; // Skip all 5 characters
+                matched = true;
+                continue;
+            }
+        }
         
         // Special case: check for "hen" at end of word FIRST (before any other processing)
         if (processText.substring(i, i + 3) === 'hen') {
@@ -660,10 +829,67 @@ function performTransliteration(latinText) {
             continue;
         }
         
+        // Special case: check for "hithaa" pattern anywhere in the text
+        if (processText.substring(i, i + 6) === 'hithaa') {
+            dhivehiText += 'ހިތާ';
+            i += 6; // Skip all 6 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "mihithaa" pattern anywhere in the text
+        if (processText.substring(i, i + 8) === 'mihithaa') {
+            dhivehiText += 'މިހިތާ';
+            i += 8; // Skip all 8 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "hithuge" pattern anywhere in the text
+        if (processText.substring(i, i + 7) === 'hithuge') {
+            dhivehiText += 'ހިތުގެ';
+            i += 7; // Skip all 7 characters
+            matched = true;
+            continue;
+        }
+        
         // Special case: check for "veyey" pattern anywhere in the text
         if (processText.substring(i, i + 5) === 'veyey') {
             dhivehiText += 'ވެޔޭ';
             i += 5; // Skip all 5 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "edhey" at end of word
+        if (processText.substring(i, i + 5) === 'edhey') {
+            // Check if this 'edhey' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 5 >= processText.length || 
+                processText[i + 5] === ' ' || 
+                processText[i + 5] === '\n' ||
+                processText[i + 5] === '\r' ||
+                processText[i + 5] === ',' ||
+                processText[i + 5] === '#' ||
+                /[0-9]/.test(processText[i + 5]) ||
+                /[.,!?;:]/.test(processText[i + 5])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'އެދޭ'; // special transliteration for word-final 'edhey'
+                i += 5; // Skip all 5 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "vaaneyey" pattern anywhere in the text
+        if (processText.substring(i, i + 8) === 'vaaneyey') {
+            dhivehiText += 'ވާނެޔޭ';
+            i += 8; // Skip all 8 characters
             matched = true;
             continue;
         }
@@ -678,11 +904,14 @@ function performTransliteration(latinText) {
             { pattern: 'dhanbu', output: 'ދަނބު', length: 6 },
             { pattern: 'dhandi', output: 'ދަނޑި', length: 6 },
             { pattern: 'thandi', output: 'ތަނޑި', length: 6 },
+            { pattern: 'thundi', output: 'ތުނޑި', length: 6 },
+            { pattern: 'thundu', output: 'ތުނޑު', length: 6 },
             { pattern: 'thanbu', output: 'ތަނބު', length: 6 },
             { pattern: 'kandhi', output: 'ކަނދި', length: 6 },
             { pattern: 'bandhi', output: 'ބަނދި', length: 6 },
             { pattern: 'handhi', output: 'ހަނދި', length: 6 },
             { pattern: 'handhu', output: 'ހަނދު', length: 6 },
+            { pattern: 'handha', output: 'ހަނދަ', length: 6 },
             { pattern: 'sandhu', output: 'ސަނދު', length: 6 },
             { pattern: 'kandhu', output: 'ކަނދު', length: 6 },
             { pattern: 'hindhu', output: 'ހިނދު', length: 6 },
@@ -698,6 +927,7 @@ function performTransliteration(latinText) {
             { pattern: 'landu', output: 'ލަނޑު', length: 5 },
             { pattern: 'bandu', output: 'ބަނޑު', length: 5 },
             { pattern: 'gandu', output: 'ގަނޑު', length: 5 },
+            { pattern: 'gondu', output: 'ގޮނޑު', length: 5 },
             { pattern: 'ganda', output: 'ގަނޑަ', length: 5 },
             { pattern: 'randu', output: 'ރަނޑު', length: 5 },
             { pattern: 'kanbu', output: 'ކަނބު', length: 5 },
