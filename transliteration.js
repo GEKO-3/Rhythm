@@ -750,6 +750,32 @@ function performTransliteration(latinText) {
             }
         }
         
+        // Special case: check for "na" at end of word
+        if (processText.substring(i, i + 2) === 'na') {
+            // Check if this 'na' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 2 >= processText.length || 
+                processText[i + 2] === ' ' || 
+                processText[i + 2] === '\n' ||
+                processText[i + 2] === '\r' ||
+                processText[i + 2] === ',' ||
+
+                processText[i + 2] === '#' ||
+                /[0-9]/.test(processText[i + 2]) ||
+                /[.,!?;:]/.test(processText[i + 2])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ނަ'; // special transliteration for word-final 'na'
+                i += 2; // Skip all 2 characters
+                matched = true;
+                continue;
+            }
+        }
+        
         // Special case: check for "theehey" at end of word
         if (processText.substring(i, i + 8) === 'theehey') {
             // Check if this 'theehey' is at the end of a word
@@ -1252,7 +1278,12 @@ function performTransliteration(latinText) {
             let char2 = processText[i + 1];
             
             if (transliterationMap[char1] && char1 === char2) {
-                dhivehiText += 'އް' + transliterationMap[char1]; // alif + sukun + consonant
+                // Special case: doubled 'nn' should be 'ންނ' instead of 'އް' + consonant
+                if (char1 === 'n') {
+                    dhivehiText += 'ންނ'; // sukun + nun + nun for doubled 'nn'
+                } else {
+                    dhivehiText += 'އް' + transliterationMap[char1]; // alif + sukun + consonant for other doubled consonants
+                }
                 i += 2; // skip both occurrences
                 foundDoubledConsonant = true;
                 matched = true;
