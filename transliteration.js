@@ -67,9 +67,30 @@ const vowelConsonants = {
     'oa': 'އޯ',  // alif with oabofili
 };
 
+// Shaviyanisukun array - consonants that change "ah" ending to "ަށް"
+const shaviyanisukun = ['m', 'dh'];
+
 // Special cases mapping - words that need exact transliteration
 const specialCases = [
     // Order matters: longer strings first to avoid partial matches
+    { input: 'zaeemun', output: 'ޒަޢީމުން' },
+    { input: 'zaeemaa', output: 'ޒަޢީމާ' },
+    { input: 'zaeemey', output: 'ޒަޢީމޭ' },
+    { input: 'zaeeme', output: 'ޒަޢީމެ' },
+    { input: 'zaeemu', output: 'ޒަޢީމު' },
+    { input: 'zaeem', output: 'ޒަޢީމު' },
+    { input: 'maaiivi', output: 'މާތްވި' },
+    { input: 'maayyvi', output: 'މާތްވި' },
+    { input: 'maaiyvi', output: 'މާތްވި' },
+    { input: 'maiivi', output: 'މާތްވި' },
+    { input: 'maiyvi', output: 'މާތްވި' },
+    { input: 'mayyvi', output: 'މާތްވި' },
+    { input: 'maaii', output: 'މާތް' },
+    { input: 'maayy', output: 'މާތް' },
+    { input: 'maaiy', output: 'މާތް' },
+    { input: 'maii', output: 'މާތް' },
+    { input: 'maiy', output: 'މާތް' },
+    { input: 'mayy', output: 'މާތް' },
     { input: 'meehunaaeku', output: 'މީހުނާއެކު' },
     { input: 'meehakaaeku', output: 'މީހަކާއެކު' },
     { input: 'zeenaiytherikan', output: 'ޒީނަތްތެރިކަން' },
@@ -1255,6 +1276,59 @@ function performTransliteration(latinText) {
             }
         }
         
+        // Special case: check for "ah" at end of word after specific consonants (shaviyanisukun array)
+        if (processText.substring(i, i + 2) === 'ah') {
+            // Check if this 'ah' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 2 >= processText.length || 
+                processText[i + 2] === ' ' || 
+                processText[i + 2] === '\n' ||
+                processText[i + 2] === '\r' ||
+                processText[i + 2] === ',' ||
+                processText[i + 2] === '#' ||
+                /[0-9]/.test(processText[i + 2]) ||
+                /[.,!?;:]/.test(processText[i + 2])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                // Check if previous character was a consonant from shaviyanisukun array
+                let prevIsShaviyanisukunConsonant = false;
+                let prevConsonant = '';
+                
+                if (i > 0) {
+                    // Check for multi-character consonants before current position
+                    let foundPrevConsonant = false;
+                    for (let prevLen = 3; prevLen >= 1; prevLen--) {
+                        if (i - prevLen >= 0) {
+                            let prevSubstring = processText.substring(i - prevLen, i);
+                            if (transliterationMap[prevSubstring] && shaviyanisukun.includes(prevSubstring)) {
+                                prevIsShaviyanisukunConsonant = true;
+                                prevConsonant = prevSubstring;
+                                foundPrevConsonant = true;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    // If no multi-char consonant found, check single char
+                    if (!foundPrevConsonant && transliterationMap[processText[i - 1]] && shaviyanisukun.includes(processText[i - 1])) {
+                        prevIsShaviyanisukunConsonant = true;
+                        prevConsonant = processText[i - 1];
+                    }
+                }
+                
+                if (prevIsShaviyanisukunConsonant) {
+                    dhivehiText += 'ަށް'; // fatha + shaviyani + sukun for "ah" after shaviyanisukun consonants
+                    i += 2; // Skip "ah"
+                    matched = true;
+                    continue;
+                }
+            }
+        }
+
         // Special case: check for sukun sounds after consonant
         // Check for various sukun endings (consonant + ah/eh/uh/ih/oh/aah/eyh/ooh/eeh/oah)
         const sukunSounds = ['aah', 'eyh', 'ooh', 'eeh', 'oah', 'ah', 'eh', 'uh', 'ih', 'oh'];
@@ -1738,6 +1812,8 @@ function performTransliteration(latinText) {
             matched = true;
             continue;
         }
+        
+
         
         // If no match found, keep the original character
         if (!matched) {
