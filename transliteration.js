@@ -68,7 +68,7 @@ const vowelConsonants = {
 };
 
 // Shaviyanisukun array - consonants that change "ah" ending to "ަށް"
-const shaviyanisukun = ['m', 'dh'];
+const shaviyanisukun = ['m', 'dh', 's'];
 
 // Special cases mapping - words that need exact transliteration
 const specialCases = [
@@ -1020,6 +1020,41 @@ function performTransliteration(latinText) {
             continue;
         }
         
+        // Special case: check for "raeesah" pattern first (before "raees" rule)
+        if (processText.substring(i, i + 7) === 'raeesah') {
+            dhivehiText += 'ރައީސަށް'; // specific transliteration for "raeesah"
+            i += 7; // Skip all 7 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "raees" pattern - different output based on word position
+        if (processText.substring(i, i + 5) === 'raees') {
+            // Check if this 'raees' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 5 >= processText.length || 
+                processText[i + 5] === ' ' || 
+                processText[i + 5] === '\n' ||
+                processText[i + 5] === '\r' ||
+                processText[i + 5] === ',' ||
+                processText[i + 5] === '#' ||
+                /[0-9]/.test(processText[i + 5]) ||
+                /[.,!?;:]/.test(processText[i + 5])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ރައީސް'; // raees at end of word with sukun
+            } else {
+                dhivehiText += 'ރައީސ'; // raees at start or middle of word without sukun
+            }
+            i += 5; // Skip all 5 characters
+            matched = true;
+            continue;
+        }
+
         // Special case: "hus noonu" patterns - n without sukun in specific combinations
         const husNoonuPatterns = [
             // 7-letter patterns
