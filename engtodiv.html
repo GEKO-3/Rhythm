@@ -894,10 +894,14 @@
             this.textContent = 'Opening...';
             this.style.background = '#218838';
             
-            // Get first 3 words from input field for song name
+            // Get first 3 words from first line of input field for song name
             const inputText = document.getElementById('inputDisplay').value.trim();
-            const words = inputText.split(/\s+/);
-            const songName = words.slice(0, 3)
+            const firstLine = inputText.split('\n')[0].trim();
+            const words = firstLine.split(/\s+/).filter(word => word.length > 0);
+            
+            // Use up to 3 words, or all words if less than 3
+            const wordsToUse = words.slice(0, Math.min(3, words.length));
+            const songName = wordsToUse
                 .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                 .join(' ');
             

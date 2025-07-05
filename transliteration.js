@@ -473,9 +473,6 @@ const specialCases = [
     { input: 'roohdhy', output: 'ރޫހުދީ' },
     { input: 'roohdhii', output: 'ރޫހުދީ' },
     { input: 'roohdhi', output: 'ރޫހުދީ' },
-    { input: 'roohdhiy', output: 'ރޫހުދީ' },
-    { input: 'roohudhee', output: 'ރޫހުދީ' },
-    { input: 'roohudhy', output: 'ރޫހުދީ' },
     { input: 'roohudhii', output: 'ރޫހުދީ' },
     { input: 'roohudhi', output: 'ރޫހުދީ' },
     { input: 'roohudhiy', output: 'ރޫހުދީ' },
@@ -484,21 +481,11 @@ const specialCases = [
     { input: 'aashiqi', output: 'އާޝިޤީ' },
     { input: 'aashiqii', output: 'އާޝިޤީ' },
     { input: 'aashiqiy', output: 'އާޝިޤީ' },
-    { input: 'ashiqee', output: 'އާޝިޤީ' },
-    { input: 'ashiqy', output: 'އާޝިޤީ' },
-    { input: 'ashiqi', output: 'އާޝިޤީ' },
-    { input: 'ashiqii', output: 'އާޝިޤީ' },
-    { input: 'ashiqiy', output: 'އާޝިޤީ' },
     { input: 'zindhagee', output: 'ޒިންދަގީ' },
     { input: 'zindhagy', output: 'ޒިންދަގީ' },
     { input: 'zindhagi', output: 'ޒިންދަގީ' },
     { input: 'zindhagii', output: 'ޒިންދަގީ' },
     { input: 'zindhagiy', output: 'ޒިންދަގީ' },
-    { input: 'zindhaqee', output: 'ޒިންދަގީ' },
-    { input: 'zindhaqy', output: 'ޒިންދަގީ' },
-    { input: 'zindhaqi', output: 'ޒިންދަގީ' },
-    { input: 'zindhaqii', output: 'ޒިންދަގީ' },
-    { input: 'zindhaqiy', output: 'ޒިންދަގީ' },
     { input: 'handhaanunney', output: 'ހަނދާނުންނޭ' },
     { input: 'handhaanuney', output: 'ހަނދާނުނޭ' },
     { input: 'handhaanvey', output: 'ހަނދާންވޭ' },
@@ -507,6 +494,8 @@ const specialCases = [
     { input: 'vedhaane', output: 'ވެދާނެ' },
     { input: 'farihi', output: 'ފަރިހި' },
     { input: 'handhaan', output: 'ހަނދާން' },
+    { input: 'bahaarugaa', output: 'ބަހާރުގާ' },
+    { input: 'suhaanaa', output: 'ސުހާނާ' },
     { input: 'ah', output: 'އަށް' },
     { input: 'eyy', output: 'އޭ' }
 ];
@@ -913,6 +902,22 @@ function performTransliteration(latinText) {
             continue;
         }
         
+        // Special case: check for "maayy" pattern anywhere in the text (must check before "mayy")
+        if (processText.substring(i, i + 5) === 'maayy') {
+            dhivehiText += 'މާތް';
+            i += 5; // Skip all 5 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "mayy" pattern anywhere in the text
+        if (processText.substring(i, i + 4) === 'mayy') {
+            dhivehiText += 'މަތް';
+            i += 4; // Skip all 4 characters
+            matched = true;
+            continue;
+        }
+        
         // Special case: check for "thw" pattern anywhere in the text
         if (processText.substring(i, i + 3) === 'thw') {
             dhivehiText += 'ތޯ';
@@ -1059,8 +1064,31 @@ function performTransliteration(latinText) {
             if (i + len <= processText.length) {
                 let substring = processText.substring(i, i + len);
                 if (transliterationMap[substring]) {
+                    // Special case: 'sh' at start of word should be 'ޝ' instead of 'ށ'
+                    if (substring === 'sh') {
+                        // Check if this 'sh' is at the start of a word
+                        let isStartOfWord = false;
+                        
+                        // Check if previous character is space, line break, comma, number, #, or start of text
+                        if (i === 0 || 
+                            processText[i - 1] === ' ' || 
+                            processText[i - 1] === '\n' ||
+                            processText[i - 1] === '\r' ||
+                            processText[i - 1] === ',' ||
+                            processText[i - 1] === '#' ||
+                            /[0-9]/.test(processText[i - 1]) ||
+                            /[.,!?;:]/.test(processText[i - 1])) {
+                            isStartOfWord = true;
+                        }
+                        
+                        if (isStartOfWord) {
+                            dhivehiText += 'ޝ'; // shaviyani for word-initial 'sh'
+                        } else {
+                            dhivehiText += transliterationMap[substring]; // regular seenu
+                        }
+                    } 
                     // Special case: 'ny' at end of word should be 'ނީ' instead of 'ޏ'
-                    if (substring === 'ny') {
+                    else if (substring === 'ny') {
                         // Check if this 'ny' is at the end of a word
                         let isEndOfWord = false;
                         
@@ -1656,7 +1684,54 @@ function performTransliteration(latinText) {
                 } else {
                     dhivehiText += transliterationMap[processText[i]]; // regular raa
                 }
-            } else {
+            }
+            // Special case: 'm' without vowel after should be 'މް' instead of 'މ'
+            else if (processText[i] === 'm') {
+                // Check if this 'm' is at the end of a word
+                let isEndOfWord = false;
+                
+                // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+                if (i + 1 >= processText.length || 
+                    processText[i + 1] === ' ' || 
+                    processText[i + 1] === '\n' ||
+                    processText[i + 1] === '\r' ||
+                    processText[i + 1] === ',' ||
+                    processText[i + 1] === '#' ||
+                    /[0-9]/.test(processText[i + 1]) ||
+                    /[.,!?;:]/.test(processText[i + 1])) {
+                    isEndOfWord = true;
+                }
+                
+                // Check if this 'm' is followed by a consonant (no vowel after)
+                let isFollowedByConsonant = false;
+                
+                if (i + 1 < processText.length && !isEndOfWord) {
+                    let nextChar = processText[i + 1];
+                    
+                    // Check if next character is a consonant (single or start of multi-char)
+                    if (transliterationMap[nextChar]) {
+                        isFollowedByConsonant = true;
+                    } else {
+                        // Check if it's the start of a multi-character consonant
+                        for (let len = 3; len >= 2; len--) {
+                            if (i + 1 + len <= processText.length) {
+                                let nextSubstring = processText.substring(i + 1, i + 1 + len);
+                                if (transliterationMap[nextSubstring]) {
+                                    isFollowedByConsonant = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                if (isEndOfWord || isFollowedByConsonant) {
+                    dhivehiText += 'މް'; // meem + sukun when at end of word or followed by consonant (no vowel)
+                } else {
+                    dhivehiText += transliterationMap[processText[i]]; // regular meem when followed by vowel
+                }
+            }
+            else {
                 dhivehiText += transliterationMap[processText[i]];
             }
             i++;
