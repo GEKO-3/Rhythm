@@ -94,12 +94,18 @@ const specialCases = [
     { input: 'mehefilthah', output: 'މެހެފިލުތައް' },
     { input: 'meehunaaeku', output: 'މީހުނާއެކު' },
     { input: 'meehakaaeku', output: 'މީހަކާއެކު' },
+    { input: 'ihusaasthakey', output: 'އިހުސާސްތަކޭ' },
     { input: 'zeenaiytherikan', output: 'ޒީނަތްތެރިކަން' },
     { input: 'zeenayytherikan', output: 'ޒީނަތްތެރިކަން' },
     { input: 'zeenaiitherikan', output: 'ޒީނަތްތެރިކަން' },
     { input: 'zeenaitherikan', output: 'ޒީނަތްތެރިކަން' },
     { input: 'zeenaytherikan', output: 'ޒީނަތްތެރިކަން' },
     { input: 'maraatheehey', output: 'މަރާތީހޭ' },
+    { input: 'ihusaahakee', output: 'އިހުސާހަކީ' },
+    { input: 'ihusaahakii', output: 'އިހުސާހަކީ' },
+    { input: 'ihusaahaky', output: 'އިހުސާހަކީ' },
+    { input: 'ihusaahekey', output: 'އިހުސާހެކޭ' },
+    { input: 'ihusaasthah', output: 'އިހުސާސްތައް' },
     { input: 'vaatheehey', output: 'ވާތީހޭ' },
     { input: 'neyngeyhen', output: 'ނޭންގޭހެން' },
     { input: 'thibunihenney', output: 'ތިބުނިހެންނޭ' },
@@ -109,6 +115,8 @@ const specialCases = [
     { input: 'zeenaitheri', output: 'ޒީނަތްތެރި' },
     { input: 'zeenaytheri', output: 'ޒީނަތްތެރި' },
     { input: 'fohelaafaa', output: 'ފޮހެލާފާ' },
+    { input: 'hashigandah', output: 'ހަށިގަނޑަށް' },
+    { input: 'ihusaahun', output: 'އިހުސާހުން' },
     { input: 'khidhumaiyy', output: 'ޚިދުމަތް' },
     { input: 'mulhihithaa', output: 'މުޅިހިތާ' },
     { input: 'zakhamuvy', output: 'ޒަޚަމުވީ' },
@@ -341,6 +349,8 @@ const specialCases = [
     { input: 'vaahithun', output: 'ވާހިތުން' },
     { input: 'mihithuge', output: 'މިހިތުގެ' },
     { input: 'ihusaasvee', output: 'އިހުސާސްވީ' },
+    { input: 'ihusaasaa', output: 'އިހުސާސާ' },
+    { input: 'ihusaasey', output: 'އިހުސާސޭ' },
     { input: 'vaagoiyvey', output: 'ވާގޮތްވޭ' },
     { input: 'dhehithugaa', output: 'ދެހިތުގާ' },
     { input: 'fathihashi', output: 'ފަތިހަށި' },
@@ -1965,6 +1975,12 @@ function performTransliteration(latinText) {
             i++;
         }
     }
+    
+    // Clean up any double sukun-alif combinations (އްއް) and replace with single sukun (އް)
+    dhivehiText = dhivehiText.replace(/އްއް/g, 'އް');
+    
+    // Clean up any ޭީ combinations and replace with single ޭ
+    dhivehiText = dhivehiText.replace(/ޭީ/g, 'ޭ');
     
     return dhivehiText;
 }
