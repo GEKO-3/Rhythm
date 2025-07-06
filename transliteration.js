@@ -91,6 +91,7 @@ const specialCases = [
     { input: 'maii', output: 'މާތް' },
     { input: 'maiy', output: 'މާތް' },
     { input: 'mayy', output: 'މާތް' },
+    { input: 'mehefilthah', output: 'މެހެފިލުތައް' },
     { input: 'meehunaaeku', output: 'މީހުނާއެކު' },
     { input: 'meehakaaeku', output: 'މީހަކާއެކު' },
     { input: 'zeenaiytherikan', output: 'ޒީނަތްތެރިކަން' },
@@ -134,6 +135,7 @@ const specialCases = [
     { input: 'shaairu', output: 'ޝާއިރު' },
     { input: 'furihama', output: 'ފުރިހަމަ' },
     { input: 'leyaaeku', output: 'ލެޔާއެކު' },
+    { input: 'mihaalathu', output: 'މިހާލަތު' },
     { input: 'dhehithuge', output: 'ދެހިތުގެ' },
     { input: 'ruhenyaa', output: 'ރުހެންޔާ' },
     { input: 'dhevenyaa', output: 'ދެވެންޔާ' },
@@ -159,9 +161,13 @@ const specialCases = [
     { input: 'unmeedhu', output: 'އުންމީދު' },
     { input: 'baddhalu', output: 'ބައްދަލު' },
     { input: 'dhelolah', output: 'ދެލޮލަށް' },
+    { input: 'dhuaayaa', output: 'ދުއާޔާ' },
+    { input: 'duaayaa', output: 'ދުއާޔާ' },
+    { input: 'dhuayaa', output: 'ދުއާޔާ' },
     { input: 'veymeyey', output: 'ވޭމެޔޭ' },
     { input: 'nethihey', output: 'ނެތިހޭ' },
     { input: 'ehvedhee', output: 'އެއްވެދީ' },
+    { input: 'feneyhey', output: 'ފެނޭހޭ' },
     { input: 'hiyyvaru', output: 'ހިތްވަރު' },
     { input: 'hiyvaru', output: 'ހިތްވަރު' },
     { input: 'hihvaru', output: 'ހިތްވަރު' },
@@ -201,8 +207,10 @@ const specialCases = [
     { input: 'keheynee', output: 'ކެހޭނީ' },
     { input: 'keheyny', output: 'ކެހޭނީ' },
     { input: 'keheyni', output: 'ކެހޭނީ' },
+    { input: 'mehefilu', output: 'މެހެފިލު' },
     { input: 'meehaku', output: 'މީހަކު' },
     { input: 'shaair', output: 'ޝާއިރު' },
+    { input: 'mehefil', output: 'މެހެފިލު' },
     { input: 'meehun', output: 'މީހުން' },
     { input: 'meeheh', output: 'މީހެއް' },
     { input: 'rihumaa', output: 'ރިހުމާ' },
@@ -225,6 +233,7 @@ const specialCases = [
     { input: 'euro', output: 'ޔޫރޯ' },
     { input: 'miee', output: 'މިއީ' },
     { input: 'zakham', output: 'ޒަޚަމު' },
+    { input: 'duayaa', output: 'ދުއާޔާ' },
     { input: 'gahanaa', output: 'ގަހަނާ' },
     { input: 'udhuhey', output: 'އުދުހޭ' },
     { input: 'hurihaa', output: 'ހުރިހާ' },
@@ -237,6 +246,7 @@ const specialCases = [
     { input: 'saabas', output: 'ސާބަސް' },
     { input: 'veyhey', output: 'ވޭހޭ' },
     { input: 'henney', output: 'ހެންނޭ' },
+    { input: 'hithah', output: 'ހިތަށް' },
     { input: 'thihih', output: 'ތިހިތް' },
     { input: 'thihiy', output: 'ތިހިތް' },
     { input: 'thihiyy', output: 'ތިހިތް' },
@@ -264,6 +274,7 @@ const specialCases = [
     { input: 'veyey', output: 'ވެޔޭ' },
     { input: 'leyaa', output: 'ލެޔާ' },
     { input: 'thiee', output: 'ތިއީ' },
+    { input: 'dhuaa', output: 'ދުއާ' },
     { input: 'ahan', output: 'އަހަން' },
     { input: 'ehah', output: 'އެހައް' },
     { input: 'ehee', output: 'އެހީ' },
@@ -394,6 +405,7 @@ const specialCases = [
     { input: 'enn', output: 'އެން' },
     { input: 'en', output: 'އެން' },
     { input: 'dhon', output: 'ދޮން' },
+    { input: 'duaa', output: 'ދުއާ' },
     { input: 'rooh', output: 'ރޫހު' },
     { input: 'ishq', output: 'އިޝްޤު' },
     { input: 'javaahirahves', output: 'ޖަވާހިރައްވެސް' },
@@ -621,6 +633,14 @@ function performTransliteration(latinText) {
                 matched = true;
                 continue;
             }
+        }
+        
+        // Special case: check for "jehihjey" pattern anywhere in the text EARLY (before "jehey" processing)
+        if (processText.substring(i, i + 8) === 'jehihjey') {
+            dhivehiText += 'ޖެހިއްޖޭ';
+            i += 8; // Skip all 8 characters
+            matched = true;
+            continue;
         }
         
         // Special case: check for "jehey" at end of word EARLY (before other processing)
@@ -981,6 +1001,49 @@ function performTransliteration(latinText) {
             continue;
         }
         
+        // Special case: check for "dhey" pattern anywhere in the text
+        if (processText.substring(i, i + 4) === 'dhey') {
+            dhivehiText += 'ދޭ';
+            i += 4; // Skip all 4 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "goiyy" pattern anywhere in the text
+        if (processText.substring(i, i + 5) === 'goiyy') {
+            dhivehiText += 'ގޮތް';
+            i += 5; // Skip all 5 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "ihjey" pattern anywhere in the text
+        if (processText.substring(i, i + 5) === 'ihjey') {
+            dhivehiText += 'ިއްޖޭ';
+            i += 5; // Skip all 5 characters
+            matched = true;
+            continue;
+        }
+        
+        // Special case: check for "loaiyba", "loayyba", "loyyba", "loiyba" patterns anywhere in the text
+        const loaiybaVariations = [
+            { pattern: 'loaiyba', output: 'ލޯތްބަ', length: 7 },
+            { pattern: 'loayyba', output: 'ލޯތްބަ', length: 7 },
+            { pattern: 'loyyba', output: 'ލޯތްބަ', length: 6 },
+            { pattern: 'loiyba', output: 'ލޯތްބަ', length: 6 }
+        ];
+        
+        for (let variation of loaiybaVariations) {
+            if (processText.substring(i, i + variation.length) === variation.pattern) {
+                dhivehiText += variation.output;
+                i += variation.length;
+                matched = true;
+                break;
+            }
+        }
+        
+        if (matched) continue;
+        
         // Special case: check for "hithaa" pattern anywhere in the text
         if (processText.substring(i, i + 6) === 'hithaa') {
             dhivehiText += 'ހިތާ';
@@ -1083,7 +1146,12 @@ function performTransliteration(latinText) {
 
         // Special case: "hus noonu" patterns - n without sukun in specific combinations
         const husNoonuPatterns = [
+            // 8-letter patterns
+            { pattern: 'thaangaa', output: 'ތާނގާ', length: 8 },
+            
             // 7-letter patterns
+            { pattern: 'handhah', output: 'ހަނދަށް', length: 7 },
+            { pattern: 'thaanga', output: 'ތާނގަ', length: 7 },
             { pattern: 'lhindhu', output: 'ޅިނދު', length: 7 },
             
             // 6-letter patterns
