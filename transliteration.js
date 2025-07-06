@@ -287,6 +287,7 @@ const specialCases = [
     { input: 'enkeyolhubey', output: 'އެންކެޔޮޅުބޭ' },
     { input: 'enkeyolhube', output: 'އެންކެޔޮޅުބެ' },
     { input: 'dhirihurihaa', output: 'ދިރިހުރިހާ' },
+    { input: 'rashuthereah', output: 'ރަށުތެރެއަށް' },
     { input: 'ihusaasveemaa', output: 'އިހުސާސްވީމާ' },
     { input: 'kuranvvyy', output: 'ކުރަންވީ' },
     { input: 'kuranvvy', output: 'ކުރަންވީ' },
@@ -1174,6 +1175,7 @@ function performTransliteration(latinText) {
             { pattern: 'bindhu', output: 'ބިނދު', length: 6 },
             { pattern: 'findhu', output: 'ފިނދު', length: 6 },
             { pattern: 'hingaa', output: 'ހިނގާ', length: 6 },
+            { pattern: 'lhangi', output: 'ޅަނގި', length: 6 },
             { pattern: 'gandeh', output: 'ގަނޑެއް', length: 6 },
             
             // 5-letter patterns
