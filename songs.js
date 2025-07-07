@@ -6723,7 +6723,32 @@ $2
 ރީތި މާތައް ރަކި ވެދާނޭ ހީލުމުން
 *ރީތި މޫސުން ބަދަލު ވާނޭ ރޯލުމުން
 ފުން ހަނދާނޭ ކެތް ނުވާ ތަގުދީރުހޭ
-*އެދެނީ ކަލާ ލިބުމޭ މަގޭ ތަގުދީރުގާ`
+*އެދެނީ ކަލާ ލިބުމޭ މަގޭ ތަގުދީރުގާ`,
+
+englishLyrics: `#M
+Veyn libeythee ey kuraa thaubeerugaa
+*Edheny kalaa libumey magey thagudheerugaa
+#1
+Mey thelhun vaathee hithey noathee madun
+*Rey nidhin heylavvanee huvafen thakun
+Rey dhuvaa edheny eky bahdhalu velun
+*Heydha vevuneemaa ethaa loabin mihen
+Hiyaalugaa vaa hiy ruhey thas veeruhey
+*Edheny kalaa libumey magey thagudheerugaa
+#2
+Hiy mulhin nuruhihjeyey dhurugaa hurun
+*Fun asaru kuruvaifiyey roe roe mihen
+Kei mashah nuveveyneyey dhekelaa hithun
+*Dhen mihen hureveynehey shakuvaa kuran
+Vaudhu loabin koh mihen hureveynehey
+*Edheny kalaa libumey magey thagudheerugaa
+#3
+Hoonukan dheythee himeyn neyvaa thakun
+*Vee ruhun hithugaa kuraa ithubaarakun
+Reethi maathah raki vedhaaney heelumun
+*Reethi moosun badhalu vaaney roa lumum
+Fun handhaaney kei nuvaa thagudheeruhey
+*Edheny kalaa libumey magey thagudheerugaa`
 },
 {
   id: 207,

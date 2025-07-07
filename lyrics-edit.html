@@ -1010,6 +1010,7 @@
       let currentSection = null;
       let importSectionCount = 0;
       let hasContent = false;
+      let currentPrefix = '#'; // Start with # prefix
       const sectionsDiv = document.getElementById('sections');
       
       for (let i = 0; i < lines.length; i++) {
@@ -1025,6 +1026,10 @@
           breakDiv.className = 'break-line';
           breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
           sectionsDiv.appendChild(breakDiv);
+          
+          // Switch prefix after break: # -> $, $ -> #
+          currentPrefix = currentPrefix === '#' ? '$' : '#';
+          importSectionCount = 0; // Reset section count for new prefix group
           continue;
         }
         
@@ -1041,12 +1046,10 @@
           importSectionCount++;
           let sectionName;
           
-          // Use standard section naming convention: #M for first, then #1, #2, etc.
-          if (importSectionCount === 1) {
-            sectionName = '#M';
-          } else {
-            sectionName = `#${importSectionCount - 1}`;
-          }
+          // Use same section naming as English editor: M, 1, 2, 3, etc. with current prefix
+          const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
+          const sectionIndex = (importSectionCount - 1) % sectionOrder.length;
+          sectionName = currentPrefix + sectionOrder[sectionIndex];
           
           currentSection = addSection(sectionName, true, true);
         }

@@ -585,18 +585,12 @@
         }
       });
       const lyricsEscaped = lyrics.trim().replace(/`/g, '\u0060');
-      const output = `{
-  id: ${loadedSongId ? loadedSongId : nextId},
-  name: \`${songName.replace(/`/g, '\u0060')}\`,
-  englishLyrics: \`${lyricsEscaped}\`
-},`;
+      const output = `,
+  englishLyrics: \`${lyricsEscaped}\`,`;
       if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(output).then(() => {
-          alert('English lyrics copied to clipboard!');
-        });
+        navigator.clipboard.writeText(output);
       } else {
         fallbackCopyTextToClipboard(output);
-        alert('English lyrics copied to clipboard!');
       }
     }
     
@@ -820,8 +814,9 @@
           
           // If no section header, auto-add
           if (!currentSection) {
-            const sectionNames = ['Verse 1', 'Verse 2', 'Verse 3', 'Chorus'];
-            let autoName = sectionNames[sectionIndex % sectionNames.length];
+            const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
+            const autoSectionIndex = sectionIndex % sectionOrder.length;
+            let autoName = '#' + sectionOrder[autoSectionIndex];
             currentSection = addSection(autoName, true, true); // skip initial line
             sectionCount++;
             sectionIndex++;
@@ -886,6 +881,7 @@
       let currentSection = null;
       let importSectionCount = 0;
       let hasContent = false;
+      let currentPrefix = '#'; // Start with # prefix
       const sectionsDiv = document.getElementById('sections');
       
       for (let i = 0; i < lines.length; i++) {
@@ -901,6 +897,10 @@
           breakDiv.className = 'break-line';
           breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove(); saveState();">×</button>';
           sectionsDiv.appendChild(breakDiv);
+          
+          // Switch prefix after break: # -> $, $ -> #
+          currentPrefix = currentPrefix === '#' ? '$' : '#';
+          importSectionCount = 0; // Reset section count for new prefix group
           continue;
         }
         
@@ -917,14 +917,10 @@
           importSectionCount++;
           let sectionName;
           
-          // Use standard English section naming convention
-          if (importSectionCount === 1) {
-            sectionName = 'Verse 1';
-          } else if (importSectionCount === 2) {
-            sectionName = 'Chorus';
-          } else {
-            sectionName = `Verse ${importSectionCount}`;
-          }
+          // Use same section naming as Dhivehi editor: M, 1, 2, 3, etc. with current prefix
+          const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
+          const sectionIndex = (importSectionCount - 1) % sectionOrder.length;
+          sectionName = currentPrefix + sectionOrder[sectionIndex];
           
           currentSection = addSection(sectionName, true, true);
         }
