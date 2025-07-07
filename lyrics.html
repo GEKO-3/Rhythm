@@ -9,6 +9,23 @@
 <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
 <link rel="manifest" href="favicons/manifest.webmanifest">
   <style>
+    /* Load local fonts from Fonts folder */
+    @font-face {
+      font-family: 'Faruma';
+      src: url('Fonts/Faruma.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+    
     html, body {
       /* Allow scrolling, but prevent zoom gestures */
       touch-action: pan-x pan-y;
@@ -61,6 +78,37 @@
       margin-top: 40px;
       margin-bottom: 40px;
     }
+    .back-button {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0;
+      z-index: 10;
+    }
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      gap: 20px;
+    }
+    .back-button:hover {
+      background-color: var(--hover-color);
+      transform: scale(1.1);
+    }
+    .back-button:active {
+      background-color: var(--active-color);
+      transform: scale(0.95);
+    }
     button {
       background-color: var(--primary-color);
       color: var(--text-color);
@@ -81,8 +129,87 @@
       background-color: var(--active-color);
       transform: scale(0.97);
     }
+    .language-toggle {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 200px;
+      height: 50px;
+      background-color: #555;
+      border-radius: 25px;
+      border: 2px solid #666;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .toggle-switch.disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      background-color: #333;
+      border-color: #444;
+    }
+    .toggle-switch.disabled .toggle-label.english {
+      text-decoration: line-through;
+    }
+    .toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 96px;
+      height: 42px;
+      background-color: var(--primary-color);
+      border-radius: 21px;
+      transition: transform 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: var(--text-color);
+      font-size: 0.9em;
+      z-index: 2;
+      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif;
+    }
+    .toggle-slider.english {
+      transform: translateX(96px);
+    }
+    .toggle-labels {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      z-index: 1;
+    }
+    .toggle-label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9em;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: color 0.3s ease;
+      pointer-events: none;
+    }
+    .toggle-label.dhivehi {
+      color: var(--text-color);
+      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif;
+    }
+    .toggle-label.english {
+      color: #ccc;
+    }
+    .toggle-switch:not(.disabled):hover {
+      border-color: var(--primary-color);
+    }
+    .language-btn {
+      display: none; /* Hide the old buttons */
+    }
     .lyrics-template {
-      margin-top: 2em;
+      margin-top: 0;
       display: none;
       direction: rtl;
       font-size: 1.3em;
@@ -94,7 +221,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.07);
       text-align: right;
       line-height: 2em;
-      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', Arial, sans-serif;
+      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif;
       user-select: none;
       -webkit-user-select: none;
       -ms-user-select: none;
@@ -110,6 +237,8 @@
       color: var(--primary-color);
       text-align: center;
       font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      margin: 0 0 20px 0;
+      padding: 0;
     }
     .highlight-line {
       color: #f5d000;
@@ -131,6 +260,13 @@
       touch-action: none;
       pointer-events: auto;
       will-change: transform;
+      transition: left 0.3s ease, right 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease;
+    }
+    .section-nav-bar.english {
+      left: auto;
+      right: 0;
+      border-radius: 8px 0 0 8px;
+      box-shadow: -2px 0 8px rgba(0,0,0,0.08);
     }
     .section-nav-bar,
     .section-nav-bar * {
@@ -159,6 +295,9 @@
       border-radius: 0 5px 5px 0;
       margin-bottom: 5px;
     }
+    .section-nav-bar.english .yellow-btn {
+      border-radius: 5px 0 0 5px;
+    }
     .section-nav-bar .yellow-btn:hover {
       background: var(--hover-color);
       font-weight: bold;
@@ -169,6 +308,9 @@
       border-radius: 0 5px 5px 0;
       margin-bottom: 5px;
       margin-left: 0;
+    }
+    .section-nav-bar.english .white-btn {
+      border-radius: 5px 0 0 5px;
     }
     .section-nav-bar .white-btn:hover {
       background: #f5f5f5;
@@ -204,6 +346,29 @@
         max-width: 95vw;
         padding: 10px;
       }
+      .back-button {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+      }
+      .controls-row {
+        gap: 15px;
+      }
+      .toggle-switch {
+        width: 180px;
+        height: 45px;
+      }
+      .toggle-slider {
+        width: 86px;
+        height: 37px;
+        font-size: 0.8em;
+      }
+      .toggle-slider.english {
+        transform: translateX(86px);
+      }
+      .toggle-label {
+        font-size: 0.8em;
+      }
       .lyrics-template {
         padding: 10px;
       }
@@ -221,6 +386,12 @@
         overflow-x: unset;
         background: rgba(31,31,31,0.85);
       }
+      .section-nav-bar.english {
+        left: auto;
+        right: 0;
+        border-radius: 8px 0 0 8px;
+        box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+      }
       .section-nav-bar button {
         border-radius: 0 5px 5px 0;
         font-size: 0.95em;
@@ -230,6 +401,10 @@
       .section-nav-bar .yellow-btn,
       .section-nav-bar .white-btn {
         border-radius: 0 5px 5px 0;
+      }
+      .section-nav-bar.english .yellow-btn,
+      .section-nav-bar.english .white-btn {
+        border-radius: 5px 0 0 5px;
       }
     }
   </style>
@@ -269,9 +444,20 @@
 <body>
   <div class="section-nav-bar" id="section-nav-bar"></div>
   <div class="container">
-    <button onclick="window.location.href='songlist.html'">← Back</button>
+    <h2 id="song-title"></h2>
+    <div class="controls-row">
+      <button class="back-button" onclick="window.location.href='songlist.html'">←</button>
+      <div class="language-toggle">
+        <div class="toggle-switch" id="language-toggle" onclick="toggleLanguage()">
+          <div class="toggle-slider" id="toggle-slider">ދިވެހި</div>
+          <div class="toggle-labels">
+            <div class="toggle-label dhivehi">ދިވެހި</div>
+            <div class="toggle-label english">English</div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div id="lyrics-template" class="lyrics-template" dir="rtl">
-      <h2 id="song-title"></h2>
       <div id="song-lyrics"></div>
     </div>
   </div>
@@ -281,8 +467,92 @@
     const songLyrics = document.getElementById('song-lyrics');
     const lyricsTemplate = document.getElementById('lyrics-template');
     const sectionNavBar = document.getElementById('section-nav-bar');
+    const languageToggle = document.getElementById('language-toggle');
+    const toggleSlider = document.getElementById('toggle-slider');
     const selectedId = localStorage.getItem('selectedSongId');
     const song = songs.find(s => String(s.id) === String(selectedId));
+    
+    let currentLanguage = 'dhivehi'; // Default to Dhivehi
+    let englishAvailable = true;
+    
+    function toggleLanguage() {
+      if (!englishAvailable) return; // Don't toggle if English not available
+      
+      if (currentLanguage === 'dhivehi') {
+        switchLanguage('english');
+      } else {
+        switchLanguage('dhivehi');
+      }
+    }
+    
+    function switchLanguage(language) {
+      if (language === 'english' && !englishAvailable) {
+        return; // Don't switch if no English lyrics available
+      }
+      
+      currentLanguage = language;
+      
+      // Update toggle slider
+      if (language === 'english') {
+        toggleSlider.classList.add('english');
+        toggleSlider.textContent = 'English';
+        toggleSlider.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
+        // Move section nav bar to right
+        sectionNavBar.classList.add('english');
+      } else {
+        toggleSlider.classList.remove('english');
+        toggleSlider.textContent = 'ދިވެހި';
+        toggleSlider.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
+        // Move section nav bar to left
+        sectionNavBar.classList.remove('english');
+      }
+      
+      // Update lyrics display
+      const lyrics = language === 'dhivehi' ? song.lyrics : song.englishLyrics;
+      const { html, orderedSections } = parseSections(lyrics);
+      songLyrics.innerHTML = html;
+      
+      // Update text direction and font
+      const lyricsContainer = document.getElementById('lyrics-template');
+      if (language === 'english') {
+        lyricsContainer.style.direction = 'ltr';
+        lyricsContainer.style.textAlign = 'left';
+        lyricsContainer.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
+      } else {
+        lyricsContainer.style.direction = 'rtl';
+        lyricsContainer.style.textAlign = 'right';
+        lyricsContainer.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
+      }
+      
+      // Update navigation buttons
+      renderSectionButtons(orderedSections);
+    }
+    
+    function renderSectionButtons(orderedSections) {
+      sectionNavBar.innerHTML = '';
+      orderedSections.forEach((section) => {
+        const btn = document.createElement('button');
+        btn.textContent = section.name;
+        btn.className = section.type === 'yellow' ? 'yellow-btn' : 'white-btn';
+        btn.onclick = function() {
+          const sectionElem = document.getElementById(section.id);
+          if (sectionElem) {
+            sectionElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Flash effect
+            sectionElem.classList.add('flash');
+            btn.classList.add('flash');
+            setTimeout(() => {
+              sectionElem.classList.remove('flash');
+              btn.classList.remove('flash');
+            }, 350);
+          }
+          // Remove active from all buttons of the same type
+          sectionNavBar.querySelectorAll('.' + btn.className).forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+        sectionNavBar.appendChild(btn);
+      });
+    }
     
     function slugify(text) {
       return text
@@ -367,38 +637,33 @@
 
     if (song) {
       songTitle.textContent = song.name;
+      
+      // Check if English lyrics are available
+      englishAvailable = song.englishLyrics && song.englishLyrics.trim() !== '';
+      
+      if (!englishAvailable) {
+        languageToggle.classList.add('disabled');
+        languageToggle.title = 'English lyrics not available';
+      } else {
+        languageToggle.classList.remove('disabled');
+        languageToggle.title = '';
+      }
+      
+      // Load Dhivehi lyrics by default
       const { html, orderedSections } = parseSections(song.lyrics);
       songLyrics.innerHTML = html;
       lyricsTemplate.style.display = 'block';
-
-      // Render section buttons in the order they appear in the lyrics
-      sectionNavBar.innerHTML = '';
-      orderedSections.forEach((section) => {
-        const btn = document.createElement('button');
-        btn.textContent = section.name;
-        btn.className = section.type === 'yellow' ? 'yellow-btn' : 'white-btn';
-        btn.onclick = function() {
-          const sectionElem = document.getElementById(section.id);
-          if (sectionElem) {
-            sectionElem.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            // Flash effect
-            sectionElem.classList.add('flash');
-            btn.classList.add('flash');
-            setTimeout(() => {
-              sectionElem.classList.remove('flash');
-              btn.classList.remove('flash');
-            }, 350);
-          }
-          // Remove active from all buttons of the same type
-          sectionNavBar.querySelectorAll('.' + btn.className).forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-        };
-        sectionNavBar.appendChild(btn);
-      });
+      
+      // Render section buttons
+      renderSectionButtons(orderedSections);
     } else {
       songTitle.textContent = 'Error: Song not found.';
       songLyrics.textContent = 'Error: Lyrics not found.';
       lyricsTemplate.style.display = 'block';
+      
+      // Disable toggle if song not found
+      languageToggle.classList.add('disabled');
+      englishAvailable = false;
     }
   </script>
 </body>

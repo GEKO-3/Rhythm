@@ -6,12 +6,24 @@
       <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
 <link rel="manifest" href="favicons/manifest.webmanifest">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Faruma&display=swap" rel="stylesheet">
     <title>Dhivehi Transliteration Tool</title>
     <style>
+        /* Local font definitions */
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
         /* --- Begin: Style updated to match lyrics.html --- */
         body {
             font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
@@ -265,7 +277,7 @@
         
         /* Output text (Dhivehi) - Use Faruma */
         #dhivehiOutput, #dhivehiLines {
-            font-family: 'Faruma', 'MV Boli', Tahoma, sans-serif;
+            font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
         }
         
         /* Line view text elements */
@@ -275,7 +287,7 @@
         }
         
         #dhivehiLines .line-text {
-            font-family: 'Faruma', 'MV Boli', Tahoma, sans-serif;
+            font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
         }
         button {
             background-color: #f5d000;
@@ -365,8 +377,9 @@
         <div class="input-output-container">
             <div class="input-section">
                 <h3 style="display: flex; align-items: center; justify-content: space-between;">
-                    Input Text
+                    Input
                     <div style="display: flex; gap: 8px; align-items: center;">
+                        <button id="importEnglishBtn" type="button" title="Import to English Lyrics Editor" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #007bff; color: white; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Import</button>
                         <button id="syncScrollBtn" type="button" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #f5d000; color: #232323; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;" title="Toggle synchronized scrolling">Sync</button>
                         <span id="syncIndicator" style="font-size: 0.85rem; color: #f5d000; font-weight: 500;">🔗 Sync enabled</span>
                     </div>
@@ -380,7 +393,7 @@
                     Output
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <button id="copyAllBtn" type="button" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #444; color: #ffe066; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Copy</button>
-                        <button id="importBtn" type="button" title="Import to Lyrics Editor" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #28a745; color: white; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Import</button>
+                        <button id="importBtn" type="button" title="Import to Dhivehi Lyrics Editor" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #28a745; color: white; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Import</button>
                         <button id="toggleViewBtn" type="button" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #f5d000; color: #232323; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Line</button>
                     </div>
                 </h3>
@@ -922,6 +935,45 @@
             }, 1000);
         });
         
+        // Import English to English Lyrics Editor functionality
+        document.getElementById('importEnglishBtn').addEventListener('click', function() {
+            const inputText = document.getElementById('inputDisplay').value.trim();
+            if (!inputText) {
+                alert('No English text to import! Please enter some text first.');
+                return;
+            }
+            
+            // Visual feedback
+            this.textContent = 'Opening...';
+            this.style.background = '#0056b3';
+            
+            // Get first 3 words from first line of input field for song name
+            const firstLine = inputText.split('\n')[0].trim();
+            const words = firstLine.split(/\s+/).filter(word => word.length > 0);
+            
+            // Use up to 3 words, or all words if less than 3
+            const wordsToUse = words.slice(0, Math.min(3, words.length));
+            const songName = wordsToUse
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+            
+            // Prepare the text for import
+            const textToImport = encodeURIComponent(inputText);
+            
+            // Open English lyrics editor with imported text and song name
+            let url = `lyrics-edit-english.html?import=${textToImport}`;
+            if (songName) {
+                url += `&songName=${encodeURIComponent(songName)}`;
+            }
+            window.open(url, '_blank');
+            
+            // Reset button
+            setTimeout(() => {
+                this.textContent = 'Import EN';
+                this.style.background = '#007bff';
+            }, 1000);
+        });
+        
         // Toggle View button functionality
         document.getElementById('toggleViewBtn').addEventListener('click', function() {
             const inputTextarea = document.getElementById('inputDisplay');
@@ -998,7 +1050,7 @@
                     text-align: right;
                     margin-right: 10px;
                     word-wrap: break-word;
-                    font-family: 'Faruma', 'MV Boli', Tahoma, sans-serif;
+                    font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
                 `;
                 
                 const copyButton = document.createElement('button');

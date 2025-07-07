@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="dv">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Lyrics Editor</title>
+  <title>English Lyrics Editor</title>
+  <!-- Disable browser zooming completely -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
@@ -75,36 +76,15 @@
       margin-top: 40px;
       margin-bottom: 40px;
     }
-    button {
-      background-color: var(--primary-color);
-      color: var(--text-color);
-      border: none;
-      border-radius: 5px;
-      padding: 10px 18px;
-      font-size: 1em;
-      cursor: pointer;
-      margin-bottom: 20px;
-      transition: background-color 0.3s, transform 0.2s;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-    }
-    button:hover {
-      background-color: var(--hover-color);
-      font-weight: bold;
-    }
-    button:active {
-      background-color: var(--active-color);
-      transform: scale(0.97);
-    }
     .section {
       background: rgba(43,43,43,0.7);
-      border: 1px solid #313131;
-      box-shadow: 0 1px 4px #0001;
-      padding: 16px 14px 14px 14px;
-      margin-bottom: 28px;
       border-radius: 8px;
+      margin-bottom: 24px;
+      padding: 18px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
       position: relative;
-      text-align: right;
-      direction: rtl;
+      text-align: left;
+      direction: ltr;
     }
     .section-title {
       font-weight: 700;
@@ -113,53 +93,40 @@
       border: none;
       background: none;
       width: 100%;
-      color: #ffffff;
+      color: var(--primary-color);
       margin-bottom: 10px;
-      border-bottom: 1px solid #494949;
-      border-radius: 0;
+      border-bottom: 1px solid #535353;
       outline: none;
-      transition: border-color 0.2s;
-      background: transparent;
-      direction: ltr;
-      font-family: 'Montserrat', Arial, sans-serif;
-      text-align: left;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
     }
     .section-title:focus {
-      border-color: #E6B800;
-      background: #111111;
+      border-bottom-color: var(--primary-color);
     }
     .line {
       display: flex;
       align-items: stretch;
       margin-bottom: 10px;
-      direction: rtl;
-      flex-direction: row-reverse;
+      direction: ltr;
+      flex-direction: row;
       gap: 6px;
     }
     .line input[type="text"] {
       flex: 1;
       max-width: 500px;
       width: 100%;
-      padding: 7px 12px 7px 5px;
+      padding: 7px 5px 7px 12px;
       border-radius: 5px;
       border: 1px solid #535353;
-      background: #1b1b1b;
-      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif;
-      direction: rtl;
-      font-size: 1.1em;
-      color: #ffffff;
+      background: rgba(43,43,43,0.85);
+      color: #FFFFFF;
       outline: none;
-      transition: border-color 0.2s, background 0.2s;
-      height: 38px;
-      box-sizing: border-box;
+      font-size: 1.05em;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      direction: ltr;
+      text-align: left;
     }
-    .line input[type="checkbox"] {
-      height: 90%;
-      width: 18px;
-      accent-color: #f5d000;
-      margin-left: 2px;
-      align-self: center;
-      display: flex;
+    .line input[type="text"]:focus {
+      border-color: var(--primary-color);
     }
     .star-line-btn {
       width: 26px;
@@ -175,7 +142,7 @@
       align-items: center;
       justify-content: center;
       padding: 0;
-      margin-left: 6px;
+      margin-right: 6px;
       transition: background 0.2s, color 0.2s;
       box-shadow: none;
       font-family: 'Montserrat', Arial, sans-serif;
@@ -222,11 +189,6 @@
       color: #fff;
     }
     .remove-line-btn {
-      height: 100%;
-      aspect-ratio: 1/1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       width: 26px;
       height: 26px;
       background: #ff7920;
@@ -240,7 +202,7 @@
       align-items: center;
       justify-content: center;
       padding: 0;
-      margin-left: 6px;
+      margin-right: 6px;
       transition: background 0.2s, color 0.2s;
       box-shadow: none;
       font-family: 'Montserrat', Arial, sans-serif;
@@ -271,6 +233,26 @@
     .add-line-btn:hover {
       background: #fced98;
       color: #2b2b2b;
+    }
+    button {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 5px;
+      padding: 10px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background-color 0.3s, transform 0.2s;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    button:hover {
+      background-color: var(--hover-color);
+      font-weight: bold;
+    }
+    button:active {
+      background-color: var(--active-color);
+      transform: scale(0.97);
     }
     .break-line {
       width: 100%;
@@ -310,35 +292,23 @@
       color: #fff;
     }
     @media (max-width: 600px) {
-      html, body {
-        font-size: 18px;
-      }
       .container {
-        padding: 12px 2vw 18px 2vw;
-        max-width: 98vw;
-        min-width: 0;
+        max-width: 95vw;
+        padding: 10px;
       }
-      h2 {
-        font-size: 1.3em;
-      }
-      .section-title {
-        font-size: 1em;
-        padding: 6px 0 10px 0;
+      .section {
+        padding: 12px 10px;
       }
       .line input[type="text"] {
         font-size: 1em;
-        padding: 8px 8px 8px 4px;
-        min-width: 0;
-        max-width: 100%;
       }
       .controls {
         flex-direction: column;
-        gap: 10px;
+        align-items: center;
       }
-      button, .remove-section-btn, .remove-line-btn {
-        font-size: 1em;
-        padding: 10px 0;
-        min-width: 0;
+      button {
+        width: 100%;
+        max-width: 200px;
       }
     }
   </style>
@@ -389,59 +359,30 @@
   </div>
   <script>
     let sectionCount = 0;
-    function transliterateToThaana(text) {
-      const map = {
-        'A': 'ާ', 'B': 'ޞ', 'C': 'ޝ', 'D': 'ޑ', 'E': 'ޭ', 'F': 'ﷲ', 'G': 'ޣ', 'H': 'ޙ', 'I': 'ީ', 'J': 'ޛ', 'K': 'ޚ', 'L': 'ޅ', 'M': 'ޟ', 'N': 'ޏ', 'O': 'ޯ', 'P': '÷', 'Q': 'ޤ', 'R': 'ޜ', 'S': 'ށ', 'T': 'ޓ', 'U': 'ޫ', 'V': 'ޥ', 'W': 'ޢ', 'X': 'ޘ', 'Y': 'ޠ', 'Z': 'ޡ',
-        'a': 'ަ', 'b': 'ބ', 'c': 'ޗ', 'd': 'ދ', 'e': 'ެ', 'f': 'ފ', 'g': 'ގ', 'h': 'ހ', 'i': 'ި', 'j': 'ޖ', 'k': 'ކ', 'l': 'ލ', 'm': 'މ', 'n': 'ނ', 'o': 'ޮ', 'p': 'ޕ', 'q': 'ް', 'r': 'ރ', 's': 'ސ', 't': 'ތ', 'u': 'ު', 'v': 'ވ', 'w': 'އ', 'x': '×', 'y': 'ޔ', 'z': 'ޒ'
-      };
-      let thaana = text.split('').map(ch => map[ch] || ch).join('');
-      // Remove forbidden Thaana characters if directly after any forbidden
-      const forbidden = ['ާ','ަ','ް','ޭ','ެ','ޯ','ޮ','ީ','ި','ޫ','ު'];
-      let result = '';
-      for (let i = 0; i < thaana.length; i++) {
-        if (
-          i > 0 &&
-          forbidden.includes(thaana[i]) &&
-          forbidden.includes(thaana[i - 1])
-        ) {
-          continue; // skip if previous is forbidden
-        }
-        result += thaana[i];
-      }
-      return result;
-    }
-    function setupThaanaTransliteration(input) {
-      input.addEventListener('input', function(e) {
-        const caret = input.selectionStart;
-        const original = input.value;
-        const thaana = transliterateToThaana(original);
-        if (original !== thaana) {
-          input.value = thaana;
-          input.setSelectionRange(caret, caret);
-        }
-      });
-    }
+    
     function saveState() {
       const data = [];
       const container = document.getElementById('sections');
       const children = Array.from(container.children);
       children.forEach(child => {
         if (child.classList.contains('section')) {
-          const sectionTitle = child.querySelector('.section-title').value;
-          const lines = [];
-          child.querySelectorAll('.line').forEach(line => {
-            lines.push({
-              text: line.querySelector('input[type="text"]').value,
-              starred: line.querySelector('.star-line-btn').classList.contains('active')
-            });
+          const title = child.querySelector('.section-title').value;
+          const lines = Array.from(child.querySelectorAll('.line')).map(line => {
+            const input = line.querySelector('input[type="text"]');
+            const starBtn = line.querySelector('.star-line-btn');
+            return {
+              text: input.value,
+              starred: starBtn.classList.contains('active')
+            };
           });
-          data.push({ type: 'section', title: sectionTitle, lines });
+          data.push({ type: 'section', title, lines });
         } else if (child.classList.contains('break-line')) {
           data.push({ type: 'break' });
         }
       });
-      localStorage.setItem('lyricsEditorData', JSON.stringify(data));
+      localStorage.setItem('englishLyricsEditorData', JSON.stringify(data));
     }
+    
     function setLineHighlight(lineDiv) {
       const input = lineDiv.querySelector('input[type="text"]');
       const starBtn = lineDiv.querySelector('.star-line-btn');
@@ -451,68 +392,34 @@
         input.style.color = '#ffffff';
       }
     }
+    
     function loadState() {
-      const data = JSON.parse(localStorage.getItem('lyricsEditorData') || 'null');
+      const data = JSON.parse(localStorage.getItem('englishLyricsEditorData') || 'null');
       if (!data) return false;
       document.getElementById('sections').innerHTML = '';
       sectionCount = 0;
       data.forEach(item => {
         if (item.type === 'section') {
-          sectionCount++;
-          const sectionsDiv = document.getElementById('sections');
-          const section = document.createElement('div');
-          section.className = 'section';
-          section.dataset.sectionId = sectionCount;
-          section.innerHTML = `
-            <input type="text" class="section-title" placeholder="#M,#1,#2,#4 - $M,$1,$2,$4" />
-            <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
-            <div class="lines"></div>
-            <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
-          `;
-          sectionsDiv.appendChild(section);
-          const sectionTitleInput = section.querySelector('.section-title');
-          sectionTitleInput.value = item.title;
-          const linesDiv = section.querySelector('.lines');
+          const section = addSection(item.title, true, true);
           item.lines.forEach(lineData => {
-            const lineDiv = document.createElement('div');
-            lineDiv.className = 'line';
-            lineDiv.innerHTML = `
-              <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
-              <button class="star-line-btn" title="Nagaa / Zuvaabu">N</button>
-              <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
-            `;
-            linesDiv.appendChild(lineDiv);
-            const lineInput = lineDiv.querySelector('input[type="text"]');
-            lineInput.value = lineData.text;
-            setupThaanaTransliteration(lineInput);
-            setupInputNavigation(lineInput);
-            const starBtn = lineDiv.querySelector('.star-line-btn');
-            if (lineData && lineData.starred) {
+            const lineDiv = addLineToSection(section, lineData.text);
+            if (lineData.starred) {
+              const starBtn = lineDiv.querySelector('.star-line-btn');
               starBtn.classList.add('active');
               starBtn.textContent = 'Z';
-            } else {
-              starBtn.textContent = 'N';
-            }
-            setLineHighlight(lineDiv);
-            lineInput.addEventListener('input', saveState);
-            starBtn.addEventListener('click', function() {
-              starBtn.classList.toggle('active');
-              starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
               setLineHighlight(lineDiv);
-              saveState();
-            });
-            lineInput.addEventListener('input', saveState);
+            }
           });
         } else if (item.type === 'break') {
-          const sectionsDiv = document.getElementById('sections');
           const breakDiv = document.createElement('div');
           breakDiv.className = 'break-line';
-          breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
-          sectionsDiv.appendChild(breakDiv);
+          breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove(); saveState();">×</button>';
+          document.getElementById('sections').appendChild(breakDiv);
         }
       });
       return true;
     }
+    
     function addSection(sectionName, editable, skipInitialLine) {
       sectionCount++;
       const sectionsDiv = document.getElementById('sections');
@@ -565,13 +472,10 @@
         sectionTitleInput.focus();
         sectionTitleInput.addEventListener('keydown', function(e) {
           if (e.key === 'Enter') {
-            e.preventDefault();
-            let firstLineInput = section.querySelector('.line input[type="text"]');
-            if (!firstLineInput) {
-              addLine(section);
-              firstLineInput = section.querySelector('.line input[type="text"]');
+            const firstLineInput = section.querySelector('.line input[type="text"]');
+            if (firstLineInput) {
+              firstLineInput.focus();
             }
-            if (firstLineInput) firstLineInput.focus();
           }
         });
       }
@@ -581,18 +485,18 @@
       saveState();
       return section;
     }
+    
     function addLine(sectionDiv) {
       const linesDiv = sectionDiv.querySelector('.lines');
       const lineDiv = document.createElement('div');
       lineDiv.className = 'line';
       lineDiv.innerHTML = `
-        <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް"/>
         <button class="star-line-btn" title="Star this line">N</button>
         <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+        <input type="text" placeholder="Enter lyrics here..."/>
       `;
       linesDiv.appendChild(lineDiv);
       const lineInput = lineDiv.querySelector('input[type="text"]');
-      setupThaanaTransliteration(lineInput);
       setupInputNavigation(lineInput);
       const starBtn = lineDiv.querySelector('.star-line-btn');
       starBtn.textContent = 'N';
@@ -605,7 +509,9 @@
         saveState();
       });
       saveState();
+      return lineDiv;
     }
+    
     function addBreak() {
       // Find the currently focused section or default to last section
       let activeSection = document.activeElement && document.activeElement.closest('.section');
@@ -616,10 +522,12 @@
       if (activeSection) {
         const breakDiv = document.createElement('div');
         breakDiv.className = 'break-line';
-        breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+        breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove(); saveState();">×</button>';
         activeSection.parentNode.insertBefore(breakDiv, activeSection.nextSibling);
+        saveState();
       }
     }
+    
     function copyToClipboard() {
       const songName = document.getElementById('song-name-input').value.trim();
       const container = document.getElementById('sections');
@@ -666,11 +574,12 @@
             const starBtn = line.querySelector('.star-line-btn');
             let text = input.value.trim();
             if (text) {
-              if (starBtn.classList.contains('active')) text = '*' + text;
+              if (starBtn.classList.contains('active')) {
+                text = '*' + text;
+              }
               lyrics += text + '\n';
             }
           });
-          lyrics += '\n';
         } else if (child.classList.contains('break-line')) {
           lyrics += '-\n';
         }
@@ -679,14 +588,18 @@
       const output = `{
   id: ${loadedSongId ? loadedSongId : nextId},
   name: \`${songName.replace(/`/g, '\u0060')}\`,
-  lyrics: \`${lyricsEscaped}\`
+  englishLyrics: \`${lyricsEscaped}\`
 },`;
       if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(output);
+        navigator.clipboard.writeText(output).then(() => {
+          alert('English lyrics copied to clipboard!');
+        });
       } else {
         fallbackCopyTextToClipboard(output);
+        alert('English lyrics copied to clipboard!');
       }
     }
+    
     function fallbackCopyTextToClipboard(text) {
       const textArea = document.createElement('textarea');
       textArea.value = text;
@@ -710,30 +623,36 @@
       }
       document.body.removeChild(textArea);
     }
+    
     function removeLine(lineDiv) {
       lineDiv.remove();
       saveState();
     }
+    
     function removeSection(sectionDiv) {
       sectionDiv.remove();
       saveState();
     }
+    
     function resetTool() {
-      localStorage.removeItem('lyricsEditorData');
-      localStorage.removeItem('lyricsEditorSongName');
+      localStorage.removeItem('englishLyricsEditorData');
+      localStorage.removeItem('englishLyricsEditorSongName');
       document.getElementById('sections').innerHTML = '';
       sectionCount = 0;
       document.getElementById('song-name-input').value = '';
       addSection();
     }
+    
     document.addEventListener('input', function(e) {
       if (e.target.classList && e.target.classList.contains('section-title')) {
         saveState();
       }
     });
+    
     if (!loadState()) {
       addSection();
     }
+    
     function setupInputNavigation(lineInput) {
       lineInput.addEventListener('keydown', function(e) {
         const currentLine = lineInput.closest('.line');
@@ -776,13 +695,12 @@
             const newLine = document.createElement('div');
             newLine.className = 'line';
             newLine.innerHTML = `
-              <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
               <button class="star-line-btn" title="Star this line">N</button>
               <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+              <input type="text" placeholder="Enter lyrics here..." />
             `;
             linesDiv.insertBefore(newLine, lines[idx + 1] || null);
             const newInput = newLine.querySelector('input[type="text"]');
-            setupThaanaTransliteration(newInput);
             setupInputNavigation(newInput);
             const starBtn = newLine.querySelector('.star-line-btn');
             starBtn.textContent = 'N';
@@ -821,9 +739,10 @@
         }
       });
     }
+    
     // Song name input save/load
     const songNameInput = document.getElementById('song-name-input');
-    songNameInput.value = localStorage.getItem('lyricsEditorSongName') || '';
+    songNameInput.value = localStorage.getItem('englishLyricsEditorSongName') || '';
     songNameInput.addEventListener('input', function() {
       // Capitalize first letter of every word as you type
       let value = songNameInput.value;
@@ -835,8 +754,9 @@
         songNameInput.value = value;
         songNameInput.setSelectionRange(pos, pos);
       }
-      localStorage.setItem('lyricsEditorSongName', songNameInput.value);
+      localStorage.setItem('englishLyricsEditorSongName', songNameInput.value);
     });
+    
     // Populate song name suggestions from songs.js
     let songIdMap = {};
     function populateSongNameSuggestions() {
@@ -844,7 +764,7 @@
         .then(response => response.text())
         .then(jsText => {
           // Extract id and name pairs from the JS file
-          const songRegex = /{\s*id:\s*(\d+),\s*name:\s*([`'"])(.*?)\2,\s*lyrics:\s*([`'"])([\s\S]*?)\4/g;
+          const songRegex = /{\s*id:\s*(\d+),\s*name:\s*([`'"])(.*?)\2,\s*lyrics:\s*([`'"])([\s\S]*?)\4(?:,\s*englishLyrics:\s*([`'"])([\s\S]*?)\6)?/g;
           const datalist = document.getElementById('song-names-list');
           datalist.innerHTML = '';
           songIdMap = {};
@@ -853,10 +773,11 @@
             const id = match[1];
             const name = match[3];
             const lyrics = match[5];
+            const englishLyrics = match[7] || '';
             const option = document.createElement('option');
             option.value = `${id} - ${name}`;
             datalist.appendChild(option);
-            songIdMap[`${id} - ${name}`] = { id, name, lyrics };
+            songIdMap[`${id} - ${name}`] = { id, name, lyrics, englishLyrics };
           }
         });
     }
@@ -866,100 +787,55 @@
     let loadedSongId = null;
     songNameInput.addEventListener('change', function() {
       const song = songIdMap[songNameInput.value];
-      if (song) {
+      if (song && song.englishLyrics) {
         songNameInput.value = song.name;
         loadedSongId = parseInt(song.id, 10);
         document.getElementById('sections').innerHTML = '';
         sectionCount = 0;
-        const lines = song.lyrics.split(/\r?\n/);
+        
+        // Parse English lyrics
+        const lines = song.englishLyrics.split(/\r?\n/);
         let currentSection = null;
-        let sectionPrefix = '#';
         let sectionIndex = 0;
-        let afterBreak = false;
-        const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
+        
         lines.forEach(line => {
           if (/^[-]+$/.test(line.trim())) {
             // Add break line
             const breakDiv = document.createElement('div');
             breakDiv.className = 'break-line';
-            breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+            breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove(); saveState();">×</button>';
             document.getElementById('sections').appendChild(breakDiv);
-            afterBreak = true;
-            sectionPrefix = '$';
-            sectionIndex = 0;
             currentSection = null;
             return;
           }
+          
           // Detect section header
-          let match = line.match(/^(#|\$)([A-Za-z0-9]+)/);
+          let match = line.match(/^#(.+)/);
           if (match) {
-            sectionPrefix = match[1];
-            let label = match[2];
-            sectionIndex = sectionOrder.indexOf(label);
-            if (sectionIndex === -1) sectionIndex = 0;
-            currentSection = addSection(line, true, true); // skip initial line
+            let sectionName = match[1].trim();
+            currentSection = addSection(sectionName, true, true); // skip initial line
             sectionCount++;
             return;
           }
-          // If line is a break section (e.g., $M, $1, etc.)
-          if (/^(\$[A-Za-z0-9]+)/.test(line.trim())) {
-            sectionPrefix = '$';
-            let label = line.trim().substring(1);
-            sectionIndex = sectionOrder.indexOf(label);
-            if (sectionIndex === -1) sectionIndex = 0;
-            currentSection = addSection(line, true, true); // skip initial line
-            sectionCount++;
-            return;
-          }
+          
           // If no section header, auto-add
           if (!currentSection) {
-            let autoLabel = sectionPrefix + sectionOrder[sectionIndex];
-            currentSection = addSection(autoLabel, true, true); // skip initial line
+            const sectionNames = ['Verse 1', 'Verse 2', 'Verse 3', 'Chorus'];
+            let autoName = sectionNames[sectionIndex % sectionNames.length];
+            currentSection = addSection(autoName, true, true); // skip initial line
             sectionCount++;
+            sectionIndex++;
           }
+          
           // Add line to current section as a new input
           if (currentSection) {
             if (line.trim() !== '') { // Only add non-empty lines
-              const linesDiv = currentSection.querySelector('.lines');
-              const lineDiv = document.createElement('div');
-              lineDiv.className = 'line';
-              lineDiv.innerHTML = `
-                <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
-                <button class="star-line-btn" title="Nagaa / Zuvaabu">N</button>
-                <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
-              `;
-              linesDiv.appendChild(lineDiv);
-              const lineInput = lineDiv.querySelector('input[type="text"]');
-              let text = line;
-              let starred = false;
-              if (text.startsWith('*')) {
-                starred = true;
-                text = text.slice(1);
-              }
-              lineInput.value = text;
-              setupThaanaTransliteration(lineInput);
-              setupInputNavigation(lineInput);
-              const starBtn = lineDiv.querySelector('.star-line-btn');
-              if (starred) {
-                starBtn.classList.add('active');
-                starBtn.textContent = 'Z';
-              } else {
-                starBtn.textContent = 'N';
-              }
-              setLineHighlight(lineDiv);
-              lineInput.addEventListener('input', saveState);
-              starBtn.addEventListener('click', function() {
-                starBtn.classList.toggle('active');
-                starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
-                setLineHighlight(lineDiv);
-                saveState();
-              });
-              lineInput.addEventListener('input', saveState);
+              const lineDiv = addLineToSection(currentSection, line);
             }
           }
-          // If next line is a new section, increment index
+          
+          // If next line is a new section, reset
           if (line.trim() === '') {
-            sectionIndex++;
             currentSection = null;
           }
         });
@@ -984,7 +860,7 @@
           if (decodedSongName) {
             const songNameInput = document.getElementById('song-name-input');
             songNameInput.value = decodedSongName;
-            localStorage.setItem('lyricsEditorSongName', decodedSongName);
+            localStorage.setItem('englishLyricsEditorSongName', decodedSongName);
           }
           
           // Clean up URL to remove import parameters
@@ -1000,7 +876,7 @@
     // Function to import text and create sections/lines
     function importTextToLyrics(text) {
       // Clear existing sections without adding a default empty section
-      localStorage.removeItem('lyricsEditorData');
+      localStorage.removeItem('englishLyricsEditorData');
       document.getElementById('sections').innerHTML = '';
       sectionCount = 0;
       document.getElementById('song-name-input').value = '';
@@ -1023,7 +899,7 @@
           // Add a break line
           const breakDiv = document.createElement('div');
           breakDiv.className = 'break-line';
-          breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+          breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove(); saveState();">×</button>';
           sectionsDiv.appendChild(breakDiv);
           continue;
         }
@@ -1041,11 +917,13 @@
           importSectionCount++;
           let sectionName;
           
-          // Use standard section naming convention: #M for first, then #1, #2, etc.
+          // Use standard English section naming convention
           if (importSectionCount === 1) {
-            sectionName = '#M';
+            sectionName = 'Verse 1';
+          } else if (importSectionCount === 2) {
+            sectionName = 'Chorus';
           } else {
-            sectionName = `#${importSectionCount - 1}`;
+            sectionName = `Verse ${importSectionCount}`;
           }
           
           currentSection = addSection(sectionName, true, true);
@@ -1078,21 +956,35 @@
       const lineDiv = document.createElement('div');
       lineDiv.className = 'line';
       lineDiv.innerHTML = `
-        <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް"/>
         <button class="star-line-btn" title="Star this line">N</button>
         <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+        <input type="text" placeholder="Enter lyrics here..."/>
       `;
       linesDiv.appendChild(lineDiv);
       
       const lineInput = lineDiv.querySelector('input[type="text"]');
       const starBtn = lineDiv.querySelector('.star-line-btn');
       
+      // Check if line starts with * for highlighted text
+      let starred = false;
+      if (text.startsWith('*')) {
+        starred = true;
+        text = text.slice(1);
+      }
+      
       // Set the text value
       lineInput.value = text;
       
-      // Set up transliteration and navigation
-      setupThaanaTransliteration(lineInput);
+      // Set up navigation
       setupInputNavigation(lineInput);
+      
+      // Set up star button
+      if (starred) {
+        starBtn.classList.add('active');
+        starBtn.textContent = 'Z';
+      } else {
+        starBtn.textContent = 'N';
+      }
       
       // Set up line highlighting
       setLineHighlight(lineDiv);
@@ -1105,6 +997,8 @@
         setLineHighlight(lineDiv);
         saveState();
       });
+      
+      return lineDiv;
     }
     
     // Call handleImportedText when page loads
