@@ -1008,13 +1008,17 @@
       // Split text into lines and filter out completely empty content
       const lines = text.split(/\r?\n/);
       let currentSection = null;
-      let importSectionCount = 0;
       let hasContent = false;
-      let currentPrefix = '#'; // Start with # prefix
       const sectionsDiv = document.getElementById('sections');
       
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
+        
+        // Empty lines mark the end of the current section
+        if (line === '') {
+          currentSection = null;
+          continue;
+        }
         
         // Check if line is a break indicator (just a dash or multiple dashes)
         if (/^-+$/.test(line)) {
@@ -1026,32 +1030,22 @@
           breakDiv.className = 'break-line';
           breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
           sectionsDiv.appendChild(breakDiv);
-          
-          // Switch prefix after break: # -> $, $ -> #
-          currentPrefix = currentPrefix === '#' ? '$' : '#';
-          importSectionCount = 0; // Reset section count for new prefix group
           continue;
         }
         
-        // If it's an empty line, mark end of current section
-        if (line === '') {
-          currentSection = null;
+        // Check if line is a section name (starts with # or $ followed by letters/numbers)
+        if (/^[#$][A-Za-z0-9]+$/.test(line)) {
+          hasContent = true;
+          currentSection = addSection(line, true, true);
           continue;
         }
         
+        // This is a lyric line - add it to current section
         hasContent = true;
         
-        // If we don't have a current section, create one
+        // If we don't have a current section, create a default one
         if (!currentSection) {
-          importSectionCount++;
-          let sectionName;
-          
-          // Use same section naming as English editor: M, 1, 2, 3, etc. with current prefix
-          const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
-          const sectionIndex = (importSectionCount - 1) % sectionOrder.length;
-          sectionName = currentPrefix + sectionOrder[sectionIndex];
-          
-          currentSection = addSection(sectionName, true, true);
+          currentSection = addSection('#M', true, true);
         }
         
         // Add the line to the current section
@@ -1090,12 +1084,27 @@
       const lineInput = lineDiv.querySelector('input[type="text"]');
       const starBtn = lineDiv.querySelector('.star-line-btn');
       
-      // Set the text value
+      // Check if line starts with * for starred text
+      let starred = false;
+      if (text.startsWith('*')) {
+        starred = true;
+        text = text.slice(1); // Remove the * prefix
+      }
+      
+      // Set the text value (without the * if it was starred)
       lineInput.value = text;
       
       // Set up transliteration and navigation
       setupThaanaTransliteration(lineInput);
       setupInputNavigation(lineInput);
+      
+      // Set up star button
+      if (starred) {
+        starBtn.classList.add('active');
+        starBtn.textContent = 'Z';
+      } else {
+        starBtn.textContent = 'N';
+      }
       
       // Set up line highlighting
       setLineHighlight(lineDiv);

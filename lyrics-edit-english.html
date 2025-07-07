@@ -354,9 +354,11 @@
       <button onclick="addSection()">Add Section</button>
       <button onclick="addBreak()">Add Break</button>
       <button onclick="copyToClipboard()">Copy to Clipboard</button>
+      <button onclick="transliterateAndSend()">Transliterate</button>
       <button onclick="resetTool()">Reset</button>
     </div>
   </div>
+  <script src="transliteration.js"></script>
   <script>
     let sectionCount = 0;
     
@@ -366,16 +368,15 @@
       const children = Array.from(container.children);
       children.forEach(child => {
         if (child.classList.contains('section')) {
-          const title = child.querySelector('.section-title').value;
-          const lines = Array.from(child.querySelectorAll('.line')).map(line => {
-            const input = line.querySelector('input[type="text"]');
-            const starBtn = line.querySelector('.star-line-btn');
-            return {
-              text: input.value,
-              starred: starBtn.classList.contains('active')
-            };
+          const sectionTitle = child.querySelector('.section-title').value;
+          const lines = [];
+          child.querySelectorAll('.line').forEach(line => {
+            lines.push({
+              text: line.querySelector('input[type="text"]').value,
+              starred: line.querySelector('.star-line-btn').classList.contains('active')
+            });
           });
-          data.push({ type: 'section', title, lines });
+          data.push({ type: 'section', title: sectionTitle, lines });
         } else if (child.classList.contains('break-line')) {
           data.push({ type: 'break' });
         }
@@ -400,21 +401,56 @@
       sectionCount = 0;
       data.forEach(item => {
         if (item.type === 'section') {
-          const section = addSection(item.title, true, true);
+          sectionCount++;
+          const sectionsDiv = document.getElementById('sections');
+          const section = document.createElement('div');
+          section.className = 'section';
+          section.dataset.sectionId = sectionCount;
+          section.innerHTML = `
+            <input type="text" class="section-title" placeholder="#M,#1,#2,#4 - $M,$1,$2,$4" />
+            <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
+            <div class="lines"></div>
+            <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
+          `;
+          sectionsDiv.appendChild(section);
+          const sectionTitleInput = section.querySelector('.section-title');
+          sectionTitleInput.value = item.title;
+          const linesDiv = section.querySelector('.lines');
           item.lines.forEach(lineData => {
-            const lineDiv = addLineToSection(section, lineData.text);
-            if (lineData.starred) {
-              const starBtn = lineDiv.querySelector('.star-line-btn');
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'line';
+            lineDiv.innerHTML = `
+              <button class="star-line-btn" title="Star this line">N</button>
+              <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+              <input type="text" placeholder="Enter lyrics here..."/>
+            `;
+            linesDiv.appendChild(lineDiv);
+            const lineInput = lineDiv.querySelector('input[type="text"]');
+            lineInput.value = lineData.text;
+            setupInputNavigation(lineInput);
+            const starBtn = lineDiv.querySelector('.star-line-btn');
+            if (lineData && lineData.starred) {
               starBtn.classList.add('active');
               starBtn.textContent = 'Z';
-              setLineHighlight(lineDiv);
+            } else {
+              starBtn.textContent = 'N';
             }
+            setLineHighlight(lineDiv);
+            lineInput.addEventListener('input', saveState);
+            starBtn.addEventListener('click', function() {
+              starBtn.classList.toggle('active');
+              starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+              setLineHighlight(lineDiv);
+              saveState();
+            });
+            lineInput.addEventListener('input', saveState);
           });
         } else if (item.type === 'break') {
+          const sectionsDiv = document.getElementById('sections');
           const breakDiv = document.createElement('div');
           breakDiv.className = 'break-line';
           breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove(); saveState();">×</button>';
-          document.getElementById('sections').appendChild(breakDiv);
+          sectionsDiv.appendChild(breakDiv);
         }
       });
       return true;
@@ -592,6 +628,57 @@
       } else {
         fallbackCopyTextToClipboard(output);
       }
+    }
+    
+    function transliterateAndSend() {
+      const songName = document.getElementById('song-name-input').value.trim();
+      const container = document.getElementById('sections');
+      const children = Array.from(container.children);
+      
+      // Collect lyrics content preserving structure but only transliterating lyric lines
+      let lyrics = '';
+      children.forEach(child => {
+        if (child.classList.contains('section')) {
+          const sectionTitle = child.querySelector('.section-title').value.trim();
+          if (sectionTitle) {
+            // Keep section titles as-is (don't transliterate)
+            lyrics += sectionTitle + '\n';
+          }
+          const lines = child.querySelectorAll('.line');
+          lines.forEach(line => {
+            const input = line.querySelector('input[type="text"]');
+            const starBtn = line.querySelector('.star-line-btn');
+            let text = input.value.trim();
+            if (text) {
+              // Transliterate only the lyric content, preserve starred state
+              const transliteratedText = performTransliteration(text);
+              if (starBtn.classList.contains('active')) {
+                lyrics += '*' + transliteratedText + '\n';
+              } else {
+                lyrics += transliteratedText + '\n';
+              }
+            }
+          });
+        } else if (child.classList.contains('break-line')) {
+          // Keep breaks as-is
+          lyrics += '-\n';
+        }
+      });
+      
+      if (!lyrics.trim()) {
+        alert('No lyrics content to transliterate.');
+        return;
+      }
+      
+      // Encode the lyrics and song name for URL
+      const encodedLyrics = encodeURIComponent(lyrics.trim());
+      const encodedSongName = songName ? encodeURIComponent(songName) : '';
+      
+      // Build URL to Dhivehi editor with import parameters
+      const dhivehiEditorUrl = `lyrics-edit.html?import=${encodedLyrics}${encodedSongName ? `&songName=${encodedSongName}` : ''}`;
+      
+      // Open Dhivehi editor in a new tab
+      window.open(dhivehiEditorUrl, '_blank');
     }
     
     function fallbackCopyTextToClipboard(text) {
