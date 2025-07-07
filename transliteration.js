@@ -172,6 +172,7 @@ const specialCases = [
     { input: 'ashiqiygaa', output: 'އާޝިޤީގާ' },
     { input: 'shabaabugaa', output: 'ޝަބާބުގާ' },
     { input: 'fenijjeyey', output: 'ފެނިއްޖެޔޭ' },
+    { input: 'furihamakan', output: 'ފުރިހަމަކަން' },
     { input: 'vaagoiyvey', output: 'ވާގޮތްވޭ' },
     { input: 'dholhuhaas', output: 'ދޮޅުހާސް' },
     { input: 'ruheynuhey', output: 'ރުހޭނުހޭ' },
@@ -568,6 +569,7 @@ const specialCases = [
     { input: 'zaeeme', output: 'ޒަޢީމެ' },
     { input: 'zaeemu', output: 'ޒަޢީމު' },
     { input: 'zaeem', output: 'ޒަޢީމު' },
+    { input: 'zahamu', output: 'ޒަހަމު' },
     { input: 'shaair', output: 'ޝާއިރު' },
     
     // 5 characters
@@ -583,6 +585,7 @@ const specialCases = [
     { input: 'maii', output: 'މާތް' },
     { input: 'maiy', output: 'މާތް' },
     { input: 'mayy', output: 'މާތް' },
+    { input: 'zaham', output: 'ޒަހަމު' },
     
     // 4 characters
     { input: 'dhon', output: 'ދޮން' },
@@ -1329,8 +1332,11 @@ function performTransliteration(latinText) {
         
         // Special case: check for front-of-word substring patterns
         const frontOfWordPatterns = [
+            { pattern: 'furihama', output: 'ފުރިހަމަ', length: 9 },
             { pattern: 'echch', output: 'އެއްޗ', length: 5 },
-            { pattern: 'ehch', output: 'އެއްޗ', length: 4 }
+            { pattern: 'ehch', output: 'އެއްޗ', length: 4 },
+            { pattern: 'thi', output: 'ތި', length: 3 },
+            { pattern: 'vi', output: 'ވި', length: 2 },
         ];
         
         for (let frontPattern of frontOfWordPatterns) {
