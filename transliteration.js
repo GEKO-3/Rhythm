@@ -1348,6 +1348,7 @@ function performTransliteration(latinText) {
             { pattern: 'joash', output: 'ޖޯޝ', length: 5 },
             { pattern: 'echch', output: 'އެއްޗ', length: 5 },
             { pattern: 'ehch', output: 'އެއްޗ', length: 4 },
+            { pattern: 'ash', output: 'އަޝ', length: 3 },
             { pattern: 'thi', output: 'ތި', length: 3 },
             { pattern: 'vi', output: 'ވި', length: 2 },
         ];
