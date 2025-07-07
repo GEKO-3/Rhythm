@@ -344,6 +344,7 @@ const specialCases = [
     { input: 'roohudhiy', output: 'ރޫހުދީ' },
     { input: 'javaahiru', output: 'ޖަވާހިރު' },
     { input: 'javaahir', output: 'ޖަވާހިރު' },
+    { input: 'keyolhaku', output: 'ކެޔޮޅަކު' },
     { input: 'shabaab', output: 'ޝަބާބު' },
     { input: 'shabaabu', output: 'ޝަބާބު' },
     { input: 'bahaaru', output: 'ބަހާރު' },
@@ -547,6 +548,7 @@ const specialCases = [
     { input: 'veyhey', output: 'ވޭހޭ' },
     
     // 6 characters
+    { input: 'farulu', output: 'ފަރުޟު' },
     { input: 'farihi', output: 'ފަރިހި' },
     { input: 'lwbyge', output: 'ލޯބީގެ' },
     { input: 'henney', output: 'ހެންނޭ' },
@@ -2159,6 +2161,15 @@ function performTransliteration(latinText) {
     
     // Clean up any ޭީ combinations and replace with single ޭ
     dhivehiText = dhivehiText.replace(/ޭީ/g, 'ޭ');
+    
+    // Clean up spaces before "ގެ" when it appears as a standalone word
+    dhivehiText = dhivehiText.replace(/\s+ގެ(?=\s|$)/g, 'ގެ');
+    
+    // Clean up spaces before "ކޮށް" when it appears as a standalone word
+    dhivehiText = dhivehiText.replace(/\s+ކޮށް(?=\s|$)/g, 'ކޮށް');
+    
+    // Clean up spaces after "ބާ" when it appears as a standalone word
+    dhivehiText = dhivehiText.replace(/(?<=^|\s)ބާ\s+/g, 'ބާ');
     
     return dhivehiText;
 }
