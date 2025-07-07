@@ -282,6 +282,7 @@ const specialCases = [
     { input: 'fahathun', output: 'ފަހަތުން' },
     { input: 'shabaabun', output: 'ޝަބާބުން' },
     { input: 'shabunam', output: 'ޝަބުނަމު' },
+    { input: 'thahuniyaa', output: 'ތަހުނިޔާ' },
     { input: 'nishaanun', output: 'ނިޝާނުން' },
     { input: 'nishaanaa', output: 'ނިޝާނާ' },
     { input: 'roohudhey', output: 'ރޫހުދޭ' },
@@ -425,8 +426,11 @@ const specialCases = [
     { input: 'keyolhaa', output: 'ކެޔޮޅާ' },
     { input: 'keyolhu', output: 'ކެޔޮޅު' },
     { input: 'dhushmin', output: 'ދުޝްމިން' },
+    { input: 'eidhugaa', output: 'އީދުގާ' },
+    { input: 'eidhakee', output: 'އީދަކީ' },
     { input: 'faseyheh', output: 'ފަސޭހެއް' },
     { input: 'faseyhey', output: 'ފަސޭހޭ' },
+    { input: 'jahamaa', output: 'ޖަހަމާ' },
     { input: 'faseyhun', output: 'ފަސޭހުން' },
     { input: 'faseyha', output: 'ފަސޭހަ' },
     { input: 'thihiree', output: 'ތިހިރީ' },
@@ -483,6 +487,8 @@ const specialCases = [
     { input: 'kulhely', output: 'ކުޅެލީ' },
     
     // 7 characters
+    { input: 'eidhuge', output: 'އީދުގެ' },
+    { input: 'eidhuga', output: 'އީދުގަ' },
     { input: 'fahayy', output: 'ފަހަތް' },
     { input: 'fahaiy', output: 'ފަހަތް' },
     { input: 'fahaii', output: 'ފަހަތް' },
@@ -573,10 +579,12 @@ const specialCases = [
     { input: 'shaair', output: 'ޝާއިރު' },
     
     // 5 characters
+    { input: 'eidhu', output: 'އީދު' },
     { input: 'lwbin', output: 'ލޯބިން' },
     { input: 'kihen', output: 'ކިހެން' },
     { input: 'eyhey', output: 'އޭހޭ' },
     { input: 'leyaa', output: 'ލެޔާ' },
+    { input: 'roohu', output: 'ރޫހު' },
     { input: 'thiee', output: 'ތިއީ' },
     { input: 'dhuaa', output: 'ދުއާ' },
     { input: 'maaii', output: 'މާތް' },
@@ -588,6 +596,7 @@ const specialCases = [
     { input: 'zaham', output: 'ޒަހަމު' },
     
     // 4 characters
+    { input: 'aiyy', output: 'އަތް' },
     { input: 'dhon', output: 'ދޮން' },
     { input: 'dhil', output: 'ދިލް' },
     { input: 'duaa', output: 'ދުއާ' },
@@ -625,6 +634,9 @@ const specialCases = [
     { input: 'miee', output: 'މިއީ' },
 
     // 3 characters
+    { input: 'aii', output: 'އަތް' },
+    { input: 'ayy', output: 'އަތް' },
+    { input: 'eid', output: 'އީދު' },
     { input: 'enn', output: 'އެން' },
     { input: 'dil', output: 'ދިލް' },
     { input: 'eyy', output: 'އޭ' },
@@ -1333,6 +1345,7 @@ function performTransliteration(latinText) {
         // Special case: check for front-of-word substring patterns
         const frontOfWordPatterns = [
             { pattern: 'furihama', output: 'ފުރިހަމަ', length: 9 },
+            { pattern: 'joash', output: 'ޖޯޝ', length: 5 },
             { pattern: 'echch', output: 'އެއްޗ', length: 5 },
             { pattern: 'ehch', output: 'އެއްޗ', length: 4 },
             { pattern: 'thi', output: 'ތި', length: 3 },
