@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Songs</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <!-- Local font definitions -->
   <style>
     @font-face {
@@ -26,6 +26,14 @@
 <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
 <link rel="manifest" href="favicons/manifest.webmanifest">
   <style>
+    html, body {
+      /* Allow scrolling, but prevent zoom gestures */
+      touch-action: pan-x pan-y;
+      overscroll-behavior: none;
+    }
+    input, textarea, select, button {
+      touch-action: manipulation;
+    }
     :root {
       --primary-color: #f5d000;
       --hover-color: #fced98;
@@ -83,9 +91,10 @@
       font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
     }
     .search-container {
-      background: rgba(43,43,43,0.95);
+      background: #1f1f1f;
+      max-width: 600px;
       border-radius: 8px;
-      padding: 16px 0 10px 0;
+      padding: 16px 16px 10px 16px;
       margin: 0 auto 18px auto;
       width: 96%;
       display: flex;
@@ -93,9 +102,68 @@
       align-items: center;
       position: relative;
       z-index: 11;
+      gap: 10px;
+    }
+    .filter-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .filter-btn {
+      background: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 1.2em;
+      cursor: pointer;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: background-color 0.3s;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .filter-btn:hover {
+      background: var(--hover-color);
+    }
+    .filter-content {
+      display: none;
+      position: absolute;
+      background: rgba(43,43,43,0.98);
+      border: 1px solid #444;
+      border-radius: 5px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      min-width: 200px;
+      min-width: 200px;
+      width: 200px;
+      top: 100%;
+      left: 0;
+      margin-top: 2px;
+    }
+    .filter-content a {
+      color: var(--primary-color);
+      padding: 8px 12px;
+      text-decoration: none;
+      display: block;
+      cursor: pointer;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      border-bottom: 1px solid #333;
+    }
+    .filter-content a:last-child {
+      border-bottom: none;
+    }
+    .filter-content a:hover {
+      background: var(--hover-color);
+      color: var(--text-color);
+    }
+    .filter-dropdown.show .filter-content {
+      display: block;
     }
     #search-box {
-      width: 90%;
+      flex: 1;
       padding: 10px;
       border-radius: 5px;
       border: 1px solid #444;
@@ -139,23 +207,73 @@
         padding: 10px;
       }
       #search-box {
-        width: 98%;
-      }
-      .header-search-wrapper {
-        border-radius: 0;
+        flex: 1;
       }
       .search-container {
         width: 99%;
         padding: 10px 0 8px 0;
+        gap: 8px;
+      }
+      .filter-btn {
+        width: 40px;
+        height: 40px;
+      }
+      .filter-content {
+        right: 0;
+        left: auto;
+        min-width: 120px;
+      }
+      .header-search-wrapper {
+        border-radius: 0;
       }
     }
   </style>
+  <script>
+    // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (
+        e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0'
+      )) {
+        e.preventDefault();
+      }
+    });
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+    // Prevent double-tap zoom on mobile
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 350) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+    // Prevent pinch-zoom and gesture events on iOS/Safari
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gesturechange', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gestureend', function(e) {
+      e.preventDefault();
+    });
+  </script>
 </head>
 <body>
   <div class="container">
     <div class="header-search-wrapper">
       <div class="search-container">
         <input type="text" id="search-box" placeholder="Search songs..." />
+        <div class="filter-dropdown">
+          <button class="filter-btn" id="filter-btn">
+            <img src="src/Filter.png" alt="Filter" style="width: 20px; height: 20px;">
+          </button>
+          <div class="filter-content" id="filter-content">
+            <!-- Content will be generated dynamically -->
+          </div>
+        </div>
       </div>
     </div>
     <ul id="song-list"></ul>
@@ -164,11 +282,52 @@
   <script>
     const songList = document.getElementById('song-list');
     const searchBox = document.getElementById('search-box');
+    const filterBtn = document.getElementById('filter-btn');
+    const filterDropdown = document.querySelector('.filter-dropdown');
+    const filterContent = document.getElementById('filter-content');
+    
+    let currentGenreFilter = 'all';
 
-    function renderList(filter = '') {
+    function updateFilterDropdown() {
+      // Count songs by genre
+      const genreCounts = {
+        'Baburu': 0,
+        'Kaasi': 0,
+        'Nala': 0,
+        'Taki': 0,
+        'Thinberu': 0,
+        'Zamaanee': 0
+      };
+      
+      let totalSongs = 0;
+      
+      songs.forEach(song => {
+        if (song.genre && genreCounts.hasOwnProperty(song.genre)) {
+          genreCounts[song.genre]++;
+        }
+        totalSongs++;
+      });
+      
+      // Update dropdown content
+      filterContent.innerHTML = `
+        <a onclick="setFilter('all')">All (${totalSongs})</a>
+        <a onclick="setFilter('Baburu')">Baburu (${genreCounts.Baburu})</a>
+        <a onclick="setFilter('Kaasi')">Kaasi (${genreCounts.Kaasi})</a>
+        <a onclick="setFilter('Nala')">Nala (${genreCounts.Nala})</a>
+        <a onclick="setFilter('Taki')">Taki (${genreCounts.Taki})</a>
+        <a onclick="setFilter('Thinberu')">Thinberu (${genreCounts.Thinberu})</a>
+        <a onclick="setFilter('Zamaanee')">Zamaanee (${genreCounts.Zamaanee})</a>
+      `;
+    }
+
+    function renderList(searchFilter = '', genreFilter = 'all') {
       songList.innerHTML = '';
       songs
-        .filter(song => song.name.toLowerCase().includes(filter.toLowerCase()))
+        .filter(song => {
+          const matchesSearch = song.name.toLowerCase().includes(searchFilter.toLowerCase());
+          const matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
+          return matchesSearch && matchesGenre;
+        })
         .sort((a, b) => a.name.localeCompare(b.name)) // Sort alphabetically
         .forEach(song => {
           const li = document.createElement('li');
@@ -181,10 +340,30 @@
         });
     }
 
-    searchBox.addEventListener('input', e => {
-      renderList(e.target.value);
+    function setFilter(genre) {
+      currentGenreFilter = genre;
+      // Keep the filter icon, don't change button text
+      filterDropdown.classList.remove('show');
+      renderList(searchBox.value, currentGenreFilter);
+    }
+
+    // Toggle dropdown
+    filterBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      filterDropdown.classList.toggle('show');
     });
 
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+      filterDropdown.classList.remove('show');
+    });
+
+    searchBox.addEventListener('input', e => {
+      renderList(e.target.value, currentGenreFilter);
+    });
+
+    // Initialize
+    updateFilterDropdown();
     renderList();
   </script>
 </body>
