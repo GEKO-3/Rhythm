@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="description" content="Page with useful links and resources.">
     <title>Rhythm Boduberu</title>
     <!-- Local font definitions -->
@@ -61,6 +61,9 @@
             background-size: cover;
             color: var(--primary-color);
             animation: fadeIn 0.5s ease-in-out;
+            /* Disable overscroll and pinch zoom */
+            overscroll-behavior: none;
+            touch-action: pan-x pan-y;
         }
 
         .background-color {
@@ -238,5 +241,27 @@
     <footer>
          Rhythm Boduberu <a href="https://rhythmboduberu.com" target="_blank">- Phone: 7576784 / 9128889</a>
     </footer>
+
+    <script>
+        // Prevent pinch to zoom
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function(event) {
+            if (event.scale && event.scale !== 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        // Prevent zoom via keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if ((event.ctrlKey || event.metaKey) && (event.key === '+' || event.key === '-' || event.key === '0')) {
+                event.preventDefault();
+            }
+        });
+    </script>
 </body>
 </html>
