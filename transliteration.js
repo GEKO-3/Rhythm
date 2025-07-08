@@ -406,6 +406,7 @@ const specialCases = [
     { input: 'loyybaa', output: 'ލޯތްބާ' },
     { input: 'loiibaa', output: 'ލޯތްބާ' },
     { input: 'udhuhey', output: 'އުދުހޭ' },
+    { input: 'ulheyhaa', output: 'އުޅޭހާ' },
     { input: 'hurihaa', output: 'ހުރިހާ' },
     
     // 8 characters
@@ -419,6 +420,7 @@ const specialCases = [
     { input: 'vedhaane', output: 'ވެދާނެ' },
     { input: 'fahathu', output: 'ފަހަތު' },
     { input: 'fathihu', output: 'ފަތިހު' },
+    { input: 'fathihah', output: 'ފަތިހަށް' },
     { input: 'nerenyy', output: 'ނެރެނީ' },
     { input: 'nereny', output: 'ނެރެނީ' },
     { input: 'alhanyy', output: 'އަޅަނީ' },
@@ -580,6 +582,9 @@ const specialCases = [
     
     // 5 characters
     { input: 'eidhu', output: 'އީދު' },
+    { input: 'hilmy', output: 'ހިލްމީ' },
+    { input: 'hilmee', output: 'ހިލްމީ' },
+    { input: 'hilmii', output: 'ހިލްމީ' },
     { input: 'lwbin', output: 'ލޯބިން' },
     { input: 'kihen', output: 'ކިހެން' },
     { input: 'eyhey', output: 'އޭހޭ' },
@@ -1278,11 +1283,13 @@ function performTransliteration(latinText) {
             { pattern: 'thaangaa', output: 'ތާނގާ', length: 8 },
             
             // 7-letter patterns
+            { pattern: 'chandha', output: 'ޗަނދަ', length: 7 },
             { pattern: 'handhah', output: 'ހަނދަށް', length: 7 },
             { pattern: 'thaanga', output: 'ތާނގަ', length: 7 },
             { pattern: 'lhindhu', output: 'ޅިނދު', length: 7 },
             
             // 6-letter patterns
+            { pattern: 'aanhaa', output: 'އާނހާ', length: 6 },
             { pattern: 'dhandu', output: 'ދަނޑު', length: 6 },
             { pattern: 'dhanbu', output: 'ދަނބު', length: 6 },
             { pattern: 'dhandi', output: 'ދަނޑި', length: 6 },
@@ -1306,6 +1313,7 @@ function performTransliteration(latinText) {
             { pattern: 'gandeh', output: 'ގަނޑެއް', length: 6 },
             
             // 5-letter patterns
+            { pattern: 'aanha', output: 'އާނހަ', length: 5 },
             { pattern: 'kandu', output: 'ކަނޑު', length: 5 },
             { pattern: 'fandu', output: 'ފަނޑު', length: 5 },
             { pattern: 'landu', output: 'ލަނޑު', length: 5 },
@@ -1322,9 +1330,11 @@ function performTransliteration(latinText) {
             { pattern: 'bandi', output: 'ބަނޑި', length: 5 },
             { pattern: 'kanda', output: 'ކަނޑަ', length: 5 },
             { pattern: 'kandi', output: 'ކަނޑި', length: 5 },
+            { pattern: 'kanga', output: 'ކަނގަ', length: 5 },
             { pattern: 'hinga', output: 'ހިނގަ', length: 5 },
             { pattern: 'engey', output: 'އެނގޭ', length: 5 },
             { pattern: 'ingey', output: 'އިނގޭ', length: 5 },
+            { pattern: 'yangi', output: 'ޔަނގި', length: 5 },
             
             // 4-letter patterns
             { pattern: 'anga', output: 'އަނގަ', length: 4 },

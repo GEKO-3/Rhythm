@@ -362,6 +362,15 @@
   <script>
     let sectionCount = 0;
     
+    function capitalizeFirstLetter(input) {
+      let value = input.value;
+      if (value.length > 0) {
+        const pos = input.selectionStart;
+        input.value = value.charAt(0).toUpperCase() + value.slice(1);
+        input.setSelectionRange(pos, pos);
+      }
+    }
+    
     function saveState() {
       const data = [];
       const container = document.getElementById('sections');
@@ -427,6 +436,7 @@
             linesDiv.appendChild(lineDiv);
             const lineInput = lineDiv.querySelector('input[type="text"]');
             lineInput.value = lineData.text;
+            capitalizeFirstLetter(lineInput);
             setupInputNavigation(lineInput);
             const starBtn = lineDiv.querySelector('.star-line-btn');
             if (lineData && lineData.starred) {
@@ -436,14 +446,16 @@
               starBtn.textContent = 'N';
             }
             setLineHighlight(lineDiv);
-            lineInput.addEventListener('input', saveState);
+            lineInput.addEventListener('input', function() {
+              capitalizeFirstLetter(lineInput);
+              saveState();
+            });
             starBtn.addEventListener('click', function() {
               starBtn.classList.toggle('active');
               starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
               setLineHighlight(lineDiv);
               saveState();
             });
-            lineInput.addEventListener('input', saveState);
           });
         } else if (item.type === 'break') {
           const sectionsDiv = document.getElementById('sections');
@@ -537,7 +549,10 @@
       const starBtn = lineDiv.querySelector('.star-line-btn');
       starBtn.textContent = 'N';
       setLineHighlight(lineDiv);
-      lineInput.addEventListener('input', saveState);
+      lineInput.addEventListener('input', function() {
+        capitalizeFirstLetter(lineInput);
+        saveState();
+      });
       starBtn.addEventListener('click', function() {
         starBtn.classList.toggle('active');
         starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
@@ -621,7 +636,7 @@
         }
       });
       const lyricsEscaped = lyrics.trim().replace(/`/g, '\u0060');
-      const output = `,
+      const output = `
   englishLyrics: \`${lyricsEscaped}\`,`;
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(output);
@@ -786,7 +801,10 @@
             const starBtn = newLine.querySelector('.star-line-btn');
             starBtn.textContent = 'N';
             setLineHighlight(newLine);
-            newInput.addEventListener('input', saveState);
+            newInput.addEventListener('input', function() {
+              capitalizeFirstLetter(newInput);
+              saveState();
+            });
             starBtn.addEventListener('click', function() {
               starBtn.classList.toggle('active');
               starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
@@ -1057,6 +1075,7 @@
       
       // Set the text value
       lineInput.value = text;
+      capitalizeFirstLetter(lineInput);
       
       // Set up navigation
       setupInputNavigation(lineInput);
@@ -1073,7 +1092,10 @@
       setLineHighlight(lineDiv);
       
       // Add event listeners
-      lineInput.addEventListener('input', saveState);
+      lineInput.addEventListener('input', function() {
+        capitalizeFirstLetter(lineInput);
+        saveState();
+      });
       starBtn.addEventListener('click', function() {
         starBtn.classList.toggle('active');
         starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
