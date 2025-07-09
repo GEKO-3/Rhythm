@@ -379,6 +379,20 @@
   <div class="container">
     <input id="song-name-input" type="text" placeholder="Song Name" autocomplete="off" list="song-names-list" style="width:100%;max-width:600px;margin-bottom:18px;font-size:1.2em;padding:10px 12px;border-radius:7px;border:1px solid #aaa;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
     <datalist id="song-names-list"></datalist>
+    
+    <div class="genre-container" style="width:100%;max-width:600px;margin-bottom:18px;position:relative;">
+      <button id="genre-btn" type="button" style="width:100%;font-size:1.2em;padding:10px 12px;border-radius:5px;border:1px solid #444;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#222;color:#f5d000;font-weight:bold;text-align:left;cursor:pointer;transition:border-color 0.2s;">
+        Select Genre ▼
+      </button>
+      <div id="genre-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:rgba(43,43,43,0.98);border:1px solid #444;border-radius:5px;z-index:10;box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);margin-top:2px;">
+        <div class="genre-option" data-genre="Baburu" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Baburu</div>
+        <div class="genre-option" data-genre="Kaasi" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Kaasi</div>
+        <div class="genre-option" data-genre="Nala" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Nala</div>
+        <div class="genre-option" data-genre="Taki" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Taki</div>
+        <div class="genre-option" data-genre="Thinberu" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Thinberu</div>
+        <div class="genre-option" data-genre="Zamaanee" style="padding:8px 12px;cursor:pointer;border-bottom:none;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Zamaanee</div>
+      </div>
+    </div>
     <div id="sections"></div>
     <div class="controls">
       <button onclick="addSection()">Add Section</button>
@@ -631,9 +645,10 @@
           if (!sectionTitle) missingSections.push(child);
         }
       });
-      if (!songName || missingSections.length > 0) {
+      if (!songName || !selectedGenre || missingSections.length > 0) {
         let msg = '';
         if (!songName) msg += 'Song name is empty.\n';
+        if (!selectedGenre) msg += 'Genre is not selected.\n';
         if (missingSections.length > 0) msg += 'One or more section names are empty.';
         alert(msg);
         return;
@@ -679,6 +694,7 @@
       const output = `{
   id: ${loadedSongId ? loadedSongId : nextId},
   name: \`${songName.replace(/`/g, '\u0060')}\`,
+  genre: '${selectedGenre}',
   lyrics: \`${lyricsEscaped}\`
 },`;
       if (navigator.clipboard && window.isSecureContext) {
@@ -721,9 +737,12 @@
     function resetTool() {
       localStorage.removeItem('lyricsEditorData');
       localStorage.removeItem('lyricsEditorSongName');
+      localStorage.removeItem('lyricsEditorGenre');
       document.getElementById('sections').innerHTML = '';
       sectionCount = 0;
       document.getElementById('song-name-input').value = '';
+      selectedGenre = '';
+      updateGenreButton();
       addSection();
     }
     document.addEventListener('input', function(e) {
@@ -837,14 +856,67 @@
       }
       localStorage.setItem('lyricsEditorSongName', songNameInput.value);
     });
+
+    // Genre dropdown functionality
+    let selectedGenre = localStorage.getItem('lyricsEditorGenre') || '';
+    const genreBtn = document.getElementById('genre-btn');
+    const genreDropdown = document.getElementById('genre-dropdown');
+    
+    // Update genre button text
+    function updateGenreButton() {
+      if (selectedGenre) {
+        genreBtn.textContent = selectedGenre + ' ▼';
+        genreBtn.style.color = '#f5d000';
+        genreBtn.style.borderColor = '#f5d000';
+      } else {
+        genreBtn.textContent = 'Select Genre ▼';
+        genreBtn.style.color = '#f5d000';
+        genreBtn.style.borderColor = '#444';
+      }
+    }
+    
+    // Initialize genre button
+    updateGenreButton();
+    
+    // Toggle dropdown
+    genreBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isVisible = genreDropdown.style.display !== 'none';
+      genreDropdown.style.display = isVisible ? 'none' : 'block';
+    });
+    
+    // Handle genre selection
+    document.querySelectorAll('.genre-option').forEach(option => {
+      option.addEventListener('click', function() {
+        selectedGenre = this.dataset.genre;
+        localStorage.setItem('lyricsEditorGenre', selectedGenre);
+        updateGenreButton();
+        genreDropdown.style.display = 'none';
+      });
+      
+      // Add hover effect to match songlist filter style
+      option.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#fced98';
+        this.style.color = '#2b2b2b';
+      });
+      option.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = 'transparent';
+        this.style.color = '#f5d000';
+      });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+      genreDropdown.style.display = 'none';
+    });
     // Populate song name suggestions from songs.js
     let songIdMap = {};
     function populateSongNameSuggestions() {
       fetch('songs.js')
         .then(response => response.text())
         .then(jsText => {
-          // Extract id and name pairs from the JS file
-          const songRegex = /{\s*id:\s*(\d+),\s*name:\s*([`'"])(.*?)\2,\s*lyrics:\s*([`'"])([\s\S]*?)\4/g;
+          // Extract id, name, genre and lyrics from the JS file
+          const songRegex = /{\s*id:\s*(\d+),\s*name:\s*([`'"])(.*?)\2,\s*genre:\s*([`'"])(.*?)\4,\s*lyrics:\s*([`'"])([\s\S]*?)\6/g;
           const datalist = document.getElementById('song-names-list');
           datalist.innerHTML = '';
           songIdMap = {};
@@ -852,11 +924,12 @@
           while ((match = songRegex.exec(jsText)) !== null) {
             const id = match[1];
             const name = match[3];
-            const lyrics = match[5];
+            const genre = match[5];
+            const lyrics = match[7];
             const option = document.createElement('option');
             option.value = `${id} - ${name}`;
             datalist.appendChild(option);
-            songIdMap[`${id} - ${name}`] = { id, name, lyrics };
+            songIdMap[`${id} - ${name}`] = { id, name, genre, lyrics };
           }
         });
     }
@@ -869,6 +942,12 @@
       if (song) {
         songNameInput.value = song.name;
         loadedSongId = parseInt(song.id, 10);
+        
+        // Set the genre
+        selectedGenre = song.genre || '';
+        localStorage.setItem('lyricsEditorGenre', selectedGenre);
+        updateGenreButton();
+        
         document.getElementById('sections').innerHTML = '';
         sectionCount = 0;
         const lines = song.lyrics.split(/\r?\n/);
@@ -1001,22 +1080,27 @@
     function importTextToLyrics(text) {
       // Clear existing sections without adding a default empty section
       localStorage.removeItem('lyricsEditorData');
+      localStorage.removeItem('lyricsEditorGenre');
       document.getElementById('sections').innerHTML = '';
       sectionCount = 0;
       document.getElementById('song-name-input').value = '';
+      selectedGenre = '';
+      updateGenreButton();
       
       // Split text into lines and filter out completely empty content
       const lines = text.split(/\r?\n/);
       let currentSection = null;
       let hasContent = false;
       const sectionsDiv = document.getElementById('sections');
+      let pendingSection = false; // Flag to indicate we need a new section for the next lyric line
       
       for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
         
-        // Empty lines mark the end of the current section
+        // Empty lines mark the end of the current section and prepare for a new one
         if (line === '') {
           currentSection = null;
+          pendingSection = true; // Next lyric line should start a new section
           continue;
         }
         
@@ -1024,6 +1108,7 @@
         if (/^-+$/.test(line)) {
           hasContent = true;
           currentSection = null;
+          pendingSection = false;
           
           // Add a break line
           const breakDiv = document.createElement('div');
@@ -1037,15 +1122,17 @@
         if (/^[#$][A-Za-z0-9]+$/.test(line)) {
           hasContent = true;
           currentSection = addSection(line, true, true);
+          pendingSection = false;
           continue;
         }
         
         // This is a lyric line - add it to current section
         hasContent = true;
         
-        // If we don't have a current section, create a default one
-        if (!currentSection) {
-          currentSection = addSection('#M', true, true);
+        // If we don't have a current section or need a new section, create one with automatic naming
+        if (!currentSection || pendingSection) {
+          currentSection = addSection('', true, true); // Pass empty string to trigger automatic naming
+          pendingSection = false;
         }
         
         // Add the line to the current section
