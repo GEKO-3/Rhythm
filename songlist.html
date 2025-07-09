@@ -332,6 +332,10 @@
         .forEach(song => {
           const li = document.createElement('li');
           li.textContent = song.name;
+          
+          // Check if English lyrics are available
+          if (!song.englishLyrics || song.englishLyrics.trim() === '') {li.style.color = '#ffffff';}
+          
           li.onclick = () => {
             localStorage.setItem('selectedSongId', song.id);
             window.location.href = 'lyrics.html';

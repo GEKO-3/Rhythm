@@ -941,7 +941,21 @@ $N
 މަލާމަތުގަ ބަސްތައް އިއްވާ ބަލާނިކަން ހިތުގާ ޖައްސާ
 *މަލާމަތުގަ ބަސްތައް އިއްވާ ބަލާނިކަން ހިތުގާ ޖައްސާ
 ކަލާ ތިހެން ނުރުހުން ވީމާ ވަޅޯވެގެން މާތައް މިލަނީ
-*ކަލާ ތިހެން ނުރުހުން ވީމާ ވަޅޯވެގެން މާތައް މިލަނީ`
+*ކަލާ ތިހެން ނުރުހުން ވީމާ ވަޅޯވެގެން މާތައް މިލަނީ`,
+      
+  englishLyrics: `#M
+Thiya goma feni
+Thiya goma feni aashoahey vevenee hai
+*Migey dhashun magun hingaathee magey hithah keiy nuvaathee
+#1
+Balaa balaa foohseh nuviyey bilaahakah mee dhen vehjey
+*Halaalu hiyy nulibeyneythee balaa mashah dhoalhey vevenee
+#2
+Ziyaarathah nadhureh bunefaa eyaa dhurah dhaahiyy nethifaa
+*Dheloafulhaa dhon dhon kanbuloa baheh nubune dhaathee rovenee
+#3
+Malaamathuga basthah ivvaa balaa nikan hithugaa jassaa
+*Kalaa thihen nuruhun veemaa valhoa vegen maathah milanee`,
 },
 {
   id: 27,
@@ -1188,9 +1202,9 @@ $4
 ހޮޅި ފިހިއްޖޭ ހަލްގައިގެ ހޫނުން
 *ހޮޅި ފިހިއްޖޭ ހަލްގައިގެ ހޫނުން
 ހޮޅި ފިހިއްޖޭ ހަލްގައިގެ ހޫނުން
-*ހޮޅިވެ ލަނގޮނޑި މުޅިން
+*ހޮޅިވެ ލަގޮނޑި މުޅިން
 މޮޅިއިން ލިބޭ ގިނަ އަދުގާ މިކަށަ މިއަބަދުގާ
-*ައަދަދު ނުވެދާންވީހޭ
+*އަދަދު ނުވެދާންވީހޭ
 
 #4
 ރަންގު ލޯބިން ދާތީ ފިލައިގެން
@@ -7697,7 +7711,25 @@ $2
 ޗާލު ރީތި ކަޅިރަވަޔާ ސާފު ރީތި އެސްފިޔަތައް
 *ސާފު ރީތި އެސްފިޔަތައް
 ފެނުމުން ފުރިހަމަކަން ފެނިލައްޒަތު ޒަހަމު ވުމުން
-*ފުރުސަތެއް ލިބޭނެތޯ ފަހަތުން ބޯދީ ބެލީ`
+*ފުރުސަތެއް ލިބޭނެތޯ ފަހަތުން ބޯދީ ބެލީ`, 
+      englishLyrics: `#M
+Dhuru dhurun hiyanivelaa thuru thurulaa hee nagaa
+*Furusatheh libeynethoa fahathun boadhee belee
+#1
+Soora nikan reethi gomaa Hooru paree fadha gomaa
+*Hooru paree fadha gomaa
+Mulhi thihandhu fadha ekuvaa moonu saafu farivumun
+*Furusatheh libeynethoa fahathun boadhee belee
+#2
+Isthashigandu vihuraalaa vaige therey nashaalumun
+*Vaige therey nashaalumun
+Neshumuge fari harakaathun mulhi hiyy eku furaalumaa
+*Furusatheh libeynethoa fahathun boadhee belee
+#3
+Chaalu reethi kalhiravayaa saafu reethi esfiyathah
+*Saafu reethi esfiyathah
+Fenumun furihamakan fenilaa hiyy adhu zaham vumun
+*Furusatheh libeynethoa fahathun boadhee belee`,
 },
 {
   id: 231,
@@ -7705,9 +7737,8 @@ $2
   genre: 'Nala',
   lyrics: `#M
 އުފަލުން ފޮޅޭނޭ އީދު އައުމުން
-*ކުރަމުން އުފާ އަދި ފޯރި ނަގަމުން
-އީދު ހެދުމުން ޒީނަތް ވެލަމުން
-*މީކިޔާ ތަހުނިޔާ
+ކުރަމުން އުފާ އަދި ފޯރި ނަގަމުން
+*އީދު ހެދުމުން ޒީނަތް ވެލަމުން މީކިޔާ ތަހުނިޔާ
 
 #1
 ކޯޑި ނެރުމުން ވީ އުފަލުގާ
@@ -7731,7 +7762,32 @@ $2
 ބާރުލާ އަޑު ލަވަކިޔާލާ
 *ބާރުލާ އަޑު ލަވަކިޔާލާ
 އެކި ނެށުމުގާ ފައި ހަމަ ކުރަމާ
-*ޖޯޝުގާ އަތް ޖަހަމާ`
+*ޖޯޝުގާ އަތް ޖަހަމާ`, 
+      englishLyrics: `#M
+Ufalun folheyney eid aumun
+Kuramun ufaa adhi foari nagamun
+*Eid hedhumun zeenaiy velamun meekiyaa thahuniyaa
+#1
+Koadi nerumun vee ufalugaa
+*Koadi nerumun vee ufalugaa
+Foari genuvaa eki neshumugaa
+*Foari genuvaa eki neshumugaa
+Farisagaafee harakaaiy thakugaa
+*Ekuve enmen nashamaa
+#2
+Ekuverin'naa aailaa yaa
+*Ekuverin'naa aailaa yaa
+Ekuve eidhuge roohu dhiruvaa
+*Ekuve eidhuge roohu dhiruvaa
+Eidhu hadhiyaa hihsaa kuramaa
+*Aimi eidhuge ufalaa
+#3
+Raagugaa boduberu jahaalaa
+*Raagugaa boduberu jahaalaa
+Baarulaa adu lavakiyaalaa
+*Baarulaa adu lavakiyaalaa
+Eki neshumugaa fai hama kuramaa
+*Joashugaa aiyy jahamaa`,
 },
 {
   id: 232,

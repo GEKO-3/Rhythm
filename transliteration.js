@@ -88,6 +88,7 @@ const specialCases = [
     { input: 'thibunihenney', output: 'ތިބުނިހެންނޭ' },
     
     // 14 characters
+    { input: 'ishthashigandu', output: 'އިސްތަށިގަނޑު' },
     { input: 'handhaanunney', output: 'ހަނދާނުންނޭ' },
     { input: 'javaahirahves', output: 'ޖަވާހިރައްވެސް' },
     { input: 'zindhageegaa', output: 'ޒިންދަގީގާ' },
@@ -215,6 +216,7 @@ const specialCases = [
     { input: 'bahaareh', output: 'ބަހާރެއް' },
     
     // 11 characters
+    { input: 'nimidhaaney', output: 'ނިމިދާނޭ' },
     { input: 'handhaanvey', output: 'ހަނދާންވޭ' },
     { input: 'javaahiruge', output: 'ޖަވާހިރުގެ' },
     { input: 'fahathugaaa', output: 'ފަހަތުގާ' },
@@ -273,8 +275,11 @@ const specialCases = [
     { input: 'hageeqayy', output: 'ހަޤީގަތް' },
     { input: 'hageeqaiy', output: 'ހަޤީގަތް' },
     { input: 'hageeqaii', output: 'ހަޤީގަތް' },
+    { input: 'nimidhaaney', output: 'ނިމިދާނޭ' },
     
     // 10 characters
+    { input: 'bilaahakah', output: 'ބިލާހަކަށް' },
+    { input: 'bilaahekey', output: 'ބިލާހެކޭ' },
     { input: 'handhaanun', output: 'ހަނދާނުން' },
     { input: 'handhaaney', output: 'ހަނދާނޭ' },
     { input: 'bahaarugaa', output: 'ބަހާރުގާ' },
@@ -338,6 +343,13 @@ const specialCases = [
     { input: 'roa lumum', output: 'ރޯލުމުން' },
     
     // 9 characters
+    { input: 'aashoahey', output: 'އާޝޯހޭ' },
+    { input: 'nuruhuney', output: 'ނުރުހުނޭ' },
+    { input: 'fursatheh', output: 'ފުރުސަތެއް' },
+    { input: 'harakaaiy', output: 'ހަރަކާތް' },
+    { input: 'mihuthuge', output: 'މިހިތުގެ' },
+    { input: 'nimidhaan', output: 'ނިމިދާން' },
+    { input: 'bilaaheh', output: 'ބިލާހެއް' },
     { input: 'zindhagee', output: 'ޒިންދަގީ' },
     { input: 'zindhagy', output: 'ޒިންދަގީ' },
     { input: 'zindhagi', output: 'ޒިންދަގީ' },
@@ -487,6 +499,15 @@ const specialCases = [
     { input: 'maayyvi', output: 'މާތްވި' },
     { input: 'maaiyvi', output: 'މާތްވި' },
     { input: 'kulhely', output: 'ކުޅެލީ' },
+    { input: 'dhanvaan', output: 'ދަންވާން' },
+    { input: 'kanmeelu', output: 'ކަންމީލު' },
+    { input: 'baithuge', output: 'ބައިތުގެ' },
+    { input: 'gothakaa', output: 'ގޮތަކާ' },
+    { input: 'goyykaa', output: 'ގޮތަކާ' },
+    { input: 'loabakah', output: 'ލޯބަކަށް' },
+    { input: 'samaakaa', output: 'ސަމާކާ' },
+    { input: 'hevesgun', output: 'ހެވެސްގުން' },
+    { input: 'nuruhun', output: 'ނުރުހުން' },
     
     // 7 characters
     { input: 'eidhuge', output: 'އީދުގެ' },
@@ -555,6 +576,16 @@ const specialCases = [
     { input: 'zakham', output: 'ޒަޚަމު' },
     { input: 'duayaa', output: 'ދުއާޔާ' },
     { input: 'veyhey', output: 'ވޭހޭ' },
+    { input: 'hanvaah', output: 'ހަންވާހް' },
+    { input: 'jareebu', output: 'ޖަރީބު' },
+    { input: 'vashitu', output: 'ވަށީތު' },
+    { input: 'hevesge', output: 'ހެވެސްގެ' },
+    { input: 'hevesgn', output: 'ހެވެސްގުން' },
+    { input: 'vaaheek', output: 'ވާހީކް' },
+    { input: 'hurekey', output: 'ހުރެކޭ' },
+    { input: 'dheykey', output: 'ދެޔްކޭ' },
+    { input: 'dhaahiyy', output: 'ދާހިތް' },
+    { input: 'dhaahiy', output: 'ދާހިތް' },
     
     // 6 characters
     { input: 'farulu', output: 'ފަރުޟު' },
@@ -579,6 +610,21 @@ const specialCases = [
     { input: 'zaeem', output: 'ޒަޢީމު' },
     { input: 'zahamu', output: 'ޒަހަމު' },
     { input: 'shaair', output: 'ޝާއިރު' },
+    { input: 'veshey', output: 'ވެޝޭ' },
+    { input: 'dhokey', output: 'ދޮކޭ' },
+    { input: 'thaafy', output: 'ތާފީ' },
+    { input: 'huveed', output: 'ހުވީދު' },
+    { input: 'beyrum', output: 'ބޭރުން' },
+    { input: 'hureeh', output: 'ހުރެއް' },
+    { input: 'bavana', output: 'ބަވަނަ' },
+    { input: 'henaan', output: 'ހެނާން' },
+    { input: 'kurahn', output: 'ކުރާން' },
+    { input: 'kanbal', output: 'ކަނބަލް' },
+    { input: 'nuvath', output: 'ނުވަތް' },
+    { input: 'nuvaiy', output: 'ނުވަތް' },
+    { input: 'hendhey', output: 'ހެންދޭ' },
+    { input: 'dhaskey', output: 'ދަސްކޭ' },
+    { input: 'mahure', output: 'މަހުރެ' },
     
     // 5 characters
     { input: 'eidhu', output: 'އީދު' },
@@ -599,6 +645,38 @@ const specialCases = [
     { input: 'maiy', output: 'މާތް' },
     { input: 'mayy', output: 'މާތް' },
     { input: 'zaham', output: 'ޒަހަމު' },
+    { input: 'hureh', output: 'ހުރެއް' },
+    { input: 'huvah', output: 'ހުވަށް' },
+    { input: 'beyru', output: 'ބޭރު' },
+    { input: 'shedu', output: 'ޝެދު' },
+    { input: 'bayah', output: 'ބަޔަށް' },
+    { input: 'rangu', output: 'ރަނގު' },
+    { input: 'dhen', output: 'ދެން' },
+    { input: 'ekan', output: 'އެކަން' },
+    { input: 'elhey', output: 'އެޅޭ' },
+    { input: 'dhuva', output: 'ދުވަހު' },
+    { input: 'vegen', output: 'ވެގެން' },
+    { input: 'huvee', output: 'ހުވީ' },
+    { input: 'huvii', output: 'ހުވީ' },
+    { input: 'huviy', output: 'ހުވީ' },
+    { input: 'huvee', output: 'ހުވީ' },
+    { input: 'huvii', output: 'ހުވީ' },
+    { input: 'huviy', output: 'ހުވީ' },
+    { input: 'huvyy', output: 'ހުވީ' },
+    { input: 'nurun', output: 'ނޫރުން' },
+    { input: 'anhen', output: 'އަންހެން' },
+    { input: 'anhen', output: 'އަންހެން' },
+    { input: 'henon', output: 'ހެނޮން' },
+    { input: 'henonn', output: 'ހެނޮން' },
+    { input: 'henun', output: 'ހެނުން' },
+    { input: 'hennun', output: 'ހެނުން' },
+    { input: 'henaan', output: 'ހެނާން' },
+    { input: 'henaann', output: 'ހެނާން' },
+    { input: 'hengen', output: 'ހެނގެން' },
+    { input: 'hengenn', output: 'ހެނގެން' },
+    { input: 'dhaske', output: 'ދަސްކެ' },
+    { input: 'dhaskun', output: 'ދަސްކުން' },
+    { input: 'dhaskunn', output: 'ދަސްކުން' },
     
     // 4 characters
     { input: 'aiyy', output: 'އަތް' },
@@ -637,6 +715,10 @@ const specialCases = [
     { input: 'haas', output: 'ހާސް' },
     { input: 'euro', output: 'ޔޫރޯ' },
     { input: 'miee', output: 'މިއީ' },
+    { input: 'eyaa', output: 'އެޔާ' },
+    { input: 'baheh', output: 'ބަހެއް' },
+    { input: 'bahey', output: 'ބަހެއް' },
+    { input: 'baheii', output: 'ބަހެއް' },
 
     // 3 characters
     { input: 'aii', output: 'އަތް' },
@@ -1275,6 +1357,54 @@ function performTransliteration(latinText) {
             i += 5; // Skip all 5 characters
             matched = true;
             continue;
+        }
+
+        // Special case: 'nn' should be 'ން' when followed by consonant OR at end of word (before hus noonu patterns)
+        if (processText.substring(i, i + 2) === 'nn') {
+            // Check if this 'nn' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 2 >= processText.length || 
+                processText[i + 2] === ' ' || 
+                processText[i + 2] === '\n' ||
+                processText[i + 2] === '\r' ||
+                processText[i + 2] === ',' ||
+                processText[i + 2] === '#' ||
+                /[0-9]/.test(processText[i + 2]) ||
+                /[.,!?;:]/.test(processText[i + 2])) {
+                isEndOfWord = true;
+            }
+            
+            // Check if this 'nn' is followed by a consonant (not another 'n')
+            let isFollowedByConsonant = false;
+            
+            if (!isEndOfWord && i + 2 < processText.length) {
+                let nextChar = processText[i + 2];
+                
+                // Check if next character is a consonant (single or start of multi-char) but not 'n'
+                if (transliterationMap[nextChar] && nextChar !== 'n') {
+                    isFollowedByConsonant = true;
+                } else if (nextChar !== 'n') {
+                    // Check if it's the start of a multi-character consonant
+                    for (let len = 3; len >= 2; len--) {
+                        if (i + 2 + len <= processText.length) {
+                            let nextSubstring = processText.substring(i + 2, i + 2 + len);
+                            if (transliterationMap[nextSubstring]) {
+                                isFollowedByConsonant = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            if (isEndOfWord || isFollowedByConsonant) {
+                dhivehiText += 'ން'; // sukun + nun when 'nn' at end of word or followed by consonant
+                i += 2; // Skip both 'n' characters
+                matched = true;
+                continue;
+            }
         }
 
         // Special case: "hus noonu" patterns - n without sukun in specific combinations
