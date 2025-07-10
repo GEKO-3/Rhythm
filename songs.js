@@ -479,37 +479,65 @@ Dheereyney roohaai jaanaa
 Mihaaru aa vee
 *Dhilfari mi ulheyhaa`,
   },
-          {
-    id: 13,
-    name: 'Aaberu Toh Toh',
-    genre: 'Nala',
-    lyrics: `#M
+{
+  id: 13,
+  name: `Aaberu Toh Toh`,
+  genre: 'Nala',
+  lyrics: `#M
 އާބެރު ޓޮއް ޓޮއް
 *ބާބެރު ޑަން ޑަން
-އާބެރު ޓޮއް ޓޮއް ޓޮއް ޓޮއް ބާބެރު ޑަން ޑަން ބާރުކޮއް ހިނގާށޭ
-*އާބެރު ޓޮއް ޓޮއް ޓޮއް ޓޮއް ބާބެރު ޑަން ޑަން ބާރުކޮއް ހިނގާށޭ
+އާބެރު ޓޮއް ޓޮއް ޓޮއް ޓޮއް ބާބެރު ޑަން ޑަން ބާރުކޮށް އަހާށޭ
+*އާބެރު ޓޮއް ޓޮއް ޓޮއް ޓޮއް ބާބެރު ޑަން ޑަން ބާރުކޮށް ކިޔާށޭ
+
 #1
-މަސަލަހުން ހަރުބީ އެ ފެށީމާ
-*ހަރުބިއައް އަޑު ބަދަލުކުރީމާ
+މަސަލަހުން ހަރުބީ އެފެށީމާ
+*ތަގުޑިޔަށް އަޑު ބަދަލުކުރީމާ
 ލަސްލަހުން އަޑުތައް އެކުވީމާ
-*ހަތަރު ބެރު ބުން ހާމަކުރީމާ
+*ހަތަރު ބެރު ބުން ފާޅުކުރީމާ
+
 #2
-އެހަމަޔައް އަޑުތައް ވަކިކޮއްފާ
-*އެކު އެކީ އަޑަކާ ކުޅެލީމާ
-ދެކަކުލުން ފަހަތައް ކޮއްޕާލާ
-*ކުރިކަމުގެ ކުލަރީތިވި ދިއްލާ
+ދެ ހަމަޔަށް އަޑުތައް ވަކިކޮއްފާ
+*ދެކުޅި އެކުގާ ދާނުވެލީމާ
+ދެކަކުލުން ފަށްަތައް ސޮއްސާލާ
+*ހެވިކަމުގެ ހުނަރެއް ދެއްކީތާ
+
 #3
-މެދު ހެޔައް ކަތަ ހޮޅިތައް އަރުވާ
-*އެހުރި މާފަތި ކަރުފަތި އަޅުވާ
-ދެބުމަޔައް ހިމަތޫނު ޖެހީމާ
-*ރީތި ހެދުމުގާ ފަރިވެލަނީ މާ
+ގިގުނިއާ ތަކަހޮޅިތައް އަޅުވާ
+*އެމުނި މާފަތިތައް ކަރު އަޅުވާ
+ދެބުމަޔަށް ހިމަ ކޫރު ދެމީމާ
+*އެކި ނެށުމުގާ ފަރިވެލަނީތާ
+
 #4
-ރާވެރިން ރުކުގާ ތިބެ ބަލަނީ
-*މަރު ބިރައް ވުރެގޮތް ހޭ ނުވަނީ
-ދިރި ފުށައްވުރެ މަހަބަޑިހުރެހެލެނީ
-*އިވެނީ ބުނާއަޑު ހޭ ނިދީގާ
-`,
-  },
+ރާވެރިން ރުކުގާތިބެ ބަލަނީ
+*ފަރުހިލަން ހުރެ ގޮއްޔެ އެނަށަނީ
+ޅިސްކޮށަން މާވަޑި ހުރެ ހެލެނީ
+*ދެބެރު ފުނަ އަޑު ރީތިވީމާ`, 
+      englishLyrics: `#M
+Aaberu toh toh
+*Baaberu dan dan
+Aaberu toh toh toh toh baaberu dan dan baarukoh ahaashey
+*Aaberu toh toh toh toh baaberu dan dan baarukoh kiyaashey
+#1
+Masalahun harubee efesheemaa
+*Thagudiyah adu badhalukureemaa
+Laslahun aduthah ekuveemaa
+*Hatharu beru bun faalhukureemaa
+#2
+Dhe hamayah aduthah vakikohfaa
+*Dhekulhi ekugaa dhaanuveleemaa
+Dhekakulun fahathah sossaalaa
+*Hevikamuge hunareh dhehkeethaa
+#3
+Giguniaa thakaholhithah alhuvaa
+*Emuni maafathithah karu alhuvaa
+Dhebumayah hima kooru dhemeemaa
+*Eki neshumugaa farivelaneethaa
+#4
+Raaverin rukugaathibe balanee
+*Faruhilan hure gohye enashanee
+Lhiskoshan maavadi hure helenee
+*Dheberu funa adu reethiveemaa`,
+},
             {
     id: 14,
     name: 'Hoadhaadheyshey',

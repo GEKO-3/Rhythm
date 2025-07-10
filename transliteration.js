@@ -76,6 +76,7 @@ const specialCases = [
     { input: 'masthukohlaafaaneyey', output: 'މަސްތުކޮށްލާ ފާނެޔޭ' },
     
     // 17 characters
+    { input: 'thakaholhithah', output: 'ތަކަހޮޅިތައް' },
     { input: 'nimihingaidhaaney', output: 'ނިމިހިނގައިދާނޭ' },
     
     // 16 characters
@@ -298,6 +299,7 @@ const specialCases = [
     { input: 'fahathun', output: 'ފަހަތުން' },
     { input: 'shabaabun', output: 'ޝަބާބުން' },
     { input: 'shabunam', output: 'ޝަބުނަމު' },
+    { input: 'thakaholhi', output: 'ތަކަހޮޅި' },
     { input: 'thahuniyaa', output: 'ތަހުނިޔާ' },
     { input: 'nishaanun', output: 'ނިޝާނުން' },
     { input: 'nishaanaa', output: 'ނިޝާނާ' },
@@ -357,6 +359,8 @@ const specialCases = [
     
     // 9 characters
     { input: 'aashoahey', output: 'އާޝޯހޭ' },
+    { input: 'faruhilan', output: 'ފަރުހިލަން' },
+    { input: 'faruhilun', output: 'ފަރުހިލުން' },
     { input: 'nuruhuney', output: 'ނުރުހުނޭ' },
     { input: 'fursatheh', output: 'ފުރުސަތެއް' },
     { input: 'harakaaiy', output: 'ހަރަކާތް' },
@@ -436,6 +440,7 @@ const specialCases = [
     { input: 'fihijjey', output: 'ފިހިއްޖޭ' },
     
     // 8 characters
+    { input: 'ahaashey', output: 'އަހާށޭ' },
     { input: 'mihithah', output: 'މިހިތައް' },
     { input: 'henveiru', output: 'ހެންވޭރު' },
     { input: 'henveyru', output: 'ހެންވޭރު' },
@@ -1047,6 +1052,31 @@ function performTransliteration(latinText) {
             if (isEndOfWord) {
                 dhivehiText += 'ނަ'; // special transliteration for word-final 'na'
                 i += 2; // Skip all 2 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "ahun" at end of word
+        if (processText.substring(i, i + 4) === 'ahun') {
+            // Check if this 'ahun' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 4 >= processText.length || 
+                processText[i + 4] === ' ' || 
+                processText[i + 4] === '\n' ||
+                processText[i + 4] === '\r' ||
+                processText[i + 4] === ',' ||
+                processText[i + 4] === '#' ||
+                /[0-9]/.test(processText[i + 4]) ||
+                /[.,!?;:]/.test(processText[i + 4])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ަހުން'; // special transliteration for word-final 'ahun'
+                i += 4; // Skip all 4 characters
                 matched = true;
                 continue;
             }
