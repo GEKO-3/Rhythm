@@ -334,9 +334,19 @@
           li.textContent = song.name;
           
           // Check if English lyrics are available
-          if (!song.englishLyrics || song.englishLyrics.trim() === '') {li.style.color = '#ffffff';}
+          if (!song.englishLyrics || song.englishLyrics.trim() === '') {
+                li.style.color = '#f5d467';
+                li.addEventListener('mouseenter', () => {
+                  li.style.color = 'black';
+                });
+                li.addEventListener('mouseleave', () => {
+                  li.style.color = '#f5d467';
+                });
+                }
           
           li.onclick = () => {
+            // Save current scroll position before navigating
+            localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
             localStorage.setItem('selectedSongId', song.id);
             window.location.href = 'lyrics.html';
           };
@@ -369,6 +379,19 @@
     // Initialize
     updateFilterDropdown();
     renderList();
+    
+    // Restore scroll position when page loads
+    window.addEventListener('load', function() {
+      const savedScrollPosition = localStorage.getItem('songListScrollPosition');
+      if (savedScrollPosition !== null) {
+        // Use setTimeout to ensure content is fully rendered before scrolling
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(savedScrollPosition));
+          // Clear the stored position after restoring it
+          localStorage.removeItem('songListScrollPosition');
+        }, 100);
+      }
+    });
   </script>
 </body>
 </html>

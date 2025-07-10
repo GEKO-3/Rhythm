@@ -1224,7 +1224,57 @@ $4
 ވާތި ގިލަނެއް ހިތުގާ ނުފިލުވޭ
 *ނާ ތެދު މަޖެހިގެން
 ޒާތީ ޚިޔާލިގެ އަނިޔާތައް ހިތުގެ ހިޔަނިވާ
-*ދީވާނާ ފަރުދާވީހޭ`
+*ދީވާނާ ފަރުދާވީހޭ`, 
+      englishLyrics: `#M
+Vathee hithaama gilanuga mihuthuge laganugaa
+*Mahure nimidhaan veehey
+Zaathee khiyaalu ge aniyaathah hithuge hiyanivaa
+*Dheevaanaa farudhaa veehey
+#1
+Nehtha rahumeh hithugaa kaleyney
+*Ennme miskaaleh
+Vejje kamugaa heevey roveyney
+*Vejje kamugaa heevey roveyney
+Vejje kamugaa heevey roveyney
+*Fennanivi haaley
+Theh kannfulheh nethi arugaa abadhu miasarugaa
+*Khabaru nethi dhaan veehey
+#2
+Koaru hedhifaa karunaige raalhun
+*Loadhemeri adhuga
+Roala roalaa kuruvaa handhaanun
+*Roala roalaa kuruvaa handhaanun
+Roala roalaa kuruvaa handhaanun
+*Foave karunaiga
+Loabeege chaalu rasamugaa ekamuge saramugaa
+*Araamu nethi dhaan veehey
+#3
+Dholhi elhijjey aniyaage sababun
+*Olhi mihijura mulhinn
+Holhi fihijjey hallgaige hoonun
+*Holhi fihijjey hallgaige hoonun
+Holhi fihijjey hallgaige hoonun
+*Holhive lagondi mulhinn
+Molhi inn libey gina adhugaa mikasha mi abadhugaa
+*Adhadhu nuve dhaan veehey
+#4
+Ranngu loabin dhaathee filaigen
+*Namuge baavathakun
+Janngu hithugaa vaathee fashaigen
+*Janngu hithugaa vaathee fashaigen
+Janngu hithugaa vaathee fashaigen
+*Gammge thoofaanunn
+Janngal khareefuge valuga ekaniveri jalugaa
+*Ajalu jehi dhaan veehey
+#5
+Dhaathi laganunn dhoovevi dhuveliey
+*Zaathakah dhemigen
+Vaathi gilaneh hithugaa nufiluvey
+*Vaathi gilaneh hithugaa nufiluvey
+Vaathi gilaneh hithugaa nufiluvey
+*Naa thedhu ma jehigenn
+Zaathee khiyaaluge aniyaa thah hithuge hiyanivaa
+*Dhivaana farudhaa veehey`,
 },
 {
   id: 33,
@@ -3853,7 +3903,108 @@ $N
 *ދެން އަހަރެންވަކި ކީއްހެ ކުރާނީ`
 },
 {
-  id: 110,
+  id: 106,
+  name: `Kandhi Mudaloa`,
+  genre: 'Zamaanee',
+  lyrics: `#M
+އާން ކަލޭ ނުހޮރުއްޕާނޭ ތިމަރަ ވަޅިން &ކަނދި މުޑަލޯ&
+އައްދޯތް ކަލޭ ނުހޮރުއްޕާނޭ ތިމަރަ ވަޅިން &ކަނދި މުޑަލޯ&
+އާނހާ ކަލޭ ނުހޮރުއްޕާނޭ ތިމަރަ ވަޅިން &ކަނދި މުޑަލޯ&
+
+#1
+ހެންވޭރު ހަރުގެ ވެއްޓުނީޔާ ގެއިން މީހަކު ބުނި ނަދުރަކީ ކަޅުބޭބެ ކިރާން ކަނދިމުންޑަލޯ
+
+#2
+ކަޅު ބޭބެ ތުނބުޅި ދެކެ ދެކެފާ ހެންވޭރު ކުދިން ބިރުން ދުވަނީ ވިލޭރެއަކު ބަނޑަށް ކެރި ބާލާ ހެނޮލަ  ކަނދި މުޑަލޯ
+
+#3
+ހެންވޭރުހުރި މުސްކުޅި ލޯޑަކު މުނާރު ތެރަށް ކޮއްޕާވައްދައިގެން ނިންމާލައިފިޔޯ ކަނދި މުޑަލޯ
+
+#4
+ހެންވޭރަށް އަރާކަށް ލާހިކެއް ނޫނޭ ހެންވޭރު ކުދިން ރައިވަރު ހަދާ ނިންމާފާނެޔޮ ކަނދި މުޑަލޯ
+
+#5
+ކަދި ރުނބަޔާ ތެދަ ދަނޑިޔާ މުންނާރު ދޮށަށް އެއްތާން ކޮއްފާ ކަޅު ބޭބެ ހޯދާން ދިޔަ ކުއްޖަކު އައިއްސާ ބުންނޭ ކަޅު ބޭބެ އެބޯތެ އީދު މިސްކިއްދޮށު ބޮޑު ދިގާ ގަސްދޮށު ބޮޑު އުންދޯލީގާ ކޯމަހު ތުނބާ ތުން ފުރޮޅިފައެ ދުންބޮޔެ ނަގާން ކަނދި މުޑަލޯ
+
+#6
+ކަޅުބޭބެ ހޯދާން ދިޔަ ކުއްޖަކު އައިއްސާ ބުޏޭ ކަޅުބޭބެ އެބޯތޭ މައްޗަން ގޯޅީ މާވެވުގޭ ފެން ހުސްކޮށް ބޯލައިގެން ކަނދި މުޑަލޯ
+
+#7
+ފުއްތެޔޮ ފަޅަން އުރުނު ނަވުގެ އޮތްހާ ކާފައިން މާލެ ބޮޑު ބައްތީގެފުކަށް ތުން އަނބުރާ އަޑި ނިމާލާފިޔޮ ކަނދި މުޑަލޯ
+
+#8
+ކަޅުބޭބެ ހޯދާން ދިޔަ ކުއްޖަކު އައިއްސާ ބުޏޭ ކަޅުބޭބެ ހޯދަ ހޯދަ ހޯދަ ނުފެނުނޮލަ ކަނދި މުޑަލޯ`, 
+      englishLyrics: `#M
+Aan kaley nuhuruhpaaney thimara valhin &kandhi mudaloa&
+Ahdhoih kaley nuhuruhpaaney thimara valhin &kandhi mudaloa&
+Aanhaa kaley nuhuruhpaaney thimara valhin &kandhi mudaloa&
+#1
+Henveyru haruge vehtuneeyaa gein meehaku buni nadhurakee kalhubeybe kiraan kandhimundaloa
+#2
+Kalhu beybe thunbulhi dheke dhekefaa henveyru kudhin birun dhuvanee vileyreaku bandah keri baalaa henola  kandhi mudaloa
+#3
+Henveruhuri muskulhi loadaku munaaru therah kohpaavahdhaigen ninmaalaifiyoa kandhi mudaloa
+#4
+Henveyrah araakah laahikeh nooney henveyru kudhin raivaru hadhaa ninmaafaaneyo kandhi mudaloa
+#5
+Kadhi runbayaa thedha dhandiyaa munnaaru dhoshah ehthaan kohfaa kalhu beybe hoadhaan dhiya kujjaku aissaa bunney kalhu beybe eboathe eid miskihdhoshu bodu dhigaa gasdhoshu bodu undhoaleegaa koamahu thunbaa thun furolhifae dhunboye nagaan kandhi mudaloa
+#6
+Kalhubeybe hoadhaan dhiya kujjaku aissaa bunyey kalhubeybe eboathey mahchan goalhee maavevugey fen hus koh boalaigen kandhi mudaloa
+#7
+Fuhtheyo falhan urunu navuge oihaa kaafain male bodu bahtheegefukah thun anburaa adi nimaalaafiyo kandhi mudaloa
+#8
+Kalhubeybe hoadhaan dhiya kujjaku aissaa bunyey kalhubeybe hoadha hoadha hoadha nufenunola kandhi mudaloa`,
+},
+{
+  id: 207,
+  name: `Malaa Fenifa`,
+  genre: 'Thinberu',
+  lyrics: `#M
+މަލާ ފެނިފަ މަގެ މިހިތުގެ ވިންދުން ގަދަ ރާޅު ނަގާ
+*ފިލާ ނުހުރެ ނުކުމެ ތިފަރި މޫނުން އަދި ހީލަ ބަލާ
+ފަލަކުން ތަރި ޖާގަ ހަދާ ގޮވާނެ ތިބެ ހަނާ އަޅާ
+*ފަލަކުން ތަރި ޖާގަ ހަދާ ގޮވާނެ ތިބެ ހަނާ އަޅާ
+
+#1
+ލޮލުގާ ވާ ނަޒަރުން ފުން ކަނޑުހާ ފުން ވެފާ
+*ލޮލުގާ ވާ ނަޒަރުން ފުން ކަނޑުހާ ފުން ވެފާ
+ބޮލުގެ ފަށުވި އިސްތަށި ގަނޑު މޫނު ވަށާ ބާނި ނަގާ
+*ބޮލުގެ ފަށުވި އިސްތަށި ގަނޑު މޫނު ވަށާ ބާނި ނަގާ މޫނު ވަށާ ބާނި ނަގާ
+
+#2
+ތުންފަތުގާ ވާ އަސަރުން ޖާދޫ ފަހެ ފާޅުވާ
+*ތުންފަތުގާ ވާ އަސަރުން ޖާދޫ ފަހެ ފާޅުވާ
+ދޮންވެ ދިހުން ހުރި ފޮނި ފޮނި މޭވަ އެކޭ ހީވެ މިތާ
+*ދޮންވެ ދިހުން ހުރި ފޮނި ފޮނި މޭވަ އެކޭ ހީވެ މިތާ މޭވަ އެކޭ ހީވެ މިތާ
+
+#3
+ބުނެލާ ތޯ ބަހެއް ހިތް ތެޅެނީ ދަހި ވެފާ
+*ބުނެލާ ތޯ ބަހެއް ހިތް ތެޅެނީ ދަހި ވެފާ
+ގިނި މި ހިތުން ފިލުވައިދީ ކަމަނަ ނިކަން ހީލަ ބަލާ
+*ގިނި މި ހިތުން ފިލުވައިދީ ކަމަނަ ނިކަން ހީލަ ބަލާ ކަމަނަ ނިކަން ހީލަ ބަލާ`, 
+      englishLyrics: `#M
+Malaa fenifa mage mihithuge vindhun gadha raalhu nagaa
+*Filaa nuhure nukume thifari moonun adhi heela balaa
+Falakun thari jaaga hadhaa govaane thibe hanaa alhaa
+*Falakun thari jaaga hadhaa govaane thibe hanaa alhaa
+#1
+Lolugaa vaa nazarun fun kanduhaa fun vefaa
+*Lolugaa vaa nazarun fun kanduhaa fun vefaa
+Boluge fashuvi isthashi gandu moonu vashaa baani nagaa
+*Boluge fashuvi isthashi gandu moonu vashaa baani nagaa moonu vashaa baani nagaa
+#2
+Thunfathugaa vaa asarun jaadhoo fahe faalhuvaa
+*Thunfathugaa vaa asarun jaadhoo fahe faalhuvaa
+Dhonve dhihun huri foni foni meyva ekey heeve mithaa
+*Dhonve dhihun huri foni foni meyva ekey heeve mithaa meyva ekey heeve mithaa
+#3
+Bunelaa thoa baheh hiy thelheny dhahi vefaa
+*Bunelaa thoa baheh hiy thelheny dhahi vefaa
+Gini mi hithun filuvaidhee kamana nikan heela balaa
+*Gini mi hithun filuvaidhee kamana nikan heela balaa kamana nikan heela balaa`,
+},
+{
+  id: 109,
   name: `Gina Keriyaa`,
   genre: 'Kaasi',
   lyrics: `#S
