@@ -3956,7 +3956,7 @@ Fuhtheyo falhan urunu navuge oihaa kaafain male bodu bahtheegefukah thun anburaa
 Kalhubeybe hoadhaan dhiya kujjaku aissaa bunyey kalhubeybe hoadha hoadha hoadha nufenunola kandhi mudaloa`,
 },
 {
-  id: 207,
+  id: 107,
   name: `Malaa Fenifa`,
   genre: 'Thinberu',
   lyrics: `#M
@@ -4002,6 +4002,81 @@ Bunelaa thoa baheh hiy thelheny dhahi vefaa
 *Bunelaa thoa baheh hiy thelheny dhahi vefaa
 Gini mi hithun filuvaidhee kamana nikan heela balaa
 *Gini mi hithun filuvaidhee kamana nikan heela balaa kamana nikan heela balaa`,
+},
+{
+  id: 108,
+  name: `Fini Fini Mastheevayaa`,
+  genre: 'Nala',
+  lyrics: `#M
+ފިނި ފިނި މަސްތީ ވަޔާ
+*ތުނިތުނި ނުކުޅޭ ހިތާ
+ލޯބިންވޭ ދިވާނާ ދިވާނާ ދިވާނާ
+*ލޯބިންވޭ ދިވާނާ ދިވާނާ ދިވާނާ
+ރީއްޗޭ ރީއްޗޭ މާ ލޯތްބޭ ޔާރު
+*ހިތާ ހިތޭވީ ބޭގަރާރު
+ލޯބިންނޭ ދީވާނާ ދީވާނާ ދީވާނާ
+*ލޯބިންނޭ ދީވާނާ ދީވާނާ ދީވާނާ
+*ފިނި ފިނި މަސްތީވަޔާ
+
+#1
+އަންނާށޭ އަންނާށޭ މޫސުން ރީއްޗޭ ދެކޭށޭ
+*އަންނާށޭ އަންނާށޭ މޫސުން ރީއްޗޭ ދެކޭށޭ
+ގައިމޭ ހަނދަށް ވުރެ ރީތީ ކަލާއޭ
+*ނޫ އުޑު ގާވާ ތަރިތައް ރޯށަން ޗާލޭ ބަލާށޭ
+އިޝްޤީ ޒުވާން ތި މޫނަށް ބެލުމަށް ބުނާށޭ
+އާލަމް މި ލޯބީގެ
+*ނޫރުން ވިދާތީ އޭ
+މިހިތައް ވާ އިހުސާސް
+*ތި ހިތަށް ނުވޭ ހޭ ތި ހިތަށް ނުވޭ ހޭ
+ނޫނޭ މޫނޭ ޔާރާ ވެޔޭ
+*ވާމޭ މިރޭ ވާމެ މަ ފިދާ
+
+#2
+ގުލްޒާރުން ގުލްޒާރުން ފަރިވާ މާތައް ފެނޭހޭ
+*ގުލްޒާރުން ގުލްޒާރުން ފަރިވާ މާތައް ފެނޭހޭ
+ފިނިފެންމަލައް ވުރެ ރީތީ ކަލާއޭ
+*ހިތުވިންދުން މި ޖަހާލާ ގިގުނިން ރާގެއް އިވޭއްޭ
+ލޯބި ލޯބި ގިނުނީގެ އަޑަކީ ތިބާ އޭ
+މޫރިތިމި ޝާހިލް
+*މި ލޯބީގެ މަންޒިލު
+ޔާރާއޭ މަސްތުން
+*ފުރިފާ ނުވޭހޭ ފުރިފާ ނުވޭހޭ
+ފަރިފަރި އިޝްޤީ އަދާ
+*ދެކޭ ހިތް ވެޔޭ ތިޔަ ލޮލާ`, 
+      englishLyrics: `#M
+Fini fini masthee vayaa
+*Thunithuni nukulhey hithaa
+Loabinvey dhivaanaa dhivaanaa dhivaanaa
+*Loabinvey dhivaanaa dhivaanaa dhivaanaa
+Reehchey reehchey maa loayybe yaaru
+*Hithaa hitheyvee beygaraaru
+Loabinney dheevaanaa dheevaanaa dheevaanaa
+*Loabinney dheevaanaa dheevaanaa dheevaanaa
+*Fini fini mastheevayaa
+#1
+Annaashey annaashey moosun reehchey dhekeyshey
+*Annaashey annaashey moosun reehchey dhekeyshey
+Gaimey handhah vure reethee kalaaey
+*Noo udu gaavaa tharithah roashan chaaley balaashey
+Ishqee zuvaan thi moonah belumah bunaashey
+Aalam mi loabeege
+*Noorun vidhaathee ey
+Mihithah vaa ihusaas
+*Thi hithah nuvey hey thi hithah nuvey hey
+Nooney mooney yaaraa veyey
+*Vaamey mirey vaame ma fidhaa
+#2
+Gulzaarun gulzaarun farivaa maathah feneyhey
+*Gulzaarun gulzaarun farivaa maathah feneyhey
+Finifenmalah vure reethee kalaaey
+*Hithuvindhun mi jahaalaa gigunin raageh iveyhey
+Loabi loabi ginuneege adakee thibaa ey
+Moorithimi shaahil
+*Mi loabeege manzil
+Yaaraaey masthun
+*Furifaa nuveyhey furifaa nuveyhey
+Farifari ishqee adhaa
+*Dhekey hiyy veyey thiya lolaa`,
 },
 {
   id: 109,

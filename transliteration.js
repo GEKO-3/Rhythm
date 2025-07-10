@@ -436,6 +436,7 @@ const specialCases = [
     { input: 'fihijjey', output: 'ފިހިއްޖޭ' },
     
     // 8 characters
+    { input: 'mihithah', output: 'މިހިތައް' },
     { input: 'henveiru', output: 'ހެންވޭރު' },
     { input: 'henveyru', output: 'ހެންވޭރު' },
     { input: 'laahikeh', output: 'ލާހިކެއް' },
@@ -529,6 +530,8 @@ const specialCases = [
     { input: 'rahumeh', output: 'ރަހުމެއް' },
     
     // 7 characters
+    { input: 'loayybe', output: 'ލޯތްބޭ' },
+    { input: 'shaahil', output: 'ޝާހިލް' },
     { input: 'nuhurey', output: 'ނުހުރޭ' },
     { input: 'henveru', output: 'ހެންވޭރު' },
     { input: 'laahiku', output: 'ލާހިކު' },
