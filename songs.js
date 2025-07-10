@@ -5518,7 +5518,7 @@ $2
 },
 {
   id: 152,
-  name: `Eesa Beyaa Kudadhon`,
+  name: `Eesa Beyaa`,
   genre: 'Kaasi',
   lyrics: `#M
 އީސަ ބެޔާ ކުޑަދޮން ތަކުރާ ފެންނާނެޔޯ
