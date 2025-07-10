@@ -603,7 +603,7 @@ $N
     lyrics: `#M
 އަދުމިކުރީ ސާފު އިބާރާ ތުން
 *ހިތޭ ހަދިޔާ
-މިހިތ އޭގެ ވާހާބާރާ
+މިހިތާ އޭގާ ވާހާބާރާ
 *ކުރީ ހަދިޔާ
 #1
 ފަރުވާ އެއް ލިބޭނޭ ބޭހަކީ
@@ -5515,6 +5515,86 @@ $2
 *މިތުރެކެ މީބުނެ ހިތްހިތާ ގުޅުވައިދިނޭ
 އެކަމަކު ހޭލެވުމުން އެކަނިވެރިމަވީތީ
 *ވޭމެޔޭ ކިޔައިދޭ ހިތްނިކަން ގަޔާވީތީ`
+},
+{
+  id: 152,
+  name: `Eesa Beyaa Kudadhon`,
+  genre: 'Kaasi',
+  lyrics: `#M
+އީސަ ބެޔާ ކުޑަދޮން ތަކުރާ ފެންނާނެޔޯ
+*އީސަ ބެޔާ ކުޑަދޮން ތަކުރާ ފެންނާނެޔޯ
+މާ މަޑަކުން ދެން ތިބެ ތިބެފާ ލޯ އަޅާނެޔޯ
+*މާ މަޑަކުން ދެން ތިބެ ތިބެފާ ލޯ އަޅާނެޔޯ
+ވަގަށް ނަގާ ހިތަކުން އުޅެފާ
+*ވަގަށް ގެނައި ނަލަ ރަން ފައްޓަރު އޮންނާނެޔޯ އޮންނާނެޔޯ
+
+#1
+ފިލަމުން ފިލަމުން ދުވަމުން ބޮނދަމުން ވަދެ އެތަން މިތަން ހާވަ ބަލާފާ
+*ފިލަމުން ފިލަމުން ދުވަމުން ބޮނދަމުން ވަދެ އެތަން މިތަން ހާވަ ބަލާފާ
+ވަގަށް ނެގީ ރަން ފައްޓަރު ބައެކޭ
+*ވަގަށް ނެގީ ރިހި ފައްޓަރު ބައެކޭ
+ނޫނޭ ވަގަށް ނެގީ ރަން ފައްޓަރު ބައެކޭ
+*ވަގަށް ނެގީ ރިހި ފައްޓަރު ބައެކޭ އަސްތާ ކަލޯ އަސްތާ ކަލޯ
+
+#2
+އެގެއިން މިގެއިން ކެޓެމުން ތެޅެމުން ވަދެ އެޔަށް މިޔަށް ހޯހޮ ގޮވާފާ
+*އެގެއިން މިގެއިން ކެޓެމުން ތެޅެމުން ވަދެ އެޔަށް މިޔަށް ހޯހޮ ގޮވާފާ
+ވަގަށް ނެގީ ރަން ފައްޓަރު ބައެކޭ
+*ވަގަށް ނެގީ ރިހި ފައްޓަރު ބައެކޭ
+ނޫނޭ ވަގަށް ނެގީ ރަން ފައްޓަރު ބައެކޭ
+*ވަގަށް ނެގީ ރިހި ފައްޓަރު ބައެކޭ އަސްތާ ކަލޮ އަސްތާ ކަލޮ
+
+-
+$M
+އީސަ ބެޔާ ދޮން ތަކުރާ ބިރުވެސް ނުގަނޭހޭ
+*މުޅި ރަށުގަ ފަލީހަތް ވާން ލަދުވެސް ނުގަނޭހޭ
+
+$1
+ވަގަކަށް ވީ ހާސް ދުވަހޭ ވެރިޔަށް މީ އޮތް ދުވަހޭ
+*ވެރިޔަށް މީ އޮތް ދުވަހޭ ވެރިޔަށް މީ އޮތް ދުވަހޭ
+މަގަކުން ގެއަކަށް ވަދެވެސް ނުފިލޭނޭ މީ ދުވަހޭ
+*ނުފިލޭނޭ މީ ދުވަހޭ ނުފިލޭނޭ މީ ދުވަހޭ
+
+$2
+*އީސަބޭ ވަގަށް ނެގީ
+ރަން ފައްޓަރު ކޮބާހޭ
+ރިހި ފައްޓަރު ކޮބާހޭ
+ބަލަ ދޮން ތަކުރާ ކޮބާހޭ`, 
+      englishLyrics: `#M
+Eesa beyaa kudadhon thakuraa fennaaneyoa
+*Eesa beyaa kudadhon thakuraa fennaaneyoa
+Maa madakun dhen thibe thibefaa loa alhaaneyoa
+*Maa madakun dhen thibe thibefaa loa alhaaneyoa
+Vagah nagaa hithakun ulhefaa
+*Vagah genai nala ran fahtaru onnaaneyoa onnaaneyoa
+#1
+Filamun filamun dhuvamun bondhamun vadhe ethan mithan haava balaafaa
+*Filamun filamun dhuvamun bondhamun vadhe ethan mithan haava balaafaa
+Vagah negy ran fahtaru baekey
+*Vagah negy rihi fahtaru baekey
+Nooney Vagah negy ran fahtaru baekey
+*Vagah negy Rihi fahtaru baekey asthaa kaloa asthaa kaloa
+#2
+Egein migein ketemun thelhemun vadhe eyah miyah hoaho govaafaa
+*Egein migein ketemun thelhemun vadhe eyah miyah hoaho govaafaa
+Vagah negy ran fahtaru baekey
+*Vagah negy Rihi fahtaru baekey
+Nooney Vagah negy ran fahtaru baekey
+*Vagah negy Rihi fahtaru baekey asthaa kalo asthaa kalo
+-
+$M
+Eesa beyaa dhon thakuraa biruves nuganeyhey
+*Mulhi rashuga faleehaiy vaan ladhuves nuganeyhey
+$1
+Vagakah vee haas dhuvahey veriyah mee oiy dhuvahey
+*Veriyah mee oiy dhuvahey veriyah mee oiy dhuvahey
+Magakun geakah vadheves nufileyney mee dhuvahey
+*Nufileyney mee dhuvahey nufileyney mee dhuvahey
+$2
+*Ran fahtaru kobaahey
+Eesabey vagah negy
+Rihi fahtaru kobaahey
+Bala dhon thakuraa kobaahey`,
 },
 {
   id: 154,

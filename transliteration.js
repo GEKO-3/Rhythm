@@ -358,6 +358,11 @@ const specialCases = [
     { input: 'hallgaige', output: 'ހަލްގައިގެ' },
     
     // 9 characters
+    { input: 'faleehaiy', output: 'ފަލީހަތް' },
+    { input: 'faleehayy', output: 'ފަލީހަތް' },
+    { input: 'faleehaii', output: 'ފަލީހަތް' },
+    { input: 'eesabeyaa', output: 'އީސަބެޔާ' },
+    { input: 'dhuvahey', output: 'ދުވަހޭ' },
     { input: 'aashoahey', output: 'އާޝޯހޭ' },
     { input: 'faruhilan', output: 'ފަރުހިލަން' },
     { input: 'faruhilun', output: 'ފަރުހިލުން' },
@@ -440,6 +445,7 @@ const specialCases = [
     { input: 'fihijjey', output: 'ފިހިއްޖޭ' },
     
     // 8 characters
+    { input: 'kobaahey', output: 'ކޮބާހޭ' },
     { input: 'ahaashey', output: 'އަހާށޭ' },
     { input: 'mihithah', output: 'މިހިތައް' },
     { input: 'henveiru', output: 'ހެންވޭރު' },
@@ -535,6 +541,8 @@ const specialCases = [
     { input: 'rahumeh', output: 'ރަހުމެއް' },
     
     // 7 characters
+    { input: 'fahtaru', output: 'ފައްޓަރު' },
+    { input: 'eesabey', output: 'އީސަބޭ' },
     { input: 'loayybe', output: 'ލޯތްބޭ' },
     { input: 'shaahil', output: 'ޝާހިލް' },
     { input: 'nuhurey', output: 'ނުހުރޭ' },
@@ -672,6 +680,8 @@ const specialCases = [
     { input: 'gammge', output: 'ގަމްގެ' },
     
     // 5 characters
+    { input: 'beyaa', output: 'ބެޔާ' },
+    { input: 'hoaho', output: 'ހޯހޮ' },
     { input: 'dhahi', output: 'ދަހި' },
     { input: 'theyo', output: 'ތެޔޮ' },
     { input: 'oihaa', output: 'އޮތްހާ' },
@@ -731,6 +741,9 @@ const specialCases = [
     { input: 'araam', output: 'އަރާމު' },
     
     // 4 characters
+    { input: 'eyah', output: 'އެޔަށް' },
+    { input: 'eesa', output: 'އީސަ' },
+    { input: 'rihi', output: 'ރިހި' },
     { input: 'male', output: 'މާލެ' },
     { input: 'aiyy', output: 'އަތް' },
     { input: 'dhon', output: 'ދޮން' },
@@ -774,6 +787,7 @@ const specialCases = [
     { input: 'baheii', output: 'ބަހެއް' },
 
     // 3 characters
+    { input: 'oiy', output: 'އޮތް' },
     { input: 'hiy', output: 'ހިތް' },
     { input: 'aii', output: 'އަތް' },
     { input: 'ayy', output: 'އަތް' },
@@ -1052,6 +1066,81 @@ function performTransliteration(latinText) {
             if (isEndOfWord) {
                 dhivehiText += 'ނަ'; // special transliteration for word-final 'na'
                 i += 2; // Skip all 2 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "neyhey" at end of word
+        if (processText.substring(i, i + 6) === 'neyhey') {
+            // Check if this 'neyhey' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 6 >= processText.length || 
+                processText[i + 6] === ' ' || 
+                processText[i + 6] === '\n' ||
+                processText[i + 6] === '\r' ||
+                processText[i + 6] === ',' ||
+                processText[i + 6] === '#' ||
+                /[0-9]/.test(processText[i + 6]) ||
+                /[.,!?;:]/.test(processText[i + 6])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ނޭހޭ'; // special transliteration for word-final 'neyhey'
+                i += 6; // Skip all 6 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "neyoa" at end of word
+        if (processText.substring(i, i + 5) === 'neyoa') {
+            // Check if this 'neyoa' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 5 >= processText.length || 
+                processText[i + 5] === ' ' || 
+                processText[i + 5] === '\n' ||
+                processText[i + 5] === '\r' ||
+                processText[i + 5] === ',' ||
+                processText[i + 5] === '#' ||
+                /[0-9]/.test(processText[i + 5]) ||
+                /[.,!?;:]/.test(processText[i + 5])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ނެޔޯ'; // special transliteration for word-final 'neyoa'
+                i += 5; // Skip all 5 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "neyo" at end of word
+        if (processText.substring(i, i + 4) === 'neyo') {
+            // Check if this 'neyo' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 4 >= processText.length || 
+                processText[i + 4] === ' ' || 
+                processText[i + 4] === '\n' ||
+                processText[i + 4] === '\r' ||
+                processText[i + 4] === ',' ||
+                processText[i + 4] === '#' ||
+                /[0-9]/.test(processText[i + 4]) ||
+                /[.,!?;:]/.test(processText[i + 4])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ނެޔޮ'; // special transliteration for word-final 'neyo'
+                i += 4; // Skip all 4 characters
                 matched = true;
                 continue;
             }
@@ -1499,6 +1588,7 @@ function performTransliteration(latinText) {
             { pattern: 'thunbaa', output: 'ތުނބާ', length: 7 },
             
             // 6-letter patterns
+            { pattern: 'bondha', output: 'ބޮނދަ', length: 6 },
             { pattern: 'aanhaa', output: 'އާނހާ', length: 6 },
             { pattern: 'dhandu', output: 'ދަނޑު', length: 6 },
             { pattern: 'dhanbu', output: 'ދަނބު', length: 6 },
