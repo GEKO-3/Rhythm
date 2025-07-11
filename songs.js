@@ -5573,7 +5573,7 @@ Filamun filamun dhuvamun bondhamun vadhe ethan mithan haava balaafaa
 Vagah negy ran fahtaru baekey
 *Vagah negy rihi fahtaru baekey
 Nooney Vagah negy ran fahtaru baekey
-*Vagah negy Rihi fahtaru baekey asthaa kaloa asthaa kaloa
+*Vagah negy rihi fahtaru baekey asthaa kaloa asthaa kaloa
 #2
 Egein migein ketemun thelhemun vadhe eyah miyah hoaho govaafaa
 *Egein migein ketemun thelhemun vadhe eyah miyah hoaho govaafaa
@@ -5595,6 +5595,89 @@ $2
 Eesabey vagah negy
 Rihi fahtaru kobaahey
 Bala dhon thakuraa kobaahey`,
+},
+{
+  id: 153,
+  name: `Moalu Marufulhey Mage`,
+  genre: 'Taki',
+  lyrics: `#M
+މޯލު މަރުފުޅޭ މަގެ ދަރި ހިތް ނުރުހެއްޗޭ
+*ދަރިފުޅޭ
+ހިތް ނުރުހެއްޗޭ
+*ރޯލު ޖަންބު ގޮނެއް މަޔަމާ ނުދެނީސް
+މޯލު މަރުފުޅޭ ކުޑަ ދަރި ހިތް ނުރުހެއްޗޭ
+*ދަރިފުޅޭ
+ރަން ނުކިޔައްޗޭ
+*އަންބަރު އަތާރު ދެދަޅު ނުދެނީސް
+
+#1
+ލޯބިން ހުރެފާ އަނާ ލޯބި މަގޭ ރަންކޮޅާ
+*ލޯބިން ހުރެފާ އަނާ ލޯބި މަގޭ ރަންކޮޅާ
+ލޯ ރަތްރަތް އައިނަކާ ރިހި ކަސަބު ލިބާހަކާ
+*ނުދެނީސް ހިތް ނުރުހެއްޗޭ
+ހަމަ ހިލާ
+*ރަން ނުކިޔައްޗޭ އަންބަރު އަތާރު ދެދަޅު ނުދެނީސް
+
+#2
+ގޯހެއް ކަމުގާ މި ނުލާ ރޯދި މަށަށް ދޭށެ މާ
+*ގޯހެއް ކަމުގާ މި ނުލާ ރޯދި މަށަށް ދޭށެ މާ
+ބޯކަޅުވާ ބޭހަކާ ލޯ އަލިވާ އައިނަކާ
+*ނުދެނީސް ހިތް ނުރުހެއްޗޭ
+ހަމަ ހިލާ
+*ރަން ނުކިޔައްޗޭ އަންބަރު އަތާރު ދެދަޅު ނުދެނީސް
+
+#3
+ރަން ކުދި ކުދި ކަތުރާ ރަންފަގަލީ ތިނޯހާ
+*ރަން ކުދި ކުދި ކަތުރާ ރަންފަގަލީ ތިނޯހާ
+ރަން ފައިވާން ޖޯޑަކާ ރަން މުތް ހުރީ ހާރަކާ
+*ނުދެނީސް ހިތް ނުރުހެއްޗޭ
+ހަމަ ހިލާ
+*ރަން ނުކިޔައްޗޭ އަންބަރު އަތާރު ދެދަޅު ނުދެނީސް
+
+#4
+ކިޔަ ކިޔަލުން ދުމާމާ ތިޔަފުޅު ދަރި ގާތުގާ
+*ކިޔަ ކިޔަލުން ދުމާމާ ތިޔަފުޅު ދަރި ގާތުގާ
+ވިޔަކޮށް ހުރިހާ މުދާ ލިޔެ ފަތް ނުދެނީސް ހިލާ
+*ހިލާ ހިތް ނުރުހެއްޗޭ
+ހަމަ ހިލާ
+*ރަން ނުކިޔައްޗޭ އަންބަރު އަތާރު ދެދަޅު ނުދެނީސް`, 
+      englishLyrics: `#M
+Moalu marufulhey mage dhari hiyy nuruhehchey
+*Dharifulhey
+Hiyy nuruhehchey
+*Roalu janbu goneh mayamaa nudhenees
+Moalu marufulhey kuda dhari hiyy nuruhehchey
+*Dharifulhey
+Ran nukiyahchey
+*Anbaru athaaru dhedhalhu nudhenees
+#1
+Loabin hurefaa anaa loabi magey rankolhaa
+*Loabin hurefaa anaa loabi magey rankolhaa
+Loa rayyrayy ainakaa rihi kasabu libaahakaa
+*Nudhenees hiyy nuruhehchey
+Hama hilaa
+*Ran nukiyahchey anbaru athaaru dhedhalhu nudhenees
+#2
+Goaheh kamugaa mi nulaa roadhi mashah dheyshe maa
+*Goaheh kamugaa mi nulaa roadhi mashah dheyshe maa
+Boakalhuvaa beyhakaa loa alivaa ainakaa
+*Nudhenees hiyy nuruhehchey
+Hama hilaa
+*Ran nukiyahchey anbaru athaaru dhedhalhu nudhenees
+#3
+Ran kudhi kudhi kathuraa ranfagalee thinoahaa
+*Ran kudhi kudhi kathuraa ranfagalee thinoahaa
+Ran faivaan joadakaa ran muyy huree haarakaa
+*Nudhenees hiyy nuruhehchey
+Hama hilaa
+*Ran nukiyahchey anbaru athaaru dhedhalhu nudhenees
+#4
+Kiya kiyalun dhumaamaa thiyafulhu dhari gaathugaa
+*Kiya kiyalun dhumaamaa thiyafulhu dhari gaathugaa
+Viyakoh hurihaa mudhaa liye fayy nudhenees hilaa
+*Hilaa hiyy nuruhehchey
+Hama hilaa
+*Ran nukiyahchey anbaru athaaru dhedhalhu nudhenees`,
 },
 {
   id: 154,
@@ -8255,5 +8338,42 @@ Eki neshumugaa fai hama kuramaa
 ތުރުތުރު އަޅުވާ ފުރޮޅި
 އަތްފައި ހަލުވާ ފުރޮޅި
 ގުޑުގުޑު ލައްވާ ފުރޮޅި`
+},
+{
+  id: 236,
+  name: `Dhin Mi Nazarugaa`,
+  genre: 'Zamaanee',
+  lyrics: `#M
+ދިން މި ނަޒަރުގާ ލޯބި ޒުވާނާ މަސްތުގެ ރާނީ ކޮއްލަނީ ދިވާނާ
+*ލޯބިން ދީވާނާ
+ދީވާނާ
+*ލޯބިން ދީވާނާ
+
+#1
+ފަރި ކަމުގާ އިޝްޤީ ޝަބާބު ގެނައި
+*އަސަރު ގުޅޭ ލޯބީގެ ސީދާ ނާ
+ހާދަ ބޭ ޒަހަމު ތިޔަ އަތޭ ޒަހަމު ކޮއްލަނީ ފުރާނާ
+*ލޯބިން ދީވާނާ
+
+#2
+އުދުހި އަރާމު ދަނީ ލޮލުން ނިންޖާ
+*ހަމަތައް އޮޅި ޖާނުން ލެޔާ ވިންދާ
+ބޭގަރާރުވީ ހިތް މި ޖާޒުބީ ކޮއްލަނީ ހަޒާނާ
+*ލޯބިން ދީވާނާ`, 
+      englishLyrics: `#M
+Dhin mi nazarugaa loabi zuvaanaa masthuge raanee kollanee dhivaanaa
+*Loabin dheevaanaa
+Dheevaanaa
+*Loabin dheevaanaa
+#1
+Fari kamugaa ishgee shabaabu genai
+*Asaru gulhey loabeege seedhaa naa
+Haadha bey zaham thiya athey zaham kollanee furaanaa
+*Loabin dheevaanaa
+#2
+Udhuhi araamu dhanee lolun ninjaa
+*Hamathah olhi jaanun leyaa vindhaa
+Beygaraarvee hiy mi jaazubee kollanee hazaanaa
+*Loabin dheevaanaa`,
 },
 ]

@@ -166,6 +166,8 @@ const specialCases = [
     { input: 'dhuniyege', output: 'ދުނިޔޭގެ' },
     
     // 12 characters
+    { input: 'beygaraarvee', output: 'ބޭގަރާރުވީ' },
+    { input: 'nukiyahchey', output: 'ނުކިޔައްޗޭ' },
     { input: 'henveruhuri', output: 'ހެންވޭރުހުރި' },
     { input: 'henveyruhuri', output: 'ހެންވޭރުހުރި' },
     { input: 'handhaanuney', output: 'ހަނދާނުނޭ' },
@@ -225,6 +227,8 @@ const specialCases = [
     { input: 'bahaareh', output: 'ބަހާރެއް' },
     
     // 11 characters
+    { input: 'nuruhehchey', output: 'ނުރުހެއްޗޭ' },
+    { input: 'nukiahchey', output: 'ނުކިއައްޗޭ' },
     { input: 'nimidhaaney', output: 'ނިމިދާނޭ' },
     { input: 'handhaanvey', output: 'ހަނދާންވޭ' },
     { input: 'javaahiruge', output: 'ޖަވާހިރުގެ' },
@@ -290,6 +294,7 @@ const specialCases = [
     { input: 'dhaanveehey', output: 'ދާންވީހޭ' },
     
     // 10 characters
+    { input: 'libaahakaa', output: 'ލިބާހަކާ' },
     { input: 'bilaahakah', output: 'ބިލާހަކަށް' },
     { input: 'bilaahekey', output: 'ބިލާހެކޭ' },
     { input: 'handhaanun', output: 'ހަނދާނުން' },
@@ -358,6 +363,8 @@ const specialCases = [
     { input: 'hallgaige', output: 'ހަލްގައިގެ' },
     
     // 9 characters
+    { input: 'beygaraar', output: 'ބޭގަރާރު' },
+    { input: 'thinoahaa', output: 'ތިނޯހާ' },
     { input: 'faleehaiy', output: 'ފަލީހަތް' },
     { input: 'faleehayy', output: 'ފަލީހަތް' },
     { input: 'faleehaii', output: 'ފަލީހަތް' },
@@ -445,6 +452,10 @@ const specialCases = [
     { input: 'fihijjey', output: 'ފިހިއްޖޭ' },
     
     // 8 characters
+    { input: 'rayyrayy', output: 'ރަތްރަތް' },
+    { input: 'raiyraiy', output: 'ރަތްރަތް' },
+    { input: 'raiiraii', output: 'ރަތްރަތް' },
+    { input: 'beyhakaa', output: 'ބޭހަކާ' },
     { input: 'kobaahey', output: 'ކޮބާހޭ' },
     { input: 'ahaashey', output: 'އަހާށޭ' },
     { input: 'mihithah', output: 'މިހިތައް' },
@@ -633,6 +644,8 @@ const specialCases = [
     { input: 'rahumey', output: 'ރަހުމޭ' },
     
     // 6 characters
+    { input: 'udhuhi', output: 'އުދުހި' },
+    { input: 'goaheh', output: 'ގޯހެއް' },
     { input: 'nuhure', output: 'ނުހުރެ' },
     { input: 'dhihun', output: 'ދިހުން' },
     { input: 'adhoih', output: 'އައްދޯތް' },
@@ -741,6 +754,15 @@ const specialCases = [
     { input: 'araam', output: 'އަރާމު' },
     
     // 4 characters
+    { input: 'rayy', output: 'ރަތް' },
+    { input: 'raiy', output: 'ރަތް' },
+    { input: 'raii', output: 'ރަތް' },
+    { input: 'muyy', output: 'މުތް' },
+    { input: 'muiy', output: 'މުތް' },
+    { input: 'muii', output: 'މުތް' },
+    { input: 'fayy', output: 'ފަތް' },
+    { input: 'faiy', output: 'ފަތް' },
+    { input: 'faii', output: 'ފަތް' },
     { input: 'eyah', output: 'އެޔަށް' },
     { input: 'eesa', output: 'އީސަ' },
     { input: 'rihi', output: 'ރިހި' },
@@ -1166,6 +1188,31 @@ function performTransliteration(latinText) {
             if (isEndOfWord) {
                 dhivehiText += 'ަހުން'; // special transliteration for word-final 'ahun'
                 i += 4; // Skip all 4 characters
+                matched = true;
+                continue;
+            }
+        }
+        
+        // Special case: check for "hakaa" at end of word
+        if (processText.substring(i, i + 5) === 'hakaa') {
+            // Check if this 'hakaa' is at the end of a word
+            let isEndOfWord = false;
+            
+            // Check if next character is space, punctuation, line break, comma, number, #, or end of text
+            if (i + 5 >= processText.length || 
+                processText[i + 5] === ' ' || 
+                processText[i + 5] === '\n' ||
+                processText[i + 5] === '\r' ||
+                processText[i + 5] === ',' ||
+                processText[i + 5] === '#' ||
+                /[0-9]/.test(processText[i + 5]) ||
+                /[.,!?;:]/.test(processText[i + 5])) {
+                isEndOfWord = true;
+            }
+            
+            if (isEndOfWord) {
+                dhivehiText += 'ހަކާ'; // special transliteration for word-final 'hakaa'
+                i += 5; // Skip all 5 characters
                 matched = true;
                 continue;
             }
