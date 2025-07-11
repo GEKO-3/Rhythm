@@ -363,6 +363,9 @@ const specialCases = [
     { input: 'hallgaige', output: 'ހަލްގައިގެ' },
     
     // 9 characters
+    { input: 'raheyngoa', output: 'ރަހޭންގޯ' },
+    { input: 'vehurumaa', output: 'ވެހުރުމާ' },
+    { input: 'nuhurumaa', output: 'ނުހުރުމާ' },
     { input: 'beygaraar', output: 'ބޭގަރާރު' },
     { input: 'thinoahaa', output: 'ތިނޯހާ' },
     { input: 'faleehaiy', output: 'ފަލީހަތް' },
@@ -452,6 +455,9 @@ const specialCases = [
     { input: 'fihijjey', output: 'ފިހިއްޖޭ' },
     
     // 8 characters
+    { input: 'rahengoa', output: 'ރަހެންގޯ' },
+    { input: 'dhenvehi', output: 'ދެންވެހި' },
+    { input: 'ahlaare', output: 'އައްލާރެ' },
     { input: 'rayyrayy', output: 'ރަތްރަތް' },
     { input: 'raiyraiy', output: 'ރަތްރަތް' },
     { input: 'raiiraii', output: 'ރަތްރަތް' },
@@ -552,6 +558,8 @@ const specialCases = [
     { input: 'rahumeh', output: 'ރަހުމެއް' },
     
     // 7 characters
+    { input: 'fenvehi', output: 'ފެންވެހި' },
+    { input: 'chuhare', output: 'ޗުހަރެ' },
     { input: 'fahtaru', output: 'ފައްޓަރު' },
     { input: 'eesabey', output: 'އީސަބޭ' },
     { input: 'loayybe', output: 'ލޯތްބޭ' },
@@ -644,6 +652,8 @@ const specialCases = [
     { input: 'rahumey', output: 'ރަހުމޭ' },
     
     // 6 characters
+    { input: 'suhare', output: 'ސުހަރެ' },
+    { input: 'chaahe', output: 'ޗާހެ' },
     { input: 'udhuhi', output: 'އުދުހި' },
     { input: 'goaheh', output: 'ގޯހެއް' },
     { input: 'nuhure', output: 'ނުހުރެ' },
@@ -754,6 +764,7 @@ const specialCases = [
     { input: 'araam', output: 'އަރާމު' },
     
     // 4 characters
+    { input: 'vehi', output: 'ވެހި' },
     { input: 'rayy', output: 'ރަތް' },
     { input: 'raiy', output: 'ރަތް' },
     { input: 'raii', output: 'ރަތް' },
@@ -1644,6 +1655,7 @@ function performTransliteration(latinText) {
             { pattern: 'thundi', output: 'ތުނޑި', length: 6 },
             { pattern: 'thundu', output: 'ތުނޑު', length: 6 },
             { pattern: 'thunbu', output: 'ތުނބު', length: 6 },
+            { pattern: 'thunbi', output: 'ތުނބި', length: 6 },
             { pattern: 'thunba', output: 'ތުނބަ', length: 6 },
             { pattern: 'thanbu', output: 'ތަނބު', length: 6 },
             { pattern: 'kandhi', output: 'ކަނދި', length: 6 },

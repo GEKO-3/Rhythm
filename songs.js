@@ -8376,4 +8376,71 @@ Udhuhi araamu dhanee lolun ninjaa
 Beygaraarvee hiy mi jaazubee kollanee hazaanaa
 *Loabin dheevaanaa`,
 },
+{
+  id: 237,
+  name: `Adhudhu Kayyaa`,
+  genre: 'Baburu',
+  lyrics: `#M
+އަދުދު ކައްޔާ ވޭ އަދުދުން ކާ އައްޔާވޭ
+*އަދުދު ކައްޔާ ވޭ އަދުދުން ކާ އައްޔާވޭ
+އާލު ވެ ދާލު ގޯލު ޕިޗަންޑޭ ޗުހަރެ ގެކޭ ނިއަންޗޯރެ ޖުމާރެ & ޗާހެ އައްލާރެ &
+ލާ ކަ ގިރިޒަނަވެ & ޗާހެ އައްލާރެ &
+ލާ ކަސި ކަތިވެ & ޗާހެ އައްލާރެ &
+ލާ ރުޕަންޖަނަވެ & ޗާހެ އައްލާރެ &
+ވާނަމަރޯންބޭ އަޔާވޭ
+
+#1
+ބުޅިތުނބި ކޮވެލި ގޮވާލި އޭ މުޅި އުޑު ކިސަޑު ކޮއްފިޔޭ
+ދެންވެހި ބަލަގަ ވާރޭގާ
+ބޭރުން ކަތަކު ގޮވާލިޔޭ ދެ ދަނޑި މަތީގަ އޮންނަރުމާ
+ހެ ހުރުމާ ނުހުރުމާ
+
+#2
+ހަސަނާ ތުޖެ އަމަރެ ސަމަރާންގޯ &މާ ހަލޯންގޯ&
+ލޯންގޯ &މާ ހަލޯންގޯ&
+މާ ހަލޯންގޯ &މާ ހަލޯންގޯ&
+ނަމަސެކެ ރަހެންގޯ &މާ ހަލޯންގޯ&
+ސުހަރެ ހަރެންގޯ &މާ ހަލޯންގޯ&
+
+#3
+ދޫނި ރެކި ތިބޭނީ
+*ހޯރަކަތަ ޗޯރައިގާ
+ކުންރަނގި ބަލަ ދަމާލީ
+*ހޯރަކަތަ ޗޯރައިގާ
+ނިދި ކުރަނގި ތިބޭނީ
+*ހޯރަކަތަ ޗޯރައިގާ
+
+#4
+*ގިޔާ ގަލީ ކީ
+ވާނީ ގިޔާލީ`, 
+      englishLyrics: `#M
+Adhudhu kayyaa vey adhudhun kaa ayyaavey
+*Adhudhu kayyaa vey adhudhun kaa ayyaavey
+Aal ve dhaal goal pichandey chuhare gekey nianchoare jumaare & Chaahe ahlaare &
+Laa ka girizanave & Chaahe ahlaare &
+Laa kasi kathive & Chaahe ahlaare &
+Laa rupanjanave & Chaahe ahlaare &
+Vaanamaroanbey ayaavey
+#1
+Bulhithunbi koveli govaali ey mulhi udu kisadu koffiyey
+Dhenvehi balaga vaareygaa
+Beyrun kathaku govaaliyey dhe dhandi matheega onnarumaa
+He hurumaa nuhurumaa
+#2
+Hasanaa thuje amare samaraangoa &Maa haloangoa&
+Loangoa &Maa haloangoa&
+Maa haloangoa &Maa haloangoa&
+Namaseke rahengoa &Maa haloangoa&
+Suhare harengoa &Maa haloangoa&
+#3
+Dhooni reki thibeyny
+*Hoarakatha choaraigaa
+Kunrangi bala dhamaalee
+*Hoarakatha choaraigaa
+Nidhi kurangi thibeyny
+*Hoarakatha choaraigaa
+#4
+*Giyaa galee kee
+Vaany giyaalee`,
+},
 ]
