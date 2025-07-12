@@ -994,56 +994,99 @@ Nala baburu
 Ekani hure
 Foaridhee`,
 },
-              {
-    id: 21,
-    name: 'Dhaaru Ofu',
-    genre: 'Thinberu',
-    lyrics: `#M
+{
+  id: 21,
+  name: `Dhaaruofu`,
+  genre: 'Thinberu',
+  lyrics: `#M
 ދާރުއޮފު މާތްވި ޅަމުރާލިޔެފުޅު ބިރާގަމީ
 *ހާނުޖަލުގާ ޖެހެވިފާ އިނީ
+
 #1
 ތުންފަސުލާ ނަމޭ ފަށާ
 *ދޮން އަނބު މަގޭ މިތުރާ
 ފުރުސަ ކައިރީ ނެތިގެނީ ދުން މަޑުވެ މަޑުން ރޮވެނީ
 *ފުރުސަ ކައިރީ ނެތިގެނީ ދުން މަޑުވެ މަޑުން ރޮވެނީ
 *ހާނުޖަލުގާ ޖެހެވިފާ އިނީ
+
 #2
 ގޯހެއްނެތި ދަންނަވަމޭ
 *ލޯ ދެފަދަވީ މިތުރާ
 ގޯލަރަނު ކުލަ އެއަރާ ކޯފުޅުނަލަ ބިރާގަމީ
 *ގޯލަރަނު ކުލަ އެއަރާ ކޯފުޅުނަލަ ބިރާގަމީ
 *ހާނުޖަލުގާ ޖެހެވިފާ އިނީ
+
 #3
 ވަރުހަށީ ނެތި މަގޮވާ
-*ތަރުހަދަމުއިނދެ މިތުރާ
-ހަރުފަމޯރާކުލަވާ ކަރުފުޅުދަލަ ބިރާގަމީ
-*ހަރުފަމޯރާކުލަވާ ކަރުފުޅުދަލަ ބިރާގަމީ
-*ހާނުޖަލުގާ ޖެހެވިފާ އިނީ
-`,
-  },
-     {
-    id: 22,
-    name: 'Dhaneehe Aisbalaa',
-    genre: 'Nala',
-    lyrics: `#M
+*ތަރުހަދަމު އިނދެ މިތުރާ
+ހަރުފަމޯރާކުލަވާ ކަރުފުޅުނަލަ ބިރާގަމީ
+*ހަރުފަމޯރާކުލަވާ ކަރުފުޅުނަލަ ބިރާގަމީ
+*ހާނުޖަލުގާ ޖެހެވިފާ އިނީ`,
+       
+  englishLyrics: `#M
+Dhaaruofu maayyvi lhamuraaliyefulhu biraagamee
+*Haanujalugaa jehevifaa inee
+#1
+Thunfasulaa namey fashaa
+*Dhon anbu magey mithuraa
+Furusa kairee nethigenee dhun maduve madun rovenee
+*Furusa kairee nethigenee dhun maduve madun rovenee
+*Haanujalugaa jehevifaa inee
+#2
+Goahehnethi dhannavamey
+*Loa dhefadhavee mithuraa
+Goalaranu kula earaa koafulhunala biraagamee
+*Goalaranu kula earaa koafulhunala biraagamee
+*Haanujalugaa jehevifaa inee
+#3
+Varuhashee nethi magovaa
+*Tharuhadhamu indhe mithuraa
+Harufamoaraakulavaa karufulhunala biraagamee
+*Harufamoaraakulavaa karufulhunala biraagamee
+*Haanujalugaa jehevifaa inee`,
+},
+{
+  id: 22,
+  name: `Dhaneehe Aisbalaa`,
+  genre: 'Nala',
+  lyrics: `#M
 ދަނީހެ އައިސްބަލާ ބުނެލަދީބަލާ އަނގައިން
 *ވީމެނުކެރިފާ ވެވުނު ނަފުރަތުން އިނގޭ
+
 #1
-އެއީކީއް ވެގެންހޭ ވަކިން ކީއްވެގެންހޭ
-*ޭތިބުނަނީ ފަހެ ނުދާށޭ
+އެ އީ ކީއްވެގެންހޭ ވަކިން ކީއްވެގެންހޭޭ
+*ތިބުނަނީ ފަހެ ނުދާށޭ
 ބުނަމޭ އުފާދޭ މިހިތުގެ ދިރުންދޭ
-*ރީތި ނާޒުކުު ބަހާރޭ
+*ރީތި ނާޒުކު ބަހާރޭ
 އިއްވާދީ އާނއެކޭ ނުބުނެ ނޫނެކޭ އަނގައިން
 *ވީމެނުކެރިފާ ވެވުނު ނަފުރަތުން އިނގޭ
+
 #2
 ހުންނަ ގޮތަކުންވެސް މަ ހުންނަ ގޮތަނުންވެސް
 *ފެންނަނީހޭ ރުހޭތީ
-އުފާދެއްވި ސޫރައިން ތިފާޅުވި އިޝާރާތް
+އުފާދެއްވި ސޫރައިން ތިފާޅުވީ އިޝާރާތް
 *ހިތުގެ ކާނާ ލިބޭތީ
 އާދޭހުން ފޯވެގެން ދާންވީހޭ ނުބުނެގެން އަނގައިން
-*ވީމެނުކެރިފާ ވެވުނު ނަފުރަތުން އިނގޭ
-`,
-  },
+*ވީމެނުކެރިފާ ވެވުނު ނަފުރަތުން އިނގޭ`,
+       
+  englishLyrics: `#M
+Dhaneehe aisbalaa buneladheebalaa angain
+*Veemenukerifaa vevunu nafurathun ingey
+#1
+E ee keehvegenhey vakin keehvegenheyey
+*Thibunanee fahe nudhaashey
+Bunamey ufaadhey mihithuge dhirundhey
+*Reethi naazuku bahaarey
+Ihvaadhee aanekey nubune noonekey angain
+*Veemenukerifaa vevunu nafurathun ingey
+#2
+Hunna gothakunves ma hunna gothanunves
+*Fennaneehey ruheythee
+Ufaadhehvi soorain thifaalhuvee ishaaraayy
+*Hithuge kaanaa libeythee
+Aadheyhun foavegen dhaanveehey nubunegen angain
+*Veemenukerifaa vevunu nafurathun ingey`,
+},
             {
 id: 23,
 name: 'Muniyaage Loabin',
@@ -1574,7 +1617,21 @@ Zaathee khiyaaluge aniyaa thah hithuge hiyanivaa
 މުރާލިވެތި މަންޒަރު ހަދަމުން ފުރާނާ އަތްމައްޗައް ލައިގެން
 *މުރާލިވެތި މަންޒަރު ހަދަމުން ފުރާނާ އަތްމައްޗައް ލައިގެން
 ތުރާތަކާ ވޭނާ ލިބިގެން މުރާދު ހާސިލް ވެވޭތޯ
-*ތުރާތަކާ ވޭނާ ލިބިގެން މުރާދު ހާސިލް ވެވޭތޯ`
+*ތުރާތަކާ ވޭނާ ލިބިގެން މުރާދު ހާސިލް ވެވޭތޯ`,
+       
+  englishLyrics: `#M
+Dhathurufesheemey kamana libeythoa loabi libeythoa
+*Aan aan aan aan loabilibeythoa
+#1
+Dharaafenaa kohthaa hoadhaa baraa kureemey odiahlaa
+*Dharaafenaa kohthaa hoadhaa baraa kureemey odiahlaa
+Baraabarah fahsi evaigai thuraakunah dhen dheveythoa
+*Baraabarah fahsi evaigai thuraakunah dhen dheveythoa
+#2
+Muraalivethi manzaru hadhamun furaanaa ayymahchah laigen
+*Muraalivethi manzaru hadhamun furaanaa ayymahchah laigen
+Thuraathakaa veynaa libigen muraadhu haasil veveythoa
+*Thuraathakaa veynaa libigen muraadhu haasil veveythoa`,
 },
 {
   id: 34,
@@ -1614,7 +1671,40 @@ Zaathee khiyaaluge aniyaa thah hithuge hiyanivaa
 ތުންގަނޑު ހަރަމުން
 *ބިމުއަޑި ތެރެއަށް
 ހިނިފުޅު ވަޑުވާދޯ
-*ފަނި ކުދިކުދި ހޮވާކެޔޯ ދެފަށް ކަނބިއްޔޯ`
+*ފަނި ކުދިކުދި ހޮވާކެޔޯ ދެފަށް ކަނބިއްޔޯ`,
+       
+  englishLyrics: `#M
+Kuredhi faluga nudhevi fithifa inndhe kanbihyoa
+*Loahooraa boahooraa indhe kanbihyoa
+Thuruthuru alha meysihihi indhe kanbihyoa
+*Fiyavaalhuve biruheevefa inndhe kanbihyoa
+#1
+Fiyagandu hulhuvaa
+*Sahlaa kohlaa
+Dhaaneygothakah
+*Medhugai visnaa
+Kolhukolhu balamun
+*Dheathah hirilaa
+Indhe indhe gaanaaboa
+*Huri haaskan boduvihyoa indhe kanbihyoa
+#2
+Thoshimaa aumun
+*Baarah roelaa
+Rakihini gothakah
+*Thoshimaa hevilaa
+Kurunees kohlaa
+*Edhebeyn nerelaa
+Hurehure hevilaadhoa
+*Boakeyogahu mathin dhiyoa dhefah kanbihyoa
+#3
+Libidhin ufalun
+*Thundiyah jehilaa
+Hiyy hamajehilaa
+*Boahure hooraa
+Thungandu haramun
+*Bimuadi thereah
+Hinifulhu vaduvaadhoa
+*Fani kudhikudhi hovaakeyoa dhefah kanbihyoa`,
 },
 {
   id: 35,
@@ -4211,27 +4301,61 @@ Laslahun`,
 އެތައްއެތައް ފަހަރުވުމުން ނުވާނެ ހައިރާން
 *ނިމުމާއެކީ މިވީއެ ބަދުނާމު
 އަދުމިހިނގާ ދުނިޔެ ހަމައިން
-*އަދުބުނަމޭ މިގޮތޭ ވާނީ`
+*އަދުބުނަމޭ މިގޮތޭ ވާނީ`,
+       
+  englishLyrics: `#M
+Dhehitheh gulheyney dhehitheh netheyney
+*Hoadhanvee nooru vidhaalee
+Dhuniyeyge therein roohaai gulhigen
+*Hoadhaashe meeru ufaavee
+#1
+Mihenmihen feshenvumun dhireyshe vee jaan
+*Adhugaamivee hingaashe hoadhaa
+Asaruasaru hithahvumun nuvaane hairaan
+*Fenumaaekee mivee iraadhaan
+Adhu hithugaa kiyaidhin roohey
+*Adhubunamey migothey vaanee
+#2
+Mihenmihen nimenvumun hithaai gurubaan
+*Adhugaa mivee furaana roalaa
+Ethahethah faharuvumun nuvaane hairaan
+*Nimumaaekee miveee badhunaamu
+Adhumihingaa dhuniye hamain
+*Adhubunamey migothey vaanee`,
 },
 {
   id: 101,
-  name: `Dheythi Hiley`,
+  name: `Dheythee Hiley`,
   genre: 'Nala',
   lyrics: `#M
-ދޭތީ ހިލޭ ޒިންދްގާނީރޭ ތީރުދެންވީ ޖަވާނިހެރީ
-*ތޯއެ ރޭ އާއެ ޢަމްބީ މިތާ އެހުރީ
+ދޭތީ ހިލޭ ޒިންދުގާނީރޭ ތީރުދެންވީ ޖަވާނީހެރީ
+*ތޯއެ ރޭ އާއެ އަމްބީ މިތާ އެހުރީ
 
 #1
 ހާލުވަނީއޭ ލޯބި ވިރާނާ
 *އަދުތަ ނަފުސު ބަދަލު ކުރިޖާނާ މަލުގެ ޕަރުވާނާ
-ދާހަ އެރޫހުވެ ލޮބުވެތި ޖާނާ
+ދާހާ އެރޫހުވެ ލޮބުވެތި ޖާނާ
 *ލޮބުވެތި ޖާނާ
 
 #2
 ސާމިލުވީ އަދު ރޫހާ ޖާނޭ
-*ހެކިވެ މިލޯބި ތެރޭގާ ހާލެމި ދެން މިތުރާއެ
+*ހެކިވެ މިލޯބި ތެރޭގާ ހާލެމި ދެން މިތުރާއޭ
 ވާލޯބި ނުދެކޭ ހިތުގެ ހަޒާނާ
-*ހިތުގެ ހަޒާނާ`
+*ހިތުގެ ހަޒާނާ`,
+       
+  englishLyrics: `#M
+Dheythee hiley zindhgaaneerey theerudhenvee javaaniheree
+*Thoae rey aae ambee mithaa ehuree
+#1
+Haaluvaneeey loabi viraanaa
+*Adhutha nafusu badhalu kurijaanaa maluge paruvaanaa
+Dhaahaa eroohuve lobuvethi jaanaa
+*Lobuvethi jaanaa
+#2
+Saamiluvee adhu roohaa jaaney
+*Hekive miloabi thereygaa haalemi dhen mithuraaey
+Vaaloabi nudhekey hithuge hazaanaa
+*Hithuge hazaanaa`,
 },
 {
   id: 102,
@@ -7463,7 +7587,34 @@ Nufilaa hithugaa ehandhaanthah vaathee
 މާދުރުން
 އޮތްތަނުން
 ދިޔަގޮތުން
-ފަޅުމެދުން`
+ފަޅުމެދުން`,
+       
+  englishLyrics: `#M
+Dhanvaru nidheegaa thihbaa keyolhu govaalee
+*Heylaa
+Dhanvaru nidheegaa nuthibe thedhuvebalaashey
+*Heylaa
+Fathihu nidheegaa thihbaa keyolhugovaaney
+*Thedhuvey
+Avahah thedhuvey
+*Alivanihyey
+Mehi hondali roadhi dhamaandhaan
+*Thedhuvey
+Roadhi dhamaandhaan
+*Thedhuvey roadhi dhamaandhaan thedhuvey
+#1
+*Odi nerun furaifiyoa
+Endhaman furaifiyoa
+Ennagaa dhevenothee
+Mendhaman furaifiyoa
+#2
+*Fumey godhaa
+Kandumedhun
+Rashumedhun
+Maadhurun
+Oyythanun
+Dhiyagothun
+Falhumedhun`,
 },
 {
   id: 190,
@@ -8975,7 +9126,25 @@ Eki neshumugaa fai hama kuramaa
 *ނިދިން ތެދުވެ ވާށާ ބަލާ
 ތުރުތުރު އަޅުވާ ފުރޮޅި
 އަތްފައި ހަލުވާ ފުރޮޅި
-ގުޑުގުޑު ލައްވާ ފުރޮޅި`
+ގުޑުގުޑު ލައްވާ ފުރޮޅި`,
+       
+  englishLyrics: `#M
+Dhanvaru handhuvaru dhonveli matheen
+*Kuhjaku dhushee hiyanivelaa
+Vihsaali sihsaali buhraas jahaa
+*Kanduge lonugandu mahchah araa
+Vilaa rohjeh uduga jahaa
+*Banave vihsaara andhirivelaa
+#1
+*Nahtaali fahayy balaa
+Udaku bimaku nujehi filan
+Ehchaku thereyga nujehi filan
+Nukeri hurefa birun filan
+#2
+*Nidhin thedhuve vaashaa balaa
+Thuruthuru alhuvaa furolhi
+Ayyfai haluvaa furolhi
+Gudugudu lahvaa furolhi`,
 },
 {
   id: 236,
