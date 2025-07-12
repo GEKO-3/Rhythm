@@ -636,8 +636,9 @@
         }
       });
       const lyricsEscaped = lyrics.trim().replace(/`/g, '\u0060');
-      const output = `, 
-      englishLyrics: \`${lyricsEscaped}\`,`;
+      const output = `,
+       
+  englishLyrics: \`${lyricsEscaped}\`,`;
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(output);
       } else {
