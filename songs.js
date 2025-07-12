@@ -572,31 +572,54 @@ Lhiskoshan maavadi hure helenee
 *މިހިތާ ލެޔާއޭ
 `,
   },
-              {
-    id: 15,
-    name: 'Adhabee Salaam',
-    genre: 'Kaasi',
-    lyrics: `#M
+{
+  id: 15,
+  name: `Adhabee Salaam`,
+  genre: 'Kaasi',
+  lyrics: `#M
 ފަރިވާހާ
 *ގުލްޒާރުން މާމަލުން އަދަބީ ސަލަމުގާ ވެދުމޭ ކުރާނީ
+
 #1
 އެކިވައްތަރު މާމަލުން
 *އެކިއެކި ގުލްހާރުތައް އަމުނާމަލުން
--------------------------------------------------
+
+-
 $M
 ފަރިވާ އުފާވެ ދާ މަލޭތާ
-*ކޯޅީގާ ނޫރާނީ ފޯދޭނެއޭ
+*ކޯޅީގާ ނޫރާނީ ފޯދޭނެޔޭ
+
 $1
 ގުލޭޒާރުންނޭ އާވާ އެއީ
 *ރޫހޭ ދިރޭ
+
 $2
 ދެކޭ ފިނިރޯޅި ވައިގާ އައީ
-*މޫސުނެެ ދިރޭ
-$N
+*މޫސުން ދިރޭ
+
+$3
 ކޯޅީގާ ނޫރާނީ
-*ފޯދޭނެއޭ
-`,
-  },
+*ފޯދޭނީީ`, 
+      englishLyrics: `#M
+Farivaahaa
+*Gulzaarun maamalun adhabee salamugaa vedhumey kuraanee
+#1
+Ekivahtharu maamalun
+*Ekieki gulhaaruthah amunaamalun
+-
+$M
+Farivaa ufaave dhaa maleythaa
+*Koalheegaa nooraanee foadheyneyey
+$1
+Guleyzaarunney aavaa eee
+*Roohey dhirey
+$2
+Dhekey finiroalhi vaigaa aee
+*Moosun dhirey
+$3
+Koalheegaa nooraanee
+*Foadheyneey`,
+},
               {
     id: 16,
     name: 'Adhumikuree',
@@ -629,8 +652,36 @@ $N
 *ހިތޭ ހަދިޔާ
 #N
 ހިތޭ ހަދިޔާ
-*ކުރީ ހަދިޔާ
-`,
+*ކުރީ ހަދިޔާ`, 
+      englishLyrics: `#M
+Adhumikuree saafu ibaaraathun
+*Hithey hadhiyaa
+Mihithaa eygaa vaahaa baaraa
+*Kuree hadhiyaa
+#1
+Faruvaa eh libeyney beyhakee
+*Dhirumeh dhen dheveyney roohakee
+Firumaidhee hedheyney meehakee
+*Firumaidhee hedheyney meehakee
+Thiyaeekamugaa vaathee mikuree
+*Hithey hadhiyaa
+#2
+Nugaboolas bunaashey aanekey
+*Nubunashey iveyhen noonekey
+Bunumun vaan othee barubaadhekey
+*Bunumun vaan othee barubaadhekey
+Unmeedhuthakaa ekugaa kuranee
+*Hithey hadhiyaa
+#3
+Nuruhumugaa kuraa inkaarakee
+*Nuhifannyaa vedhaa barubaadhakee
+Marukamugaa veyey insaafakee
+*Marukamugaa veyey insaafakee
+Foruvaafa nubaahvaashey mikuree
+*Hithey hadhiyaa
+#4
+Hithey hadhiyaa
+*Kuree hadhiyaa`,
   },
               {
     id: 17,
@@ -3570,30 +3621,49 @@ $N
 },
 {
   id: 93,
-  name: `Aee Aeetho`,
+  name: `Aee Aeethoa`,
   genre: 'Kaasi',
   lyrics: `#M
-އައީއައީތޯ މައިނާ މީގުލްޝަން ނޫރީ ނޫންގުރާ
-*އައީއައީތޯ މައިނާ މީ
+އައީ އައީތޯ މައިނާ މީ ގުލްޝަން ނޫރީ ނޫގުރާ
+*އައީ އައީތޯ މައިނާ މީ
 ގުލްޝަން މަނޫރީ ނޫގުރާ
-*އައީއައީތޯ މައިނާ މީ
+*އައީ އައީތޯ މައިނާ މީ
 
 #1
 އަލުން ހިތެއް ދިރުވައިދޭ
 *އަލުން ގޮތެއް ހޯދައިދޭ
 މަލުން މަލުން ފޮނި ބޯން އުދުހޭ މީ ބުލްބުލް ކެނެރީ މާބުރާ
-*އައީއައީތޯ މައިނާ މީގުލްޝަން ނޫރީ ނޫންގުރާ
+*އައީ އައީތޯ މައިނާ މީގުލްޝަން ނޫރީ ނޫގުރާ
 
 -
 $M
-ސޯސަން ގުލްމާ ފަރިވާ އިރައް
-*ތޯތާ މުނިޔާ ކުދި ދޯނިތަކޭ އުދުހެނީ
+ސޯސަން ގުލްމާ ފަރިވާ އިރަށް
+*ތޯތާ މުނިޔާ ކުދި ދޫނިތަކޭ އުދުހެނީ
 
 $1
 ފިޔަތައް ވާޅު ވެގެން އުދުހޭ ކުދި ދޫނިތައް
 *ފިޔަތައް ވާޅު ވެގެން އުދުހޭ ކުދި ދޫނިތައް
 ޒާރެއް މަލުގާ ފިޔަފޮޅުވައިންގެން އުދުހެނީ
-*ޒާރެއް މަލުގާ ފިޔަފޮޅުވައިންގެން އުދުހެނީ`
+*ޒާރެއް މަލުގާ ފިޔަފޮޅުވައިންގެން އުދުހެނީ`, 
+      englishLyrics: `#M
+Aee aeethoa mainaa mee gulshan nooree nooguraa
+*Aee aeethoa mainaa mee
+Gulshan manooree nooguraa
+*Aee aeethoa mainaa mee
+#1
+Alun hitheh dhiruvaidhey
+*Alun gotheh hoadhaidhey
+Malun malun foni boan udhuhey mee bulbul keneree maaburaa
+*Aee aeethoa mainaa meegulshan nooree nooguraa
+-
+$M
+Soasan gulmaa farivaa irah
+*Thoathaa muniyaa kudhi dhoonithakey udhuhenee
+$1
+Fiyathah vaalhu vegen udhuhey kudhi dhoonithah
+*Fiyathah vaalhu vegen udhuhey kudhi dhoonithah
+Zaareh malugaa fiyafolhuvaingen udhuhenee
+*Zaareh malugaa fiyafolhuvaingen udhuhenee`,
 },
 {
   id: 94,
@@ -4658,7 +4728,33 @@ $N
 ކެތްވާނީ ކިހިނަކުން ޒުވާނާ
 *ނަގާ މިރާޅު މޭގާ ދެން އޮބިގެން ނުދާތީ
 ތިއީ ހާދަ މަސްތީ މިޒާޖެހޭ މިރޭ
-*ތިއީ ހާދަ މަސްތީ މިޒާޖެހޭ މިރޭ`
+*ތިއީ ހާދަ މަސްތީ މިޒާޖެހޭ މިރޭ`, 
+      englishLyrics: `#M
+Ahaashey zuvaanaa bunaashe loabivaa
+*Ahaashey zuvaanaa bunaashe loabivaa
+Varah reethi reekey hingaalamaa hingaa
+*Varah reethi reekey hingaalamaa hingaa
+#1
+Hoonun yaaraage hasheegaavaa
+*Meygaa uthurey finikan filuvaalanhey
+Eyrun hithahthi kuruvaaney
+*Araamu nikan loabin bayaankohdhenhey
+Thihennoolhey mithuraa nidhan hingaa mirey
+*Thihennoolhey mithuraa nidhan hingaa mirey
+#2
+Mithuraaey dhanvarey himeynvey
+*Siyaasa vegen noolheyshey keyytherivaashey
+Kiyaadheynamey mihithu thereyvaa
+*Hiyaalu nikan loabin adudhen ahaashey
+Thihennoolhey gaathah jeheyshey dhenmirey
+*Thihennoolhey gaathah jeheyshey dhenmirey
+#3
+Naadheymirey ma hilaa ninjeh
+*Loabeegaavedhaa gothekeymee hiyyheyo kuraathee
+Keyyvaanee kihinakun zuvaanaa
+*Nagaa miraalhu meygaa dhen obigen nudhaathee
+Thiee haadha masthee mizaajehey mirey
+*Thiee haadha masthee mizaajehey mirey`,
 },
 {
   id: 124,
@@ -6829,7 +6925,24 @@ $4
 ކޮއްކޯއޭ އެހުމުން އަންނާށޭ މިތަނައް
 *ފޯރިދީއެންމެން ކޮއްކޮ އައިމާ ނަށާލަ ން
 ކިޔާށޭ ލަސްލަހުން މިރާގައް ކޮއްކޮމެން
-*ފޯރިއޭރުންމާ ގަދަވާނޭ ދޯމިތާ`
+*ފޯރިއޭރުންމާ ގަދަވާނޭ ދޯމިތާ`, 
+      englishLyrics: `#M
+Meerukaanaa kaigen dhoa nashaanee
+*Boanee ice cream hey
+Juice nuboashey eyrunney nesheynee
+*Vaaney foarinagan
+Vaaney kohkomen lavakiyaa foaridhee
+*Eyrunney enmen vaanee ufaa
+#1
+Aadhey kohkomen annaashey partyah
+*Enmen ehveemaa vaaney haadhahaa majaa
+Foohsehves nuvaaney partygaa kohkomen
+*Enmen eyyveemaa vaaney haadhahaa majaa
+#2
+Kohkoaey ehumun annaashey mithanah
+*Foaridheeenmen kohko aimaa nashaalan
+Kiyaashey laslahun miraagah kohkomen
+*Foarieyrunmaa gadhavaaney dhoamithaa`,
 },
 {
   id: 188,

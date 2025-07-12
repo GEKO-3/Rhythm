@@ -75,6 +75,11 @@ const specialCases = [
     // 21 characters
     { input: 'masthukohlaafaaneyey', output: 'މަސްތުކޮށްލާ ފާނެޔޭ' },
     
+    // 18 characters
+    { input: 'keyytherivaashey', output: 'ކެތްތެރިވާށޭ' },
+    { input: 'keiytherivaashey', output: 'ކެތްތެރިވާށޭ' },
+    { input: 'keiitherivaashey', output: 'ކެތްތެރިވާށޭ' },
+    
     // 17 characters
     { input: 'thakaholhithah', output: 'ތަކަހޮޅިތައް' },
     { input: 'nimihingaidhaaney', output: 'ނިމިހިނގައިދާނޭ' },
@@ -97,6 +102,7 @@ const specialCases = [
     { input: 'nohorohpaaney', output: 'ނޮހޮރޮއްޕާނޭ' },
     { input: 'ihhuthiyaareh', output: 'އިޙުތިޔާރެއް' },
     { input: 'rahttehinnaa', output: 'ރައްޓެހިންނާ' },
+    { input: 'thiyaeekamugaa', output: 'ތިޔައީކަމުގާ' },
     { input: 'ishthashigandu', output: 'އިސްތަށިގަނޑު' },
     { input: 'handhaanunney', output: 'ހަނދާނުންނޭ' },
     { input: 'javaahirahves', output: 'ޖަވާހިރައްވެސް' },
@@ -169,7 +175,9 @@ const specialCases = [
     { input: 'dhuniyege', output: 'ދުނިޔޭގެ' },
     
     // 12 characters
+    { input: 'aeeaeethoa', output: 'އައީއައީތޯ' },
     { input: 'beygaraarvee', output: 'ބޭގަރާރުވީ' },
+    { input: 'gulhaaruthah', output: 'ގުލްހާރުތައް' },
     { input: 'ihhuthiyaaru', output: 'އިޙުތިޔާރު' },
     { input: 'ihuthiyaareh', output: 'އިޙުތިޔާރެއް' },
     { input: 'nukiyahchey', output: 'ނުކިޔައްޗޭ' },
@@ -232,10 +240,13 @@ const specialCases = [
     { input: 'bahaareh', output: 'ބަހާރެއް' },
     
     // 11 characters
+    { input: 'meegulshan', output: 'މީގުލްޝަން' },
     { input: 'aashoahuvee', output: 'އާޝޯހުވީ' },
     { input: 'ehidhaaney', output: 'އެހިދާނޭ' },
     { input: 'hiyyufaavaa', output: 'ހިތްއުފާވާ' },
     { input: 'ihuthiyaaru', output: 'އިޙުތިޔާރު' },
+    { input: 'nuhifannyaa', output: 'ނުހިފަންޔާ' },
+    { input: 'nuruhumugaa', output: 'ނުރުހުމުގާ' },
     { input: 'nuruhehchey', output: 'ނުރުހެއްޗޭ' },
     { input: 'nukiahchey', output: 'ނުކިއައްޗޭ' },
     { input: 'nimidhaaney', output: 'ނިމިދާނޭ' },
@@ -303,8 +314,24 @@ const specialCases = [
     { input: 'dhaanveehey', output: 'ދާންވީހޭ' },
     
     // 10 characters
+    { input: 'keyyvaanee', output: 'ކެތްވާނީ' },
+    { input: 'keiyvaanee', output: 'ކެތްވާނީ' },
+    { input: 'keiivaanee', output: 'ކެތްވާނީ' },
+    { input: 'keyyvaany', output: 'ކެތްވާނީ' },
+    { input: 'keiyvaany', output: 'ކެތްވާނީ' },
+    { input: 'keiivaany', output: 'ކެތްވާނީ' },
+    { input: 'keyyvaanii', output: 'ކެތްވާނީ' },
+    { input: 'keiyvaanii', output: 'ކެތްވާނީ' },
+    { input: 'keiivaanii', output: 'ކެތްވާނީ' },
+    { input: 'kihinakun', output: 'ކިހިނަކުން' },
+    { input: 'gulshanun', output: 'ގުލްޝަނުން' },
+    { input: 'udhuhenee', output: 'އުދުހެނީ' },
+    { input: 'udhuheny', output: 'އުދުހެނީ' },
+    { input: 'udhuhunee', output: 'އުދުހުނީ' },
+    { input: 'udhuhuny', output: 'އުދުހުނީ' },
     { input: 'ahaalanves', output: 'އަހާލަންވެސް' },
     { input: 'faharehgaa', output: 'ފަހަރެއްގާ' },
+    { input: 'farivaahaa', output: 'ފަރިވާހާ' },
     { input: 'libaahakaa', output: 'ލިބާހަކާ' },
     { input: 'bilaahakah', output: 'ބިލާހަކަށް' },
     { input: 'bilaahekey', output: 'ބިލާހެކޭ' },
@@ -375,12 +402,24 @@ const specialCases = [
     { input: 'hallgaige', output: 'ހަލްގައިގެ' },
     
     // 9 characters
+    { input: 'keyytheri', output: 'ކެތްތެރި' },
+    { input: 'keiytheri', output: 'ކެތްތެރި' },
+    { input: 'keiitheri', output: 'ކެތްތެރި' },
+    { input: 'hiyyheyo', output: 'ހިތްހެޔޮ' },
+    { input: 'jeheyshey', output: 'ޖެހޭށޭ' },
+    { input: 'gulshaney', output: 'ގުލްޝަނޭ' },
     { input: 'hiyymagey', output: 'ހިތްމަގޭ' },
     { input: 'rahttehin', output: 'ރައްޓެހިން' },
     { input: 'thasbeeha', output: 'ތަސްބީހަ' },
     { input: 'bondibayy', output: 'ބޮނޑިބަތް' },
     { input: 'bondibaiy', output: 'ބޮނޑިބަތް' },
     { input: 'bondibaii', output: 'ބޮނޑިބަތް' },
+    { input: 'eyyveemaa', output: 'އެއްވީމާ' },
+    { input: 'eiiveemaa', output: 'އެއްވީމާ' },
+    { input: 'gulhaarun', output: 'ގުލްހާރުން' },
+    { input: 'gulhaarey', output: 'ގުލްހާރޭ' },
+    { input: 'nuruhumun', output: 'ނުރުހުމުން' },
+    { input: 'nuruhunee', output: 'ނުރުހުނީ' },
     { input: 'raheyngoa', output: 'ރަހޭންގޯ' },
     { input: 'vehurumaa', output: 'ވެހުރުމާ' },
     { input: 'nuhurumaa', output: 'ނުހުރުމާ' },
@@ -475,7 +514,22 @@ const specialCases = [
     { input: 'fihijjey', output: 'ފިހިއްޖޭ' },
     
     // 8 characters
+    { input: 'aeethoa', output: 'އައީތޯ' },
+    { input: 'gulshan', output: 'ގުލްޝަން' },
     { input: 'aashoahu', output: 'އާޝޯހު' },
+    { input: 'beyhakee', output: 'ބޭހަކީ' },
+    { input: 'beyhakaa', output: 'ބޭހަކާ' },
+    { input: 'beyhekey', output: 'ބޭހެކޭ' },
+    { input: 'ehveemaa', output: 'އެއްވީމާ' },
+    { input: 'gulhaaru', output: 'ގުލްހާރު' },
+    { input: 'meehakee', output: 'މީހަކީ' },
+    { input: 'meehekey', output: 'މީހެކޭ' },
+    { input: 'meehakaa', output: 'މީހަކާ' },
+    { input: 'partygaa', output: 'ޕާޓީގާ' },
+    { input: 'roohakee', output: 'ރޫހަކީ' },
+    { input: 'roohakaa', output: 'ރޫހަކާ' },
+    { input: 'roohekey', output: 'ރޫހެކޭ' },
+    { input: 'roohakun', output: 'ރޫހަކުން' },
     { input: 'nanbunan', output: 'ނަންބުނަން' },
     { input: 'thiyahen', output: 'ތިޔަހެން' },
     { input: 'dhaahiyy', output: 'ދާހިތް' },
@@ -583,6 +637,7 @@ const specialCases = [
     { input: 'rahumeh', output: 'ރަހުމެއް' },
     
     // 7 characters
+    { input: 'mihithu', output: 'މިހިތު' },
     { input: 'aanekey', output: 'އާނއެކޭ' },
     { input: 'aashoah', output: 'އާޝޯހު' },
     { input: 'vahumeh', output: 'ވަހުމެއް' },
@@ -592,6 +647,10 @@ const specialCases = [
     { input: 'kanfayy', output: 'ކަންފަތް' },
     { input: 'kanfaiy', output: 'ކަންފަތް' },
     { input: 'kanfaii', output: 'ކަންފަތް' },
+    { input: 'partyah', output: 'ޕާޓީއަށް' },
+    { input: 'partyga', output: 'ޕާޓީގަ' },
+    { input: 'iveyhen', output: 'އިވޭހެން' },
+    { input: 'nuruhun', output: 'ނުރުހުން' },
     { input: 'fenvehi', output: 'ފެންވެހި' },
     { input: 'chuhare', output: 'ޗުހަރެ' },
     { input: 'fahtaru', output: 'ފައްޓަރު' },
@@ -686,11 +745,17 @@ const specialCases = [
     { input: 'rahumey', output: 'ރަހުމޭ' },
     
     // 6 characters
+    { input: 'bulbul', output: 'ބުލްބުލް' },
+    { input: 'aeeaee', output: 'އައީއައީ' },
     { input: 'fihunu', output: 'ފިހުނު' },
     { input: 'heehee', output: 'ހީހީ' },
+    { input: 'iveyey', output: 'އިވެޔޭ' },
+    { input: 'iveyne', output: 'އިވޭނެ' },
     { input: 'migoyy', output: 'މިގޮތް' },
     { input: 'migoiy', output: 'މިގޮތް' },
+    { input: 'vaahaa', output: 'ވާހާ' },
     { input: 'migoii', output: 'މިގޮތް' },
+    { input: 'roohey', output: 'ރޫހޭ' },
     { input: 'vigoyy', output: 'ވިގޮތް' },
     { input: 'vigoiy', output: 'ވިގޮތް' },
     { input: 'vigoii', output: 'ވިގޮތް' },
@@ -747,9 +812,12 @@ const specialCases = [
     
     // 5 characters
     { input: 'bahaa', output: 'ބަހާ' },
+    { input: 'cream', output: 'ކުރީމު' },
     { input: 'ehgaa', output: 'އެއްގާ' },
     { input: 'foohi', output: 'ފޫހި' },
+    { input: 'juice', output: 'ޖޫސް' },
     { input: 'mahaa', output: 'މަހާ' },
+    { input: 'party', output: 'ޕާޓީ' },
     { input: 'vahum', output: 'ވަހުމު' },
     { input: 'beyaa', output: 'ބެޔާ' },
     { input: 'hoaho', output: 'ހޯހޮ' },
@@ -821,6 +889,7 @@ const specialCases = [
     { input: 'gaii', output: 'ގަތް' },
     { input: 'gaiy', output: 'ގަތް' },
     { input: 'heyo', output: 'ހެޔޮ' },
+    { input: 'ivey', output: 'އިވޭ' },
     { input: 'vehi', output: 'ވެހި' },
     { input: 'rayy', output: 'ރަތް' },
     { input: 'raiy', output: 'ރަތް' },
@@ -878,6 +947,9 @@ const specialCases = [
 
     // 3 characters
     { input: 'gay', output: 'ގަތް' },
+    { input: 'ice', output: 'އައިސް' },
+    { input: 'aee', output: 'އައީ' },
+    { input: 'eee', output: 'އެއީ' },
     { input: 'oiy', output: 'އޮތް' },
     { input: 'hiy', output: 'ހިތް' },
     { input: 'aii', output: 'އަތް' },
@@ -1319,6 +1391,39 @@ function performTransliteration(latinText) {
             }
             i++;
             continue;
+        }
+        
+        // Special case: check for "eh" as a standalone word
+        if (processText.substring(i, i + 2) === 'eh') {
+            // Check if this is a whole word (word boundaries before and after)
+            let isWholeWord = true;
+            
+            // Check character before (should be word boundary or start of string)
+            if (i > 0) {
+                const charBefore = processText[i - 1];
+                if (charBefore !== ' ' && charBefore !== '\t' && charBefore !== '\n' && 
+                    charBefore !== '\r' && charBefore !== '*' && 
+                    charBefore !== ',' && charBefore !== '#' && !/[0-9]/.test(charBefore) && !/[.,!?;:]/.test(charBefore)) {
+                    isWholeWord = false;
+                }
+            }
+            
+            // Check character after (should be word boundary or end of string)
+            if (isWholeWord && i + 2 < processText.length) {
+                const charAfter = processText[i + 2];
+                if (charAfter !== ' ' && charAfter !== '\t' && charAfter !== '\n' && 
+                    charAfter !== '\r' && charAfter !== '*' && 
+                    charAfter !== ',' && charAfter !== '#' && !/[0-9]/.test(charAfter) && !/[.,!?;:]/.test(charAfter)) {
+                    isWholeWord = false;
+                }
+            }
+            
+            if (isWholeWord) {
+                dhivehiText += 'އެއް'; // special transliteration for standalone "eh"
+                i += 2; // Skip both characters
+                matched = true;
+                continue;
+            }
         }
         
         // Check for special cases first (only as whole words)

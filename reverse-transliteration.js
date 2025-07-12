@@ -3,7 +3,7 @@ const reverseTransliterationMap = {
     'ހ': 'h', 'ށ': 'sh', 'ނ': 'n', 'ރ': 'r', 'ބ': 'b', 'ޅ': 'lh', 'ކ': 'k',
     'ވ': 'v', 'މ': 'm', 'ފ': 'f', 'ދ': 'dh', 'ތ': 'th', 'ލ': 'l',
     'ގ': 'g', 'ޏ': 'ny', 'ސ': 's', 'ޑ': 'd', 'ޒ': 'z', 'ޓ': 'tt', 'ޔ': 'y',
-    'ޕ': 'p', 'ޖ': 'j', 'ޗ': 'ch', 'ޝ': 'sh', 'ޙ': 'hh', 'ޚ': 'kh',
+    'ޕ': 'p', 'ޖ': 'j', 'ޗ': 'ch', 'ޝ': 'sh', 'ޙ': 'h', 'ޚ': 'kh',
     'ޤ': 'q', 'ޣ': 'gh', 'ޒ': 'z'
 };
 
@@ -39,7 +39,7 @@ const specialChars = {
     'ޓް': 'tt', // ttaalu with sukun
     'ޒް': 'z', // zaviyani with sukun
     'ޏް': 'ny', // gnaviyani with sukun
-    'ޙް': 'hh', // hhaa with sukun
+    'ޙް': 'h', // hhaa with sukun
     'ޚް': 'kh', // khaa with sukun
     'ޤް': 'q', // qaafu with sukun
     'ޣް': 'gh'  // ghain with sukun
@@ -104,6 +104,9 @@ const reverseSpecialCases = [
     { input: 'ނުވާ', output: 'nuvaa' },
     { input: 'ޖެހިއްޖޭ', output: 'jehihjey' },
     { input: 'ވެއްޖެއޭ', output: 'vehje ey' },
+    { input: 'ޕާޓީ', output: 'party' },
+    { input: 'ޕާޓީގާ', output: 'partygaa' },
+    { input: 'ޕާޓީއަށް', output: 'partyah' },
     { input: 'ންނުވާ', output: 'nnuvaa' }
 ];
 
