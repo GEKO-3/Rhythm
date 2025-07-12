@@ -297,6 +297,7 @@ const specialCases = [
     { input: 'libaahakaa', output: 'ލިބާހަކާ' },
     { input: 'bilaahakah', output: 'ބިލާހަކަށް' },
     { input: 'bilaahekey', output: 'ބިލާހެކޭ' },
+    { input: 'dhaahithun', output: 'ދާހިތުން' },
     { input: 'handhaanun', output: 'ހަނދާނުން' },
     { input: 'handhaaney', output: 'ހަނދާނޭ' },
     { input: 'bahaarugaa', output: 'ބަހާރުގާ' },
@@ -452,9 +453,13 @@ const specialCases = [
     { input: 'udhuhey', output: 'އުދުހޭ' },
     { input: 'ulheyhaa', output: 'އުޅޭހާ' },
     { input: 'hurihaa', output: 'ހުރިހާ' },
+    { input: 'fathihaa', output: 'ފަތިހާ' },
+    { input: 'midhaahaa', output: 'މިދާހާ' },
     { input: 'fihijjey', output: 'ފިހިއްޖޭ' },
     
     // 8 characters
+    { input: 'dhaahiyy', output: 'ދާހިތް' },
+    { input: 'dhaahih', output: 'ދާހިތް' },
     { input: 'rahengoa', output: 'ރަހެންގޯ' },
     { input: 'dhenvehi', output: 'ދެންވެހި' },
     { input: 'ahlaare', output: 'އައްލާރެ' },

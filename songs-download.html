@@ -215,6 +215,15 @@
       cursor: wait;
     }
     
+    .download-btn.copy-btn {
+      background: #9C27B0;
+      color: white;
+    }
+    
+    .download-btn.copy-btn:hover {
+      background: #7B1FA2;
+    }
+    
     .search-container {
       background: #1f1f1f;
       max-width: 600px;
@@ -500,9 +509,15 @@
             <button class="download-btn" onclick="downloadLyrics(${song.id}, 'dhivehi')">
               Download ދިވެހި
             </button>
+            <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'dhivehi')">
+              Copy ދިވެހި
+            </button>
             ${hasEnglish ? `
               <button class="download-btn english" onclick="downloadLyrics(${song.id}, 'english')">
                 Download English
+              </button>
+              <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'english')">
+                Copy English
               </button>
             ` : ''}
           </div>
@@ -563,6 +578,77 @@
       localStorage.setItem('selectedSongId', songId);
       // Navigate to lyrics.html
       window.location.href = 'lyrics.html';
+    }
+    
+    function copyLyrics(songId, language) {
+      const song = songs.find(s => s.id === songId);
+      if (!song) return;
+      
+      const button = event.target;
+      const originalText = button.textContent;
+      button.textContent = 'Copying...';
+      button.disabled = true;
+      
+      try {
+        const lyrics = language === 'dhivehi' ? song.lyrics : song.englishLyrics;
+        
+        if (!lyrics || lyrics.trim() === '') {
+          alert('No lyrics available for this language.');
+          return;
+        }
+        
+        // Clean the lyrics text
+        const cleanLyrics = cleanLyricsText(lyrics);
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(cleanLyrics).then(() => {
+          button.textContent = 'Copied!';
+          button.style.background = '#4CAF50';
+          setTimeout(() => {
+            button.textContent = originalText;
+            button.style.background = '#9C27B0';
+          }, 2000);
+        }).catch(err => {
+          console.error('Failed to copy: ', err);
+          alert('Failed to copy lyrics. Please try again.');
+        });
+        
+      } catch (error) {
+        console.error('Error copying lyrics:', error);
+        alert('Error copying lyrics. Please try again.');
+      } finally {
+        button.disabled = false;
+      }
+    }
+    
+    function cleanLyricsText(lyrics) {
+      const lines = lyrics.split('\n');
+      let cleanLines = [];
+      
+      lines.forEach(line => {
+        // Skip section headers (lines starting with # or $)
+        if (line.startsWith('#') || line.startsWith('$')) {
+          return;
+        }
+        
+        // Skip break lines (lines starting with -)
+        if (line.startsWith('-')) {
+          return;
+        }
+        
+        // Clean the line by removing asterisks and other formatting
+        let cleanLine = line
+          .replace(/^\*+/, '') // Remove asterisks at the beginning
+          .replace(/&/g, '') // Remove & symbols
+          .trim();
+        
+        // Only add non-empty lines
+        if (cleanLine !== '') {
+          cleanLines.push(cleanLine);
+        }
+      });
+      
+      return cleanLines.join('\n');
     }
     
     async function downloadLyrics(songId, language) {

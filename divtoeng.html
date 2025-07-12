@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dhivehi to English - Rhythm</title>
+    
+    <!-- Local font definitions -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+    
+    <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
+    <link rel="manifest" href="favicons/manifest.webmanifest">
+    
+    <style>
+        html, body {
+            touch-action: pan-x pan-y;
+            overscroll-behavior: none;
+        }
+        
+        input, textarea, select, button {
+            touch-action: manipulation;
+        }
+        
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #2b2b2b;
+            --bg-opacity: rgba(31, 31, 31, 0.0);
+            --hover-color2: #3a3a3a;
+            --active-color2: #111111;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            0% { transform: translateY(10px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        body {
+            font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
+            background: #232323;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: #2b2b2b;
+            max-width: 700px;
+            margin: 40px auto 0 auto;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+            padding: 32px 28px 28px 28px;
+        }
+        
+        h1 {
+            color: #f5d000;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        
+        p {
+            color: #e0e0e0;
+            margin-bottom: 28px;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            z-index: 10;
+        }
+        
+        .back-button:hover {
+            background: var(--hover-color);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: left;
+        }
+        
+        button {
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        
+        button:hover {
+            background: var(--hover-color);
+        }
+        
+        button:active {
+            background: var(--active-color);
+        }
+        
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .clear-btn:hover {
+            background: #c82333;
+        }
+        
+        .input-output-container {
+            display: flex;
+            gap: 18px;
+            margin-top: 18px;
+            align-items: flex-start;
+        }
+        .input-section, .output-section {
+            flex: 1;
+            min-width: 0;
+            height: 600px;
+        }
+        .input-section textarea, .output-section textarea, .input-section #inputLines, .output-section #englishLines {
+            min-height: 160px;
+            height: 550px;
+        }
+        .input-section textarea {
+            direction: rtl;
+        }
+        h3 {
+            color: #f5d000;
+            font-size: 1.1rem;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 13px;
+            font-size: 1.08rem;
+            border: 2px solid #444;
+            border-radius: 7px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            background: #232323;
+            color: #fff;
+            font-family: inherit;
+            transition: border 0.2s;
+        }
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #f5d000;
+        }
+        textarea[readonly] {
+            background: #232323;
+            color: #ffe066;
+        }
+        
+        /* Input text (Dhivehi) - Use Faruma */
+        #dhivehiInput, #inputLines {
+            font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
+        }
+        
+        /* Output text (English) - Use Montserrat */
+        #englishOutput, #englishLines {
+            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            font-size: 0.95rem;
+        }
+        
+        /* Line view text elements */
+        #inputLines .line-text {
+            font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
+        }
+        
+        #englishLines .line-text {
+            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            font-size: 0.95rem !important;
+        }
+        
+        button {
+            background-color: #f5d000;
+            color: #232323;
+            padding: 11px 26px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+        }
+        button:hover {
+            background-color: #e6c200;
+            transform: translateY(-1px);
+        }
+        .clear-btn {
+            background-color: #444;
+            color: #ffe066;
+        }
+        .clear-btn:hover {
+            background-color: #555;
+        }
+        
+        #uploadBtn {
+            background-color: #f5d000;
+            color: #232323;
+        }
+        
+        #uploadBtn:hover {
+            background-color: #e6c200;
+        }
+        
+        /* Line view styling */
+        .line-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 8px;
+            padding: 4px 0;
+        }
+        
+        .line-number {
+            color: #f5d000;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 8px;
+            min-width: 35px;
+            display: inline-block;
+            text-align: right;
+        }
+        
+        .line-text {
+            color: #fff;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            flex: 1;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #f5d000;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e6c200;
+        }
+        
+        /* Sync indicator styling */
+        #syncIndicator {
+            font-size: 0.85rem;
+            color: #f5d000;
+            font-weight: 500;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px auto;
+                padding: 20px;
+            }
+            
+            .input-output-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .input-section, .output-section {
+                height: auto;
+            }
+            
+            .input-section textarea, .output-section textarea, .input-section #inputLines, .output-section #englishLines {
+                height: 300px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            h3 {
+                font-size: 1rem;
+            }
+            
+            textarea {
+                font-size: 1rem;
+            }
+            
+            button {
+                padding: 10px 20px;
+                font-size: 0.95rem;
+            }
+        }
+        
+        /* Synchronized scrolling indicator */
+        .sync-indicator {
+            font-size: 0.85rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .sync-disabled {
+            color: #999;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                max-width: 95vw;
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .input-output-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            textarea {
+                height: 300px;
+            }
+            
+            .back-button {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dhivehi Reverse Transliteration Tool</h1>
+        <p>Convert Dhivehi script (Thaana) to Dhivehi Latin text</p>
+        
+        <button onclick="transliterate()">Transliterate</button>
+        <button class="clear-btn" onclick="clearText()">Clear</button>
+        <button id="uploadBtn" onclick="document.getElementById('fileInput').click()">Upload Text File</button>
+        <input type="file" id="fileInput" accept=".txt,.text" style="display: none;" onchange="handleFileUpload(event)">
+        
+        <div class="input-output-container">
+            <div class="input-section">
+                <h3 style="display: flex; align-items: center; justify-content: space-between;">
+                    Input (Dhivehi)
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button id="importDhivehiBtn" type="button" title="Import to Dhivehi Lyrics Editor" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #28a745; color: white; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Import</button>
+                        <button id="syncScrollBtn" type="button" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #f5d000; color: #232323; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;" title="Toggle synchronized scrolling">Sync</button>
+                        <span id="syncIndicator" style="font-size: 0.85rem; color: #f5d000; font-weight: 500;">🔗 Sync enabled</span>
+                    </div>
+                </h3>
+                <textarea id="dhivehiInput" placeholder="ދިވެހި ލިޔުން މިތާނަށް ލިޔުއްވާ..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="direction: rtl; font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif; display: block;"></textarea>
+                <div id="inputLines" style="display: none; height: 550px; overflow-y: auto; background: #232323; border: 2px solid #444; border-radius: 7px; padding: 13px; direction: rtl;"></div>
+            </div>
+            
+            <div class="output-section">
+                <h3 style="display: flex; align-items: center; justify-content: space-between;">
+                    Output (English)
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button id="copyAllBtn" type="button" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #444; color: #ffe066; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Copy</button>
+                        <button id="importEnglishBtn" type="button" title="Import to English Lyrics Editor" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #007bff; color: white; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Import</button>
+                        <button id="toggleViewBtn" type="button" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #f5d000; color: #232323; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Line</button>
+                    </div>
+                </h3>
+                <textarea id="englishOutput" readonly placeholder="English text will appear here..." style="display: block; direction: ltr;"></textarea>
+                <div id="englishLines" style="display: none; height: 550px; overflow-y: auto; background: #232323; border: 2px solid #444; border-radius: 7px; padding: 13px; direction: ltr;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="transliteration.js"></script>
+    <script src="reverse-transliteration.js"></script>
+    <script>
+        // Initialize Thaana transliteration for Dhivehi input
+        document.addEventListener('DOMContentLoaded', function() {
+            setupThaanaTransliteration(document.getElementById('dhivehiInput'));
+        });
+
+        function setupThaanaTransliteration(input) {
+            let isTransliterating = false;
+            input.addEventListener('input', function(e) {
+                if (isTransliterating) return;
+                
+                const cursorPos = input.selectionStart;
+                const inputLength = input.value.length;
+                
+                // Check if we're typing in English (basic check)
+                const lastChar = input.value[cursorPos - 1];
+                if (lastChar && /[a-zA-Z0-9]/.test(lastChar)) {
+                    isTransliterating = true;
+                    
+                    // Find the start of the current word
+                    let wordStart = cursorPos - 1;
+                    while (wordStart > 0 && /[a-zA-Z0-9]/.test(input.value[wordStart - 1])) {
+                        wordStart--;
+                    }
+                    
+                    // Extract the word
+                    const word = input.value.substring(wordStart, cursorPos);
+                    
+                    // Transliterate the word
+                    const transliterated = transliterateToThaana(word);
+                    
+                    // Replace the word with transliterated text
+                    const newValue = input.value.substring(0, wordStart) + transliterated + input.value.substring(cursorPos);
+                    input.value = newValue;
+                    
+                    // Adjust cursor position
+                    const newCursorPos = wordStart + transliterated.length;
+                    input.setSelectionRange(newCursorPos, newCursorPos);
+                    
+                    isTransliterating = false;
+                    
+                    // Save the transliterated text (Thaana characters) to localStorage
+                    saveInputText(input.value);
+                    
+                    // Trigger auto-transliteration if enabled
+                    if (input.value.trim()) {
+                        transliterate();
+                    }
+                }
+            });
+        }
+
+        function transliterate() {
+            const input = document.getElementById('dhivehiInput');
+            const output = document.getElementById('englishOutput');
+            
+            let dhivehiText = input.value;
+            
+            if (!dhivehiText || !dhivehiText.trim()) {
+                alert('Please enter some Dhivehi text to transliterate!');
+                return;
+            }
+            
+            // Perform reverse transliteration
+            const englishText = reverseTransliterate(dhivehiText);
+            
+            output.value = englishText;
+        }
+        
+        function clearText() {
+            document.getElementById('dhivehiInput').value = '';
+            document.getElementById('englishOutput').value = '';
+            
+            // Clear saved input text from localStorage
+            clearSavedInputText();
+            
+            // Clear line views if in line view mode
+            if (isLineView) {
+                updateLineView();
+                updateInputLineView();
+            }
+            
+            // Focus on the input area
+            document.getElementById('dhivehiInput').focus();
+        }
+        
+        // File upload functionality
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Check file type
+            if (!file.name.toLowerCase().endsWith('.txt') && !file.name.toLowerCase().endsWith('.text')) {
+                alert('Please select a text file (.txt or .text)');
+                return;
+            }
+            
+            // Check file size (limit to 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size is too large. Please select a file smaller than 10MB.');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const dhivehiInput = document.getElementById('dhivehiInput');
+                
+                // Set the file content to the input textarea
+                dhivehiInput.value = content;
+                
+                // Save to localStorage
+                saveInputText(content);
+                
+                // Auto-transliterate if there's content
+                if (content.trim()) {
+                    transliterate();
+                }
+                
+                // Update line views if in line view mode
+                if (isLineView) {
+                    updateLineView();
+                    updateInputLineView();
+                }
+                
+                // Visual feedback
+                const uploadBtn = document.getElementById('uploadBtn');
+                uploadBtn.textContent = 'Uploaded!';
+                uploadBtn.style.background = '#28a745';
+                setTimeout(() => {
+                    uploadBtn.textContent = 'Upload Text File';
+                    uploadBtn.style.background = '#f5d000';
+                }, 2000);
+            };
+            
+            reader.onerror = function() {
+                alert('Error reading file. Please try again.');
+            };
+            
+            reader.readAsText(file, 'UTF-8');
+            
+            // Reset the file input
+            event.target.value = '';
+        }
+        
+        // Save and load input text functionality
+        function saveInputText(text) {
+            localStorage.setItem('divtoengInputText', text);
+        }
+        
+        function loadSavedInputText() {
+            const savedText = localStorage.getItem('divtoengInputText');
+            if (savedText) {
+                document.getElementById('dhivehiInput').value = savedText;
+                if (savedText.trim()) {
+                    transliterate();
+                }
+            }
+        }
+        
+        function clearSavedInputText() {
+            localStorage.removeItem('divtoengInputText');
+        }
+        
+        // Line view functionality
+        let isLineView = false;
+        let isScrollingSynced = true;
+        
+        function toggleView() {
+            isLineView = !isLineView;
+            
+            const inputDisplay = document.getElementById('dhivehiInput');
+            const inputLines = document.getElementById('inputLines');
+            const outputDisplay = document.getElementById('englishOutput');
+            const outputLines = document.getElementById('englishLines');
+            const toggleBtn = document.getElementById('toggleViewBtn');
+            
+            if (isLineView) {
+                inputDisplay.style.display = 'none';
+                inputLines.style.display = 'block';
+                outputDisplay.style.display = 'none';
+                outputLines.style.display = 'block';
+                toggleBtn.textContent = 'Text';
+                
+                updateLineView();
+                updateInputLineView();
+            } else {
+                inputDisplay.style.display = 'block';
+                inputLines.style.display = 'none';
+                outputDisplay.style.display = 'block';
+                outputLines.style.display = 'none';
+                toggleBtn.textContent = 'Line';
+            }
+        }
+        
+        function updateLineView() {
+            const output = document.getElementById('englishOutput');
+            const outputLines = document.getElementById('englishLines');
+            
+            const text = output.value;
+            const lines = text.split('\n');
+            
+            let html = '';
+            lines.forEach((line, index) => {
+                const lineNumber = index + 1;
+                html += `<div class="line-item">
+                    <span class="line-number">${lineNumber}.</span>
+                    <span class="line-text">${line || ' '}</span>
+                </div>`;
+            });
+            
+            outputLines.innerHTML = html;
+        }
+        
+        function updateInputLineView() {
+            const input = document.getElementById('dhivehiInput');
+            const inputLines = document.getElementById('inputLines');
+            
+            const text = input.value;
+            const lines = text.split('\n');
+            
+            let html = '';
+            lines.forEach((line, index) => {
+                const lineNumber = index + 1;
+                html += `<div class="line-item">
+                    <span class="line-number">${lineNumber}.</span>
+                    <span class="line-text">${line || ' '}</span>
+                </div>`;
+            });
+            
+            inputLines.innerHTML = html;
+        }
+        
+        // Synchronized scrolling functionality
+        function setupSynchronizedScrolling() {
+            const inputTextarea = document.getElementById('dhivehiInput');
+            const outputTextarea = document.getElementById('englishOutput');
+            const inputLines = document.getElementById('inputLines');
+            const outputLines = document.getElementById('englishLines');
+            let isScrolling = false;
+            
+            function syncScroll(source, target) {
+                if (!isScrollingSynced || isScrolling) return;
+                
+                isScrolling = true;
+                const sourceScrollTop = source.scrollTop;
+                const sourceScrollHeight = source.scrollHeight - source.clientHeight;
+                const targetScrollHeight = target.scrollHeight - target.clientHeight;
+                
+                if (sourceScrollHeight > 0 && targetScrollHeight > 0) {
+                    const scrollRatio = sourceScrollTop / sourceScrollHeight;
+                    target.scrollTop = scrollRatio * targetScrollHeight;
+                }
+                
+                setTimeout(() => { isScrolling = false; }, 10);
+            }
+            
+            inputTextarea.addEventListener('scroll', () => syncScroll(inputTextarea, outputTextarea));
+            outputTextarea.addEventListener('scroll', () => syncScroll(outputTextarea, inputTextarea));
+            inputLines.addEventListener('scroll', () => syncScroll(inputLines, outputLines));
+            outputLines.addEventListener('scroll', () => syncScroll(outputLines, inputLines));
+        }
+        
+        // Initialize synchronized scrolling on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setupSynchronizedScrolling();
+            setupThaanaTransliteration(document.getElementById('dhivehiInput'));
+            loadSavedInputText();
+        });
+
+        // Auto-transliterate on input change and save input text
+        document.getElementById('dhivehiInput').addEventListener('input', function() {
+            // Only save if the input wasn't changed by the transliteration feature
+            // (The transliteration feature handles its own saving)
+            const inputValue = this.value;
+            
+            // Check if this input contains mostly Thaana characters (not English being typed)
+            const thaanaCharCount = (inputValue.match(/[\u0780-\u07BF]/g) || []).length;
+            const englishCharCount = (inputValue.match(/[a-zA-Z]/g) || []).length;
+            
+            // If mostly Thaana characters or no English characters, save it
+            if (thaanaCharCount >= englishCharCount) {
+                saveInputText(this.value);
+            }
+            
+            if (this.value.trim()) {
+                transliterate();
+            } else {
+                document.getElementById('englishOutput').value = '';
+            }
+            
+            // Update line views if in line view mode
+            if (isLineView) {
+                updateLineView();
+                updateInputLineView();
+            }
+        });
+        
+        // Event listeners for buttons
+        document.getElementById('toggleViewBtn').addEventListener('click', toggleView);
+        
+        document.getElementById('syncScrollBtn').addEventListener('click', function() {
+            isScrollingSynced = !isScrollingSynced;
+            const syncIndicator = document.getElementById('syncIndicator');
+            
+            if (isScrollingSynced) {
+                this.textContent = 'Sync';
+                this.style.background = '#f5d000';
+                this.style.color = '#232323';
+                this.title = 'Synchronized scrolling enabled - Click to disable';
+                syncIndicator.textContent = '🔗 Sync enabled';
+                syncIndicator.style.color = '#f5d000';
+            } else {
+                this.textContent = 'Off';
+                this.style.background = '#444';
+                this.style.color = '#ffe066';
+                this.title = 'Synchronized scrolling disabled - Click to enable';
+                syncIndicator.textContent = '🔗 Sync disabled';
+                syncIndicator.style.color = '#999';
+            }
+        });
+        
+        document.getElementById('copyAllBtn').addEventListener('click', function() {
+            const output = document.getElementById('englishOutput');
+            if (output.value) {
+                navigator.clipboard.writeText(output.value).then(() => {
+                    this.textContent = 'Copied!';
+                    this.style.background = '#28a745';
+                    setTimeout(() => { 
+                        this.textContent = 'Copy'; 
+                        this.style.background = '#444';
+                    }, 1200);
+                });
+            }
+        });
+        
+        // Import to English Lyrics Editor functionality
+        document.getElementById('importEnglishBtn').addEventListener('click', function() {
+            const output = document.getElementById('englishOutput');
+            if (!output.value.trim()) {
+                alert('No text to import! Please transliterate some text first.');
+                return;
+            }
+            
+            // Visual feedback
+            this.textContent = 'Opening...';
+            this.style.background = '#0056b3';
+            
+            // Get first 3 words from first line of output for song name
+            const outputText = output.value.trim();
+            const firstLine = outputText.split('\n')[0].trim();
+            const words = firstLine.split(/\s+/).filter(word => word.length > 0);
+            
+            // Use up to 3 words, or all words if less than 3
+            const wordsToUse = words.slice(0, Math.min(3, words.length));
+            const songName = wordsToUse
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+            
+            // Prepare the text for import
+            const textToImport = encodeURIComponent(output.value);
+            
+            // Open English lyrics editor with imported text and song name
+            let url = `lyrics-edit-english.html?import=${textToImport}`;
+            if (songName) {
+                url += `&songName=${encodeURIComponent(songName)}`;
+            }
+            window.open(url, '_blank');
+            
+            // Reset button
+            setTimeout(() => {
+                this.textContent = 'Import';
+                this.style.background = '#007bff';
+            }, 1000);
+        });
+        
+        // Import to Dhivehi Lyrics Editor functionality
+        document.getElementById('importDhivehiBtn').addEventListener('click', function() {
+            const input = document.getElementById('dhivehiInput');
+            const output = document.getElementById('englishOutput');
+            
+            if (!input.value.trim()) {
+                alert('No text to import! Please enter some Dhivehi text first.');
+                return;
+            }
+            
+            // Visual feedback
+            this.textContent = 'Opening...';
+            this.style.background = '#218838';
+            
+            // Ensure we have the latest transliteration
+            const englishText = reverseTransliterate(input.value);
+            
+            // Get first 3 words from first line of English output for song name
+            const firstLine = englishText.split('\n')[0].trim();
+            const words = firstLine.split(/\s+/).filter(word => word.length > 0);
+            
+            // Use up to 3 words, or all words if less than 3
+            const wordsToUse = words.slice(0, Math.min(3, words.length));
+            const songName = wordsToUse
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+            
+            // Prepare the text for import
+            const textToImport = encodeURIComponent(input.value);
+            
+            // Open Dhivehi lyrics editor with imported text and song name
+            let url = `lyrics-edit.html?import=${textToImport}`;
+            if (songName) {
+                url += `&songName=${encodeURIComponent(songName)}`;
+            }
+            window.open(url, '_blank');
+            
+            // Reset button
+            setTimeout(() => {
+                this.textContent = 'Import';
+                this.style.background = '#28a745';
+            }, 1000);
+        });
+        
+        // Sync Scroll button functionality
+        document.getElementById('syncScrollBtn').addEventListener('click', function() {
+            isScrollingSynced = !isScrollingSynced;
+            const syncIndicator = document.getElementById('syncIndicator');
+            
+            if (isScrollingSynced) {
+                this.textContent = '🔗 Sync';
+                this.style.background = '#f5d000';
+                this.style.color = '#232323';
+                this.title = 'Synchronized scrolling enabled - Click to disable';
+                syncIndicator.textContent = '🔗 Sync enabled';
+                syncIndicator.classList.remove('sync-disabled');
+            } else {
+                this.textContent = '🔗 Off';
+                this.style.background = '#444';
+                this.style.color = '#ffe066';
+                this.title = 'Synchronized scrolling disabled - Click to enable';
+                syncIndicator.textContent = '🔗 Sync disabled';
+                syncIndicator.classList.add('sync-disabled');
+            }
+        });
+        
+        // Copy All button functionality
+        document.getElementById('copyAllBtn').addEventListener('click', function() {
+            const output = document.getElementById('englishOutput');
+            if (output.value) {
+                navigator.clipboard.writeText(output.value).then(() => {
+                    this.textContent = 'Copied!';
+                    this.style.background = '#28a745';
+                    setTimeout(() => { 
+                        this.textContent = 'Copy'; 
+                        this.style.background = '#444';
+                    }, 1200);
+                });
+            }
+        });
+        
+        // Import to English Lyrics Editor functionality
+        document.getElementById('importBtn').addEventListener('click', function() {
+            const output = document.getElementById('englishOutput');
+            if (!output.value.trim()) {
+                alert('No text to import! Please transliterate some text first.');
+                return;
+            }
+            
+            // Visual feedback
+            this.textContent = 'Opening...';
+            this.style.background = '#0056b3';
+            
+            // Get first 3 words from first line of output for song name
+            const outputText = output.value.trim();
+            const firstLine = outputText.split('\n')[0].trim();
+            const words = firstLine.split(/\s+/).filter(word => word.length > 0);
+            
+            // Use up to 3 words, or all words if less than 3
+            const wordsToUse = words.slice(0, Math.min(3, words.length));
+            const songName = wordsToUse
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+            
+            // Prepare the text for import
+            const textToImport = encodeURIComponent(output.value);
+            
+            // Open English lyrics editor with imported text and song name
+            let url = `lyrics-edit-english.html?import=${textToImport}`;
+            if (songName) {
+                url += `&name=${encodeURIComponent(songName)}`;
+            }
+            window.open(url, '_blank');
+            
+            // Reset button
+            setTimeout(() => {
+                this.textContent = 'Import';
+                this.style.background = '#007bff';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

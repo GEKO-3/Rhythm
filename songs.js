@@ -8444,4 +8444,70 @@ Nidhi kurangi thibeyny
 *Giyaa galee kee
 Vaany giyaalee`,
 },
+{
+  id: 238,
+  name: `Kiyaadhevuneemaa Haalu Yaaraa`,
+  genre: 'Kaasi',
+  lyrics: `#M
+ކިޔާދެވުނީމާ ހާލު ޔާރާ ކުރީ އިންކާރު
+*ވާ ލޯބިން ދެވޭނެ ނޫންހެ ދެކިލަން ފަތިހާ ދަންވަރު ހޯ ދެން ފަތިހާ ދަންވަރު ދޯ
+ފެނުމުން ކައިރިވެލާ ރަކިކޮށްލަން ނޫޅެބަލާ
+*ބޭނުންވީ ޚިޔާލު ބަލާލަންދޯ ހޯދީ ފުރުސަތު ހޯ ދެން ހޯދީ ފުރުސަތު ހޯ
+
+#1
+އިންސާނަކަށް މީ ވާވަރު މީވާވަރު ކަލާ ފެނިފާ
+*އިންސާނަކަށް މީ ވާވަރު މީވާވަރު ކަލާ ފެނިފާ
+ހީލާ ހަދާއިރު ހީވޭ ތާޒާ މަލޭ މީ ފަރިވާ
+*ހީލާ ހަދާއިރު ހީވޭ ތާޒާ މަލޭ މީ ފަރިވާ
+ފޮޅިލާތޯ ކެތްކުރީމޭ
+*ފޮޅިލާތޯ ކެތްކުރީމޭ
+*ބިންނަން ދާހިތުން މިހާރު
+
+#2
+ވޭނާ އަނިޔާ ލިބިދާނޭ ތިޔަ ޚިޔާލުގާ ހުންނާތީ
+*ވޭނާ އަނިޔާ ލިބިދާނޭ ތިޔަ ޚިޔާލުގާ ހުންނާތީ
+ވިސްނަމޭ އަދިފަހުން ވަކިވާން ޖެހިދާނެޔޭ ހީވާތީ
+*ވިސްނަމޭ އަދިފަހުން ވަކިވާން ޖެހިދާނެޔޭ ހީވާތީ
+މީ މިންވަރު ފެންނަ މަންޒަރު
+*މީ މިންވަރު ފެންނަ މަންޒަރު
+*އޯގާތެރިވޭ މިހާރު
+
+#3
+ކުރަމުން މިދާހާ ގޯނާ ނުކެނޑޭނެ ބޭނުން ވާތީ
+*ކުރަމުން މިދާހާ ގޯނާ ނުކެނޑޭނެ ބޭނުން ވާތީ
+މިހިތާއި ލޭ ހިލުވާލާ ތިޔަ ލޯބި ހިތުގާ ވާތީ
+*މިހިތާއި ލޭ ހިލުވާލާ ތިޔަ ލޯބި ހިތުގާ ވާތީ
+ތިޔަ މޫރިތި ސޫރަޔާ ހެދި
+*ތިޔަ މޫރިތި ސޫރަޔާ ހެދި
+*ވާތީޔޭ ބޭޤަރާރު`, 
+      englishLyrics: `#M
+Kiyaadhevuneemaa haalu yaaraa kuree inkaaru
+*Vaa loabin dheveyne noonhe dhekilan fathihaa dhanvaru hoa dhen fathihaa dhanvaru dhoa
+Fenumun kairivelaa rakikohlan noolhebalaa
+*Beynunvee khiyaalu balaalandhoa hoadhee furusathu hoa dhen hoadhee furusathu hoa
+#1
+Insaanakah mee vaavaru meevaavaru kalaa fenifaa
+*Insaanakah mee vaavaru meevaavaru kalaa fenifaa
+Heelaa hadhaairu heevey thaazhaa maley mee farivaa
+*Heelaa hadhaairu heevey thaazhaa maley mee farivaa
+Folhilaathoa keyykureemey
+*Folhilaathoa keyykureemey
+*Binnan dhaahithun mihaaru
+#2
+Veynaa aniyaa libidhaaney thiya khiyaalugaa hunnaathee
+*Veynaa aniyaa libidhaaney thiya khiyaalugaa hunnaathee
+Visnamey adhifahun vakivaan jehidhaaneyey heevaathee
+*Visnamey adhifahun vakivaan jehidhaaneyey heevaathee
+Mee minvaru fenna manzharu
+*Mee minvaru fenna manzharu
+*Oagaatherivey mihaaru
+#3
+Kuramun midhaahaa goanaa nukenadeyne beynun vaathee
+*Kuramun midhaahaa goanaa nukenadeyne beynun vaathee
+Mihithaai ley hiluvaalaa thiya loabi hithugaa vaathee
+*Mihithaai ley hiluvaalaa thiya loabi hithugaa vaathee
+Thiya moorithi soorayaa hedhi
+*Thiya moorithi soorayaa hedhi
+*Vaatheeyey beyqaraaru`,
+},
 ]
