@@ -624,10 +624,16 @@
     function cleanLyricsText(lyrics) {
       const lines = lyrics.split('\n');
       let cleanLines = [];
+      let previousWasSection = false;
       
       lines.forEach(line => {
-        // Skip section headers (lines starting with # or $)
+        // Check if this is a section header (lines starting with # or $)
         if (line.startsWith('#') || line.startsWith('$')) {
+          // Add empty line before section if there are already lyrics
+          if (cleanLines.length > 0 && !previousWasSection) {
+            cleanLines.push('');
+          }
+          previousWasSection = true;
           return;
         }
         
@@ -642,9 +648,10 @@
           .replace(/&/g, '') // Remove & symbols
           .trim();
         
-        // Only add non-empty lines
+        // Add non-empty lines
         if (cleanLine !== '') {
           cleanLines.push(cleanLine);
+          previousWasSection = false;
         }
       });
       

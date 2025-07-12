@@ -944,7 +944,49 @@ $N
 އާދަނު ބެލި ހުވަފެނަކުން އާދަނު މޮޔަވެއްޖެތާ
 *އާދަނުބެލި ހުވަފެނަކުން
 ބުއްދި ފިލާ ގޮއްސިތާ
-*އާދަނުބެލި ހުވަފެނަކުން`
+*އާދަނުބެލި ހުވަފެނަކުން`, 
+      englishLyrics: `#M
+Aadhanaa ekanive nidheegaa
+*Haadha kanu kalhufoe re ehgaa
+Faathumaafulhu neyy endhehgaa
+*Gaathu thiothee kon athehbaa
+#1
+Thooli adakun baarubaarah aadhanah govanee
+*Heyli vaguthah gadibalaalee huhttifaa evanee
+Manzareh neyy aduthakehthaa aadhanah ivenee
+*Kanfathah kulhadhaana nuvumun gayy birun rovenee
+#2
+Dhoove baaraa ihhuthiyaareh neyy kamah vaathee
+*Hoothakaa mulhi hashigandaa eku ganduvefaa vaathee
+Heevi ajaley aadhanah loa fusvegen dhaathee
+*Beevi maazee boluthereygai babulhamun dhaathee
+-
+$M
+Huvafenekey huvafenekey vahumeh masthehnuvaa
+*Hulhuvidheloa edheloa aadhanuvee vaanuvaa
+$1
+Zikuraa thasbeeha kiyaa ufalunney thedhuvee
+*Heylevi heyohaalugaa veemaa aashoahuvee
+Shukuraa hamdhaai sanaa kiyamun aadhanu dhuvee
+*Ma salaamayy vehje ey ma salaamayy vehje ey
+Ufalun hama hurivarun
+*Rashu enmenah govee
+Kukulhu mahaa fihunu mahaa bondibayy rashugaa bahaa
+*Hulhuvidheloa edheloa aadhanuvee vaanuvaa
+$2
+Veegoyy enmenge therey aadhanu ekiyaadhinee
+*Kanulaa enmen ekamah kanfayy dheegen thibee
+Nimumun gina rahttehin buni aadhanu moyagovee
+*Engumunney faathumaves heehee huhttun nuvee
+Aslahves hurefaa hama
+*Aadhanuthaa moyagovee
+Aslu vigoyy aslu vigoyy fennan hehkehnuvaa
+*Hulhuvidheloa edheloa aadhanuvee vaanuvaa
+$3
+Aadhanu beli huvafenakun aadhanu moyavehjethaa
+*Aadhanubeli huvafenakun
+Buhdhi filaa gohsithaa
+*Aadhanubeli huvafenakun`,
 },
   {
   id: 26,
@@ -5960,7 +6002,7 @@ $2
   name: `Aadhakoh Mimagun`,
   genre: 'Nala',
   lyrics: `#M
-އާދަކޮށް މިމަގުން ކުރިކަނޑަންޏާ
+އާދަކޮށް މިމަގުން ކުރިކަޑަންޏާ
 *ހާލުކިހިނެއްތޯ އެހިދާނޭ
 މާގިނައިން ތިޔަހެން ފެނި އުޅެންޏާ
 *ނަން އަހާލަންވެސް ޖެހިދާނޭ
@@ -5969,19 +6011,39 @@ $2
 ދުރުދުރުން ތިޔަހެން ލޯމަރަންޏާ
 *ބަސްބަހުން ހަމަލާދީ ހަދަންޏާ
 ނަންބުނަން ޖެހިލުންވެ ފިލަންޏާ
-*ފޯނުނަ ންބަރުވެސް ބެލިދާނޭ
+*ފޯނު ނަންބަރުވެސް ބެލިދާނޭ
 
 #2
 ފާޑަކަށް ތިޔަހެން ހީއުޅެންޏާ
-*ގޮތް ގޮތަ ށް ނަޒަރުން މެސެޖު ދެންޏާ
-ހިތްމަގ ކިޔަމަން ނުވެވިގެން ގޮސް
+*ގޮތް ގޮތަށް ނަޒަރުން މެސެޖު ދެންޏާ
+ހިތްމަގޭ ކިޔަމަން ނުވެވިގެން ގޮސް
 *ލޯބި ފަހަރެއްގާ ވެވިދާނޭ
 
 #3
 ހިތްއުފާވާ ޖަވާބެއް ނުދެންޏާ
 *އާނއެކޭ ނުބުނެ މާ ލަސްކުރަންޏާ
 އިންތިޒާރުގެ ވަގުތު ދި ގުކުރަންޏާ
-*ފޫހި ފަހަރެއްގާ ވެވިދާނޭ`
+*ފޫހި ފަހަރެއްގާ ވެވިދާނޭ`, 
+      englishLyrics: `#M
+Aadhakoh mimagun kurikadannyaa
+*Haalukihinehthoa ehidhaaney
+Maaginain thiyahen feni ulhennyaa
+*Nan ahaalanves jehidhaaney
+#1
+Dhurudhurun thiyahen loamarannyaa
+*Basbahun hamalaadhee hadhannyaa
+Nanbunan jehilunve filannyaa
+*Foanu nanbaruves belidhaaney
+#2
+Faadakah thiyahen heeulhennyaa
+*Goyy gothah nazarun meseju dhennyaa
+Hiyymagey kiyaman nuvevigen gos
+*Loabi faharehgaa vevidhaaney
+#3
+Hiyyufaavaa javaabeh nudhennyaa
+*Aanaekey nubune maa laskurannyaa
+Inthizaaruge vaguthu dhi gukurannyaa
+*Foohi faharehgaa vevidhaaney`,
 },
 {
   id: 164,

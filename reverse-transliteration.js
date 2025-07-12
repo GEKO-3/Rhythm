@@ -2,9 +2,9 @@
 const reverseTransliterationMap = {
     'ހ': 'h', 'ށ': 'sh', 'ނ': 'n', 'ރ': 'r', 'ބ': 'b', 'ޅ': 'lh', 'ކ': 'k',
     'ވ': 'v', 'މ': 'm', 'ފ': 'f', 'ދ': 'dh', 'ތ': 'th', 'ލ': 'l',
-    'ގ': 'g', 'ޏ': 'gn', 'ސ': 's', 'ޑ': 'd', 'ޒ': 'z', 'ޓ': 'tt', 'ޔ': 'y',
+    'ގ': 'g', 'ޏ': 'ny', 'ސ': 's', 'ޑ': 'd', 'ޒ': 'z', 'ޓ': 'tt', 'ޔ': 'y',
     'ޕ': 'p', 'ޖ': 'j', 'ޗ': 'ch', 'ޝ': 'sh', 'ޙ': 'hh', 'ޚ': 'kh',
-    'ޤ': 'q', 'ޣ': 'gh', 'ޒ': 'zh'
+    'ޤ': 'q', 'ޣ': 'gh', 'ޒ': 'z'
 };
 
 // Reverse vowel diacritics map
@@ -16,6 +16,7 @@ const reverseVowelDiacritics = {
 // Special Dhivehi characters
 const specialChars = {
     'ް': '', // sukun (silent)
+    'އް': 'h', // alif with sukun
     'ށް': 'h', // shaviyani with sukun
     'ން': 'n', // noonu with sukun
     'ރް': 'r', // raa with sukun
@@ -37,7 +38,7 @@ const specialChars = {
     'ޑް': 'd', // daviyani with sukun
     'ޓް': 'tt', // ttaalu with sukun
     'ޒް': 'z', // zaviyani with sukun
-    'ޏް': 'gn', // gnaviyani with sukun
+    'ޏް': 'ny', // gnaviyani with sukun
     'ޙް': 'hh', // hhaa with sukun
     'ޚް': 'kh', // khaa with sukun
     'ޤް': 'q', // qaafu with sukun
@@ -62,6 +63,7 @@ const reverseSpecialCases = [
     { input: 'ނިންމާފާނެޔޮ', output: 'ninmaafaaneyo' },
     { input: 'ނުހޮރުއްޕާނޭ', output: 'nuhuruhpaaney' },
     { input: 'ނޮހޮރޮއްޕާނޭ', output: 'nohorohpaaney' },
+    { input: 'އާނއެކޭ', output: 'aanekey' },
     { input: 'އިސްތަށިގަނޑު', output: 'ishthashigandu' },
     { input: 'ހަނދާނުންނޭ', output: 'handhaanunney' },
     { input: 'ޖަވާހިރައްވެސް', output: 'javaahirahves' },
@@ -101,6 +103,7 @@ const reverseSpecialCases = [
     { input: 'ޖެޔޭ', output: 'jeyey' },
     { input: 'ނުވާ', output: 'nuvaa' },
     { input: 'ޖެހިއްޖޭ', output: 'jehihjey' },
+    { input: 'ވެއްޖެއޭ', output: 'vehje ey' },
     { input: 'ންނުވާ', output: 'nnuvaa' }
 ];
 
@@ -158,6 +161,14 @@ function reverseTransliterate(dhivehiText) {
         // Check for standalone consonants
         if (reverseTransliterationMap[char]) {
             finalResult += reverseTransliterationMap[char];
+            
+            // Special case: ނ followed by a consonant should be 'n' without default 'a'
+            if (char === 'ނ' && i + 1 < result.length && reverseTransliterationMap[result[i + 1]]) {
+                // Don't add default 'a' vowel when ނ is followed by another consonant
+                i++;
+                continue;
+            }
+            
             // Add default 'a' vowel for standalone consonants (except at end of word)
             if (i + 1 < result.length && 
                 result[i + 1] !== ' ' && 
