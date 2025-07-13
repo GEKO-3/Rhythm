@@ -55,6 +55,7 @@
       padding: 16px 36px;
       font-size: 1.2em;
       font-weight: bold;
+      font-family: 'Montserrat', Arial, sans-serif;
       cursor: pointer;
       transition: background 0.2s, color 0.2s;
       margin: 0 0 0 0;
@@ -64,7 +65,21 @@
       background: #fced98;
       color: #111;
     }
+    
+    .page-title {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    
     @media (max-width: 600px) {
+      .page-title {
+        font-size: 2em;
+        margin-bottom: 20px;
+      }
       .menu-container {
         padding: 24px 6vw;
       }
@@ -77,6 +92,7 @@
   </style>
 </head>
 <body>
+  <h1 class="page-title">Admin Menu</h1>
   <div class="menu-container">
     <button class="menu-btn" onclick="location.href='members.html'">Members</button>
     <button class="menu-btn" onclick="location.href='songlist.html'">Song List</button>

@@ -2,11 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rhythm - Main Menu</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rhythm Boduberu - Developer Menu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="description" content="Developer menu for Rhythm Boduberu website management and editing tools">
+  <meta name="keywords" content="Rhythm Boduberu, developer, admin, lyrics editor, song management">
+  <meta name="author" content="Rhythm Boduberu">
+  
+  <!-- Favicon and web app manifest -->
+  <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon.ico">
   <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
-<link rel="manifest" href="favicons/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+  <link rel="manifest" href="favicons/dev-manifest.webmanifest">
+  
+  <!-- PWA and social sharing meta tags -->
+  <meta name="theme-color" content="#f5d000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rhythm Dev">
+  <meta property="og:title" content="Rhythm Boduberu - Developer Menu">
+  <meta property="og:description" content="Developer menu for Rhythm Boduberu website management">
+  <meta property="og:image" content="https://rhythmboduberu.com/src/Logo.png">
+  <meta property="og:url" content="https://rhythmboduberu.com/dev">
+  <meta property="og:type" content="website">
   <style>
     /* Local font definitions */
     @font-face {
@@ -35,17 +56,25 @@
       justify-content: center;
       min-height: 100vh;
       margin: 0;
+      /* Web app safe area support for iPhone notch */
+      padding-top: env(safe-area-inset-top, 0);
+      padding-bottom: env(safe-area-inset-bottom, 0);
+      /* Disable overscroll and pinch zoom for web app */
+      overscroll-behavior: none;
+      touch-action: pan-x pan-y;
     }
     .menu-container {
-      background: rgba(43,43,43,0.7);
+      background: rgba(43,43,43,0.9);
       width: 300px;
       border-radius: 12px;
       padding: 40px 32px;
-      box-shadow: 0 2px 12px #0002;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
       display: flex;
       flex-direction: column;
       gap: 24px;
       align-items: center;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(245, 208, 0, 0.1);
     }
     .menu-btn {
       background: #f5d000;
@@ -56,35 +85,70 @@
       font-size: 1.2em;
       font-weight: bold;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition: all 0.2s ease;
       margin: 0 0 0 0;
       width: 220px;
+      position: relative;
+      overflow: hidden;
+      /* Better touch targets for mobile */
+      min-height: 48px;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
     .menu-btn:hover {
       background: #fced98;
       color: #111;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 208, 0, 0.3);
     }
+    .menu-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(245, 208, 0, 0.2);
+    }
+    
+    .page-title {
+      font-size: 2.5em;
+      font-weight: bold;
+      margin-bottom: 30px;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    
     @media (max-width: 600px) {
+      .page-title {
+        font-size: 2em;
+        margin-bottom: 20px;
+      }
       .menu-container {
         padding: 24px 6vw;
+        width: 90%;
+        max-width: 350px;
       }
       .menu-btn {
         width: 100%;
         font-size: 1em;
         padding: 14px 0;
+        min-height: 44px;
+      }
+      body {
+        padding-left: env(safe-area-inset-left, 0);
+        padding-right: env(safe-area-inset-right, 0);
       }
     }
   </style>
 </head>
 <body>
+  <h1 class="page-title">Developer Menu</h1>
   <div class="menu-container">
-    <button class="menu-btn" onclick="location.href='members.html'">Members</button>
-    <button class="menu-btn" onclick="location.href='songlist.html'">Song List</button>
-    <button class="menu-btn" onclick="location.href='lyrics-edit.html'">DHI Editor</button>
-    <button class="menu-btn" onclick="location.href='lyrics-edit-english.html'">ENG Editor</button>
-    <button class="menu-btn" onclick="location.href='engtodiv.html'">ENG to DIV</button>
-    <button class="menu-btn" onclick="location.href='divtoeng.html'">DIV to ENG</button>
-    <button class="menu-btn" onclick="location.href='songs-download.html'">Song Download</button>
+    <button class="menu-btn" onclick="location.href='/'">🏠 Home</button>
+    <button class="menu-btn" onclick="location.href='/members'">Members</button>
+    <button class="menu-btn" onclick="location.href='/songlist'">Song List</button>
+    <button class="menu-btn" onclick="location.href='/lyrics-edit'">DHI Editor</button>
+    <button class="menu-btn" onclick="location.href='/lyrics-edit-english'">ENG Editor</button>
+    <button class="menu-btn" onclick="location.href='/engtodiv'">ENG to DIV</button>
+    <button class="menu-btn" onclick="location.href='/divtoeng'">DIV to ENG</button>
+    <button class="menu-btn" onclick="location.href='/songs-download'">Song Download</button>
   </div>
 </body>
 </html>
