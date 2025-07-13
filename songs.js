@@ -2375,25 +2375,25 @@ Kulayaa rahayaai vahaa
 },
 {
   id: 44,
-  name: `Eid`,
+  name: `Anhaa Aee Eedhey`,
   genre: 'Thinberu',
   lyrics: `#M
-އަނހާ އައީ އީދޭ ހާނ އުފާ ފުރާލާ
+އަންހާ އައީ އީދޭ ހާން އުފާ ފުރާލާ
 *ބަހާރުމިއައީ އުފަލުން ހެމުން ނަށާލާ
 ފަޒާތެރޭ އުދުހޭ ދޫނިތައް ގޮވާލާ
 *ބަހާރުމިއައީ އުފަލުން ހެމުން ނަށާލާ
 
 #1
-ފަތިހުހަމަހިމޭން ކަމުގާ ޝަބުނަމުން އެދިންފި ނިކަން
-*ފަތިހުހަމަހިމޭން ކަމުގާ ޝަބުނަމުން އެދިން ފިނިކަން
-ދަތިކަމޭއް ކަމަށް ނުހިތާ ފޮޅިލި ރީތިހާމާތައް
-*ދަތިކަމޭއް ކަމަށް ނުހިތާ ފޮޅިލި ރީތިހާމާތައް
+ފަތިހު ހަމަހިމޭން ކަމުގާ ޝަބުނަމުން އެދިން ފިނިކަން
+*ފަތިހު ހަމަހިމޭން ކަމުގާ ޝަބުނަމުން އެދިން ފިނިކަން
+ދަތިކަމެއް ކަމަށް ނުހިތާ ފޮޅިލި ރީތިހާމާތައް
+*ދަތިކަމެއް ކަމަށް ނުހިތާ ފޮޅިލި ރީތިހާމާތައް
 ފަތުރުވާ ހުވަނދު ހީލާ ރޯޅި އައިސް ކިޔާލާ
 *ބަހާރުމިއައީ އުފަލުން ހެމުން ނަށާލާ
 
 #2
-އަދުވަމާހެ ހިތް ހެޔޮކޮއް މިތުރުނޭ އަބަދުއެކުގާ
-*އަދުވަމާހެ ހިތް ހެޔޮކޮއް މިތުރުނޭ އަބަދުއެކުގާ
+އަދުވަމާހެ ހިތް ހެޔޮކޮށް މިތުރުނޭ އަބަދުއެކުގާ
+*އަދުވަމާހެ ހިތް ހެޔޮކޮށް މިތުރުނޭ އަބަދުއެކުގާ
 ގިނަޒަމާން ތަކަށް ދެމިވާ އެކުވެރިން ތަކެއް ކަމުގާ
 *ގިނަޒަމާން ތަކަށް ދެމިވާ އެކުވެރިން ތަކެއް ކަމުގާ
 މީއަމާން ކަމޭބުނަމުން މަރުހަބާ ކިޔާލާ
@@ -2405,7 +2405,34 @@ Kulayaa rahayaai vahaa
 އަނދިރިކަން ފިލާނެތިގޮސް ބިރުތަކުން އުފާލިބުމުން
 *އަނދިރިކަން ފިލާނެތިގޮސް ބިރުތަކުން އުފާލިބުމުން
 ނިދިފިލާ ކޮވެލި ހާލާ ރާގުގާކިޔާލާ
-*ބަހާރުމިއައީ އުފަލުން ހެމުން ނަށާލާ`
+*ބަހާރުމިއައީ އުފަލުން ހެމުން ނަށާލާ`,
+       
+  englishLyrics: `#M
+Anhaa aee eedhey haan ufaa furaalaa
+*Bahaarumiaee ufalun hemun nashaalaa
+Fazaatherey udhuhey dhoonithah govaalaa
+*Bahaaru miaee ufalun hemun nashaalaa
+#1
+Fathihu hamahimeyn kamugaa shabunamun edhin finikan
+*Fathihu hamahimeyn kamugaa shabunamun edhin finikan
+Dhathikameh kamah nuhithaa folhili reethihaa maathah
+*Dhathikameh kamah nuhithaa folhili reethihaa maathah
+Fathuruvaa huvandhu heelaa roalhi ais kiyaalaa
+*Bahaaru miaee ufalun hemun nashaalaa
+#2
+Adhuvamaahe hiyy heyokoh mithuruney abadhuekugaa
+*Adhuvamaahe hiyy heyokoh mithuruney abadhuekugaa
+Ginazamaan thakah dhemivaa ekuverin thakeh kamugaa
+*Ginazamaan thakah dhemivaa ekuverin thakeh kamugaa
+Meeamaan kameybunamun maruhabaa kiyaalaa
+*Bahaaru miaee ufalun hemun nashaalaa
+#3
+Udhavi iruge ranndhoadhin rihifazaa jareekuramun
+*Udhavi iruge ranndhoadhin rihifazaa jareekuramun
+Andhirikan filaanethigos biruthakun ufaalibumun
+*Andhirikan filaanethigos biruthakun ufaalibumun
+Nidhifilaa koveli haalaa raagugaakiyaalaa
+*Bahaaru miaee ufalun hemun nashaalaa`,
 },
 {
   id: 45,
