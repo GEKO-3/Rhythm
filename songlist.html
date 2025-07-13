@@ -84,37 +84,41 @@
       background-size: cover;
       color: var(--primary-color);
       animation: fadeIn 0.5s ease-in-out;
-      padding-top: env(safe-area-inset-top, 0);
-      padding-left: env(safe-area-inset-left, 0);
-      padding-right: env(safe-area-inset-right, 0);
-      padding-bottom: env(safe-area-inset-bottom, 0);
     }
     .container {
       text-align: center;
       position: relative;
       max-width: 600px;
       width: 100%; 
-      padding: 20px;
-      background: var(--bg-opacity);
-      border-radius: 10px;
+      padding: 10px;
+      background: transparent;
       transition: transform 0.3s ease;
       animation: slideIn 0.5s ease-in-out;
-      margin-top: 40px;
+      margin-top: 0;
       margin-bottom: 40px;
-      padding-top: env(safe-area-inset-top, 20px);
     }
     .header-search-wrapper {
-      position: sticky;
-      top: env(safe-area-inset-top, 0);
+      position: fixed;
+      top: 0;
       left: 0;
       right: 0;
       z-index: 100;
-      background: rgba(31, 31, 31, 0.95);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border-bottom: 1px solid #444;
-      padding: 10px 0;
-      margin-top: env(safe-area-inset-top, 0);
+      background: #1f1f1f;
+      padding-top: env(safe-area-inset-top, 0);
+      padding-left: env(safe-area-inset-left, 0);
+      padding-right: env(safe-area-inset-right, 0);
+      padding-bottom: 10px;
+    }
+    
+    .header-search-wrapper::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 20px;
+      background: linear-gradient(to bottom, rgba(31, 31, 31, 1), rgba(31, 31, 31, 0));
+      pointer-events: none;
     }
     h1 {
       color: var(--primary-color);
@@ -126,7 +130,7 @@
       background: transparent;
       max-width: 600px;
       border-radius: 8px;
-      padding: 16px;
+      padding: 10px 16px;
       margin: 0 auto;
       width: 96%;
       display: flex;
@@ -135,6 +139,7 @@
       position: relative;
       z-index: 101;
       gap: 10px;
+      margin-top: 10px;
     }
     .filter-dropdown {
       position: relative;
@@ -215,6 +220,7 @@
       list-style: none;
       padding: 0;
       margin: 0;
+      margin-top: calc(env(safe-area-inset-top, 0px) + 80px);
     }
     ul#song-list li {
       cursor: pointer;
@@ -236,15 +242,15 @@
     @media (max-width: 700px) {
       .container {
         max-width: 95vw;
-        padding: 10px;
-        margin-top: 20px;
+        padding: 5px;
+        margin-top: 0;
       }
       #search-box {
         flex: 1;
       }
       .search-container {
         width: 99%;
-        padding: 12px 10px;
+        padding: 8px 10px;
         gap: 8px;
       }
       .filter-btn {
@@ -257,8 +263,10 @@
         min-width: 120px;
       }
       .header-search-wrapper {
-        padding: 8px 0;
-        border-radius: 0;
+        padding-bottom: 8px;
+      }
+      ul#song-list {
+        margin-top: calc(env(safe-area-inset-top, 0px) + 70px);
       }
     }
   </style>
