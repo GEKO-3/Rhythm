@@ -1424,7 +1424,54 @@ $4
 *މޮޔަގޮވާފަޔޯ
 އެސޮރު އެ ދުވަނީ
 އަތްފައި ބުޅިކުރީ
-މުޅިގައި ވަކި އެޅީ`
+މުޅިގައި ވަކި އެޅީ`,
+       
+  englishLyrics: `#M
+Dhunfinirey andhireegaa sakaraayy gadha jehee
+*Mulheerah nidhaafa hinmeynvaa vaguthah fanihedhee
+#1
+Dhaaney valuthereyah kudaves bireh nuganeybaa
+*Dhaaney valuthereyah kudaves bireh nuganeybaa
+Vannaane falhugoathi therah asthaa jehilun nuvaneebaa
+*Vannaane falhugoathi therah asthaa jehilun nuvaneebaa
+#2
+Govaaney badiedhurah gadhayah baarah heeheefaa
+*Govaaney badiedhurah gadhayah baarah heeheefaa
+Alhaaney vaguruku kurunbaa kashimaa gahuga roakohfaa
+*Alhaaney vaguruku kurunbaa kashimaa gahuga roakohfaa
+#3
+Dhurun fenifa alifaan rongeh
+*Sihsain esoru asthaa dhiyaa
+Birun thelhifa fumenfeshee
+*Baarah dhefayah varulaa dhuvee
+Ivenee adufahgandeh baarah gugumaa
+*Ivenee adufahgandeh
+Hey adakunney
+*Naamaan kuruvaa
+#4
+Dhumun furaa mulheevaa ekee
+*Kaalhaa kanbili govaan feshee
+Gasthah vayaa helen fashaa
+*Vidhuvaru alikoh vidhan feshee
+Ivenee adufahgandeh baarah gugumaa
+*Ivenee adufahgandeh
+Hey adakunney
+*Naamaan kuruvaa
+#5
+Angain gadhayah fonuthah araa
+*Mudhunah esoru dheloaeree
+Bahakun baheh beyreh nuvey
+*Thuruthuru alhaa thelhen feshee
+Asthaa mudhinbey kiyeveli kiyavaa
+*Asthaa mudhinbey
+Fenthahteh kiyavaa
+Dhunburuvaa kiyavaa
+Dhunburuvaa mathuraa
+#6
+*Moyagovaafayoa
+Esoru e dhuvanee
+Ayyfai bulhikuree
+Mulhigai vaki elhee`,
 },
 {
   id: 30,
@@ -1838,27 +1885,27 @@ Dhanbikoe fahe`,
   name: `Dhurakah Dhuhvaa`,
   genre: 'Kaasi',
   lyrics: `#M
-ދުރަކައް ދުއްވާ އޮޑި އެމަހަށް ގޮސް
-*ކަނޑުމަތި ޖެހި ރައްގެއްލިދަނީ ރައްގެއްލިދަނީ
+ދުރަކަށް ދުއްވާ އޮޑި އެމަހަށް ގޮސް
+*ކަނޑުމަތި ޖެހި ރަށްގެއްލިދަނީ ރަށްގެއްލިދަނީ
 
 #1
 ފުސްކޮޅު ހުރެގެން އުފުލި އެދާހެން
 *ބަނަކަން ހަފަރާތައްށޭ ވެރިވީ
-ކަނޑުމަތި ޖެހި ރައްގެއްލިދަނީ
-*ރައްގެއްލިދަނީ ރައްގެއްލިދަނީ
+ކަނޑުމަތި ޖެހި ރަށްގެއްލިދަނީ
+*ރަށްގެއްލިދަނީ ރަށްގެއްލިދަނީ
 
 #2
-އިރުއްސޭތީ ދަޅަޔައްބަލަމުން
+އިރުއޮއްސޭތީ ދަޅަޔަށްބަލަމުން
 *ހުރިމިސްރާބުން އޮޑި އަނބުރާލާ
-ކަނޑުމަތި ޖެހި ރައްގެއްލިދަނީ
-*ރައްގެއްލިދަނީ ރައްގެއްލިދަނީ
+ކަނޑުމަތި ޖެހި ރަށްގެއްލިދަނީ
+*ރަށްގެއްލިދަނީ ރަށްގެއްލިދަނީ
 
 -
 $M
 ހަޒާނާ ހަޒާނާ ކަނޑުން ލިބޭ ހަޒާނާ
 *ހަޒާނާ ހަޒާނާ ކަނޑުން ލިބޭ ހަޒާނާ
-މަސްމީ ދިވެހީން ގެލކަނޑުން ބާނާ ފައިދާ އެއައްހޯދާ
-ހަޒާނާ ހަޒާނާ ކަނޑުން ލިބޭ ހަޒާނާ
+މަސްމީ ދިވެހީންގެ ކަނޑުން ބާނާ ފައިދާ އެއައްހޯދާ
+*ހަޒާނާ ހަޒާނާ ކަނޑުން ލިބޭ ހަޒާނާ
 
 $1
 އައްވާ ފިންޔާ ތެރޭ ހީވާގީ މަސްވެރިން
@@ -1866,7 +1913,33 @@ $1
 
 $2
 ރޯއްޖޭ ހޯދާލަނީ ހީވާގި މަސްވެރިން
-*ހީވާގީ މަސްވެރިން`
+*ހީވާގީ މަސްވެރިން`,
+       
+  englishLyrics: `#M
+Dhurakah dhuhvaa odi emahah gos
+*Kandumathi jehi rahgehlidhanee rahgehlidhanee
+#1
+Fuskolhu huregen ufuli edhaahen
+*Banakan hafaraathahshey verivee
+Kandumathi jehi rahgehlidhanee
+*Rahgehlidhanee rahgehlidhanee
+#2
+Iruohseythee dhalhayahbalamun
+*Hurimisraabun odi anburaalaa
+Kandumathi jehi rahgehlidhanee
+*Rahgehlidhanee rahgehlidhanee
+-
+$M
+Hazaanaa hazaanaa kandun libey hazaanaa
+*Hazaanaa hazaanaa kandun libey hazaanaa
+Masmee dhiveheenge kandun baanaa faidhaa eahhoadhaa
+*Hazaanaa hazaanaa kandun libey hazaanaa
+$1
+Ahvaa finnyaa therey heevaagee masverin
+*Heevaagee masverin
+$2
+Roahjey hoadhaalanee heevaagi masverin
+*Heevaagee masverin`,
 },
 {
   id: 38,
@@ -2217,7 +2290,7 @@ $1
   name: `Edhigen Kurevey`,
   genre: 'Kaasi',
   lyrics: `#M
-އެދިގެން ކުރެވޭ އަލުންއާވެ ފޯރީ
+އެދިގެން ކުރެވޭ އަލުންނާވެ ފޯރީ
 *ގައުމީ ގުލްޒާރު ތާޒާވަނޭ ހަޒާރުން
 
 #1
@@ -2228,7 +2301,7 @@ $1
 
 -
 $M
-ދޮންވާމީ ޗާނދަނީގެ އާރާމާ މީރުވަހާ
+ދޮންވާމީ ޗާންދަނީގެ އާރާމާ މީރުވަހާ
 *ތިޔަހަރަ ލޯބި ނަޔާ ކިޔާށެދެން ޗާލުނަޔާ
 
 $1
@@ -2239,27 +2312,66 @@ $1
 ނަޔާ އާރާމާ މީރުވަހާ
 *ތިޔަހަރަ ލޯބި ނަޔާ ކިޔާށެދެން ޗާލުނަޔާ
 
-#M
+$2
 ބިންނަން ބިނަންމާ
 *ޖަންބާ ދޭލިޔާ
 އައިޒާދު ރޯޅިޔާ
 *އައި މިވައިރޯޅިޔާ
 
-#1
+$3
 މިވަނީމާ އަދުބިންނާށެވަނީ ޒާރުގާ
 *މިވަނީމާ އަދުބިންނާށެވަނީ ޒާރުގާ
 ކޯނިތައްމާ
 *ފަރިވެލީމާ
-އޭބަނޅިދާ މާބުރާ
-*ފޫހިނެތިއުޅޭ ގުރާ
-އޭރުން އުންބުލްބުލް މައިނާތަށް އައިސް ހިތްއުފާކުރާ
-*އޭރުން އުންބުލްބުލް މައިނާތަށް އައިސް ހިތްއުފާކުރާ
+އޭބަޅިނދާ މާބުރާ
+*ފޫހިނެތި އުޅޭ ގުރާ
+އޭރުން އުންބުލްބުލް މައިނާތައް އައިސް ހިތްއުފާކުރާ
+*އޭރުން އުންބުލްބުލް މައިނާތައް އައިސް ހިތްއުފާކުރާ
 
-#2
+$4
 ދިރުވައި ދޭށެ އަލުން
 *އެމާބުލާސާރު
-ކުލަޔަރަހަޔާއި ވަހާ
-*ދިރުވައިދޭ އެންމެ ނަޔާ`
+ކުލަޔާ ރަހަޔާއި ވަހާ
+*ދިރުވައިދޭ އެންމެ ނަޔާ`,
+       
+  englishLyrics: `#M
+Edhigen kurevey alunnaave foaree
+*Gaumee gulzaaru thaazaavaney hazaarun
+#1
+Mazeenan hoadhaalaa
+*Aahiyyvarakaa dhemunndhaashe foaree
+Mazeenan hoadhaalaa
+*Aahiyyvarakaa dhemunndhaashe foaree gaumee gulzaaru thazaavaaney hazaarun
+-
+$M
+Dhonnvaamee chaandhaneege aaraamaa meeruvahaa
+*Thiyahara loabi nayaa kiyaashedhen chaalunayaa
+$1
+Netheehe nunee adhugai aniyaa
+*Kohlan veehe dhivaanaa
+Hithun dhaneyhey rannguloabi mathulabuthoa loa
+*Hithun dhaneyhey rannguloabi mathulabuthoa loa
+Nayaa aaraamaa meeruvahaa
+*Thiyahara loabi nayaa kiyaashedhen chaalunayaa
+$2
+Binnan binannmaa
+*Jannbaa dheyliyaa
+Aizaadhu roalhiyaa
+*Ai mivairoalhiyaa
+$3
+Mivaneemaa adhubinnaashevanee zaarugaa
+*Mivaneemaa adhubinnaashevanee zaarugaa
+Koanithahmaa
+*Fariveleemaa
+Eybalhindhaa maaburaa
+*Foohinethi ulhey guraa
+Eyrun unnbulbul mainaathah ais hiyyufaakuraa
+*Eyrun unnbulbul mainaathah ais hiyyufaakuraa
+$4
+Dhiruvai dheyshe alun
+*Emaabulaasaaru
+Kulayaa rahayaai vahaa
+*Dhiruvaidhey ennme nayaa`,
 },
 {
   id: 44,

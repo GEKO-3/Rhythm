@@ -53,6 +53,7 @@ const dhivehiNumbers = {
 
 // Reverse special cases mapping - most common Thaana to Latin special cases
 const reverseSpecialCases = [
+    { input: 'ބިންނަން', output: 'binnan' },
     { input: 'މަސްތުކޮށްލާ ފާނެޔޭ', output: 'masthukohlaafaaneyey' },
     { input: 'ތަކަހޮޅިތައް', output: 'thakaholhithah' },
     { input: 'ނިމިހިނގައިދާނޭ', output: 'nimihingaidhaaney' },
@@ -142,7 +143,54 @@ function reverseTransliterate(dhivehiText) {
         
         // Check for consonant + sukun combinations
         if (specialChars[twoChar]) {
-            finalResult += specialChars[twoChar];
+            // Special handling for ން based on position in word
+            if (twoChar === 'ން') {
+                // Check if ން is directly followed by ނ - handle as a unit
+                const nextCharAfterNn = i + 2 < result.length ? result[i + 2] : '';
+                if (nextCharAfterNn === 'ނ') {
+                    // Check if ނ has a vowel after it
+                    const vowelAfterN = i + 3 < result.length ? result[i + 3] : '';
+                    if (reverseVowelDiacritics[vowelAfterN]) {
+                        finalResult += 'nn' + reverseVowelDiacritics[vowelAfterN];
+                        i += 4; // Skip ން + ނ + vowel
+                    } else {
+                        finalResult += 'nna'; // Default vowel for ނ
+                        i += 3; // Skip ން + ނ
+                    }
+                    continue;
+                } else {
+                    // Check if ން is at the end of a word
+                    let isEndOfWord = true;
+                    
+                    // Look ahead to see if there are more word characters
+                    for (let j = i + 2; j < result.length; j++) {
+                        const checkChar = result[j];
+                        
+                        // If we encounter a space, newline, punctuation, or end of string, it's end of word
+                        if (checkChar === ' ' || checkChar === '\n' || checkChar === '\t' || 
+                            checkChar === ',' || checkChar === '.' || checkChar === '!' || 
+                            checkChar === '?' || checkChar === ';' || checkChar === ':') {
+                            break;
+                        }
+                        
+                        // If we find a Thaana character (consonant or vowel), it's middle of word
+                        if (reverseTransliterationMap[checkChar] || reverseVowelDiacritics[checkChar] || 
+                            checkChar === 'އ' || specialChars[checkChar + (j + 1 < result.length ? result[j + 1] : '')]) {
+                            isEndOfWord = false;
+                            break;
+                        }
+                    }
+                    
+                    // Apply different transliteration based on position
+                    if (isEndOfWord) {
+                        finalResult += 'n'; // End of word: ން = n
+                    } else {
+                        finalResult += 'nn'; // Middle of word: ން = nn
+                    }
+                }
+            } else {
+                finalResult += specialChars[twoChar];
+            }
             i += 2;
             continue;
         }
@@ -217,6 +265,9 @@ function reverseTransliterate(dhivehiText) {
         finalResult += char;
         i++;
     }
+    
+    // Clean up logic: convert any occurrence of 'nnn' to 'nn'
+    finalResult = finalResult.replace(/nnn+/g, 'nn');
     
     return finalResult;
 }
