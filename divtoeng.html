@@ -498,6 +498,9 @@
             // Clear saved input text from localStorage
             clearSavedInputText();
             
+            // Clear saved scroll positions from localStorage
+            clearSavedScrollPositions();
+            
             // Clear line views if in line view mode
             if (isLineView) {
                 updateLineView();
@@ -584,6 +587,59 @@
         
         function clearSavedInputText() {
             localStorage.removeItem('divtoengInputText');
+        }
+        
+        // Scroll position saving/loading functions
+        function saveScrollPositions() {
+            try {
+                const dhivehiInput = document.getElementById('dhivehiInput');
+                const englishOutput = document.getElementById('englishOutput');
+                const inputLines = document.getElementById('inputLines');
+                const englishLines = document.getElementById('englishLines');
+                
+                const scrollPositions = {
+                    dhivehiInput: dhivehiInput.scrollTop,
+                    englishOutput: englishOutput.scrollTop,
+                    inputLines: inputLines.scrollTop,
+                    englishLines: englishLines.scrollTop
+                };
+                
+                localStorage.setItem('divtoeng-scroll', JSON.stringify(scrollPositions));
+            } catch (e) {
+                console.warn('Could not save scroll positions to localStorage:', e);
+            }
+        }
+        
+        function loadScrollPositions() {
+            try {
+                const saved = localStorage.getItem('divtoeng-scroll');
+                if (saved) {
+                    const scrollPositions = JSON.parse(saved);
+                    
+                    // Use setTimeout to ensure elements are rendered before setting scroll
+                    setTimeout(() => {
+                        const dhivehiInput = document.getElementById('dhivehiInput');
+                        const englishOutput = document.getElementById('englishOutput');
+                        const inputLines = document.getElementById('inputLines');
+                        const englishLines = document.getElementById('englishLines');
+                        
+                        if (scrollPositions.dhivehiInput) dhivehiInput.scrollTop = scrollPositions.dhivehiInput;
+                        if (scrollPositions.englishOutput) englishOutput.scrollTop = scrollPositions.englishOutput;
+                        if (scrollPositions.inputLines) inputLines.scrollTop = scrollPositions.inputLines;
+                        if (scrollPositions.englishLines) englishLines.scrollTop = scrollPositions.englishLines;
+                    }, 100);
+                }
+            } catch (e) {
+                console.warn('Could not load scroll positions from localStorage:', e);
+            }
+        }
+        
+        function clearSavedScrollPositions() {
+            try {
+                localStorage.removeItem('divtoeng-scroll');
+            } catch (e) {
+                console.warn('Could not clear saved scroll positions from localStorage:', e);
+            }
         }
         
         // Line view functionality
@@ -690,6 +746,21 @@
             setupSynchronizedScrolling();
             setupThaanaTransliteration(document.getElementById('dhivehiInput'));
             loadSavedInputText();
+            
+            // Load saved scroll positions
+            loadScrollPositions();
+            
+            // Set up scroll position saving event listeners
+            let scrollSaveTimeout;
+            function throttledScrollSave() {
+                clearTimeout(scrollSaveTimeout);
+                scrollSaveTimeout = setTimeout(saveScrollPositions, 500); // Save after 500ms of no scrolling
+            }
+            
+            document.getElementById('dhivehiInput').addEventListener('scroll', throttledScrollSave);
+            document.getElementById('englishOutput').addEventListener('scroll', throttledScrollSave);
+            document.getElementById('inputLines').addEventListener('scroll', throttledScrollSave);
+            document.getElementById('englishLines').addEventListener('scroll', throttledScrollSave);
         });
 
         // Auto-transliterate on input change and save input text

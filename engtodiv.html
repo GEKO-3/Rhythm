@@ -460,6 +460,9 @@
             // Clear saved input text from localStorage
             clearSavedInputText();
             
+            // Clear saved scroll positions from localStorage
+            clearSavedScrollPositions();
+            
             // Clear OCR image data
             localStorage.removeItem('ocrImageData');
             currentImage = null;
@@ -1266,6 +1269,18 @@
             }
         });
         
+        // Scroll position saving event listeners
+        let scrollSaveTimeout;
+        function throttledScrollSave() {
+            clearTimeout(scrollSaveTimeout);
+            scrollSaveTimeout = setTimeout(saveScrollPositions, 500); // Save after 500ms of no scrolling
+        }
+        
+        document.getElementById('inputDisplay').addEventListener('scroll', throttledScrollSave);
+        document.getElementById('dhivehiOutput').addEventListener('scroll', throttledScrollSave);
+        document.getElementById('inputLines').addEventListener('scroll', throttledScrollSave);
+        document.getElementById('dhivehiLines').addEventListener('scroll', throttledScrollSave);
+        
         // Synchronized scrolling functionality
         let isScrollingSynced = true;
         let scrollingSide = null; // Track which side is being scrolled to prevent infinite loop
@@ -1429,7 +1444,59 @@
             }
         }
         
-        // Load saved input text on page load
+        // Scroll position saving/loading functions
+        function saveScrollPositions() {
+            try {
+                const inputDisplay = document.getElementById('inputDisplay');
+                const dhivehiOutput = document.getElementById('dhivehiOutput');
+                const inputLines = document.getElementById('inputLines');
+                const dhivehiLines = document.getElementById('dhivehiLines');
+                
+                const scrollPositions = {
+                    inputDisplay: inputDisplay.scrollTop,
+                    dhivehiOutput: dhivehiOutput.scrollTop,
+                    inputLines: inputLines.scrollTop,
+                    dhivehiLines: dhivehiLines.scrollTop
+                };
+                
+                localStorage.setItem('dhivehi-transliterator-scroll', JSON.stringify(scrollPositions));
+            } catch (e) {
+                console.warn('Could not save scroll positions to localStorage:', e);
+            }
+        }
+        
+        function loadScrollPositions() {
+            try {
+                const saved = localStorage.getItem('dhivehi-transliterator-scroll');
+                if (saved) {
+                    const scrollPositions = JSON.parse(saved);
+                    
+                    // Use setTimeout to ensure elements are rendered before setting scroll
+                    setTimeout(() => {
+                        const inputDisplay = document.getElementById('inputDisplay');
+                        const dhivehiOutput = document.getElementById('dhivehiOutput');
+                        const inputLines = document.getElementById('inputLines');
+                        const dhivehiLines = document.getElementById('dhivehiLines');
+                        
+                        if (scrollPositions.inputDisplay) inputDisplay.scrollTop = scrollPositions.inputDisplay;
+                        if (scrollPositions.dhivehiOutput) dhivehiOutput.scrollTop = scrollPositions.dhivehiOutput;
+                        if (scrollPositions.inputLines) inputLines.scrollTop = scrollPositions.inputLines;
+                        if (scrollPositions.dhivehiLines) dhivehiLines.scrollTop = scrollPositions.dhivehiLines;
+                    }, 100);
+                }
+            } catch (e) {
+                console.warn('Could not load scroll positions from localStorage:', e);
+            }
+        }
+        
+        function clearSavedScrollPositions() {
+            try {
+                localStorage.removeItem('dhivehi-transliterator-scroll');
+            } catch (e) {
+                console.warn('Could not clear saved scroll positions from localStorage:', e);
+            }
+        }
+          // Load saved input text on page load
         window.addEventListener('load', function() {
             const savedText = loadInputText();
             document.getElementById('inputDisplay').value = savedText;
@@ -1438,6 +1505,9 @@
             if (savedText.trim()) {
                 transliterate();
             }
+            
+            // Load saved scroll positions
+            loadScrollPositions();
         });
         
         // Load saved input text when page loads
@@ -1448,10 +1518,12 @@
                 inputDisplay.value = savedText;
                 // Auto-transliterate if there's saved text
                 if (savedText.trim()) {
-
                     transliterate();
                 }
             }
+            
+            // Load saved scroll positions
+            loadScrollPositions();
         });
     </script>
 </body>
