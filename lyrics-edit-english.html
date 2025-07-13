@@ -637,7 +637,7 @@
       });
       const lyricsEscaped = lyrics.trim().replace(/`/g, '\u0060');
       const output = `,
-       
+
   englishLyrics: \`${lyricsEscaped}\`,`;
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(output);
@@ -691,7 +691,7 @@
       const encodedSongName = songName ? encodeURIComponent(songName) : '';
       
       // Build URL to Dhivehi editor with import parameters
-      const dhivehiEditorUrl = `lyrics-edit.html?import=${encodedLyrics}${encodedSongName ? `&songName=${encodedSongName}` : ''}`;
+      const dhivehiEditorUrl = `lyrics-edit?import=${encodedLyrics}${encodedSongName ? `&songName=${encodedSongName}` : ''}`;
       
       // Open Dhivehi editor in a new tab
       window.open(dhivehiEditorUrl, '_blank');
