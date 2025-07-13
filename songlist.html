@@ -30,7 +30,7 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
   <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
   <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
-  <link rel="manifest" href="favicons/manifest.webmanifest">
+  <link rel="manifest" href="favicons/songlist-manifest.webmanifest">
   
   <!-- Additional meta tags for better SEO and social sharing -->
   <meta name="theme-color" content="#f5d000">
@@ -84,6 +84,10 @@
       background-size: cover;
       color: var(--primary-color);
       animation: fadeIn 0.5s ease-in-out;
+      padding-top: env(safe-area-inset-top, 0);
+      padding-left: env(safe-area-inset-left, 0);
+      padding-right: env(safe-area-inset-right, 0);
+      padding-bottom: env(safe-area-inset-bottom, 0);
     }
     .container {
       text-align: center;
@@ -95,12 +99,13 @@
       border-radius: 10px;
       transition: transform 0.3s ease;
       animation: slideIn 0.5s ease-in-out;
-      margin-top: 100px;
+      margin-top: 40px;
       margin-bottom: 40px;
+      padding-top: env(safe-area-inset-top, 20px);
     }
     .header-search-wrapper {
-      position: fixed;
-      top: 0;
+      position: sticky;
+      top: env(safe-area-inset-top, 0);
       left: 0;
       right: 0;
       z-index: 100;
@@ -109,6 +114,7 @@
       -webkit-backdrop-filter: blur(10px);
       border-bottom: 1px solid #444;
       padding: 10px 0;
+      margin-top: env(safe-area-inset-top, 0);
     }
     h1 {
       color: var(--primary-color);
@@ -231,7 +237,7 @@
       .container {
         max-width: 95vw;
         padding: 10px;
-        margin-top: 90px;
+        margin-top: 20px;
       }
       #search-box {
         flex: 1;
@@ -252,6 +258,7 @@
       }
       .header-search-wrapper {
         padding: 8px 0;
+        border-radius: 0;
       }
     }
   </style>
