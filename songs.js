@@ -1730,7 +1730,27 @@ Hinifulhu vaduvaadhoa
 ފިރި ދެލޯމެރި ފުސް ވަނީޔޭ
 *އޮޅި ދެފައި ރަކިވަނީއޭ
 ހިތް މިތެޅިތެޅީ ހިތް މިރޮއެރޮއެ
-*ފުނޑު ފުނޑު މިވާ ގޮތް ވަނީއޭ`
+*ފުނޑު ފުނޑު މިވާ ގޮތް ވަނީއޭ`,
+       
+  englishLyrics: `#M
+Janbumagu janbuge dhonjanbu feni hiyy hairaan veyey
+*Janbumagu janbuge dhonjanbu feni hiyy hairaan veyey
+Huvafenehhey aashigaaey
+*Tharithah vidhaa babulhaneeey
+#1
+Magumathin feni kos goveemey
+*Shoahuvevi magu olhihjey
+Loabivaaey aashigaaey
+*Hiyy mi fundufundu vaneeey
+Faaralevuney kanmatheehure
+*Thuruthuru alhaagoyy vaneeey
+#2
+Asthaasthaa haadha salhiey
+*Sihsa sihsain dhaneeey
+Firi dheloameri fus vaneeyey
+*Olhi dhefai rakivaneeey
+Hiyy mithelhithelhee hiyy miroeroe
+*Fundu fundu mivaa goyy vaneeey`,
 },
 {
   id: 36,
@@ -1903,7 +1923,51 @@ $1
 
 $N
 ބެރުޖަހާލާ
-*ނަށާލާ`
+*ނަށާލާ`,
+       
+  englishLyrics: `#M
+Ainekey odi kuree
+*Laamigodhayaa kannelee
+Thakuru hure goyy hus vanee
+*Vaa migadha vihsaaraee
+#1
+Dhuhvaa odi baarulaa keyolhaa
+*Hikifas mage goathi athuveythoa
+Hadhanee vihsaaraey
+*Hadhanee vihsaaraey
+#2
+Dhuhvaa odi baarulaa kuriah
+*Dheriyaa kunbu kurijahsaa
+Kandu olhiaa seedhaakoh
+*Dhefaraathun dhiyahihkaa
+Falithah baalaa fenu alhuvaalaa
+*Aan huyy
+#3
+Dhanvey andhiri redhanlaa
+*Mulhi kanduolhi alikohlee
+Heymathee bala dharinney
+*Naamaan kan verivehjey
+Falithah baalaa fenu alhuvaalaa
+*Aan huyy
+-
+$M
+Odidhuhvaa kanduthakugaa raalhu thakuthereygaa
+*Hiyyvarulaa foareegaa baanithaku thereygaa
+$1
+Mendhameh reygandeh fathiheh hama nubalaey
+*Dhathurah heyovarey konme vaguthakas hevey
+$2
+Fathihaa thedhuvegen thakurey dhathurah hedhee
+*Odiyah boafenaa kohthaa dharulaa hedhee
+$3
+Jahaa jahaa jahaa jahaa beruga jahaalaa berugajahaalaa nashaalaa
+*Jahaa jahaa jahaa jahaa beruga jahaalaa berugajahaalaa nashaalaa
+$4
+Raagukiyaalaa nalanala ragukiyaalaa
+*Raagukiyaalaa nalanala ragukiyaalaa
+$5
+Berujahaalaa
+*Nashaalaa`,
 },
 {
   id: 39,
@@ -1970,7 +2034,37 @@ $2
 ރޯނުވަލުން ކުދިފިޔޮށް ބޯނެފެނެއް ނުލިބުމުން
 *ރޯނުވަލުން ކުދިފިޔޮށް ބޯނެފެނެއް ނުލިބުމުން
 ހޯދިފަހުން ނުފެނުމުން ރޯނެވަލުގަ ހިމައަޑުން
-*ހޯދިފަހުން ނުފެނުމުން ރޯނެވަލުގަ ހިމައަޑުން`
+*ހޯދިފަހުން ނުފެނުމުން ރޯނެވަލުގަ ހިމައަޑުން`,
+       
+  englishLyrics: `#M
+Dhondhaitha dhari dhon kanbuloavaa
+*Onnaane geygaa nunidhaa
+Dhondhaitha dhari thuthu kanbuloavaa
+*Onnaane hithugaanufilaa
+#1
+Vohneh mithanthan alivaa
+*Bontheege fandukula earaa
+Nalafehi edhin handhuvaru alivaa
+*Malakaaekoanee indhaa
+#2
+Ohsey vilaathaku therevaa
+*Goshuri vilaarayy obivaa
+Baruhandhuge alikan falhimedhugaa
+*Kalhufoe andhiri vilireyrey
+-
+$M
+Kanbihyaa kanbihyashey mamigovanee
+*Kanbilivaluga bondhaafilaa vaathee
+$1
+Magoo dhanduga nidhaaney kandoofaluga hingaaney
+*Magoo dhanduga nidhaaney kandoofaluga hingaaney
+Magunhingaa dhekolhubalaa hovaakamun dhaaney
+*Magunhingaa dhekolhubalaa hovaakamun dhaaney
+$2
+Roanuvalun kudhifiyoh boanefeneh nulibumun
+*Roanuvalun kudhifiyoh boanefeneh nulibumun
+Hoadhifahun nufenumun roanevaluga himaadun
+*Hoadhifahun nufenumun roanevaluga himaadun`,
 },
 {
   id: 41,
@@ -2031,7 +2125,56 @@ $3
 ބިލެއްމާ ކަނޑުކަނބާ ކަނދުވަލު މާ ފޮނިވެލާ
 *ކަނދުވަލު މާ ފޮނިވެލާ
 ގުޑުގުޑާ ވުދުވުދޫ ކަނިފުޅުމާ ފިޔަޖަހާ
-*ކަނިފުޅުމާ ފިޔަޖަހާ ކަނިފުޅުމާ ފިޔަޖަހާ`
+*ކަނިފުޅުމާ ފިޔަޖަހާ ކަނިފުޅުމާ ފިޔަޖަހާ`,
+       
+  englishLyrics: `#M
+Dhonveli thundi kolhumatheen
+*Dhefah raalhu holhi laajahaa
+Dhonfas aruvaa thundeen
+*Ithurah thundi bodu velaa
+#1
+Akiriyaa vehyaa galaa ekuveraalhaa voduvelaa
+*Ekuveraalhaa voduvelaa
+Lahguvaa kudhiohthakun ekuve vehyaa gasfalhaa
+*Ekuve vehyaa gasfalhaa ekuve vehyaa gasfalhaa
+#2
+Vodivi dhaa thundi kolhu mathee kurangi vahlaa hoarayaa
+*Kurangi vahlaa hoarayaa
+Bis alhaa kiru dhoonithah haali haalin thundi furaa
+*Haali haalin thundi furaa haali haalin thundi furaa
+#3
+Fas araa thundi kolhu mathee lasthakeh nuve boduvelaa
+*Lasthakeh nuve boduvelaa
+Gasthakaa eki gaakolhun mulhi thundee zeenayy velaa
+*Mulhi thundee zeenayy velaa mulhi thundee zeenayy velaa
+-
+$M
+Alakabondana thoathaakudhi vahlakurangi dhuvelaa
+*Sihbureyru rathafain mulhi thundiekee furaalaa
+Ehanda ulhey boamathin
+*Vahla dhuvey thundimathin
+$1
+Maakanaa kaloathaa
+*Magaigaa jeheethaa
+Jahaaindhe fileethaa
+*Filaaindhe roneethaa
+Mathin dhamun boajehsoa
+*Thirin dhamun kohjehsoa
+$2
+Bulbulaa agulabee aahu kanbili mainaa
+*Aahu kanbili mainaa
+Zuruvuthee thakuthuvaa ginikaamaa dhoonithah
+*Ginikaamaa dhoonithah ginikaamaa dhoonithah
+$3
+Furuhlaa ilolhiaa alakavahla bisalhaa
+*Alakavahla bisalhaa
+Miyarevoo gohorugey bodugaamaa adulavaa
+*Bodugaamaa adulavaa bodugaamaa adulavaa
+$4
+Bilehmaa kandukanbaa kandhuvalu maa fonivelaa
+*Kandhuvalu maa fonivelaa
+Gudugudaa vudhuvudhoo kanifulhumaa fiyajahaa
+*Kanifulhumaa fiyajahaa kanifulhumaa fiyajahaa`,
 },
 {
   id: 42,
@@ -4394,7 +4537,37 @@ $N
 ނިކަންދެންބަލާ
 މިއޮށް ފެންނަނީ
 މިއޮށް ގެންދަނީ
-އަޅޭ ދެންބަލާ`
+އަޅޭ ދެންބަލާ`,
+       
+  englishLyrics: `#M
+Adu ahamey meefasaanaa lobuvethi alifulhu dhonhiyalaa
+*Gulhi loabin hiyyhithaavee abadhahthaa
+#1
+Alifulhumee neyy misaaley ishquge batholey
+*Alifulhumee neyy misaaley ishquge batholey
+Alifulhu adhi dhonhiyalaa ehjismeh ehgoyy misaaley
+*Gulhi loabin hiyyhithaavee abadhahthaa
+#2
+Handhufadha dhonhiyala chaaley thedhuveri loabeeveriyeh
+*Handhufadha dhonhiyala chaaley thedhuveri loabeeveriyeh
+Dhathithah kurimathiveemaa goahee meeruhumun varaaey
+*Gulhi loabin hiyyhithaavee abadhahthaa
+-
+$M
+Vaamulhin ujaalaa
+*Loabeege zamaanugaa roashanee bahaarekey
+$1
+Maaku ufaathaa paakuthereygaa
+*Maaku ufaathaa paakuthereygaa
+Nahchilhiyaa kiyanee ufalugaa naa
+*Nahchilhiyaa kiyanee ufalugaa naa
+*Loabeege zamaanugaa roashaanee bahaarekey
+$2
+*Fenmathivaa gaburehfeneyey
+Nikandhenbalaa
+Mioh fennanee
+Mioh gendhanee
+Alhey dhenbalaa`,
 },
 {
   id: 103,
