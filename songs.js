@@ -1186,8 +1186,8 @@ lyrics: `#M
 *ފޯނު މިއޮތީ ކާޑު ނެތިގެން ނުގުޅިފާ ދެރަ ވާނެޔޭ
 
 #2
-ރީތި ނޯކިޔާ ފޯނަކުން ނުވެ ޥޭކަމެއް މިއަދަކު ނެތޭ
-*ޥޭކަމެއް މިއަދަކު ނެތޭ
+ރީތި ނޯކިޔާ ފޯނަކުން ނުވެ ވޭކަމެއް މިއަދަކު ނެތޭ
+*ވޭކަމެއް މިއަދަކު ނެތޭ
 ރީތި ތުނިތުނި ބާޑު ފޯނެއްވެސް ފަހުން ގެންނާނެޔޭ
 *ފޯނު މިއޮތީ ކާޑު ނެތިގެން ނުގުޅިފާ ދެރަ ވާނެޔޭ
 
@@ -1195,7 +1195,28 @@ lyrics: `#M
 ދައްތަ ފޯނަށް ރިންގު މިއެޅީ
 *މީދަލުގެ އަޑު ރީތިދޯ
 ދައްތަ ބޭބެ ގެނައި ފޯނަށް ސިމެއް ލައްވާނެޔޭ
-*ފޯނު މިއޮތީ ކާޑު ނެތިގެން ނުގުޅިފާ ދެރަ ވާނެޔޭ`
+*ފޯނު މިއޮތީ ކާޑު ނެތިގެން ނުގުޅިފާ ދެރަ ވާނެޔޭ`,
+
+  englishLyrics: `#M
+Foanu miothee kaadu nethigen nugulhifaa dhera vaaneyey
+*Foanu miothee kaadu nethigen nugulhifaa dhera vaaneyey
+Boa salaamayy nuviyakas mikameh dhuleh nuveveyneyey
+*Boa salaamayy nuviyakas mikameh dhuleh nuveveyneyey
+#1
+Hun ayas adhi kehsiyas bolu
+*Gaa rihun maagadhaveyey
+Rinnguvaa adu iviliyas luivaa vaareh neyngeyneyey
+*Foanu miothee kaadu nethigen nugulhifaa dhera vaaneyey
+#2
+Reethi noakiyaa foanakun nuve veykameh miadhaku nethey
+*Veykameh miadhaku nethey
+Reethi thunithuni baadu foanehves fahun gennaaneyey
+*Foanu miothee kaadu nethigen nugulhifaa dhera vaaneyey
+#3
+Dhahtha foanah rinngu mielhee
+*Meedhaluge adu reethidhoa
+Dhahtha beybe genai foanah simeh lahvaaneyey
+*Foanu miothee kaadu nethigen nugulhifaa dhera vaaneyey`,
 },
 {
   id: 25,
@@ -4512,8 +4533,8 @@ $N
 *ވިދާ ގުރަހައިގެ ތަރިތައްވެސް
 
 #1
-ސަލާމޭ އާޝިގާއޭ ލޯތްބަކީ ތިޔައޭ މަގޭ ރުހީ
-*ސަލާމޭ އާޝިގާއޭ ލޯތްބަކީ ތިޔައޭ މަގޭ ރުހީ
+ސަލާމޭ އާޝިގާއޭ ލޯތްބަކީ ތިޔައޭ މަގޭ ރޫހީ
+*ސަލާމޭ އާޝިގާއޭ ލޯތްބަކީ ތިޔައޭ މަގޭ ރޫހީ
 ކަލާތީ ހޫރެކޭ ރޯޝަން އުޖާލާ މޫނުގެ ވެރިޝާހީ
 *ބަލާށޭ ފަހެ ހަނދައްވެސް އަލިކަމެއް ލިބިފާ ތިހާނުވެޔޭ
 
@@ -4527,7 +4548,29 @@ $N
 ތެދޭ ނުމެވޭ ކެތެއް ޅަޒުވާން ހިތައް ތިޔާރީތިކަން ފެނުމުން
 *ތެދޭ ނުމެވޭ ކެތެއް ޅަޒުވާން ހިތައް ތިޔާރީތިކަން ފެނުމުން
 އެދޭތިޔަ ޗާލު ހަށިގަނޑުގާ ވި އަސަރާ ޖާދޫގާ ޖެހުމުން
-*ނެތޭ ޔާރެއް ތިބާމެނުވީ މިދުނިޔޭގާ ހިލާނުވެޔޭ`
+*ނެތޭ ޔާރެއް ތިބާމެނުވީ މިދުނިޔޭގާ ހިލާނުވެޔޭ`,
+
+  englishLyrics: `#M
+Vidhaa gurahaige tharithahves
+*Thibaafenifaa sajidha kureyey
+Fidhaanumevaane mahuloogeh
+*Udaabinmugaa hilaanuveyey
+*Vidhaa gurahaige tharithahves
+#1
+Salaamey aashigaaey loayybakee thiyaey magey roohee
+*Salaamey aashigaaey loayybakee thiyaey magey roohee
+Kalaathee hoorekey roashan ujaalaa moonugeveri shaahee
+*Balaashey fahe handhahves alikameh libifaa thihaanuveyey
+#2
+Yageeney meeruvas finifen malah libunee kalaage vahun
+*Yageeney meeruvas finifen malah libunee kalaage vahun
+Hageegee reethikan hurihaa malah libunee thiya reethikamun
+*Bageechaagaa thihaa furihama maleh thaazaa folhun nuveyey
+#3
+Thedhey numevey ketheh lhazuvaan hithah thiyaareethikan fenumun
+*Thedhey numevey ketheh lhazuvaan hithah thiyaareethikan fenumun
+Edheythiya chaalu hashigandugaa vi asaraa jaadhoogaa jehumun
+*Nethey yaareh thibaamenuvee midhuniyeygaa hilaanuveyey`,
 },
 {
   id: 93,
@@ -6124,7 +6167,25 @@ Annbeyyge jaagafuraa
 #3
 ބުރުސޫރަ ރީތި މުނިޔާ އުރުފަޅު ފިލާނެ ސަންފާ
 *ނިރު އަލަގަހުން ނުފަޅަނީސް ބިރުވެތިވެ އެނބުރި އާދޭ
-*ބިރުވެތިވެ އެނބުރި އާދޭ`
+*ބިރުވެތިވެ އެނބުރި އާދޭ`,
+
+  englishLyrics: `#M
+Fiyareethi nalavi muniyaa dhiyathan nubune dhiyaeehey
+*Thiya vaane fikuru hinngan liyaleh minoon kobaahey
+Niyanethi thibaage namugaa
+*Kiyamey mihen tharaanaa
+#1
+Miyathoonu hanjarehfadha thiya kalhiravaige jaadhoo
+*Hiya sahthain kafaalaa lhiya naalhanees rujooavey
+*Lhiya naalhanees rujooavey
+#2
+Agumolhu huvandhu kavaigen maguthah mathee hingaairu
+*Hungu maavaharu nuolhuvaa dhaguyah nuvaashe aadhey
+*Dhaguyah nuvaashe aadhey
+#3
+Burusoora reethi muniyaa urufalhu filaane sannfaa
+*Niru alagahun nufalhanees biruvethive enburi aadhey
+*Biruvethive enburi aadhey`,
 },
 {
   id: 129,
@@ -7329,7 +7390,29 @@ $1
 $2
 *ވާން އުޅޭ
 އެއްކަލަގޮތް
-މަބުނާ ގޮތް`
+މަބުނާ ގޮތް`,
+
+  englishLyrics: `#M
+Vihyaa
+*Falakun dhireyhaa faalhuvelaa
+#1
+Genuvae seedhaa fenumun thaazaa
+*Finikan hunaa veynaa
+Faalhuvedhaahaa reethi etharithah
+*Faalhuvedhaahaa reethi etharithah
+Falakun dhihlaaleemaa
+*Vihyaa falakun dhireyhaa faalhuvelaa
+-
+$M
+Alivaaney noorekey
+*Alivaaney noorekey dheyhun vidhaalaanee
+$1
+Farinala aleegai
+*Nalanala dheyhun vidhaalaanee
+$2
+*Vaan ulhey
+Ehkalagoyy
+Mabunaa goyy`,
 },
 {
   id: 163,
@@ -7730,8 +7813,8 @@ Haadhavarah searchkeroo feneythoathahey
 #2
 ރޫރުލަނުއްވޭ ދެފަޔުން ފެނިލޫމާ އިނބަ ލޮލަށް
 *ނޯޅެ ހުޝާމަދުކެރާން އިތުބާރު ކެރަން ބޮނަން
-ލޯތްބުން މައާއެކު އޮޅެންނާ އުމާށޭ
-*ލޯތްބުން މައާއެކު އޮޅެންނާ އުމާށޭ
+ލޯތްބުން މަޔާއެކު އޮޅެންނާ އުމާށޭ
+*ލޯތްބުން މަޔާއެކު އޮޅެންނާ އުމާށޭ
 *ނޯޅެންނާވެސް ބޮނޭ
 
 #3
@@ -7739,7 +7822,29 @@ Haadhavarah searchkeroo feneythoathahey
 *ކަކެލުހުޅުން ވައިގި ދޫވެދާޅޭ ތެއް ބުނި ބަހުން
 މިޔޯ ނުހަނު އަގަބޮޑަ އަމާނާތެކޭ ދެން
 *މިޔޯ ނުހަނު އަގަބޮޑަ އަމާނާތެކޭ ދެން
-*އަދި އަތުލާށޭ ބޮނޭ`
+*އަދި އަތުލާށޭ ބޮނޭ`,
+
+  englishLyrics: `#M
+Foanukeroomaa umaashe bonuveney
+*Nidhi noomae ma inba dhekennhithun mirey
+#1
+Biraganefaa hunnahen inbage adun heeveyey
+*Avahakerey dhoannyakun lahanukoh afoobilaa
+Theyy olhenoo inbadhen ma ladhagannavanndhoa
+*Theyy olhenoo inbadhen ma ladhagannavanndhoa
+*Dhoganahadhaa dhen boney
+#2
+Roorulanuhvey dhefayun feniloomaa inba lolah
+*Noalhe hushaamadhukeraan ithubaaru keran bonan
+Loayybun mayaaeku olhennaa umaashey
+*Loayybun mayaaeku olhennaa umaashey
+*Noalhennaaves boney
+#3
+Rahkaa keruveylhahey dheefuhvaa dhen mihiyy
+*Kakeluhulhun vaigi dhoovedhaalhey theh buni bahun
+Miyoa nuhanu agaboda amaanaathekey dhen
+*Miyoa nuhanu agaboda amaanaathekey dhen
+*Adhi athulaashey boney`,
 },
 {
   id: 172,
@@ -7773,7 +7878,34 @@ Haadhavarah searchkeroo feneythoathahey
 ހިތް ހެޔޮކަމާއެކު އިއްވާލަދޭމީ
 *ނަލަ ރާގުރާގުން ތަހުނިޔާ
 އީދޭ އައިމީ
-*ކުދިބޮޑު އެންމެން ފޯރި ނަގާލާ`
+*ކުދިބޮޑު އެންމެން ފޯރި ނަގާލާ`,
+
+  englishLyrics: `#M
+Eedhey aimi ufalugaa
+*Ennmen joashaai majalugaa
+Kiyamaa eedhu thahuniyaa
+*Kudhibodu ennmen foari nagaalaa
+#1
+Gulhigen ekeegaa kudakudhin
+*Sakaraathuge adu mulhithaa fathuraa
+Nalareethi hedhumun zeenayyvegen
+*Huvandhun mulhi maahaulu ehvas kohlaa
+Eedhey aimee
+*Kudhibodu ennmen foari nagaalaa
+#2
+Bodumahuge kulhivaru maalineshun
+*Ennmen ekeegaa baiverivelaa
+Kulajehumuge foarin ekieki kulain
+*Eedhumajaa kulagadha kohlaa
+Eedhey aimee
+*Kudhibodu ennmen foari nagaalaa
+#3
+Amunaalevey nala basthakaa eku
+*Boduberu sagaafee fari neshumaa
+Hiyy heyokamaaeku ihvaaladheymee
+*Nala raaguraagun thahuniyaa
+Eedhey aimee
+*Kudhibodu ennmen foari nagaalaa`,
 },
 {
   id: 173,
@@ -9020,9 +9152,9 @@ Ennkeyolhaa ukaashey
 ރަށުމެދައް`
 },
 {
-  id: 206,
-  name: `Veyn Libeythi Ey`,
-  genre: 'Nala',
+  id: 239,
+  name: `Veyn Libeythee Ey`,
+  genre: 'Kaasi',
   lyrics: `#M
 ވޭން ލިބޭތީ އޭ ކުރާ ތައުބީރުގާ
 *އެދެނީ ކަލާ ލިބުމޭ މަގޭ ތަގުދީރުގާ
@@ -9032,15 +9164,15 @@ Ennkeyolhaa ukaashey
 *ރޭ ނިދިން ހޭލައްވަނީ ހުވަފެން ތަކުން
 ރޭ ދުވާ އެދެނީ އެކީ ބައްދަލު ވެލުން
 *ހޭދަ ވެވުނީމާ އެތާ ލޯބިން މިހެން
-ހިޔާލުގާ ވާ ހިތް ރުހޭ ތަސް ވީރުހޭ
+ހިޔާލުގާ ވާ ހިތް ރުހޭ ތަސްވީރުހޭ
 *އެދެނީ ކަލާ ލިބުމޭ މަގޭ ތަގުދީރުގާ
 
 #2
 ހިތް މުޅިން ނުރުހިއްޖެޔޭ ދުރުގާ ހުރުން
 *ފުން އަސަރު ކުރުވައިފިޔޭ ރޮއެ ރޮއެ މިހެން
-ކެތް މަށައް ނުވެވޭނެޔޭ ދެކެލާ ހިތުން
+ކެތްމަށަށް ނުވެވޭނެޔޭ ދެކެލާ ހިތުން
 *ދެން މިހެން ހުރެވޭނެހޭ ޝަކުވާ ކުރަން
-ވައުދު ލޯބިން ކޮށް މިހެން ހުރެވޭނެހޭ
+ވައުދު ލޯބިންކޮށް މިހެން ހުރެވޭނެހޭ
 *އެދެނީ ކަލާ ލިބުމޭ މަގޭ ތަގުދީރުގާ
 
 #3
@@ -9049,9 +9181,32 @@ Ennkeyolhaa ukaashey
 ރީތި މާތައް ރަކި ވެދާނޭ ހީލުމުން
 *ރީތި މޫސުން ބަދަލު ވާނޭ ރޯލުމުން
 ފުން ހަނދާނޭ ކެތް ނުވާ ތަގުދީރުހޭ
-*އެދެނީ ކަލާ ލިބުމޭ މަގޭ ތަގުދީރުގާ`,
+*އެދެނީ ކަލާ ލިބުމޭ މަގޭ ތަގުދީރުގާ
 
-englishLyrics: `#M
+-
+$M
+އަނިޔާ ހިތައްނުދޭށޭ ތިހެން ސަޒާނުދޭށޭ ވާޒަހަމުން މިހިތް ރޯތީ
+*އެދޭނީ ޔާރު އެހީވާށޭ އެދޭނީ ޔާރު އެހީވާށޭ
+
+$1
+ކެހިވެރިވީމާ ހާލު އެނގޭހޭ
+*އަހަރެން ހޭލާ ރޯންޖެހެނީއޭ
+ތިޔަހެން ބާކީ ކޮއްލާފާ ދާތީ
+*އެދޭނީ ޔާރު އެހީވާށޭ އެދޭނީ ޔާރު އެހީވާށޭ
+
+$2
+ދޭހަވެވޭމީ އިޝްކުގެ މާޒީ
+*އޭރު އެކީގާ ވައުދު ވެފާވީ
+އެހަނދާން ވެވިފާ އަދު ހުންނަން ވާތީ
+*އެދޭނީ ޔާރު އެހީވާށޭ އެދޭނީ ޔާރު އެހީވާށޭ
+
+$3
+ހާމަވެދާނީ ހިތުގެ އުދާހޭ
+*ނާހަމަ ތެދެކޭ ލޯބި މަލާއޭ
+ނުފިލާ ހިތުގާ އެހަނދާންތައް ވާތީ
+*އެދޭނީ ޔާރު އެހީވާށޭ އެދޭނީ ޔާރު އެހީވާށޭ`,
+
+  englishLyrics: `#M
 Veyn libeythee ey kuraa thaubeerugaa
 *Edheny kalaa libumey magey thagudheerugaa
 #1
@@ -9059,12 +9214,12 @@ Mey thelhun vaathee hithey noathee madun
 *Rey nidhin heylavvanee huvafen thakun
 Rey dhuvaa edheny eky bahdhalu velun
 *Heydha vevuneemaa ethaa loabin mihen
-Hiyaalugaa vaa hiy ruhey thas veeruhey
+Hiyaalugaa vaa hiy ruhey thasveeruhey
 *Edheny kalaa libumey magey thagudheerugaa
 #2
 Hiy mulhin nuruhihjeyey dhurugaa hurun
 *Fun asaru kuruvaifiyey roe roe mihen
-Kei mashah nuveveyneyey dhekelaa hithun
+Keyymashah nuveveyneyey dhekelaa hithun
 *Dhen mihen hureveynehey shakuvaa kuran
 Vaudhu loabin koh mihen hureveynehey
 *Edheny kalaa libumey magey thagudheerugaa
@@ -9074,7 +9229,26 @@ Hoonukan dheythee himeyn neyvaa thakun
 Reethi maathah raki vedhaaney heelumun
 *Reethi moosun badhalu vaaney roa lumum
 Fun handhaaney kei nuvaa thagudheeruhey
-*Edheny kalaa libumey magey thagudheerugaa`
+*Edheny kalaa libumey magey thagudheerugaa
+-
+$M
+Aniyaa hithahnudheyshey thihen sazaanudheyshey vaazahamun mihiyy roathee
+*Edheynee yaaru eheevaashey edheynee yaaru eheevaashey
+$1
+Kehiveriveemaa haalu engeyhey
+*Aharen heylaa roanjeheneeey
+Thiyahen baakee kohlaafaa dhaathee
+*Edheynee yaaru eheevaashey edheynee yaaru eheevaashey
+$2
+Dheyhaveveymee ishkuge maazee
+*Eyru ekeegaa vaudhu vefaavee
+Ehandhaan vevifaa adhu hunnan vaathee
+*Edheynee yaaru eheevaashey edheynee yaaru eheevaashey
+$3
+Haamavedhaanee hithuge udhaahey
+*Naahama thedhekey loabi malaaey
+Nufilaa hithugaa ehandhaanthah vaathee
+*Edheynee yaaru eheevaashey edheynee yaaru eheevaashey`,
 },
 {
   id: 207,
@@ -9320,7 +9494,7 @@ $2
 *ރީތި ދެލޮލުގަ ހުރި ގަދަ އަސަރުން
 
 #2
-މޫނުގެ އަލިކަން ވެޔޭ ޔަގީނުން ސާދަ ވަނަ ރޭ
+މޫނުގެ އަލިކަން ވެޔޭ ޔަގީނުން
 *ސާދަ ވަނަ ރޭ ހަނދުވަރު ފަދައިން
 ތޫނު އަސަރު ހުރި ދެލޮލުގެ ނަޒަރުން
 *މޭ ޒަޚަމުވީ ކުރި ޖަޒުބާތުން
@@ -9333,7 +9507,34 @@ $2
 ވީނަސް ތަރިވެސް ލަދުން ނިވާވޭ
 *މޫނުގާ ހުރި އަލިގަދަ ކަމަކުން
 ކީނަމަވެސް ބަސްތައް އަމުނައިގެން
-*ނެތޭ އަރާމެއް މިހިތުގެ ވޭނުން`
+*ނެތޭ އަރާމެއް މިހިތުގެ ވޭނުން`,
+
+  englishLyrics: `#M
+Yaaruge nalakan hithaaey kulhelee
+*Thaami bunanee furihama raagun
+Haaruge muyythah jaree ekuranee
+*Loabi mithuruge niyanethi baarun
+#1
+Mithuruge loabin furaana libigen
+*Vaa ufalakun lavaey kiyenee
+Ithuru bahaareh mahithah genuvee
+*Fenunu evaruge fari harakaathun
+Hithuge leyaaeku miraagu hinganee
+*Reethi dheloluga huri gadha asarun
+#2
+Moonuge alikan veyey yageenun
+*Saadha vanarey handhuvaru fadhain
+Thoonu asaru huri dheloluge nazarun
+*Mey zakhamuvee kuri jazubaathun
+Thoonu shuoorun vinndhey jahaanee
+*Haaufaa dhey foni unnmeedhun
+#3
+Zeenaitherikan ithuruvaanee
+*Fahe reygandehfadha isthashigandakun
+Veenas tharives ladhun nivaavey
+*Moonugaa huri aligadha kamakun
+Keenamaves basthah amunaigen
+*Nethey araameh mihithuge veynun`,
 },
 {
   id: 215,
@@ -9725,7 +9926,31 @@ Dhannaane yaareh nethi faluge thereygaa nidhaalaa
 *ހިއްސުތައް ތިރީތި ކަމުން ގައިދު ކޮއްފިއޭ
 އިހުސާސްތައް ހިތުގާ ވާ
 *ތާޒާ ކޮއްދޭ ޔާރާ ތިޔޭ
-*އުންމީދު ތައް ހިތުގެ އާލާ ވެއްޖޭ`
+*އުންމީދު ތައް ހިތުގެ އާލާ ވެއްޖޭ`,
+
+  englishLyrics: `#M
+Vinndhuthah mi hithugaa vaa heylaifiyey
+*Thifari moonu hiyy mi dhivaanaa kohfiey
+Dheevaanaa
+*Dheevaanaa
+Dheevaanaa
+*Vehje ey dheevaanaa
+#1
+Chaalu soora fenuneemaa aashoahuvey
+*Kalhi jahaa nulaa loabi hashigandah beley
+Heelumun kalaa loabin maathah folhey
+*Meeruvas dhuvaa jismun vas fathuruvaalaey
+Annaashey yaaraa ey
+*Hiyy beynun vaa loabee thiyey
+*Uhmeedhuthah hithuge aalaa vehjey
+#2
+Dhirumakee hayaathuge thiyaey hiyy buney
+*Loabi vethi vafaatherikan theee hiyybuney
+Hiyy magey thiloabeegaa gehlihje ey
+*Hihsuthah thireethi kamun gaidhu kohfiey
+Ihusaasthah hithugaa vaa
+*Thaazaa kohdhey yaaraa thiyey
+*Unnmeedhu thah hithuge aalaa vehjey`,
 },
 {
   id: 228,
