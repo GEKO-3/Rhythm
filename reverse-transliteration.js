@@ -4,7 +4,7 @@ const reverseTransliterationMap = {
     'ވ': 'v', 'މ': 'm', 'ފ': 'f', 'ދ': 'dh', 'ތ': 'th', 'ލ': 'l',
     'ގ': 'g', 'ޏ': 'ny', 'ސ': 's', 'ޑ': 'd', 'ޒ': 'z', 'ޓ': 't', 'ޔ': 'y',
     'ޕ': 'p', 'ޖ': 'j', 'ޗ': 'ch', 'ޝ': 'sh', 'ޙ': 'h', 'ޚ': 'kh',
-    'ޤ': 'q', 'ޣ': 'gh', 'ޒ': 'z'
+    'ޤ': 'q', 'ޣ': 'gh', 'ޒ': 'z', 'ޢ': 'i', 'ޠ': 'th'
 };
 
 // Reverse vowel diacritics map
