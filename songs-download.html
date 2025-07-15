@@ -419,8 +419,19 @@
     // Initialize the page
     document.addEventListener('DOMContentLoaded', function() {
       filteredSongs = [...songs].sort((a, b) => a.name.localeCompare(b.name));
-      renderSongs();
-      updateStats();
+      
+      // Restore toggle state from localStorage
+      const savedToggleState = localStorage.getItem('showOnlyNoEnglish');
+      if (savedToggleState === 'true') {
+        showOnlyNoEnglish = true;
+        const toggleBtn = document.getElementById('noEnglishToggle');
+        const toggleText = document.getElementById('toggleText');
+        toggleBtn.classList.add('active');
+        toggleText.textContent = 'ދިވެހި Only: ON';
+      }
+      
+      // Apply filters which will render songs and update stats
+      applyFilters();
       
       // Restore scroll position after rendering
       restoreScrollPosition();
@@ -489,6 +500,9 @@
         toggleBtn.classList.remove('active');
         toggleText.textContent = 'Show Only ދިވެހި';
       }
+      
+      // Save toggle state to localStorage
+      localStorage.setItem('showOnlyNoEnglish', showOnlyNoEnglish.toString());
       
       applyFilters();
     }

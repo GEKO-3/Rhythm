@@ -3099,7 +3099,36 @@ Alivileythee birun mey e rooroolanee
 އިބަ الله އަށް ރޯލަމުން އިބަ الله އަށް ރޯލަމުން
 *ކިޔަންފަށާ ހިތާދުލުން
 ނެތޭރަނގަޅު މި ސިކުނޑިއަށް
-*ފެންތިއަޑަށް ނުސިހި ވުމަށް`
+*ފެންތިއަޑަށް ނުސިހި ވުމަށް`,
+
+  englishLyrics: `#M
+Furadhan dhebaive andhirivee
+*Fennthiki adah ma sihiothee
+Ganduvaruthereyga ekanivee
+*Kanuandhiriveema birugathee
+Faraanimave hendhuthee
+*Naamaannkamun gudinulee
+#1
+Gadha aduthakeh ivennfeshee
+*Rangalhah balan nukeri othee
+Gamakah sikundimaa huhtunee
+*Rangalhah lolah maafennanee
+Mulhi endhuvashaa hingannfeshee
+*Gudilannukeri balannothee
+#2
+Ruheykamah yageen vanee
+*Hooreh fadhatha alihuree
+Irugandakuhure gehlunee
+*Hindhukolhaku nethi fennanee
+Hindhukolhaku nethi fennanee
+*Gadharayy kulaiga vidhavidhaa berubehdhi malehge sooravaa
+Gadharayy kulaiga vidhavidhaa
+*Berubehdhi malehge sooravaa
+#3
+Iba الله ah roalamun iba الله ah roalamun
+*Kiyannfashaa hithaadhulun
+Netheyrangalhu mi sikundiah
+*Fennthiadah nusihi vumah`,
 },
 {
   id: 54,
@@ -5381,7 +5410,23 @@ Thakurah hithi aniyaadhee
 އައިސްދޭށޭ އަދު ލޯބިން ޝާހީ
 *ފޮނި ހަދިޔާދޭ ލޮބުވެތި ރާނީ
 ތިއުފާ ނޫނީ ނަފުސު މިނޭދޭ
-*ދެން އަހަރެންވަކި ކީއްހެ ކުރާނީ`
+*ދެން އަހަރެންވަކި ކީއްހެ ކުރާނީ`,
+
+  englishLyrics: `#M
+Fun loayybeh eba aalaavey
+*Meygaa asaru thaazaavey
+Loabivaa zuvaanaa hithuge jazubaatha
+*Kulheligothaa handhaannaavey
+#1
+Saafu thinaazuku moonuge jaadhuvee
+*Loabi asarugaa dheyeba aniyaa
+Lhazuvaan moorithi heelun chaaley
+*Konnfadhabaaey basbunelai fiyaa
+#2
+Aisdheyshey adhu loabin shaahee
+*Foni hadhiyaadhey lobuvethi raanee
+Thiufaa noonee nafusu mineydhey
+*Dhen aharennvaki keehhe kuraanee`,
 },
 {
   id: 106,

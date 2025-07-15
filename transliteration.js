@@ -68,7 +68,7 @@ const vowelConsonants = {
 };
 
 // Shaviyanisukun array - consonants that change "ah" ending to "ަށް"
-const shaviyanisukun = ['m', 'dh', 's'];
+const shaviyanisukun = ['m', 'dh', 's', 'd'];
 
 // Special cases mapping - words that need exact transliteration
 const specialCases = [
@@ -194,6 +194,8 @@ const specialCases = [
     { input: 'shoahukohlaifi', output: 'ޝޯހުކޮއްލައިފި' },
 
     { input: 'enaanaathedhey', output: 'އެނާނާތެދޭ' },
+
+    { input: 'handhaannaavey', output: 'ހަނދާންއާވޭ' },
 
     { input: 'ihvaaladheymee', output: 'އިއްވާލަދޭމީ' },
 
@@ -538,6 +540,8 @@ const specialCases = [
 
     { input: 'ahaaleethee', output: 'އަހާލީތީ' },
 
+    { input: 'balannothee', output: 'ބަލަންއޮތީ' },
+
     { input: 'fahayybalaa', output: 'ފަހަތްބަލާ' },
 
     { input: 'gulshanugaa', output: 'ގުލްޝަނުގާ' },
@@ -706,6 +710,8 @@ const specialCases = [
     { input: 'ehbaarulaa', output: 'އެއްބާރުލާ' },
 
     { input: 'ehkalagoyy', output: 'އެއްކަލަގޮތް' },
+
+    { input: 'hendhuthee', output: 'ހެންދުތީ' },
 
     { input: 'javaahiraa', output: 'ޖަވާހިރާ' },
 
@@ -1003,6 +1009,8 @@ const specialCases = [
     { input: 'nannolhun', output: 'ނަންއޮޅުން' },
 
     { input: 'rahameeru', output: 'ރަހަމީރު' },
+
+    { input: 'rangalhah', output: 'ރަނގަޅަށް' },
 
     { input: 'vedhaahaa', output: 'ވެދާލާ' },
 
@@ -1387,6 +1395,8 @@ const specialCases = [
     { input: 'ahaashe', output: 'އަހާށެ' },
 
     { input: 'dhahtha', output: 'ދައްތަ' },
+
+    { input: 'dheyeba', output: 'ދޭއެބަ' },
 
     { input: 'ehbaaru', output: 'އެއްބާރު' },
 
@@ -2711,6 +2721,7 @@ function performTransliteration(latinText) {
             { pattern: 'andhi', output: 'އަނދި', length: 5 },
             { pattern: 'binmu', output: 'ބިނމު', length: 5 },
             { pattern: 'endhe', output: 'އެނދެ', length: 5 },
+            { pattern: 'endhu', output: 'އެނދު', length: 5 },
             { pattern: 'fundu', output: 'ފުނޑު', length: 5 },{ pattern: 'honda', output: 'ހޮނޑަ', length: 5 },
             { pattern: 'hendu', output: 'ހެނޑު', length: 5 },
             { pattern: 'hingu', output: 'ހިނގު', length: 5 },
@@ -2722,6 +2733,7 @@ function performTransliteration(latinText) {
             { pattern: 'kendi', output: 'ކެނޑި', length: 5 },
             { pattern: 'kendu', output: 'ކެނޑު', length: 5 },
             { pattern: 'kunbu', output: 'ކުނބު', length: 5 },
+            { pattern: 'kundi', output: 'ކުނޑި', length: 5 },
             { pattern: 'landu', output: 'ލަނޑު', length: 5 },
             { pattern: 'bandu', output: 'ބަނޑު', length: 5 },
             { pattern: 'gandu', output: 'ގަނޑު', length: 5 },
@@ -2759,6 +2771,7 @@ function performTransliteration(latinText) {
             { pattern: 'inba', output: 'އިނބަ', length: 4 },
             { pattern: 'ingi', output: 'އިނގި', length: 4 },
             { pattern: 'unba', output: 'އުނބަ', length: 4 },
+            { pattern: 'unga', output: 'އުނގަ', length: 4 },
             { pattern: 'ungu', output: 'އުނގު', length: 4 },];
         
         for (let husPattern of husNoonuPatterns) {
@@ -3736,7 +3749,11 @@ function performTransliteration(latinText) {
     
     // Cleanup logic: Replace ހޭޮ with ހެޔޮ
     dhivehiText = dhivehiText.replace(/ހޭޮ/g, 'ހެޔޮ');
+
+    dhivehiText = dhivehiText.replace(/އްޭ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|އ|$|\s)/g, 'ހޭ');
     
+    dhivehiText = dhivehiText.replace(/އަހ(?=\s|$)/g, 'އަށް');
+
     return dhivehiText;
 }
 

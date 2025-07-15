@@ -386,6 +386,63 @@
     <script src="transliteration.js"></script>
     <script src="reverse-transliteration.js"></script>
     <script>
+        // Transliterate Latin to Thaana function
+        function transliterateToThaana(input) {
+            const map = {
+                'A': 'ާ', 'B': 'ޞ', 'C': 'ޝ', 'D': 'ޑ', 'E': 'ޭ', 'F': 'ﷲ', 'G': 'ޣ', 'H': 'ޙ', 'I': 'ީ', 'J': 'ޛ', 'K': 'ޚ', 'L': 'ޅ', 'M': 'ޟ', 'N': 'ޏ', 'O': 'ޯ', 'P': '÷', 'Q': 'ޤ', 'R': 'ޜ', 'S': 'ށ', 'T': 'ޓ', 'U': 'ޫ', 'V': 'ޥ', 'W': 'ޢ', 'X': 'ޘ', 'Y': 'ޠ', 'Z': 'ޡ',
+                'a': 'ަ', 'b': 'ބ', 'c': 'ޗ', 'd': 'ދ', 'e': 'ެ', 'f': 'ފ', 'g': 'ގ', 'h': 'ހ', 'i': 'ި', 'j': 'ޖ', 'k': 'ކ', 'l': 'ލ', 'm': 'މ', 'n': 'ނ', 'o': 'ޮ', 'p': 'ޕ', 'q': 'ް', 'r': 'ރ', 's': 'ސ', 't': 'ތ', 'u': 'ު', 'v': 'ވ', 'w': 'އ', 'x': '×', 'y': 'ޔ', 'z': 'ޒ'
+            };
+            let thaana = input.split('').map(ch => map[ch] || ch).join('');
+            // Remove forbidden Thaana characters if directly after any forbidden
+            const forbidden = ['ާ','ަ','ް','ޭ','ެ','ޯ','ޮ','ީ','ި','ޫ','ު'];
+            let result = '';
+            for (let i = 0; i < thaana.length; i++) {
+                if (
+                    i > 0 &&
+                    forbidden.includes(thaana[i]) &&
+                    forbidden.includes(thaana[i - 1])
+                ) {
+                    continue; // skip if previous is forbidden
+                }
+                result += thaana[i];
+            }
+            return result;
+        }
+        
+        // Handle Latin to Thaana conversion in the input field
+        function handleDhivehiInput() {
+            const dhivehiInput = document.getElementById('dhivehiInput');
+            let inputTimeout;
+            
+            dhivehiInput.addEventListener('input', function(e) {
+                const inputValue = e.target.value;
+                const cursorPosition = e.target.selectionStart;
+                
+                // Check if the input contains Latin characters that need conversion
+                const hasLatinChars = /[a-zA-Z]/.test(inputValue);
+                
+                if (hasLatinChars) {
+                    // Convert Latin to Thaana
+                    const convertedValue = transliterateToThaana(inputValue);
+                    
+                    // Update the input value
+                    e.target.value = convertedValue;
+                    
+                    // Try to maintain cursor position (approximately)
+                    const newCursorPosition = Math.min(cursorPosition, convertedValue.length);
+                    e.target.setSelectionRange(newCursorPosition, newCursorPosition);
+                }
+                
+                // Save the input and perform live transliteration
+                saveInputText();
+                
+                clearTimeout(inputTimeout);
+                inputTimeout = setTimeout(() => {
+                    performLiveTransliteration();
+                }, 150);
+            });
+        }
+        
         // Auto-save functionality
         function saveInputText() {
             const dhivehiText = document.getElementById('dhivehiInput').value;
@@ -486,21 +543,68 @@
             }
         }
         
+        // Synchronized scrolling functionality
+        function setupSyncScroll() {
+            const dhivehiInput = document.getElementById('dhivehiInput');
+            const englishOutput = document.getElementById('englishOutput');
+            const dhivehiOutput = document.getElementById('dhivehiOutput');
+            
+            let isScrolling = false;
+            let animationId = null;
+            
+            function syncScroll(sourceElement, targetElements) {
+                if (isScrolling) return;
+                
+                isScrolling = true;
+                
+                // Cancel any pending animation
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+                
+                // Use requestAnimationFrame for smooth scrolling
+                animationId = requestAnimationFrame(() => {
+                    // Calculate scroll percentage (handle edge cases)
+                    const maxScroll = sourceElement.scrollHeight - sourceElement.clientHeight;
+                    const scrollPercentage = maxScroll > 0 ? sourceElement.scrollTop / maxScroll : 0;
+                    
+                    // Apply to all target elements
+                    targetElements.forEach(target => {
+                        if (target !== sourceElement) {
+                            const targetMaxScroll = target.scrollHeight - target.clientHeight;
+                            if (targetMaxScroll > 0) {
+                                const targetScrollTop = scrollPercentage * targetMaxScroll;
+                                target.scrollTop = targetScrollTop;
+                            }
+                        }
+                    });
+                    
+                    // Reset flag after animation completes
+                    setTimeout(() => {
+                        isScrolling = false;
+                    }, 16); // ~60fps
+                });
+            }
+            
+            const allTextareas = [dhivehiInput, englishOutput, dhivehiOutput];
+            
+            // Add scroll event listeners to all textareas with passive option for better performance
+            allTextareas.forEach(textarea => {
+                textarea.addEventListener('scroll', function() {
+                    syncScroll(this, allTextareas);
+                }, { passive: true });
+            });
+        }
+        
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
             loadSavedInputText();
             
-            // Auto-save on input
-            document.getElementById('dhivehiInput').addEventListener('input', saveInputText);
+            // Setup Latin to Thaana conversion for Dhivehi input
+            handleDhivehiInput();
             
-            // Live transliteration on input change
-            let inputTimeout;
-            document.getElementById('dhivehiInput').addEventListener('input', function() {
-                clearTimeout(inputTimeout);
-                inputTimeout = setTimeout(() => {
-                    performLiveTransliteration();
-                }, 150); // Very fast response for live transliteration
-            });
+            // Setup synchronized scrolling
+            setupSyncScroll();
             
             // Perform initial transliteration if there's saved text
             if (document.getElementById('dhivehiInput').value.trim()) {

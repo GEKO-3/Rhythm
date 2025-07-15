@@ -590,11 +590,8 @@
           if (!sectionTitle) missingSections.push(child);
         }
       });
-      if (!songName || missingSections.length > 0) {
-        let msg = '';
-        if (!songName) msg += 'Song name is empty.\n';
-        if (missingSections.length > 0) msg += 'One or more section names are empty.';
-        alert(msg);
+      if (missingSections.length > 0) {
+        alert('One or more section names are empty.');
         return;
       }
       // Get next available id from songs.js
