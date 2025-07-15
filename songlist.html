@@ -120,6 +120,25 @@
       background: transparent;
       pointer-events: none;
     }
+    
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ff6b6b;
+      color: white;
+      text-align: center;
+      padding: 5px;
+      font-size: 0.9em;
+      z-index: 200;
+      display: none;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    
+    .offline-indicator.show {
+      display: block;
+    }
     h1 {
       color: var(--primary-color);
       margin-bottom: 0.5em;
@@ -220,7 +239,7 @@
       list-style: none;
       padding: 0;
       margin: 0;
-      margin-top: calc(env(safe-area-inset-top, 0px) + 80px);
+      margin-top: calc(env(safe-area-inset-top, 0px) + 105px);
     }
     ul#song-list li {
       cursor: pointer;
@@ -268,7 +287,7 @@
         padding-bottom: 8px;
       }
       ul#song-list {
-        margin-top: calc(env(safe-area-inset-top, 0px) + 70px);
+        margin-top: calc(env(safe-area-inset-top, 0px) + 95px);
       }
     }
   </style>
@@ -303,9 +322,74 @@
     document.addEventListener('gestureend', function(e) {
       e.preventDefault();
     });
+
+    // Register service worker for offline functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('Service Worker registered successfully:', registration.scope);
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New content available, activate it
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            });
+          })
+          .catch((error) => {
+            console.log('Service Worker registration failed:', error);
+          });
+        
+        // Listen for messages from service worker
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data && event.data.type === 'CACHE_UPDATED') {
+            console.log('Cache updated for files:', event.data.files);
+            // Optionally reload the page or update UI
+          }
+        });
+        
+        // Update cache when online
+        window.addEventListener('online', () => {
+          console.log('Back online - updating cache');
+          updateOfflineStatus();
+          if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({
+              type: 'UPDATE_CACHE',
+              files: ['/songs.js', '/songlist.html', '/lyrics.html']
+            });
+          }
+        });
+        
+        // Handle offline status
+        window.addEventListener('offline', () => {
+          console.log('Gone offline');
+          updateOfflineStatus();
+        });
+        
+        // Initial offline status check
+        updateOfflineStatus();
+      });
+    }
+    
+    function updateOfflineStatus() {
+      const offlineIndicator = document.getElementById('offline-indicator');
+      if (!navigator.onLine) {
+        offlineIndicator.classList.add('show');
+      } else {
+        offlineIndicator.classList.remove('show');
+      }
+    }
   </script>
 </head>
 <body>
+  <div class="offline-indicator" id="offline-indicator">
+    You're offline - Using cached content
+  </div>
   <div class="container">
     <div class="header-search-wrapper">
       <div class="search-container">
