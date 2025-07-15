@@ -253,6 +253,31 @@
       border-color: var(--primary-color);
     }
     
+    .toggle-btn {
+      background: rgba(43, 43, 43, 0.8);
+      color: var(--primary-color);
+      border: 2px solid #444;
+      border-radius: 5px;
+      padding: 12px 16px;
+      font-size: 0.9em;
+      cursor: pointer;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: all 0.3s;
+      white-space: nowrap;
+      min-width: 140px;
+    }
+    
+    .toggle-btn:hover {
+      border-color: var(--primary-color);
+      background: rgba(245, 208, 0, 0.1);
+    }
+    
+    .toggle-btn.active {
+      background: var(--primary-color);
+      color: var(--text-color);
+      border-color: var(--primary-color);
+    }
+    
     .filter-dropdown {
       position: relative;
       display: inline-block;
@@ -356,6 +381,9 @@
     
     <div class="search-container">
       <input type="text" class="search-input" id="searchInput" placeholder="Search songs...">
+      <button class="toggle-btn" id="noEnglishToggle" onclick="toggleNoEnglish()">
+        <span id="toggleText">Show Only ދިވެހި</span>
+      </button>
       <div class="filter-dropdown">
         <button class="filter-btn" onclick="toggleFilter()">🎵</button>
         <div class="filter-content" id="filterContent">
@@ -386,6 +414,7 @@
   <script>
     let filteredSongs = [];
     let currentGenreFilter = 'All';
+    let showOnlyNoEnglish = false;
     
     // Initialize the page
     document.addEventListener('DOMContentLoaded', function() {
@@ -399,18 +428,7 @@
       // Add search functionality
       const searchInput = document.getElementById('searchInput');
       searchInput.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.toLowerCase();
-        filteredSongs = songs.filter(song => 
-          song.name.toLowerCase().includes(searchTerm) ||
-          song.genre.toLowerCase().includes(searchTerm)
-        ).sort((a, b) => a.name.localeCompare(b.name));
-        
-        if (currentGenreFilter !== 'All') {
-          filteredSongs = filteredSongs.filter(song => song.genre === currentGenreFilter);
-        }
-        
-        renderSongs();
-        updateStats();
+        applyFilters();
       });
     });
     
@@ -438,6 +456,42 @@
     
     // Also save scroll position when navigating away
     window.addEventListener('pagehide', saveScrollPosition);
+    
+    function applyFilters() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      // Start with all songs
+      filteredSongs = songs.filter(song => {
+        const matchesSearch = song.name.toLowerCase().includes(searchTerm) ||
+                             song.genre.toLowerCase().includes(searchTerm);
+        
+        const matchesGenre = currentGenreFilter === 'All' || song.genre === currentGenreFilter;
+        
+        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
+        const matchesEnglishFilter = !showOnlyNoEnglish || !hasEnglish;
+        
+        return matchesSearch && matchesGenre && matchesEnglishFilter;
+      }).sort((a, b) => a.name.localeCompare(b.name));
+      
+      renderSongs();
+      updateStats();
+    }
+    
+    function toggleNoEnglish() {
+      showOnlyNoEnglish = !showOnlyNoEnglish;
+      const toggleBtn = document.getElementById('noEnglishToggle');
+      const toggleText = document.getElementById('toggleText');
+      
+      if (showOnlyNoEnglish) {
+        toggleBtn.classList.add('active');
+        toggleText.textContent = 'ދިވެހި Only: ON';
+      } else {
+        toggleBtn.classList.remove('active');
+        toggleText.textContent = 'Show Only ދިވެހި';
+      }
+      
+      applyFilters();
+    }
     
     function renderSongs() {
       const songsList = document.getElementById('songsList');
@@ -490,8 +544,16 @@
       const stats = document.getElementById('stats');
       const totalSongs = filteredSongs.length;
       const songsWithEnglish = filteredSongs.filter(song => song.englishLyrics && song.englishLyrics.trim().length > 0).length;
+      const songsWithoutEnglish = totalSongs - songsWithEnglish;
       
-      stats.textContent = `Showing ${totalSongs} songs (${songsWithEnglish} with English lyrics)`;
+      let statsText = `Showing ${totalSongs} songs`;
+      if (showOnlyNoEnglish) {
+        statsText += ` (ދިވެހި only)`;
+      } else {
+        statsText += ` (${songsWithEnglish} with English, ${songsWithoutEnglish} ދިވެހި only)`;
+      }
+      
+      stats.textContent = statsText;
     }
     
     function toggleFilter() {
@@ -501,24 +563,7 @@
     
     function filterByGenre(genre) {
       currentGenreFilter = genre;
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      
-      if (genre === 'All') {
-        filteredSongs = songs.filter(song => 
-          song.name.toLowerCase().includes(searchTerm) ||
-          song.genre.toLowerCase().includes(searchTerm)
-        ).sort((a, b) => a.name.localeCompare(b.name));
-      } else {
-        filteredSongs = songs.filter(song => {
-          const matchesSearch = song.name.toLowerCase().includes(searchTerm) ||
-                               song.genre.toLowerCase().includes(searchTerm);
-          const matchesGenre = song.genre === genre;
-          return matchesSearch && matchesGenre;
-        }).sort((a, b) => a.name.localeCompare(b.name));
-      }
-      
-      renderSongs();
-      updateStats();
+      applyFilters();
       toggleFilter();
     }
     

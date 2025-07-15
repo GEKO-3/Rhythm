@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Transliteration Cycle - Rhythm</title>
+    
+    <!-- Local font definitions -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+    
+    <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
+    <link rel="manifest" href="favicons/manifest.webmanifest">
+    
+    <style>
+        html, body {
+            touch-action: pan-x pan-y;
+            overscroll-behavior: none;
+        }
+        
+        input, textarea, select, button {
+            touch-action: manipulation;
+        }
+        
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #2b2b2b;
+            --bg-opacity: rgba(31, 31, 31, 0.0);
+            --hover-color2: #3a3a3a;
+            --active-color2: #111111;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            0% { transform: translateY(10px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        body {
+            font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
+            background: #232323;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: #2b2b2b;
+            max-width: 1200px;
+            margin: 40px auto 0 auto;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+            padding: 32px 28px 28px 28px;
+        }
+        
+        h1 {
+            color: #f5d000;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        
+        p {
+            color: #e0e0e0;
+            margin-bottom: 28px;
+            text-align: center;
+        }
+        
+        .back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            z-index: 10;
+        }
+        
+        .back-button:hover {
+            background: var(--hover-color);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: left;
+        }
+        
+        button {
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+        
+        button:hover {
+            background: var(--hover-color);
+        }
+        
+        button:active {
+            background: var(--active-color);
+        }
+        
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .clear-btn:hover {
+            background: #c82333;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .three-column-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .column {
+            display: flex;
+            flex-direction: column;
+            min-height: 650px;
+        }
+        
+        .column h3 {
+            color: #f5d000;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        .step-indicator {
+            background: #444;
+            color: #f5d000;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 550px;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: 2px solid #444;
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: #232323;
+            color: #fff;
+            font-family: inherit;
+            transition: border 0.2s;
+            resize: vertical;
+            min-height: 400px;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #f5d000;
+        }
+        
+        textarea[readonly] {
+            background: #1a1a1a;
+            color: #ffe066;
+        }
+        
+        /* Dhivehi input field */
+        #dhivehiInput {
+            font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+        }
+        
+        /* English output field */
+        #englishOutput {
+            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            font-size: 1rem;
+        }
+        
+        /* Dhivehi re-transliteration field */
+        #dhivehiOutput {
+            font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
+            direction: rtl;
+            text-align: right;
+        }
+        
+        .arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #f5d000;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+        
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .flow-step {
+            background: #444;
+            color: #f5d000;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #f5d000;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e6c200;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 1024px) {
+            .three-column-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .process-flow {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+            
+            .container {
+                margin: 20px auto;
+                padding: 20px 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            textarea {
+                height: 400px;
+                font-size: 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                padding: 15px 10px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            textarea {
+                height: 350px;
+                font-size: 0.95rem;
+                padding: 12px;
+            }
+            
+            .back-button {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="back-button" onclick="window.history.back()">←</button>
+    
+    <div class="container">
+        <h1>Complete Transliteration Cycle</h1>
+        <p>Convert Dhivehi to English and back to Dhivehi to test accuracy</p>
+        
+        <div class="process-flow">
+            <div class="flow-step">Dhivehi Script</div>
+            <div class="arrow">→</div>
+            <div class="flow-step">English/Latin</div>
+            <div class="arrow">→</div>
+            <div class="flow-step">Dhivehi Script</div>
+        </div>
+        
+        <div class="controls">
+            <button class="clear-btn" onclick="clearAll()">Clear All</button>
+            <button id="uploadBtn" onclick="document.getElementById('fileInput').click()">Upload Text File</button>
+            <button onclick="importToEnglishEditor()">Import English Output</button>
+            <button onclick="importToDhivehiEditor()">Import Dhivehi Output</button>
+            <input type="file" id="fileInput" accept=".txt,.text" style="display: none;" onchange="handleFileUpload(event)">
+        </div>
+        
+        <div class="three-column-container">
+            <div class="column">
+                <div class="step-indicator">Step 1: Input</div>
+                <h3>Dhivehi Text (Thaana)</h3>
+                <textarea id="dhivehiInput" placeholder="ތިރީގައިވާ ލިޔެކިޔުން ތަރުޖަމާކުރުމަށް ލިޔުއްވާ..."></textarea>
+            </div>
+            
+            <div class="column">
+                <div class="step-indicator">Step 2: Reverse Translation</div>
+                <h3>English/Latin Output</h3>
+                <textarea id="englishOutput" readonly placeholder="English transliteration will appear here..."></textarea>
+            </div>
+            
+            <div class="column">
+                <div class="step-indicator">Step 3: Re-transliteration</div>
+                <h3>Dhivehi Re-transliteration</h3>
+                <textarea id="dhivehiOutput" readonly placeholder="އިދެއްވުމުގެ ތިރީގައިވާ ނަތީޖާ މިތާނގައި އައިސް ނުވަތަ..."></textarea>
+            </div>
+        </div>
+    </div>
+
+    <script src="transliteration.js"></script>
+    <script src="reverse-transliteration.js"></script>
+    <script>
+        // Auto-save functionality
+        function saveInputText() {
+            const dhivehiText = document.getElementById('dhivehiInput').value;
+            localStorage.setItem('completeTransliteration_dhivehiInput', dhivehiText);
+        }
+        
+        function loadSavedInputText() {
+            const savedText = localStorage.getItem('completeTransliteration_dhivehiInput');
+            if (savedText) {
+                document.getElementById('dhivehiInput').value = savedText;
+            }
+        }
+        
+        // Clear all fields
+        function clearAll() {
+            document.getElementById('dhivehiInput').value = '';
+            document.getElementById('englishOutput').value = '';
+            document.getElementById('dhivehiOutput').value = '';
+            localStorage.removeItem('completeTransliteration_dhivehiInput');
+        }
+        
+        // File upload functionality
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                document.getElementById('dhivehiInput').value = content;
+                saveInputText();
+                // Trigger live transliteration for uploaded content
+                performLiveTransliteration();
+            };
+            reader.readAsText(file, 'UTF-8');
+        }
+        
+        // Import to English Lyrics Editor functionality
+        function importToEnglishEditor() {
+            const englishText = document.getElementById('englishOutput').value;
+            if (!englishText.trim()) {
+                return;
+            }
+            
+            // Clear existing English editor data
+            localStorage.removeItem('englishLyricsEditorData');
+            localStorage.removeItem('englishLyricsEditorSongName');
+            
+            // Save the imported text with URL parameter method
+            const encodedText = encodeURIComponent(englishText);
+            const url = `lyrics-edit-english.html?import=${encodedText}`;
+            
+            // Open the English editor with the imported text
+            window.open(url, '_blank');
+        }
+        
+        // Import to Dhivehi Lyrics Editor functionality
+        function importToDhivehiEditor() {
+            const dhivehiText = document.getElementById('dhivehiOutput').value;
+            if (!dhivehiText.trim()) {
+                return;
+            }
+            
+            // Clear existing Dhivehi editor data
+            localStorage.removeItem('lyricsEditorData');
+            localStorage.removeItem('lyricsEditorSongName');
+            localStorage.removeItem('lyricsEditorGenre');
+            
+            // Save the imported text with URL parameter method
+            const encodedText = encodeURIComponent(dhivehiText);
+            const url = `lyrics-edit.html?import=${encodedText}`;
+            
+            // Open the Dhivehi editor with the imported text
+            window.open(url, '_blank');
+        }
+        
+        // Live transliteration function
+        function performLiveTransliteration() {
+            const dhivehiInput = document.getElementById('dhivehiInput').value;
+            const englishOutput = document.getElementById('englishOutput');
+            const dhivehiOutput = document.getElementById('dhivehiOutput');
+            
+            if (!dhivehiInput.trim()) {
+                // Clear outputs if input is empty
+                englishOutput.value = '';
+                dhivehiOutput.value = '';
+                return;
+            }
+            
+            // Step 1: Dhivehi to English
+            const englishText = reverseTransliterate(dhivehiInput);
+            englishOutput.value = englishText;
+            
+            // Step 2: English back to Dhivehi
+            if (englishText.trim()) {
+                const dhivehiText = performTransliteration(englishText);
+                dhivehiOutput.value = dhivehiText;
+            }
+        }
+        
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSavedInputText();
+            
+            // Auto-save on input
+            document.getElementById('dhivehiInput').addEventListener('input', saveInputText);
+            
+            // Live transliteration on input change
+            let inputTimeout;
+            document.getElementById('dhivehiInput').addEventListener('input', function() {
+                clearTimeout(inputTimeout);
+                inputTimeout = setTimeout(() => {
+                    performLiveTransliteration();
+                }, 150); // Very fast response for live transliteration
+            });
+            
+            // Perform initial transliteration if there's saved text
+            if (document.getElementById('dhivehiInput').value.trim()) {
+                performLiveTransliteration();
+            }
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch(e.key) {
+                    case 'l':
+                        e.preventDefault();
+                        clearAll();
+                        break;
+                    case 'e':
+                        e.preventDefault();
+                        importToEnglishEditor();
+                        break;
+                    case 'd':
+                        e.preventDefault();
+                        importToDhivehiEditor();
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
