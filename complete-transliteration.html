@@ -538,7 +538,7 @@
             
             // Step 2: English back to Dhivehi
             if (englishText.trim()) {
-                const dhivehiText = performTransliteration(englishText);
+                const dhivehiText = transliterateText(englishText);
                 dhivehiOutput.value = dhivehiText;
             }
         }

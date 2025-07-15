@@ -68,7 +68,7 @@ const vowelConsonants = {
 };
 
 // Shaviyanisukun array - consonants that change "ah" ending to "ަށް"
-const shaviyanisukun = ['m', 'dh', 's', 'd'];
+const shaviyanisukun = ['m', 'dh', 's', 'd', 'th'];
 
 // Special cases mapping - words that need exact transliteration
 const specialCases = [
@@ -198,6 +198,8 @@ const specialCases = [
     { input: 'handhaannaavey', output: 'ހަނދާންއާވޭ' },
 
     { input: 'ihvaaladheymee', output: 'އިއްވާލަދޭމީ' },
+
+    { input: 'leygahingaahaa', output: 'ލޭގަހިނގާހާ' },
 
     { input: 'seariouskohhey', output: 'ސީރިއަސްކޮއްހޭ' },
 
@@ -542,7 +544,11 @@ const specialCases = [
 
     { input: 'balannothee', output: 'ބަލަންއޮތީ' },
 
+    { input: 'dhakandhaai', output: 'ދަކަނދާއި' },
+
     { input: 'fahayybalaa', output: 'ފަހަތްބަލާ' },
+
+    { input: 'fehtihindhu', output: 'ފެއްޓިހިނދު' },
 
     { input: 'gulshanugaa', output: 'ގުލްޝަނުގާ' },
 
@@ -996,6 +1002,8 @@ const specialCases = [
 
     { input: 'ivvaidhey', output: 'އިއްވައިދޭ' },
 
+    { input: 'kashikeyo', output: 'ކަށިކެޔޮ' },
+
     { input: 'kulajehun', output: 'ކުލަޖެހުން' },
 
     { input: 'lahanukoh', output: 'ލަހަނުކޮށް' },
@@ -1187,6 +1195,8 @@ const specialCases = [
     { input: 'nuvaahen', output: 'ނުވާހެން' },
     { input: 'roohanee', output: 'ރޫހާނީ' },
     { input: 'shuoorey', output: 'ޝުއޫރޭ' },
+
+    { input: 'ehleemaa', output: 'އެއްލީމާ' },
 
     { input: 'eidmajaa', output: 'އީދުމަޖާ' },
 
@@ -1394,6 +1404,8 @@ const specialCases = [
 
     { input: 'ahaashe', output: 'އަހާށެ' },
 
+    { input: 'ahifalu', output: 'އަހިފަލު' },
+
     { input: 'dhahtha', output: 'ދައްތަ' },
 
     { input: 'dheyeba', output: 'ދޭއެބަ' },
@@ -1402,9 +1414,7 @@ const specialCases = [
 
     { input: 'heyokan', output: 'ހެޔޮކަން' },
 
-    { input: 'ihvaala', output: 'އިއްވާލަ' },
-
-    { input: 'jehumun', output: 'ޖެހުމުން' },
+    { input: 'ihvaala', output: 'އިއްވާލަ' },{ input: 'jehumun', output: 'ޖެހުމުން' },
 
     { input: 'ahsidha', output: 'އައްސިދަ' },
 
@@ -1417,6 +1427,8 @@ const specialCases = [
     { input: 'hiyyvey', output: 'ހިތްވޭ' },
 
     { input: 'hureyey', output: 'ހުރެޔޭ' },
+
+    { input: 'ishguga', output: 'އިޝްގުގަ' },
 
     { input: 'ishguge', output: 'އިޝްޤުގެ' },
 
@@ -1579,6 +1591,8 @@ const specialCases = [
     { input: 'thahey', output: 'ތަހޭ' },{ input: 'namaee', output: 'ނަމައީ' },
 
     { input: 'ehenas', output: 'އެހެނަސް' },
+
+    { input: 'hedhey', output: 'ހެދޭ' },
 
     { input: 'ihsaas', output: 'އިހުސާސް' },
 
@@ -1816,6 +1830,8 @@ const specialCases = [
     { input: 'ehy', output: 'އެހީ' },
     { input: 'goy', output: 'ގޮތް' },
     { input: 'oyy', output: 'އޮތް' },
+
+    { input: 'ahi', output: 'އަހި' },
 
     { input: 'kei', output: 'ކެތް' },
 
@@ -2689,6 +2705,7 @@ function performTransliteration(latinText) {
             { pattern: 'kandoo', output: 'ކަނޑޫ', length: 6 },
             { pattern: 'kendey', output: 'ކެނޑޭ', length: 6 },
             { pattern: 'kuriah', output: 'ކުރިޔަށް', length: 6 },
+            { pattern: 'lhangu', output: 'ޅަނގު', length: 6 },
             { pattern: 'runbaa', output: 'ރުނބާ', length: 6 },
             { pattern: 'thandi', output: 'ތަނޑި', length: 6 },
             { pattern: 'thundi', output: 'ތުނޑި', length: 6 },
@@ -2765,6 +2782,7 @@ function performTransliteration(latinText) {
             { pattern: 'anbi', output: 'އަނބި', length: 4 },
             { pattern: 'anga', output: 'އަނގަ', length: 4 },
             { pattern: 'anbu', output: 'އަނބު', length: 4 },
+            { pattern: 'ango', output: 'އަނގޮ', length: 4 },
             { pattern: 'enbu', output: 'އެނބު', length: 4 },
         
             { pattern: 'engi', output: 'އެނގި', length: 4 },
