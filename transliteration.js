@@ -116,6 +116,10 @@ const specialCases = [
     { input: 'malugevahunndhoa', output: 'މަލުގެވަހުންދޯ' },
     { input: 'roohaneegulhumaa', output: 'ރޫހާނީގުޅުމާ' },
 
+    { input: 'ehandhaannthakey', output: 'އެހަނދާންތަކޭ' },
+
+    { input: 'ehandhaannthekey', output: 'އެހަނދާންތެކޭ' },
+
     { input: 'hiyyheyokamaaeku', output: 'ހިތްހެޔޮކަމާއެކު' },
 
     // 15 characters
@@ -192,6 +196,8 @@ const specialCases = [
     { input: 'enaanaathedhey', output: 'އެނާނާތެދޭ' },
 
     { input: 'ihvaaladheymee', output: 'އިއްވާލަދޭމީ' },
+
+    { input: 'seariouskohhey', output: 'ސީރިއަސްކޮއްހޭ' },
 
     { input: 'thagudheeruhey', output: 'ތަގުދީރުހޭ' },
 
@@ -387,11 +393,15 @@ const specialCases = [
 
     { input: 'heyokamaaeku', output: 'ހެޔޮކަމާއެކު' },
 
+    { input: 'ihuthiraamaa', output: 'އިހުތިރާމާ' },
+
     { input: 'kakeluhulhun', output: 'ކަކެލުހުޅުން' },
 
     { input: 'kakuluhulhun', output: 'ކަކުލުހުޅުން' },
 
     { input: 'kulajehumuge', output: 'ކުލަޖެހުމުގެ' },
+
+    { input: 'nahadhaashey', output: 'ނަހަދާށޭ' },
 
     { input: 'uhmeedhuthah', output: 'އުއްމީދުތައް' },
 
@@ -531,6 +541,8 @@ const specialCases = [
     { input: 'hiyyheyokan', output: 'ހިޔްހެޔޮކަން' },
 
     { input: 'ihvaaladhey', output: 'އިއްވާލަދޭ' },
+
+    { input: 'seariouskoh', output: 'ސީރިއަސްކޮށް' },
 
     { input: 'thagudheeru', output: 'ތަގުދީރު' },
 
@@ -682,6 +694,8 @@ const specialCases = [
     { input: 'dhiyaeehey', output: 'ދިޔައީހޭ' },
     
     { input: 'eedhumajaa', output: 'އީދުމަޖާ' },
+
+    { input: 'ehbaarulaa', output: 'އެއްބާރުލާ' },
 
     { input: 'ehkalagoyy', output: 'އެއްކަލަގޮތް' },
 
@@ -948,6 +962,8 @@ const specialCases = [
 
     { input: 'dhireyhaa', output: 'ދިރޭހާ' },
 
+    { input: 'eloayybaa', output: 'އެލޯތްބާ' },
+
     { input: 'gurahaige', output: 'ގުރަހައިގެ' },
 
     { input: 'heyokamaa', output: 'ހެޔޮކަމާ' },
@@ -964,7 +980,11 @@ const specialCases = [
 
     { input: 'maavaharu', output: 'މާވަހަރު' },
 
+    { input: 'mahshooru', output: 'މައްޝޫރު' },
+
     { input: 'mihaadhen', output: 'މިހާދެން' },
+
+    { input: 'rahameeru', output: 'ރަހަމީރު' },
 
     { input: 'vedhaahaa', output: 'ވެދާލާ' },
 
@@ -1174,7 +1194,11 @@ const specialCases = [
 
     { input: 'maahaulu', output: 'މާހައުލު' },
 
+    { input: 'mahshoor', output: 'މައްޝޫރު' },
+
     { input: 'nahadhaa', output: 'ނަހަދާ' },
+
+    { input: 'searious', output: 'ސީރިއަސް' },
 
     { input: 'uhmeedhu', output: 'އުއްމީދު' },
 
@@ -1340,9 +1364,13 @@ const specialCases = [
     { input: 'unfollow', output: 'އަންފޮލޯ' },
     { input: 'viberves', output: 'ވައިބާވެސް' },
 
+    { input: 'ahaalee', output: 'އަހާލީ' },
+
     { input: 'ahaashe', output: 'އަހާށެ' },
 
     { input: 'dhahtha', output: 'ދައްތަ' },
+
+    { input: 'ehbaaru', output: 'އެއްބާރު' },
 
     { input: 'heyokan', output: 'ހެޔޮކަން' },
 
@@ -2613,6 +2641,7 @@ function performTransliteration(latinText) {
 
             // 7-letter patterns
             { pattern: 'bondhaa', output: 'ބޮނދާ', length: 7 },
+            { pattern: 'dhandoo', output: 'ދަނޑޫ', length: 7 },
             { pattern: 'handhey', output: 'ހަނދޭ', length: 7 },
             { pattern: 'thaanga', output: 'ތާނގަ', length: 7 },
             // 6-letter patterns{ pattern: 'bondha', output: 'ބޮނދަ', length: 6 },
@@ -2671,6 +2700,7 @@ function performTransliteration(latinText) {
             { pattern: 'kanbi', output: 'ކަނބި', length: 5 },
             { pattern: 'kandu', output: 'ކަނޑު', length: 5 },
             { pattern: 'fandu', output: 'ފަނޑު', length: 5 },
+            { pattern: 'kendi', output: 'ކެނޑި', length: 5 },
             { pattern: 'kendu', output: 'ކެނޑު', length: 5 },
             { pattern: 'kunbu', output: 'ކުނބު', length: 5 },
             { pattern: 'landu', output: 'ލަނޑު', length: 5 },
@@ -2708,6 +2738,8 @@ function performTransliteration(latinText) {
         
             { pattern: 'engi', output: 'އެނގި', length: 4 },
             { pattern: 'inba', output: 'އިނބަ', length: 4 },
+            { pattern: 'ingi', output: 'އިނގި', length: 4 },
+            { pattern: 'unba', output: 'އުނބަ', length: 4 },
             { pattern: 'ungu', output: 'އުނގު', length: 4 },];
         
         for (let husPattern of husNoonuPatterns) {
@@ -3632,8 +3664,11 @@ function performTransliteration(latinText) {
     // Cleanup logic: Replace ލޭާ with ލެޔާ (for "leyaa" pattern)
     dhivehiText = dhivehiText.replace(/ލޭާ/g, 'ލެޔާ');
     
-    // Cleanup logic: Replace އްާ at the end of words with ހާ
-    dhivehiText = dhivehiText.replace(/އްާ(?=\s|$)/g, 'ހާ');
+    // Cleanup logic: Replace އްާ followed by consonant or އް with ހާ
+    dhivehiText = dhivehiText.replace(/އްާ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|އް)/g, 'ހާ');
+    
+    // Cleanup logic: Replace އްާ followed by consonant with ހާ
+    dhivehiText = dhivehiText.replace(/އްާ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|އް)/g, 'ހާ');
     
     // Cleanup logic: Replace ޭޔ followed by consonant with ެތް
     dhivehiText = dhivehiText.replace(/ޭޔ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ])/g, 'ެތް');
@@ -3648,13 +3683,40 @@ function performTransliteration(latinText) {
     dhivehiText = dhivehiText.replace(/(?<=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ\u0780-\u07BF])ށް(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ\u0780-\u07BF])/g, 'އް');
     
     // Cleanup logic: Replace އްަ followed by consonant with ހަ
-    dhivehiText = dhivehiText.replace(/އްަ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ])/g, 'ހަ');
+    dhivehiText = dhivehiText.replace(/އްަ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|އް)/g, 'ހަ');
     
     // Cleanup logic: Replace އްު followed by consonant with ހު
-    dhivehiText = dhivehiText.replace(/އްު(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ])/g, 'ހު');
+    dhivehiText = dhivehiText.replace(/އްު(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|އް)/g, 'ހު');
     
     // Cleanup logic: Replace އްެ followed by consonant with ހެ
-    dhivehiText = dhivehiText.replace(/އްެ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ])/g, 'ހެ');
+    dhivehiText = dhivehiText.replace(/އްެ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|އް)/g, 'ހެ');
+    
+    // Cleanup logic: Replace އޮއްޔ followed by consonant or at end of word with އޮތް
+    dhivehiText = dhivehiText.replace(/އޮއްޔ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|$|\s)/g, 'އޮތް');
+    
+    // Cleanup logic: Replace ގޮއްޔ followed by consonant or at end of word with ގޮތް
+    dhivehiText = dhivehiText.replace(/ގޮއްޔ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|$|\s)/g, 'ގޮތް');
+    
+    // Cleanup logic: Replace އްޔ followed by consonant or at end of word with ތް
+    dhivehiText = dhivehiText.replace(/އްޔ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|$|\s)/g, 'ތް');
+    
+    // Cleanup logic: Replace އެހ at the end of words with އިއް
+    dhivehiText = dhivehiText.replace(/އެހ(?=\s|$)/g, 'އެއް');
+    
+    // Cleanup logic: Replace ީ at the end of words when preceded by a Dhivehi vowel with އީ
+    dhivehiText = dhivehiText.replace(/(?<=[ަާިީުޫެޭޮޯ])ީ(?=\s|$)/g, 'އީ');
+    
+    // Cleanup logic: Replace ރޫއްެއް with ރޫހެއް
+    dhivehiText = dhivehiText.replace(/ރޫއްެއް/g, 'ރޫހެއް');
+    
+    // Cleanup logic: Replace ިހ followed by consonant with ިއް
+    dhivehiText = dhivehiText.replace(/ިހ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ])/g, 'ިއް');
+    
+    // Cleanup logic: Replace އްެ followed by consonant or އް with ހެ
+    dhivehiText = dhivehiText.replace(/އްެ(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|އް)/g, 'ހެ');
+    
+    // Cleanup logic: Replace އްި followed by consonant or އް with ހި
+    dhivehiText = dhivehiText.replace(/އްި(?=[ހށނރބޅކވމފދތލގޏސޑޒޓޔޕޖޗޙޚޛޜޝޞޟޠޡޢޣޤޥ]|އް)/g, 'ހި');
     
     return dhivehiText;
 }
