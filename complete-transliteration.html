@@ -427,23 +427,22 @@
                     
                     // Update the input value
                     e.target.value = convertedValue;
-                    
-                    // Try to maintain cursor position (approximately)
-                    const newCursorPosition = Math.min(cursorPosition, convertedValue.length);
-                    e.target.setSelectionRange(newCursorPosition, newCursorPosition);
-                }
-                
-                // Save the input and perform live transliteration
-                saveInputText();
-                
-                clearTimeout(inputTimeout);
-                inputTimeout = setTimeout(() => {
-                    performLiveTransliteration();
-                }, 150);
+                          // Try to maintain cursor position (approximately)
+                const newCursorPosition = Math.min(cursorPosition, convertedValue.length);
+                e.target.setSelectionRange(newCursorPosition, newCursorPosition);
+            }
+            
+            // Save the input to local storage
+            saveInputText();
+            
+            clearTimeout(inputTimeout);
+            inputTimeout = setTimeout(() => {
+                performLiveTransliteration();
+            }, 150);
             });
         }
         
-        // Auto-save functionality
+        // Auto-save functionality - only for Dhivehi input
         function saveInputText() {
             const dhivehiText = document.getElementById('dhivehiInput').value;
             localStorage.setItem('completeTransliteration_dhivehiInput', dhivehiText);
