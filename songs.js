@@ -5896,7 +5896,32 @@ $N
 *ބޭލިސަހޯ ބޭލިސަޔާ
 ބޭލިސަހޯ ބޭލިސަޔާ
 ޓާކުނަޑަރު ސީނާ ވަޑައިގަތީ ސާރަސަޔާ
-ޕެއްޕެލެޕޭ ލެއްޕޭ ލެޕޭލެޕޭ ސާރަސަޔާ`
+ޕެއްޕެލެޕޭ ލެއްޕޭ ލެޕޭލެޕޭ ސާރަސަޔާ`,
+
+  englishLyrics: `#M
+Haarey piyalaaloo baalaamey usaayaa
+*Haarey piyalaaloo baalaamey usaayaa
+#1
+Moaraa chilhiyaa dheyhiyaaeythoa baaloomaa
+*Moaraa chilhiyaa dheyhiyaaeythoa baaloomaa
+Loomaa dhilkaa sahaaree
+*Eyhameyshaa
+Dhilkaa sahaaree
+*Eyhameyshaa
+-
+$M
+Thumakare baeyfumoa
+*Thiyokuna seenaliyaa
+$1
+Dhoasthuboae karikethuboae yoage mutaa dhilsehuvaa
+*Dhoasthuboae karikethuboae yoage mutaa dhilsehuvaa
+Yachadhal meyelaa dhilkemutaa dhilkahuvaa
+*Yachadhal meyelaa dhilkemutaa dhilkahuvaa
+$2
+Beylisahoa beylisayaa
+*Beylisahoa beylisayaa
+Taakunadaru seenaa vadaigathee saarasayaa
+*Pehpelepey lehpey lepeylepey saarasayaa`,
 },
 {
   id: 111,
@@ -6650,7 +6675,7 @@ Mahusharugaaves nufilaanehaa
   genre: 'Nala',
   lyrics: `#M
 ހަނދުނާރާނަމަ ހަނދު އެކުރާ ނަލަ
-*ނަލަ އަލި ކޮންކޮތަކުންތަ ކުރާނީ
+*ނަލަ އަލި ކޮންގޮތަކުންތަ ކުރާނީ
 ނޫރުން އުޖާލާ ވީމާ ދުރާލާ
 *މަގުމަގުގާ ރިހިދޫލަ އެއަޅާލީ
 
@@ -6660,7 +6685,7 @@ Mahusharugaaves nufilaanehaa
 ހިތުގާ އުފާ އޭރުން ހިޔާލީ
 *ހިތުގާ އުފާ އޭރުން ހިޔާލީ
 ހަނދު އެރުމުންނޭ ފޫހި ފިލާނީ
-*ހަނދުނާރާނަމަ ހަނދު އެކުރާ ނަލަ ނަލަ އަލި ކޮންކޮތަކުންތަ ކުރާނީ
+*ހަނދުނާރާނަމަ ހަނދު އެކުރާ ނަލަ ނަލަ އަލި ކޮންގޮތަކުންތަ ކުރާނީ
 
 #2
 ޖާނަށާ ހިތަށް ވާމިއުދާހުން
@@ -6668,7 +6693,7 @@ Mahusharugaaves nufilaanehaa
 ހަނދުވަރުގާ ހުރި އަސަރުންނެ އަލުން
 *ހަނދުވަރުގާ ހުރި އަސަރުންނެ އަލުން
 އާރޯކަން ލިބި ތާޒާވާނީ
-*ހަނދުނާރާނަމަ ހަނދު އެކުރާ ނަލަ ނަލަ އަލި ކޮންކޮތަކުންތަ ކުރާނީ
+*ހަނދުނާރާނަމަ ހަނދު އެކުރާ ނަލަ ނަލަ އަލި ކޮންގޮތަކުންތަ ކުރާނީ
 
 #3
 ފޯރާތީއޭ ނޫރުގެ އަލިކަން
@@ -6676,7 +6701,34 @@ Mahusharugaaves nufilaanehaa
 ރިހިފޭރާމުން ޒީނަތްވެ ނިކަން
 *ރިހިފޭރާމުން ޒީނަތްވެ ނިކަން
 ހިނިތުންވާށޭ ދެންއެފަށާލީ
-*ހަނދުނާރާނަމަ ހަނދު އެކުރާ ނަލަ ނަލަ އަލި ކޮންކޮތަކުންތަ ކުރާނީ`
+*ހަނދުނާރާނަމަ ހަނދު އެކުރާ ނަލަ ނަލަ އަލި ކޮންގޮތަކުންތަ ކުރާނީ`,
+
+  englishLyrics: `#M
+Handhunaaraanama handhu ekuraa nala
+*Nala ali konngothakunntha kuraanee
+Noorun ujaalaa veemaa dhuraalaa
+*Magumagugaa rihidhoola ealhaalee
+#1
+Andhirivaa hindhaku reyengidhaanee
+*Nethima handhuvaru kanndhathivaanee
+Hithugaa ufaa eyrun hiyaalee
+*Hithugaa ufaa eyrun hiyaalee
+Handhu erumunney foohi filaanee
+*Handhunaaraanama handhu ekuraa nala nala ali konngothakunntha kuraanee
+#2
+Jaanashaa hithah vaamiudhaahun
+*Vaadhathikan libifaa huri gaathun
+Handhuvarugaa huri asarunne alun
+*Handhuvarugaa huri asarunne alun
+Aaroakan libi thaazaavaanee
+*Handhunaaraanama handhu ekuraa nala nala ali konngothakunntha kuraanee
+#3
+Foaraatheeey nooruge alikan
+*Aalaavee magugaa huri nalakan
+Rihifeyraamun zeenayyve nikan
+*Rihifeyraamun zeenayyve nikan
+Hinithunnvaashey dhennefashaalee
+*Handhunaaraanama handhu ekuraa nala nala ali konngothakunntha kuraanee`,
 },
 {
   id: 131,
@@ -6697,7 +6749,7 @@ Mahusharugaaves nufilaanehaa
 
 -
 $M
-ވަލުންގެނާ ކޭލެކޭ ކޮއެ ކަނީ
+ވަލުންގެނައި ކޭލެކޭ ކޮއެ ކަނީ
 *ރޯކޭލާ ކައިގެނެ ތަލިތަތްލަނީ
 
 $1
@@ -6708,7 +6760,31 @@ $2
 *ކެޔޮކާން އަވަހަށް ހިނގާ
 ނިކަން ތެއްލައިގެން
 މިތިބަ ޒުވާނުނޭ
-ނިކަން ފޯރީގާ`
+ނިކަން ފޯރީގާ`,
+
+  englishLyrics: `#M
+Hasannbey gudhu aadheyoa
+*Vainolhi dhamaalaafaa
+Beybey gudhu aadheyoa
+*Vainolhi dhamaalaafaa
+#1
+Maabihdhashu valutherey
+*Keyley banbukeylekey
+Raadhandigandaa maha beybey gudhu aadheyoa
+*Raadhandigandaa maha beybey gudhu aadheyoa
+*Vainolhi dhamaalaafaa
+-
+$M
+Valunngenai keylekey koe kanee
+*Roakeylaa kaigene thalithayylanee
+$1
+Vaaney moyavaaney
+*Vaanemihen ulhennyaa
+$2
+*Keyokaan avahah hingaa
+Nikan thehlaigen
+Mithiba zuvaanuney
+Nikan foareegaa`,
 },
 {
   id: 132,
@@ -9281,12 +9357,12 @@ Adhuvisnihjey mihaadhen ma beynumehnethey
 *ކާގަޑީގަ ހޯދަދޭނަމޭ
 ބަރަބޮލާއި ޓަކޫއަކާ ކެކުރިއާއި ކެހެރުއަކާ
 *ސައިގަޑީގަ ހޯދަދޭނަމޭ
-ރީބޮނަޑިންވެސް ކޮއްދޭނަން
+ރީބޮންޑިންވެސް ކޮއްދޭނަން
 *ލޯބިވޭ ހާދަ ސުޒީ އޭ އޫނ އޫނ އޫނ
 
 #2
 ބާތުޑޭގެރާތުގާ ސާތުވީމަ ގާތުގާ
-*ހާތު ހާތު ދެނަގުޅާނަމޭ
+*ހާތު ހާތު ދެންގުޅާނަމޭ
 މާބުރެއްގެ ކުރަނޑިޔާ މާވަރެއްގެ ކިޑުނިޔާ
 *މާރޮނޑެއްގެ ލަގޮނޑިދޭނަމޭ
 ފޭޝަލްވެސް ހައްދަދޭނަން
@@ -9297,8 +9373,33 @@ Adhuvisnihjey mihaadhen ma beynumehnethey
 *ޒިންދަގީގެ ހާލަކީމިއޭ
 އަރުތެރޭން ކަކުނިހިރޭ ވަރުވަރުން މަ އާފުރޭ
 *މަރުބަލީގެ ބޭހަކީތިޔޭ
-ބައިޕާސްވެސް ހައްދްދޭނަން
-*ލޯބިވޭ ހާދަ ސުޒީ އޭ އޫނ އޫނ އޫނ`
+ބައިޕާސްވެސް ހައްދަދޭނަން
+*ލޯބިވޭ ހާދަ ސުޒީ އޭ އޫނ އޫނ އޫނ`,
+
+  englishLyrics: `#M
+Hahsafaharu roveymihaaru loabivey haadhasuzee
+*Loabivey haadha suzee ey oon oon oon
+#1
+Aafalaai mathivakaa kurukuraai thaavakaa
+*Kaagadeega hoadhadheynamey
+Barabolaai takooakaa kekuriaai keheruakaa
+*Saigadeega hoadhadheynamey
+Reebonndinnves kohdheynan
+*Loabivey haadha suzee ey oon oon oon
+#2
+Baathudeygeraathugaa saathuveema gaathugaa
+*Haathu haathu dhenngulhaanamey
+Maaburehge kurandiyaa maavarehge kiduniyaa
+*Maarondehge lagondidheynamey
+Feyshalves hahdhadheynan
+*Loabivey haadha suzee ey oon oon oon
+#3
+Hiyy ameynagaafaa thinnthanunnfahaafaa
+*Zinndhageege haalakeemiey
+Aruthereyn kakunihirey varuvarun ma aafurey
+*Marubaleege beyhakeethiyey
+Baipaasves hahdhadheynan
+*Loabivey haadha suzee ey oon oon oon`,
 },
 {
   id: 193,
@@ -9321,12 +9422,34 @@ Adhuvisnihjey mihaadhen ma beynumehnethey
 *ފޮނުވާނުހޭ
 
 #2
-ފެނޭތޯ ނާޗުރަންގީ ބަލާން މިރޭ
-*ފެނޭތޯ ނާޗުރަންގީ ބަލާން މިރޭ
+ފެނޭތޯ ނާޗުރަންގީ ބަލާލަން މިރޭ
+*ފެނޭތޯ ނާޗުރަންގީ ބަލާލަން މިރޭ
 ބަލާބެލުމައް މި ހަރަކާއްތައް ދެވަރެއްނުވޭ
 *ބަލާބެލުމައް މި ހަރަކާއްތައް ދެވަރެއްނުވޭ
 ބަގިޗާ ދެކިލަންދާން
-*ފޮނުވާނުހޭ`
+*ފޮނުވާނުހޭ`,
+
+  englishLyrics: `#M
+Hageegee loabin sooravaa
+*Poolu kinaaree
+Mabunaa
+*Poolu kinaaree
+Bagichaa dhekilanndhaan
+*Fonuvaanuhey
+#1
+Magey maareethi hulhijehi e laelaa kobaa
+*Magey maareethi hulhijehi e laelaa kobaa
+Eku ekeegaa hingaalannves dhaan beynumey
+*Eku ekeegaa hingaalannves dhaan beynumey
+Bagichaa dhekilanndhaan
+*Fonuvaanuhey
+#2
+Feneythoa naachuranngee balaalan mirey
+*Feneythoa naachuranngee balaan mirey
+Balaabelumah mi harakaayythah dhevarehnuvey
+*Balaabelumah mi harakaahthah dhevarehnuvey
+Bagichaa dhekilanndhaan
+*Fonuvaanuhey`,
 },
 {
   id: 194,
