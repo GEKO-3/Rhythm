@@ -3731,7 +3731,48 @@ $1
 ކާފާ އަހަންމަދު ތުނބުޅީގާ ދެތިން ނުރަ އިނޯ
 *ކާފާ އަހަންމަދު ތުނބުޅީގާ ދެތިން ނުރަ އިނޯ
 ހަލީމަ ގޮސް ބުނީމަދޯ
-*ރަތް ހަރުވާޅު ދައްކާލާ`
+*ރަތް ހަރުވާޅު ދައްކާލާ`,
+
+  englishLyrics: `#M
+Hoadhima kularan vidhaa thoathaa hulhanguge vaigaa udhuhi edhiyaa
+*Loabi nuvaathee mashaa
+*Foohivegennthaa dhiyaa
+#1
+Athugaa hevifaa hifaalaa mithureh kamugaave ulhefaa
+*Athugaa hevifaa hifaalaa mithureh kamugaave ulhefaa
+Ithubaarehneyy kamah muniyaa hathureh kamugaa vegen edhiyaa
+*Loabi nuvaathee mashaa
+#2
+Hithugaa alhu jahsuvaafaa karunain midheloa furaafaa
+*Hithugaa alhu jahsuvaafaa karunain midheloa furaafaa
+Hithugaa gina lahthakeh jahsaa athunujeheyhaa dhurah edhiyaa
+*Loabi nuvaathee mashaa
+#3
+Muhsandhikan nethi dhiyaimaa dhuhkaannthah banndhuveemaa
+*Muhsandhikan nethi dhiyaimaa dhuhkaannthah banndhuveemaa
+Fusmoonaigen rulhin ulhefaa muskulhikamugaa hadhaafa dhiyaa
+*Loabi nuvaathee mashaa
+-
+$M
+Chali rangareethoa
+*Hamaaraa saalunaa
+$1
+Saaluhey rangareethoa
+*Saaluhey rangareethoa
+Ahchaa rangareethoa
+*Hamaaraa saalunaa
+$2
+Rayy haruvaalhu dhahkaalaa bala ahannmadhaa
+*Rayy haruvaalhu dhahkaalaa
+Ey ahannmadhaa
+*Rayy haruvaalhu dhahkaalaa
+$3
+Eesaa ahannmadhu thunbulheegaa dhethin nura inoa
+*Eesaa ahannmadhu thunbulheegaa dhethin nura inoa
+Kaafaa ahannmadhu thunbulheegaa dhethin nura inoa
+*Kaafaa ahannmadhu thunbulheegaa dhethin nura inoa
+Haleema gos buneemadhoa
+*Rayy haruvaalhu dhahkaalaa`,
 },
 {
   id: 62,
@@ -3859,7 +3900,7 @@ $N
 #1
 ސާފުރޭރޭ ނާޒުގާ ރިހިދޫލައެއް ފަތުރާލުމުން
 *ސާފުރޭރޭ ނާޒުގާ ރިހިދޫލައެއް ފަތުރާލުމުން
-ވާވިލާތައް އުދުހެމުން އެކިފޫއްފުށަށް ހެލިލާގޮތުން
+ވާވިލާތައް އުދުހެމުން އެކިފުއްފުށަށް ހެލިލާގޮތުން
 *އާ އާ އާ އާ އާ
 ފެންނަމުންދާ މާތްކަރާމުން ޖަދުލު ކުރަމުންދޭ ޒަމާން
 *ހުސްނުނޫރުން ދިއްލޭ ނޫރުންތާ ދެނީރޫހީ އަރާމް
@@ -3869,7 +3910,7 @@ $N
 *ކަޝްފުވީ މޫރިތިވި ސަހުސޭތޫނު ރިހިއަލިތަކުތެރޭ
 އަދުހެމުން ހުދު ކަބަވިލާތައް ޖައްވުގާ ފަރުދާވުމުން
 *އާ އާ އާ އާ އާ
-ގުދޫރަތުން ގުޅުވާލި ގުލްސަން ދޭއްވި ފަތިހަން އަލީވިލޭ
+ގުދުރަތުން ގުޅުވާލި ގުލްސަން ދޭއްވި ފަތިހަން އަލީވިލޭ
 *ހުސްނުނޫރުން ދިއްލޭ ނޫރުންތާ ދެނީރޫހީ އަރާމް
 
 #3
@@ -3904,9 +3945,30 @@ $N
 
 #3
 ކިތަކައް އަހަރުދޯ ތިޔަމަލައް
-*ފަރިވިފަހުން މިއަދަށް މިވީ
+*ފަރިވީފަހުން މިއަދަށް މިވީ
 ހިތަކައް ލިބެން އޮތް އިރުއެތަން
-*މިތަނުން އެޔަށް ހިތް ނުއެނގިފާ`
+*މިތަނުން އެޔަށް ހިތް ނުއެނގިފާ`,
+
+  englishLyrics: `#M
+Hunnannthavee umurah mihen
+*Hithugaa edhunnvaa nufudhifaa
+Innannthavee karunugetherey
+*Themifoavegenngos foodhifaa
+#1
+Fahedhen netheehey molhu hakeemee
+*Beyhakun faruvaaakun
+Fohelaa dheveyfadha dokutareh
+*Vaa hithuge bahyah ufedhifaa
+#2
+Ey maamelaameli thakutherey
+*Farivaa vaguthugaa dhekilumah
+Emaa bulaakan fahevanee
+*Konnthaakugaahey foadhifaa
+#3
+Kithakah aharudhoa thiyamalah
+*Fariveefahun miadhah mivee
+Hithakah liben oyy iruethan
+*Mithanun eyah hiyy nuengifaa`,
 },
 {
   id: 67,
@@ -5188,10 +5250,8 @@ Anzamaanu hijaazukara belumaa rivethifulhu mujuraa
   name: `Beynumey Beynumey`,
   genre: 'Nala',
   lyrics: `#M
-ފިޔަ ރީތިކަމުންނޭ ނަމުން ގޮވާލީ
-*އޭމަލާ
-ވަސް މީރުކަމުންނޭ ދުރަށް ނުދެވުނީ
-*ބޭނުމޭ ބޭނުމޭ
+ފިޔަ ރީތިކަމުންނޭ ނަމުން ގޮވާލީ އޭމަލާ
+*ވަސް މީރުކަމުންނޭ ދުރަށް ނުދެވުނީ ބޭނުމޭ ބޭނުމޭ
 
 #1
 ފިޔަތަކުގެ ހިޔާވަހިކަން އެދެމޭ
@@ -5211,10 +5271,8 @@ Anzamaanu hijaazukara belumaa rivethifulhu mujuraa
 ކަޅި ހުއްޓިހުރިން ރުހިގެން މަ ކަލާ
 *ހިތުލީމަ ތިމާބިންދެލަން ބޭނުމޭ ބޭނުމޭ`, 
       englishLyrics: `#M
-Fiya reethikamunney namun govaalee
-*Eymalaa
-Vas meerukamunney dhurah nudhevunee
-*Beynumey beynumey
+Fiya reethikamunney namun govaalee eymalaa
+*Vas meerukamunney dhurah nudhevunee beynumey beynumey
 #1
 Fiyathakuge hiyaavahikan edhemey
 *Karuganduge vahaaeku moalhinuvaan
