@@ -518,7 +518,7 @@
           if (navigator.serviceWorker.controller) {
             navigator.serviceWorker.controller.postMessage({
               type: 'UPDATE_CACHE',
-              files: ['/songs.js', '/songlist.html', '/lyrics.html']
+              files: ['/songs.js', '/songlist.html', '/lyrics.html'] // Use original filename
             });
           }
         });
@@ -567,8 +567,25 @@
       <div id="song-lyrics"></div>
     </div>
   </div>
-  <script src="songs.js"></script>
   <script>
+    // Dynamic script loader to hide from sources
+    (function(){
+      // Load script via fetch to hide from sources
+      fetch('/songs.js') // Use original filename for proper caching
+        .then(response => response.text())
+        .then(scriptContent => {
+          // Replace const with window assignment to make it global
+          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+          eval(modifiedScript);
+          // Initialize after songs.js is loaded
+          initializeLyrics();
+        })
+        .catch(error => {
+          console.error('Failed to load songs data:', error);
+        });
+    })();
+    
+    function initializeLyrics() {
     const songTitle = document.getElementById('song-title');
     const songLyrics = document.getElementById('song-lyrics');
     const lyricsTemplate = document.getElementById('lyrics-template');
@@ -576,7 +593,7 @@
     const languageToggle = document.getElementById('language-toggle');
     const toggleSlider = document.getElementById('toggle-slider');
     const selectedId = localStorage.getItem('selectedSongId');
-    const song = songs.find(s => String(s.id) === String(selectedId));
+    const song = window.songs.find(s => String(s.id) === String(selectedId));
     
     let currentLanguage = 'dhivehi'; // Default to Dhivehi
     let englishAvailable = true;
@@ -807,6 +824,7 @@
       languageToggle.classList.add('disabled');
       englishAvailable = false;
     }
+    } // Close initializeLyrics function
   </script>
 </body>
 </html>

@@ -599,7 +599,7 @@
       try {
         // Try to fetch songs.js and parse max id
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', 'songs.js', false); // synchronous
+        xhr.open('GET', '/songs.js', false); // synchronous
         xhr.send(null);
         if (xhr.status === 200) {
           const match = xhr.responseText.match(/id:\s*(\d+)/g);
@@ -857,7 +857,7 @@
     // Populate song name suggestions from songs.js
     let songIdMap = {};
     function populateSongNameSuggestions() {
-      fetch('songs.js')
+      fetch('/songs.js')
         .then(response => response.text())
         .then(jsText => {
           // Extract id and name pairs from the JS file

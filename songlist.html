@@ -360,7 +360,7 @@
           if (navigator.serviceWorker.controller) {
             navigator.serviceWorker.controller.postMessage({
               type: 'UPDATE_CACHE',
-              files: ['/songs.js', '/songlist.html', '/lyrics.html']
+              files: ['/songs.js', '/songlist.html', '/lyrics.html'] // Use original filename
             });
           }
         });
@@ -406,15 +406,65 @@
     </div>
     <ul id="song-list"></ul>
   </div>
-  <script src="songs.js"></script>
   <script>
-    const songList = document.getElementById('song-list');
-    const searchBox = document.getElementById('search-box');
-    const filterBtn = document.getElementById('filter-btn');
-    const filterDropdown = document.querySelector('.filter-dropdown');
-    const filterContent = document.getElementById('filter-content');
-    
+    // Dynamic script loader to hide from sources
     let currentGenreFilter = 'all';
+    let songList, searchBox, filterBtn, filterDropdown, filterContent;
+    
+    (function(){
+      // Load script via fetch to hide from sources
+      fetch('/songs.js') // Use original filename for proper caching
+        .then(response => response.text())
+        .then(scriptContent => {
+          // Replace const with window assignment to make it global
+          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+          eval(modifiedScript);
+          // Initialize after songs.js is loaded
+          initializeSongList();
+        })
+        .catch(error => {
+          console.error('Failed to load songs data:', error);
+        });
+    })();
+    
+    function initializeSongList() {
+      songList = document.getElementById('song-list');
+      searchBox = document.getElementById('search-box');
+      filterBtn = document.getElementById('filter-btn');
+      filterDropdown = document.querySelector('.filter-dropdown');
+      filterContent = document.getElementById('filter-content');
+      
+      updateFilterDropdown();
+      renderList();
+      
+      // Toggle dropdown
+      filterBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        filterDropdown.classList.toggle('show');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function() {
+        filterDropdown.classList.remove('show');
+      });
+
+      searchBox.addEventListener('input', e => {
+        renderList(e.target.value, currentGenreFilter);
+      });
+      
+      // Restore scroll position when page loads
+      window.addEventListener('load', function() {
+        const savedScrollPosition = localStorage.getItem('songListScrollPosition');
+        if (savedScrollPosition !== null) {
+          // Use setTimeout to ensure content is fully rendered before scrolling
+          setTimeout(() => {
+            window.scrollTo(0, parseInt(savedScrollPosition));
+            // Clear the stored position after restoring it
+            localStorage.removeItem('songListScrollPosition');
+          }, 100);
+        }
+      });
+    }
 
     function updateFilterDropdown() {
       // Count songs by genre
@@ -429,7 +479,7 @@
       
       let totalSongs = 0;
       
-      songs.forEach(song => {
+      window.songs.forEach(song => {
         if (song.genre && genreCounts.hasOwnProperty(song.genre)) {
           genreCounts[song.genre]++;
         }
@@ -450,7 +500,7 @@
 
     function renderList(searchFilter = '', genreFilter = 'all') {
       songList.innerHTML = '';
-      songs
+      window.songs
         .filter(song => {
           const matchesSearch = song.name.toLowerCase().includes(searchFilter.toLowerCase());
           const matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
@@ -482,44 +532,13 @@
         });
     }
 
+    // Global functions for onclick handlers
     function setFilter(genre) {
       currentGenreFilter = genre;
       // Keep the filter icon, don't change button text
-      filterDropdown.classList.remove('show');
-      renderList(searchBox.value, currentGenreFilter);
+      document.querySelector('.filter-dropdown').classList.remove('show');
+      renderList(document.getElementById('search-box').value, currentGenreFilter);
     }
-
-    // Toggle dropdown
-    filterBtn.addEventListener('click', function(e) {
-      e.stopPropagation();
-      filterDropdown.classList.toggle('show');
-    });
-
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function() {
-      filterDropdown.classList.remove('show');
-    });
-
-    searchBox.addEventListener('input', e => {
-      renderList(e.target.value, currentGenreFilter);
-    });
-
-    // Initialize
-    updateFilterDropdown();
-    renderList();
-    
-    // Restore scroll position when page loads
-    window.addEventListener('load', function() {
-      const savedScrollPosition = localStorage.getItem('songListScrollPosition');
-      if (savedScrollPosition !== null) {
-        // Use setTimeout to ensure content is fully rendered before scrolling
-        setTimeout(() => {
-          window.scrollTo(0, parseInt(savedScrollPosition));
-          // Clear the stored position after restoring it
-          localStorage.removeItem('songListScrollPosition');
-        }, 100);
-      }
-    });
   </script>
 </body>
 </html>

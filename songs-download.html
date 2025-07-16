@@ -410,8 +410,25 @@
   <!-- Hidden canvas for image generation -->
   <canvas id="lyrics-canvas"></canvas>
 
-  <script src="songs.js"></script>
   <script>
+    // Dynamic script loader to hide from sources
+    (function(){
+      // Load script via fetch to hide from sources
+      fetch('/songs.js') // Use original filename for proper caching
+        .then(response => response.text())
+        .then(scriptContent => {
+          // Replace const with window assignment to make it global
+          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+          eval(modifiedScript);
+          // Initialize after songs.js is loaded
+          initializeSongsDownload();
+        })
+        .catch(error => {
+          console.error('Failed to load songs data:', error);
+        });
+    })();
+    
+    function initializeSongsDownload() {
     let filteredSongs = [];
     let currentGenreFilter = 'All';
     let showOnlyNoEnglish = false;
@@ -472,7 +489,7 @@
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
       
       // Start with all songs
-      filteredSongs = songs.filter(song => {
+      filteredSongs = window.songs.filter(song => {
         const matchesSearch = song.name.toLowerCase().includes(searchTerm) ||
                              song.genre.toLowerCase().includes(searchTerm);
         
@@ -599,7 +616,7 @@
     }
     
     function copyLyrics(songId, language) {
-      const song = songs.find(s => s.id === songId);
+      const song = window.songs.find(s => s.id === songId);
       if (!song) return;
       
       const button = event.target;
@@ -677,7 +694,7 @@
     }
     
     async function downloadLyrics(songId, language) {
-      const song = songs.find(s => s.id === songId);
+      const song = window.songs.find(s => s.id === songId);
       if (!song) return;
       
       const button = event.target;
@@ -1020,6 +1037,7 @@
         }))
       };
     }
+    } // Close initializeSongsDownload function
   </script>
 </body>
 </html>

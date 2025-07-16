@@ -3,7 +3,7 @@ const CORE_FILES = [
   '/',
   '/songlist.html',
   '/lyrics.html',
-  '/songs.js',
+  '/songs.js', // Keep original filename for service worker caching
   '/Fonts/Faruma.ttf',
   '/Fonts/Montserrat-VariableFont_wght.ttf',
   '/src/Filter.png',
