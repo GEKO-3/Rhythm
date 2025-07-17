@@ -822,8 +822,14 @@
           
           // Session is valid if authenticated and less than 3 minutes old
           if (session.authenticated && sessionAge < sessionTimeout) {
-            // Valid session found - skip PIN entry
+            // Valid session found - skip PIN entry and refresh session timestamp
             pinAuthenticated = true;
+            // Refresh session timestamp to extend it
+            const refreshedSession = {
+              timestamp: Date.now(),
+              authenticated: true
+            };
+            localStorage.setItem('pinSession', JSON.stringify(refreshedSession));
             updateLastActivity();
             hidePinOverlay();
             loadSongsData();

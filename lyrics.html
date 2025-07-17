@@ -677,7 +677,7 @@
   <div class="container">
     <h2 id="song-title"></h2>
     <div class="controls-row">
-      <button class="back-button" onclick="window.location.href='songlist.html'">←</button>
+      <button class="back-button" onclick="window.location.href='songlist'">←</button>
       <div class="language-toggle">
         <div class="toggle-switch" id="language-toggle" onclick="toggleLanguage()">
           <div class="toggle-slider" id="toggle-slider">ދިވެހި</div>
@@ -980,8 +980,14 @@
           
           // Session is valid if authenticated and less than 3 minutes old
           if (session.authenticated && sessionAge < sessionTimeout) {
-            // Valid session found - skip PIN entry
+            // Valid session found - skip PIN entry and refresh session timestamp
             pinAuthenticated = true;
+            // Refresh session timestamp to extend it
+            const refreshedSession = {
+              timestamp: Date.now(),
+              authenticated: true
+            };
+            localStorage.setItem('pinSession', JSON.stringify(refreshedSession));
             updateLastActivity();
             hidePinOverlay();
             loadSongsData();
