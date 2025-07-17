@@ -1202,13 +1202,19 @@
     //     });
     // })();
     
-    // Global variables for language toggle
-    let currentLanguage = 'dhivehi';
-    let englishAvailable = true;
-    let songTitle, songLyrics, lyricsTemplate, sectionNavBar, languageToggle, toggleSlider;
-    let currentSong = null;
+    function initializeLyrics() {
+    const songTitle = document.getElementById('song-title');
+    const songLyrics = document.getElementById('song-lyrics');
+    const lyricsTemplate = document.getElementById('lyrics-template');
+    const sectionNavBar = document.getElementById('section-nav-bar');
+    const languageToggle = document.getElementById('language-toggle');
+    const toggleSlider = document.getElementById('toggle-slider');
+    const selectedId = localStorage.getItem('selectedSongId');
+    const song = window.songs.find(s => String(s.id) === String(selectedId));
     
-    // Global toggle function
+    let currentLanguage = 'dhivehi'; // Default to Dhivehi
+    let englishAvailable = true;
+    
     function toggleLanguage() {
       if (!englishAvailable) return; // Don't toggle if English not available
       
@@ -1242,7 +1248,7 @@
       }
       
       // Update lyrics display
-      const lyrics = language === 'dhivehi' ? currentSong.lyrics : currentSong.englishLyrics;
+      const lyrics = language === 'dhivehi' ? song.lyrics : song.englishLyrics;
       const { html, orderedSections } = parseSections(lyrics);
       songLyrics.innerHTML = html;
       
@@ -1264,72 +1270,6 @@
       // Create section overlays
       setTimeout(() => createSectionOverlays(orderedSections), 100);
     }
-    
-    // Global switch function
-    function switchLanguage(language) {
-      if (language === 'english' && !englishAvailable) {
-        return; // Don't switch if no English lyrics available
-      }
-      
-      currentLanguage = language;
-      
-      // Update toggle slider
-      if (language === 'english') {
-        toggleSlider.classList.add('english');
-        toggleSlider.textContent = 'English';
-        toggleSlider.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
-        // Move section nav bar to right
-        sectionNavBar.classList.add('english');
-      } else {
-        toggleSlider.classList.remove('english');
-        toggleSlider.textContent = 'ދިވެހި';
-        toggleSlider.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
-        // Move section nav bar to left
-        sectionNavBar.classList.remove('english');
-      }
-      
-      // Update lyrics display
-      if (currentSong) {
-        const lyrics = language === 'dhivehi' ? currentSong.lyrics : currentSong.englishLyrics;
-        const { html, orderedSections } = parseSections(lyrics);
-        songLyrics.innerHTML = html;
-        
-        // Update text direction and font
-        const lyricsContainer = document.getElementById('lyrics-template');
-        if (language === 'english') {
-          lyricsContainer.style.direction = 'ltr';
-          lyricsContainer.style.textAlign = 'left';
-          lyricsContainer.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
-        } else {
-          lyricsContainer.style.direction = 'rtl';
-          lyricsContainer.style.textAlign = 'right';
-          lyricsContainer.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
-        }
-        
-        // Update navigation buttons
-        renderSectionButtons(orderedSections);
-        
-        // Create section overlays
-        setTimeout(() => createSectionOverlays(orderedSections), 100);
-      }
-    }
-    
-    function initializeLyrics() {
-    songTitle = document.getElementById('song-title');
-    songLyrics = document.getElementById('song-lyrics');
-    lyricsTemplate = document.getElementById('lyrics-template');
-    sectionNavBar = document.getElementById('section-nav-bar');
-    languageToggle = document.getElementById('language-toggle');
-    toggleSlider = document.getElementById('toggle-slider');
-    const selectedId = localStorage.getItem('selectedSongId');
-    const song = window.songs.find(s => String(s.id) === String(selectedId));
-    
-    // Store current song globally
-    currentSong = song;
-    
-    // Reset to default language
-    currentLanguage = 'dhivehi';
-    englishAvailable = true;
     
     function renderSectionButtons(orderedSections) {
       sectionNavBar.innerHTML = '';
