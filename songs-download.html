@@ -429,13 +429,10 @@
     })();
     
     function initializeSongsDownload() {
-    let filteredSongs = [];
-    let currentGenreFilter = 'All';
-    let showOnlyNoEnglish = false;
     
-    // Initialize the page
-    document.addEventListener('DOMContentLoaded', function() {
-      filteredSongs = [...songs].sort((a, b) => a.name.localeCompare(b.name));
+    // Initialize the page immediately or when DOM is ready
+    function initPage() {
+      filteredSongs = [...window.songs].sort((a, b) => a.name.localeCompare(b.name));
       
       // Restore toggle state from localStorage
       const savedToggleState = localStorage.getItem('showOnlyNoEnglish');
@@ -458,7 +455,14 @@
       searchInput.addEventListener('input', function(e) {
         applyFilters();
       });
-    });
+    }
+    
+    // Call initPage immediately if DOM is ready, otherwise wait for it
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPage);
+    } else {
+      initPage();
+    }
     
     // Save scroll position before page unloads
     function saveScrollPosition() {
@@ -1038,6 +1042,387 @@
       };
     }
     } // Close initializeSongsDownload function
+    
+    // Global variables for the functions
+    let filteredSongs = [];
+    let currentGenreFilter = 'All';
+    let showOnlyNoEnglish = false;
+    
+    // Global functions that need to be accessible from onclick handlers
+    function applyFilters() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      // Start with all songs
+      filteredSongs = window.songs.filter(song => {
+        const matchesSearch = song.name.toLowerCase().includes(searchTerm) ||
+                             song.genre.toLowerCase().includes(searchTerm);
+        
+        const matchesGenre = currentGenreFilter === 'All' || song.genre === currentGenreFilter;
+        
+        const matchesEnglish = !showOnlyNoEnglish || 
+                              !song.englishLyrics || 
+                              song.englishLyrics.trim().length === 0;
+        
+        return matchesSearch && matchesGenre && matchesEnglish;
+      });
+      
+      // Sort alphabetically
+      filteredSongs.sort((a, b) => a.name.localeCompare(b.name));
+      
+      renderSongs();
+    }
+    
+    function renderSongs() {
+      const songsContainer = document.getElementById('songs-container');
+      if (!songsContainer) return;
+      
+      songsContainer.innerHTML = '';
+      
+      filteredSongs.forEach(song => {
+        const songDiv = document.createElement('div');
+        songDiv.className = 'song-item';
+        
+        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
+        
+        songDiv.innerHTML = `
+          <div class="song-header">
+            <h3>${song.name}</h3>
+            <span class="genre-badge">${song.genre}</span>
+          </div>
+          <div class="song-actions">
+            <button class="download-btn view-btn" onclick="viewSong(${song.id})">
+              👁️ View
+            </button>
+            <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'dhivehi')">
+              📋 Copy Dhivehi
+            </button>
+            <button class="download-btn download-btn-dhivehi" onclick="downloadLyrics(${song.id}, 'dhivehi')">
+              ⬇️ Download Dhivehi
+            </button>
+            ${hasEnglish ? `
+              <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'english')">
+                📋 Copy English
+              </button>
+              <button class="download-btn download-btn-english" onclick="downloadLyrics(${song.id}, 'english')">
+                ⬇️ Download English
+              </button>
+            ` : ''}
+          </div>
+        `;
+        
+        songsContainer.appendChild(songDiv);
+      });
+      
+      // Update stats
+      const totalSongs = filteredSongs.length;
+      const songsWithEnglish = filteredSongs.filter(song => song.englishLyrics && song.englishLyrics.trim().length > 0).length;
+      const songsWithoutEnglish = totalSongs - songsWithEnglish;
+      
+      const totalSongsEl = document.getElementById('totalSongs');
+      const songsWithEnglishEl = document.getElementById('songsWithEnglish');
+      const songsWithoutEnglishEl = document.getElementById('songsWithoutEnglish');
+      
+      if (totalSongsEl) totalSongsEl.textContent = totalSongs;
+      if (songsWithEnglishEl) songsWithEnglishEl.textContent = songsWithEnglish;
+      if (songsWithoutEnglishEl) songsWithoutEnglishEl.textContent = songsWithoutEnglish;
+    }
+    
+    function toggleNoEnglish() {
+      showOnlyNoEnglish = !showOnlyNoEnglish;
+      const toggleBtn = document.getElementById('noEnglishToggle');
+      toggleBtn.textContent = showOnlyNoEnglish ? 'Show All' : 'No English Only';
+      toggleBtn.style.backgroundColor = showOnlyNoEnglish ? '#4CAF50' : '#f44336';
+      
+      // Save state to localStorage
+      localStorage.setItem('showOnlyNoEnglish', showOnlyNoEnglish);
+      
+      applyFilters();
+    }
+    
+    function toggleFilter() {
+      const filterDropdown = document.getElementById('filterDropdown');
+      filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
+    }
+    
+    function filterByGenre(genre) {
+      currentGenreFilter = genre;
+      document.getElementById('filterDropdown').style.display = 'none';
+      applyFilters();
+    }
+    
+    function viewSong(songId) {
+      localStorage.setItem('selectedSongId', songId);
+      window.location.href = 'lyrics.html';
+    }
+    
+    function copyLyrics(songId, language) {
+      const song = window.songs.find(s => s.id === songId);
+      if (!song) return;
+      
+      const button = event.target;
+      const originalText = button.textContent;
+      
+      let textToCopy = '';
+      
+      if (language === 'dhivehi') {
+        textToCopy = song.lyrics;
+      } else if (language === 'english') {
+        textToCopy = song.englishLyrics || '';
+      }
+      
+      // Clean up the text
+      textToCopy = textToCopy.replace(/#[MR\d]+/g, '').replace(/\*/g, '').trim();
+      
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        button.textContent = 'Copied!';
+        button.style.backgroundColor = '#4CAF50';
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.backgroundColor = '';
+        }, 1500);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+    
+    async function downloadLyrics(songId, language) {
+      const song = window.songs.find(s => s.id === songId);
+      if (!song) return;
+      
+      const button = event.target;
+      const originalText = button.textContent;
+      
+      try {
+        button.textContent = 'Generating...';
+        button.disabled = true;
+        
+        let lyrics = '';
+        if (language === 'dhivehi') {
+          lyrics = song.lyrics;
+        } else if (language === 'english') {
+          lyrics = song.englishLyrics || '';
+        }
+        
+        const canvas = document.getElementById('lyrics-canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Set canvas size and styling
+        canvas.width = 800;
+        canvas.height = 1000;
+        
+        // Background
+        ctx.fillStyle = '#1f1f1f';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Parse and render lyrics
+        const result = parseLyrics(lyrics);
+        
+        // Title
+        ctx.fillStyle = '#f5d000';
+        ctx.font = '24px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(song.name, canvas.width/2, 40);
+        
+        // Language indicator
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '16px Arial';
+        ctx.fillText(language === 'dhivehi' ? 'Dhivehi' : 'English', canvas.width/2, 70);
+        
+        // Render lyrics
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'left';
+        
+        let yPosition = 100;
+        const lineHeight = 20;
+        const maxWidth = canvas.width - 40;
+        
+        result.orderedSections.forEach(section => {
+          const sectionData = result.sections.find(s => s.name === section.name);
+          
+          // Section header
+          ctx.fillStyle = '#f5d000';
+          ctx.font = 'bold 16px Arial';
+          ctx.fillText(section.name, 20, yPosition);
+          yPosition += lineHeight + 10;
+          
+          // Section content
+          ctx.fillStyle = '#ffffff';
+          ctx.font = '14px Arial';
+          
+          sectionData.lines.forEach(line => {
+            const words = line.split(' ');
+            let currentLine = '';
+            
+            words.forEach(word => {
+              const testLine = currentLine + word + ' ';
+              const metrics = ctx.measureText(testLine);
+              
+              if (metrics.width > maxWidth && currentLine !== '') {
+                ctx.fillText(currentLine, 20, yPosition);
+                yPosition += lineHeight;
+                currentLine = word + ' ';
+              } else {
+                currentLine = testLine;
+              }
+            });
+            
+            if (currentLine) {
+              ctx.fillText(currentLine, 20, yPosition);
+              yPosition += lineHeight;
+            }
+          });
+          
+          yPosition += 20; // Space between sections
+        });
+        
+        // Convert to blob and download
+        canvas.toBlob((blob) => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${song.name} - ${language}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        });
+        
+        button.textContent = 'Downloaded!';
+        button.style.backgroundColor = '#4CAF50';
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.backgroundColor = '';
+          button.disabled = false;
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Download failed:', error);
+        button.textContent = 'Error';
+        button.style.backgroundColor = '#f44336';
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.style.backgroundColor = '';
+          button.disabled = false;
+        }, 2000);
+      }
+    }
+    
+    function applyFilters() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      
+      // Start with all songs
+      filteredSongs = window.songs.filter(song => {
+        const matchesSearch = song.name.toLowerCase().includes(searchTerm) ||
+                             song.genre.toLowerCase().includes(searchTerm);
+        
+        const matchesGenre = currentGenreFilter === 'All' || song.genre === currentGenreFilter;
+        
+        const matchesEnglish = !showOnlyNoEnglish || 
+                              !song.englishLyrics || 
+                              song.englishLyrics.trim().length === 0;
+        
+        return matchesSearch && matchesGenre && matchesEnglish;
+      });
+      
+      // Sort alphabetically
+      filteredSongs.sort((a, b) => a.name.localeCompare(b.name));
+      
+      renderSongs();
+    }
+    
+    function renderSongs() {
+      const songsContainer = document.getElementById('songs-container');
+      songsContainer.innerHTML = '';
+      
+      filteredSongs.forEach(song => {
+        const songDiv = document.createElement('div');
+        songDiv.className = 'song-item';
+        
+        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
+        
+        songDiv.innerHTML = `
+          <div class="song-header">
+            <h3>${song.name}</h3>
+            <span class="genre-badge">${song.genre}</span>
+          </div>
+          <div class="song-actions">
+            <button class="download-btn view-btn" onclick="viewSong(${song.id})">
+              👁️ View
+            </button>
+            <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'dhivehi')">
+              📋 Copy Dhivehi
+            </button>
+            <button class="download-btn download-btn-dhivehi" onclick="downloadLyrics(${song.id}, 'dhivehi')">
+              ⬇️ Download Dhivehi
+            </button>
+            ${hasEnglish ? `
+              <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'english')">
+                📋 Copy English
+              </button>
+              <button class="download-btn download-btn-english" onclick="downloadLyrics(${song.id}, 'english')">
+                ⬇️ Download English
+              </button>
+            ` : ''}
+          </div>
+        `;
+        
+        songsContainer.appendChild(songDiv);
+      });
+      
+      // Update stats
+      const totalSongs = filteredSongs.length;
+      const songsWithEnglish = filteredSongs.filter(song => song.englishLyrics && song.englishLyrics.trim().length > 0).length;
+      const songsWithoutEnglish = totalSongs - songsWithEnglish;
+      
+      document.getElementById('totalSongs').textContent = totalSongs;
+      document.getElementById('songsWithEnglish').textContent = songsWithEnglish;
+      document.getElementById('songsWithoutEnglish').textContent = songsWithoutEnglish;
+      
+      // Save scroll position
+      saveScrollPosition();
+    }
+    
+    function parseLyrics(lyrics) {
+      const lines = lyrics.split('\\n');
+      const sections = [];
+      let currentSection = null;
+      
+      lines.forEach(line => {
+        line = line.trim();
+        if (line.startsWith('#')) {
+          // New section
+          if (currentSection) {
+            sections.push(currentSection);
+          }
+          currentSection = {
+            name: line.substring(1).trim(),
+            lines: []
+          };
+        } else if (line && currentSection) {
+          // Add line to current section, removing * markers
+          const cleanLine = line.replace(/^\*/, '').trim();
+          if (cleanLine) {
+            currentSection.lines.push(cleanLine);
+          }
+        }
+      });
+      
+      if (currentSection) {
+        sections.push(currentSection);
+      }
+      
+      // Create ordered sections list
+      const orderedSections = sections.map((section, idx) => ({
+        name: section.name,
+        id: `section-${idx}`
+      }));
+      
+      return {
+        sections: sections,
+        orderedSections: orderedSections
+      };
+    }
   </script>
 </body>
 </html>
