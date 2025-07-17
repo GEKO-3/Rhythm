@@ -1202,109 +1202,7 @@
     //     });
     // })();
     
-    function initializeLyrics() {
-    const songTitle = document.getElementById('song-title');
-    const songLyrics = document.getElementById('song-lyrics');
-    const lyricsTemplate = document.getElementById('lyrics-template');
-    const sectionNavBar = document.getElementById('section-nav-bar');
-    const languageToggle = document.getElementById('language-toggle');
-    const toggleSlider = document.getElementById('toggle-slider');
-    const selectedId = localStorage.getItem('selectedSongId');
-    const song = window.songs.find(s => String(s.id) === String(selectedId));
-    
-    let currentLanguage = 'dhivehi'; // Default to Dhivehi
-    let englishAvailable = true;
-    
-    function toggleLanguage() {
-      if (!englishAvailable) return; // Don't toggle if English not available
-      
-      if (currentLanguage === 'dhivehi') {
-        switchLanguage('english');
-      } else {
-        switchLanguage('dhivehi');
-      }
-    }
-    
-    function switchLanguage(language) {
-      if (language === 'english' && !englishAvailable) {
-        return; // Don't switch if no English lyrics available
-      }
-      
-      currentLanguage = language;
-      
-      // Update toggle slider
-      if (language === 'english') {
-        toggleSlider.classList.add('english');
-        toggleSlider.textContent = 'English';
-        toggleSlider.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
-        // Move section nav bar to right
-        sectionNavBar.classList.add('english');
-      } else {
-        toggleSlider.classList.remove('english');
-        toggleSlider.textContent = 'ދިވެހި';
-        toggleSlider.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
-        // Move section nav bar to left
-        sectionNavBar.classList.remove('english');
-      }
-      
-      // Update lyrics display
-      const lyrics = language === 'dhivehi' ? song.lyrics : song.englishLyrics;
-      const { html, orderedSections } = parseSections(lyrics);
-      songLyrics.innerHTML = html;
-      
-      // Update text direction and font
-      const lyricsContainer = document.getElementById('lyrics-template');
-      if (language === 'english') {
-        lyricsContainer.style.direction = 'ltr';
-        lyricsContainer.style.textAlign = 'left';
-        lyricsContainer.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
-      } else {
-        lyricsContainer.style.direction = 'rtl';
-        lyricsContainer.style.textAlign = 'right';
-        lyricsContainer.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
-      }
-      
-      // Update navigation buttons
-      renderSectionButtons(orderedSections);
-      
-      // Create section overlays
-      setTimeout(() => createSectionOverlays(orderedSections), 100);
-    }
-    
-    function renderSectionButtons(orderedSections) {
-      sectionNavBar.innerHTML = '';
-      orderedSections.forEach((section) => {
-        const btn = document.createElement('button');
-        btn.textContent = section.name;
-        btn.className = section.type === 'yellow' ? 'yellow-btn' : 'white-btn';
-        btn.onclick = function() {
-          const sectionElem = document.getElementById(section.id);
-          if (sectionElem) {
-            // Calculate the position 20px from top
-            const elementPosition = sectionElem.getBoundingClientRect().top + window.pageYOffset;
-            const offsetPosition = elementPosition - 80;
-            
-            window.scrollTo({
-              top: offsetPosition,
-              behavior: 'smooth'
-            });
-            
-            // Flash effect
-            sectionElem.classList.add('flash');
-            btn.classList.add('flash');
-            setTimeout(() => {
-              sectionElem.classList.remove('flash');
-              btn.classList.remove('flash');
-            }, 350);
-          }
-          // Remove active from all buttons of the same type
-          sectionNavBar.querySelectorAll('.' + btn.className).forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-        };
-        sectionNavBar.appendChild(btn);
-      });
-    }
-    
+    // Helper functions for lyrics parsing and section management
     function slugify(text) {
       return text
         .toString()
@@ -1386,6 +1284,40 @@
       return { html: htmlSections.join(''), orderedSections };
     }
 
+    function renderSectionButtons(orderedSections) {
+      window.sectionNavBar.innerHTML = '';
+      orderedSections.forEach((section) => {
+        const btn = document.createElement('button');
+        btn.textContent = section.name;
+        btn.className = section.type === 'yellow' ? 'yellow-btn' : 'white-btn';
+        btn.onclick = function() {
+          const sectionElem = document.getElementById(section.id);
+          if (sectionElem) {
+            // Calculate the position 20px from top
+            const elementPosition = sectionElem.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = elementPosition - 80;
+            
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+            
+            // Flash effect
+            sectionElem.classList.add('flash');
+            btn.classList.add('flash');
+            setTimeout(() => {
+              sectionElem.classList.remove('flash');
+              btn.classList.remove('flash');
+            }, 350);
+          }
+          // Remove active from all buttons of the same type
+          window.sectionNavBar.querySelectorAll('.' + btn.className).forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+        };
+        window.sectionNavBar.appendChild(btn);
+      });
+    }
+
     function createSectionOverlays(orderedSections) {
       // Remove existing overlays
       document.querySelectorAll('.section-name-overlay').forEach(overlay => overlay.remove());
@@ -1395,24 +1327,96 @@
         const sectionElement = document.getElementById(section.id);
         if (sectionElement) {
           const overlay = document.createElement('div');
-          overlay.className = `section-name-overlay ${currentLanguage === 'english' ? 'english' : ''}`;
+          overlay.className = `section-name-overlay ${window.currentLanguage === 'english' ? 'english' : ''}`;
           overlay.textContent = section.name;
           
           // Position overlay relative to the section
           overlay.style.top = (sectionElement.offsetTop) + 'px';
-          overlay.style.left = currentLanguage === 'english' ? 'auto' : (sectionElement.offsetLeft) + 'px';
-          overlay.style.right = currentLanguage === 'english' ? (sectionElement.offsetParent.offsetWidth - sectionElement.offsetLeft - sectionElement.offsetWidth) + 'px' : 'auto';
+          overlay.style.left = window.currentLanguage === 'english' ? 'auto' : (sectionElement.offsetLeft) + 'px';
+          overlay.style.right = window.currentLanguage === 'english' ? (sectionElement.offsetParent.offsetWidth - sectionElement.offsetLeft - sectionElement.offsetWidth) + 'px' : 'auto';
           
           sectionElement.offsetParent.appendChild(overlay);
         }
       });
     }
+    
+    function initializeLyrics() {
+    const songTitle = document.getElementById('song-title');
+    const songLyrics = document.getElementById('song-lyrics');
+    const lyricsTemplate = document.getElementById('lyrics-template');
+    const sectionNavBar = document.getElementById('section-nav-bar');
+    const languageToggle = document.getElementById('language-toggle');
+    const toggleSlider = document.getElementById('toggle-slider');
+    const selectedId = localStorage.getItem('selectedSongId');
+    const song = window.songs.find(s => String(s.id) === String(selectedId));
+    
+    let currentLanguage = 'dhivehi'; // Default to Dhivehi
+    let englishAvailable = true;
+    
+    // Make these variables global so they can be accessed by the toggle function
+    window.currentSong = song;
+    window.currentLanguage = currentLanguage;
+    window.englishAvailable = englishAvailable;
+    window.sectionNavBar = sectionNavBar;
+    window.toggleSlider = toggleSlider;
+    window.songLyrics = songLyrics;
+    window.lyricsTemplate = lyricsTemplate;
+    
+    function switchLanguage(language) {
+      if (language === 'english' && !window.englishAvailable) {
+        return; // Don't switch if no English lyrics available
+      }
+      
+      window.currentLanguage = language;
+      
+      // Update toggle slider
+      if (language === 'english') {
+        window.toggleSlider.classList.add('english');
+        window.toggleSlider.textContent = 'English';
+        window.toggleSlider.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
+        // Move section nav bar to right
+        window.sectionNavBar.classList.add('english');
+      } else {
+        window.toggleSlider.classList.remove('english');
+        window.toggleSlider.textContent = 'ދިވެހި';
+        window.toggleSlider.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
+        // Move section nav bar to left
+        window.sectionNavBar.classList.remove('english');
+      }
+      
+      // Update lyrics display
+      const lyrics = language === 'dhivehi' ? window.currentSong.lyrics : window.currentSong.englishLyrics;
+      const { html, orderedSections } = parseSections(lyrics);
+      window.songLyrics.innerHTML = html;
+      
+      // Update text direction and font
+      const lyricsContainer = document.getElementById('lyrics-template');
+      if (language === 'english') {
+        lyricsContainer.style.direction = 'ltr';
+        lyricsContainer.style.textAlign = 'left';
+        lyricsContainer.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
+      } else {
+        lyricsContainer.style.direction = 'rtl';
+        lyricsContainer.style.textAlign = 'right';
+        lyricsContainer.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
+      }
+      
+      // Update navigation buttons
+      renderSectionButtons(orderedSections);
+      
+      // Create section overlays
+      setTimeout(() => createSectionOverlays(orderedSections), 100);
+    }
+    
+    // Make switchLanguage global
+    window.switchLanguage = switchLanguage;
 
     if (song) {
       songTitle.textContent = song.name;
       
       // Check if English lyrics are available
       englishAvailable = song.englishLyrics && song.englishLyrics.trim() !== '';
+      window.englishAvailable = englishAvailable;
       
       if (!englishAvailable) {
         languageToggle.classList.add('disabled');
@@ -1440,8 +1444,20 @@
       // Disable toggle if song not found
       languageToggle.classList.add('disabled');
       englishAvailable = false;
+      window.englishAvailable = false;
     }
     } // Close initializeLyrics function
+    
+    // Global toggle function that can be called from HTML
+    function toggleLanguage() {
+      if (!window.englishAvailable) return; // Don't toggle if English not available
+      
+      if (window.currentLanguage === 'dhivehi') {
+        window.switchLanguage('english');
+      } else {
+        window.switchLanguage('dhivehi');
+      }
+    }
   </script>
 </body>
 </html>
