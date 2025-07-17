@@ -448,6 +448,118 @@
         border-radius: 5px 0 0 5px;
       }
     }
+    
+    /* PIN Entry Styles */
+    .pin-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #1f1f1f;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    
+    .pin-container {
+      background: rgba(43,43,43,0.9);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      border: 2px solid #444;
+      max-width: 300px;
+      width: 85%;
+    }
+    
+    .pin-title {
+      color: var(--primary-color);
+      font-size: 1.3em;
+      margin-bottom: 25px;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      font-weight: 600;
+    }
+    
+    .pin-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .pin-digit {
+      width: 50px;
+      height: 50px;
+      padding: 0;
+      font-size: 1.5em;
+      text-align: center;
+      border: 2px solid #444;
+      border-radius: 8px;
+      background: #222;
+      color: var(--primary-color);
+      outline: none;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: all 0.3s ease;
+      caret-color: transparent;
+      /* Force numerical keyboard on mobile */
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+    }
+    
+    .pin-digit:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
+      transform: scale(1.05);
+    }
+    
+    .pin-digit.filled {
+      background: rgba(245, 208, 0, 0.1);
+      border-color: var(--primary-color);
+    }
+    
+    .pin-digit.error {
+      border-color: #ff6b6b;
+      animation: shake 0.5s;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+    
+    .pin-error {
+      color: #ff6b6b;
+      font-size: 0.85em;
+      margin-top: 5px;
+      min-height: 18px;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    
+    .pin-overlay.hidden {
+      display: none;
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 400px) {
+      .pin-container {
+        padding: 25px;
+        max-width: 280px;
+      }
+      
+      .pin-digit {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3em;
+      }
+      
+      .pin-inputs {
+        gap: 10px;
+      }
+    }
   </style>
   <script>
     // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
@@ -545,6 +657,19 @@
   </script>
 </head>
 <body>
+  <div class="pin-overlay" id="pin-overlay">
+    <div class="pin-container">
+      <h2 class="pin-title">Enter PIN</h2>
+      <div class="pin-inputs">
+        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-0" maxlength="1" autocomplete="off" />
+        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-1" maxlength="1" autocomplete="off" />
+        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-2" maxlength="1" autocomplete="off" />
+        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-3" maxlength="1" autocomplete="off" />
+      </div>
+      <div class="pin-error" id="pin-error"></div>
+    </div>
+  </div>
+  
   <div class="offline-indicator" id="offline-indicator">
     You're offline - Using cached content
   </div>
@@ -568,8 +693,466 @@
     </div>
   </div>
   <script>
-    // Dynamic script loader to hide from sources
-    (function(){
+    // ===========================================
+    // PIN CONFIGURATION (Easy to change)
+    // ===========================================
+    const pinAuth = 'ODc2NQ=='; // Change this to update PIN
+    
+    // PIN Security Functions
+    function decodePinConfig(encoded) {
+      try {
+        const decoded = atob(encoded);
+        const reversed = decoded.split('').reverse().join('');
+        return reversed.split('').map(Number);
+      } catch (e) {
+        return [0,0,0,0];
+      }
+    }
+    
+    function validatePinStructure(pin) {
+      // Additional validation layer
+      const checksum = pin.reduce((sum, digit) => sum + digit, 0);
+      // Calculate expected checksum based on actual PIN
+      const expectedChecksum = actualPinConfig.reduce((sum, digit) => sum + digit, 0);
+      return checksum === expectedChecksum;
+    }
+    
+    // Get actual PIN configuration
+    const actualPinConfig = decodePinConfig(pinAuth);
+    
+    // PIN Protection System
+    let pinAuthenticated = false;
+    let pinOverlay, pinDigits, pinError;
+    let attemptCount = 0;
+    const maxAttempts = 5;
+    const lockoutDuration = 60 * 60 * 1000; // 1 hour in milliseconds
+    let lockoutTimer = null;
+    
+    // Session timeout system
+    const sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
+    let sessionTimer = null;
+    let lastActivityTime = Date.now();
+    let isPageVisible = true;
+    
+    // Initialize PIN system on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      initializePinSystem();
+      initializeSessionTimeout();
+    });
+    
+    function initializeSessionTimeout() {
+      // Track page visibility
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+          isPageVisible = false;
+          // Start session timeout when page goes out of focus
+          if (pinAuthenticated) {
+            startSessionTimeout();
+          }
+        } else {
+          isPageVisible = true;
+          // Clear session timeout when page comes back into focus
+          clearSessionTimeout();
+          updateLastActivity();
+        }
+      });
+      
+      // Track user activity to reset session timer
+      const activityEvents = ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+      activityEvents.forEach(event => {
+        document.addEventListener(event, updateLastActivity, true);
+      });
+      
+      // For mobile apps, also track window focus/blur
+      window.addEventListener('focus', function() {
+        isPageVisible = true;
+        clearSessionTimeout();
+        updateLastActivity();
+      });
+      
+      window.addEventListener('blur', function() {
+        isPageVisible = false;
+        if (pinAuthenticated) {
+          startSessionTimeout();
+        }
+      });
+    }
+    
+    function updateLastActivity() {
+      lastActivityTime = Date.now();
+      if (pinAuthenticated && !isPageVisible) {
+        // Reset session timeout if user becomes active while page is hidden
+        clearSessionTimeout();
+        startSessionTimeout();
+      }
+    }
+    
+    function startSessionTimeout() {
+      clearSessionTimeout(); // Clear any existing timeout
+      
+      sessionTimer = setTimeout(() => {
+        if (pinAuthenticated && !isPageVisible) {
+          // Session expired - require PIN re-entry
+          expireSession();
+        }
+      }, sessionTimeout);
+    }
+    
+    function clearSessionTimeout() {
+      if (sessionTimer) {
+        clearTimeout(sessionTimer);
+        sessionTimer = null;
+      }
+    }
+    
+    function expireSession() {
+      pinAuthenticated = false;
+      localStorage.removeItem('pinSession');
+      
+      // Clear session timeout
+      clearSessionTimeout();
+      
+      // Show PIN overlay again
+      pinOverlay.classList.remove('hidden');
+      clearPinInputs();
+      
+      // Focus on first digit when user returns
+      setTimeout(() => {
+        pinDigits[0].focus();
+      }, 300);
+      
+      // Show session expired message
+      showPinError('Session expired. Please enter PIN again.');
+      setTimeout(() => {
+        clearPinError();
+      }, 3000);
+    }
+    
+    function initializePinSystem() {
+      pinOverlay = document.getElementById('pin-overlay');
+      pinDigits = [
+        document.getElementById('pin-digit-0'),
+        document.getElementById('pin-digit-1'),
+        document.getElementById('pin-digit-2'),
+        document.getElementById('pin-digit-3')
+      ];
+      pinError = document.getElementById('pin-error');
+      
+      // Check if PIN was previously entered (but still require re-entry)
+      checkPinStatus();
+      
+      // Setup event listeners for each digit input
+      pinDigits.forEach((digit, index) => {
+        digit.addEventListener('input', function(e) {
+          handleDigitInput(e, index);
+        });
+        
+        digit.addEventListener('keydown', function(e) {
+          handleDigitKeydown(e, index);
+        });
+        
+        digit.addEventListener('paste', function(e) {
+          handlePaste(e);
+        });
+        
+        // Mobile focus improvements
+        digit.addEventListener('focus', function() {
+          // Ensure keyboard opens on mobile
+          if (window.innerWidth <= 768) {
+            setTimeout(() => {
+              digit.focus();
+            }, 100);
+          }
+        });
+      });
+      
+      // Auto-focus first digit with delay for mobile
+      setTimeout(() => {
+        pinDigits[0].focus();
+        if (window.innerWidth <= 768) {
+          // Force keyboard to open on mobile
+          pinDigits[0].click();
+        }
+      }, 300);
+    }
+    
+    function handleDigitInput(e, index) {
+      // Check if locked out
+      if (e.target.disabled) return;
+      
+      const value = e.target.value;
+      
+      // Only allow single digit numbers
+      if (!/^\d$/.test(value)) {
+        e.target.value = '';
+        return;
+      }
+      
+      // Clear any previous errors
+      clearPinError();
+      
+      // Mark as filled
+      e.target.classList.add('filled');
+      
+      // Move to next digit
+      if (index < 3) {
+        pinDigits[index + 1].focus();
+      } else {
+        // All digits filled, verify PIN
+        setTimeout(() => verifyPin(), 100);
+      }
+    }
+    
+    function handleDigitKeydown(e, index) {
+      // Check if locked out
+      if (e.target.disabled) return;
+      
+      // Handle backspace
+      if (e.key === 'Backspace') {
+        if (e.target.value === '' && index > 0) {
+          // Move to previous digit if current is empty
+          pinDigits[index - 1].focus();
+          pinDigits[index - 1].value = '';
+          pinDigits[index - 1].classList.remove('filled');
+        } else {
+          // Clear current digit
+          e.target.value = '';
+          e.target.classList.remove('filled');
+        }
+      }
+      
+      // Handle Enter key
+      if (e.key === 'Enter') {
+        verifyPin();
+      }
+      
+      // Handle arrow keys
+      if (e.key === 'ArrowLeft' && index > 0) {
+        pinDigits[index - 1].focus();
+      }
+      if (e.key === 'ArrowRight' && index < 3) {
+        pinDigits[index + 1].focus();
+      }
+    }
+    
+    function handlePaste(e) {
+      e.preventDefault();
+      const pasteData = e.clipboardData.getData('text');
+      
+      // Check if pasted data is 4 digits
+      if (/^\d{4}$/.test(pasteData)) {
+        const digits = pasteData.split('');
+        pinDigits.forEach((digit, index) => {
+          digit.value = digits[index];
+          digit.classList.add('filled');
+        });
+        setTimeout(() => verifyPin(), 100);
+      }
+    }
+    
+    function checkPinStatus() {
+      // Check if currently locked out
+      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
+      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
+        startLockoutTimer(parseInt(lockoutEnd));
+        return;
+      }
+      
+      // Clear any expired lockout
+      if (lockoutEnd && Date.now() >= parseInt(lockoutEnd)) {
+        localStorage.removeItem('pinLockoutEnd');
+        localStorage.removeItem('pinAttemptCount');
+        attemptCount = 0;
+      }
+      
+      // Restore attempt count if not locked out
+      const savedAttempts = localStorage.getItem('pinAttemptCount');
+      if (savedAttempts) {
+        attemptCount = parseInt(savedAttempts);
+      }
+      
+      // Check for existing valid session from songlist.html
+      const sessionData = localStorage.getItem('pinSession');
+      if (sessionData) {
+        try {
+          const session = JSON.parse(sessionData);
+          const sessionAge = Date.now() - session.timestamp;
+          
+          // Session is valid if authenticated and less than 3 minutes old
+          if (session.authenticated && sessionAge < sessionTimeout) {
+            // Valid session found - skip PIN entry
+            pinAuthenticated = true;
+            updateLastActivity();
+            hidePinOverlay();
+            loadSongsData();
+            return;
+          } else {
+            // Session expired, remove it
+            localStorage.removeItem('pinSession');
+          }
+        } catch (e) {
+          // Invalid session data, remove it
+          localStorage.removeItem('pinSession');
+        }
+      }
+      
+      // No valid session - show PIN overlay
+      pinOverlay.classList.remove('hidden');
+    }
+    
+    function startLockout() {
+      const lockoutEnd = Date.now() + lockoutDuration;
+      localStorage.setItem('pinLockoutEnd', lockoutEnd.toString());
+      localStorage.setItem('pinAttemptCount', attemptCount.toString());
+      
+      // Disable all inputs
+      pinDigits.forEach(digit => digit.disabled = true);
+      
+      startLockoutTimer(lockoutEnd);
+    }
+    
+    function startLockoutTimer(lockoutEnd) {
+      function updateLockoutDisplay() {
+        const now = Date.now();
+        const remaining = lockoutEnd - now;
+        
+        if (remaining <= 0) {
+          // Lockout expired
+          clearInterval(lockoutTimer);
+          localStorage.removeItem('pinLockoutEnd');
+          localStorage.removeItem('pinAttemptCount');
+          attemptCount = 0;
+          
+          // Re-enable inputs
+          pinDigits.forEach(digit => digit.disabled = false);
+          clearPinInputs();
+          pinError.textContent = 'Lockout expired. You may try again.';
+          
+          setTimeout(() => {
+            clearPinError();
+            pinDigits[0].focus();
+          }, 2000);
+          
+          return;
+        }
+        
+        // Calculate time remaining
+        const minutes = Math.floor(remaining / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+        
+        showPinError(`Locked out. Try again in ${minutes}m ${seconds}s`);
+      }
+      
+      // Update immediately and then every second
+      updateLockoutDisplay();
+      lockoutTimer = setInterval(updateLockoutDisplay, 1000);
+    }
+    
+    function verifyPin() {
+      const enteredPin = pinDigits.map(digit => digit.value).join('');
+      
+      if (enteredPin.length !== 4) {
+        showPinError('Please enter all 4 digits');
+        return;
+      }
+      
+      // Check if currently locked out
+      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
+      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
+        showPinError('Account is locked. Please wait.');
+        return;
+      }
+      
+      // Convert entered PIN to array for comparison
+      const enteredPinArray = enteredPin.split('').map(Number);
+      
+      // Multi-layer validation
+      const basicMatch = enteredPinArray.every((digit, index) => 
+        digit === actualPinConfig[index]
+      );
+      
+      const structureValid = validatePinStructure(enteredPinArray);
+      
+      if (basicMatch && structureValid) {
+        // Successful authentication
+        pinAuthenticated = true;
+        // Store session with timestamp for cross-page access
+        const sessionData = {
+          timestamp: Date.now(),
+          authenticated: true
+        };
+        localStorage.setItem('pinSession', JSON.stringify(sessionData));
+        
+        // Clear lockout data on success
+        localStorage.removeItem('pinLockoutEnd');
+        localStorage.removeItem('pinAttemptCount');
+        attemptCount = 0;
+        
+        if (lockoutTimer) {
+          clearInterval(lockoutTimer);
+          lockoutTimer = null;
+        }
+        
+        // Update activity time and start session monitoring
+        updateLastActivity();
+        
+        hidePinOverlay();
+        loadSongsData();
+      } else {
+        // Failed authentication
+        attemptCount++;
+        localStorage.setItem('pinAttemptCount', attemptCount.toString());
+        
+        if (attemptCount >= maxAttempts) {
+          // Start lockout
+          startLockout();
+        } else {
+          // Show remaining attempts
+          const remainingAttempts = maxAttempts - attemptCount;
+          showPinError(`Invalid PIN. ${remainingAttempts} attempts remaining.`);
+          clearPinInputs();
+          setTimeout(() => pinDigits[0].focus(), 500);
+        }
+      }
+    }
+    
+    function showPinError(message) {
+      pinError.textContent = message;
+      pinDigits.forEach(digit => {
+        digit.classList.add('error');
+      });
+      setTimeout(() => {
+        pinDigits.forEach(digit => {
+          digit.classList.remove('error');
+        });
+      }, 500);
+    }
+    
+    function clearPinError() {
+      pinError.textContent = '';
+      pinDigits.forEach(digit => {
+        digit.classList.remove('error');
+      });
+    }
+    
+    function clearPinInputs() {
+      pinDigits.forEach(digit => {
+        digit.value = '';
+        digit.classList.remove('filled');
+      });
+    }
+    
+    function hidePinOverlay() {
+      pinOverlay.classList.add('hidden');
+    }
+    
+    function loadSongsData() {
+      // Only load songs after PIN is verified
+      if (!pinAuthenticated) {
+        console.log('PIN not authenticated - blocking song data load');
+        return;
+      }
+      
       // Load script via fetch to hide from sources
       fetch('/songs.js') // Use original filename for proper caching
         .then(response => response.text())
@@ -583,7 +1166,25 @@
         .catch(error => {
           console.error('Failed to load songs data:', error);
         });
-    })();
+    }
+    
+    // Dynamic script loader to hide from sources
+    // Remove the immediate execution - now controlled by PIN
+    // (function(){
+    //   // Load script via fetch to hide from sources
+    //   fetch('/songs.js') // Use original filename for proper caching
+    //     .then(response => response.text())
+    //     .then(scriptContent => {
+    //       // Replace const with window assignment to make it global
+    //       const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+    //       eval(modifiedScript);
+    //       // Initialize after songs.js is loaded
+    //       initializeLyrics();
+    //     })
+    //     .catch(error => {
+    //       console.error('Failed to load songs data:', error);
+    //     });
+    // })();
     
     function initializeLyrics() {
     const songTitle = document.getElementById('song-title');

@@ -566,6 +566,12 @@
     const lockoutDuration = 60 * 60 * 1000; // 1 hour in milliseconds
     let lockoutTimer = null;
     
+    // Session timeout system
+    const sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
+    let sessionTimer = null;
+    let lastActivityTime = Date.now();
+    let isPageVisible = true;
+    
     // Dynamic script loader to hide from sources
     let currentGenreFilter = 'all';
     let songList, searchBox, filterBtn, filterDropdown, filterContent;
@@ -573,7 +579,96 @@
     // Initialize PIN system on page load
     document.addEventListener('DOMContentLoaded', function() {
       initializePinSystem();
+      initializeSessionTimeout();
     });
+    
+    function initializeSessionTimeout() {
+      // Track page visibility
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+          isPageVisible = false;
+          // Start session timeout when page goes out of focus
+          if (pinAuthenticated) {
+            startSessionTimeout();
+          }
+        } else {
+          isPageVisible = true;
+          // Clear session timeout when page comes back into focus
+          clearSessionTimeout();
+          updateLastActivity();
+        }
+      });
+      
+      // Track user activity to reset session timer
+      const activityEvents = ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+      activityEvents.forEach(event => {
+        document.addEventListener(event, updateLastActivity, true);
+      });
+      
+      // For mobile apps, also track window focus/blur
+      window.addEventListener('focus', function() {
+        isPageVisible = true;
+        clearSessionTimeout();
+        updateLastActivity();
+      });
+      
+      window.addEventListener('blur', function() {
+        isPageVisible = false;
+        if (pinAuthenticated) {
+          startSessionTimeout();
+        }
+      });
+    }
+    
+    function updateLastActivity() {
+      lastActivityTime = Date.now();
+      if (pinAuthenticated && !isPageVisible) {
+        // Reset session timeout if user becomes active while page is hidden
+        clearSessionTimeout();
+        startSessionTimeout();
+      }
+    }
+    
+    function startSessionTimeout() {
+      clearSessionTimeout(); // Clear any existing timeout
+      
+      sessionTimer = setTimeout(() => {
+        if (pinAuthenticated && !isPageVisible) {
+          // Session expired - require PIN re-entry
+          expireSession();
+        }
+      }, sessionTimeout);
+    }
+    
+    function clearSessionTimeout() {
+      if (sessionTimer) {
+        clearTimeout(sessionTimer);
+        sessionTimer = null;
+      }
+    }
+    
+    function expireSession() {
+      pinAuthenticated = false;
+      localStorage.removeItem('pinSession');
+      
+      // Clear session timeout
+      clearSessionTimeout();
+      
+      // Show PIN overlay again
+      pinOverlay.classList.remove('hidden');
+      clearPinInputs();
+      
+      // Focus on first digit when user returns
+      setTimeout(() => {
+        pinDigits[0].focus();
+      }, 300);
+      
+      // Show session expired message
+      showPinError('Session expired. Please enter PIN again.');
+      setTimeout(() => {
+        clearPinError();
+      }, 3000);
+    }
     
     function initializePinSystem() {
       pinOverlay = document.getElementById('pin-overlay');
@@ -718,7 +813,32 @@
         attemptCount = parseInt(savedAttempts);
       }
       
-      // Always show PIN overlay - user must enter PIN every time
+      // Check for existing valid session 
+      const sessionData = localStorage.getItem('pinSession');
+      if (sessionData) {
+        try {
+          const session = JSON.parse(sessionData);
+          const sessionAge = Date.now() - session.timestamp;
+          
+          // Session is valid if authenticated and less than 3 minutes old
+          if (session.authenticated && sessionAge < sessionTimeout) {
+            // Valid session found - skip PIN entry
+            pinAuthenticated = true;
+            updateLastActivity();
+            hidePinOverlay();
+            loadSongsData();
+            return;
+          } else {
+            // Session expired, remove it
+            localStorage.removeItem('pinSession');
+          }
+        } catch (e) {
+          // Invalid session data, remove it
+          localStorage.removeItem('pinSession');
+        }
+      }
+      
+      // No valid session - show PIN overlay
       pinOverlay.classList.remove('hidden');
     }
     
@@ -798,7 +918,12 @@
       if (basicMatch && structureValid) {
         // Successful authentication
         pinAuthenticated = true;
-        localStorage.setItem('pinSession', Date.now().toString());
+        // Store session with timestamp for cross-page access
+        const sessionData = {
+          timestamp: Date.now(),
+          authenticated: true
+        };
+        localStorage.setItem('pinSession', JSON.stringify(sessionData));
         
         // Clear lockout data on success
         localStorage.removeItem('pinLockoutEnd');
@@ -809,6 +934,9 @@
           clearInterval(lockoutTimer);
           lockoutTimer = null;
         }
+        
+        // Update activity time and start session monitoring
+        updateLastActivity();
         
         hidePinOverlay();
         loadSongsData();
