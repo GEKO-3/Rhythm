@@ -572,6 +572,9 @@
     let lastActivityTime = Date.now();
     let isPageVisible = true;
     
+    // Note: Using sessionStorage instead of localStorage for PIN session
+    // This ensures users must re-enter PIN when browser/app is completely closed
+    
     // Dynamic script loader to hide from sources
     let currentGenreFilter = 'all';
     let songList, searchBox, filterBtn, filterDropdown, filterContent;
@@ -649,7 +652,7 @@
     
     function expireSession() {
       pinAuthenticated = false;
-      localStorage.removeItem('pinSession');
+      sessionStorage.removeItem('pinSession');
       
       // Clear session timeout
       clearSessionTimeout();
@@ -814,7 +817,7 @@
       }
       
       // Check for existing valid session 
-      const sessionData = localStorage.getItem('pinSession');
+      const sessionData = sessionStorage.getItem('pinSession');
       if (sessionData) {
         try {
           const session = JSON.parse(sessionData);
@@ -829,18 +832,18 @@
               timestamp: Date.now(),
               authenticated: true
             };
-            localStorage.setItem('pinSession', JSON.stringify(refreshedSession));
+            sessionStorage.setItem('pinSession', JSON.stringify(refreshedSession));
             updateLastActivity();
             hidePinOverlay();
             loadSongsData();
             return;
           } else {
             // Session expired, remove it
-            localStorage.removeItem('pinSession');
+            sessionStorage.removeItem('pinSession');
           }
         } catch (e) {
           // Invalid session data, remove it
-          localStorage.removeItem('pinSession');
+          sessionStorage.removeItem('pinSession');
         }
       }
       
@@ -929,7 +932,7 @@
           timestamp: Date.now(),
           authenticated: true
         };
-        localStorage.setItem('pinSession', JSON.stringify(sessionData));
+        sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
         
         // Clear lockout data on success
         localStorage.removeItem('pinLockoutEnd');
@@ -1138,7 +1141,7 @@
                 timestamp: Date.now(),
                 authenticated: true
               };
-              localStorage.setItem('pinSession', JSON.stringify(sessionData));
+              sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
             }
             window.location.href = 'lyrics';
           };
