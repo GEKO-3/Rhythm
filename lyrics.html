@@ -1234,14 +1234,24 @@
         return;
       }
       
-      // Load script via fetch to hide from sources
+      // Load songs.js first, then showlist.js
       fetch('/songs.js') // Use original filename for proper caching
         .then(response => response.text())
         .then(scriptContent => {
           // Replace const with window assignment to make it global
           const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
           eval(modifiedScript);
-          // Initialize after songs.js is loaded
+          
+          // Now load showlist.js
+          return fetch('/showlist.js');
+        })
+        .then(response => response.text())
+        .then(showlistContent => {
+          // Replace const with window assignment to make it global
+          const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
+          eval(modifiedShowlist);
+          
+          // Initialize after both files are loaded
           initializeLyrics();
         })
         .catch(error => {

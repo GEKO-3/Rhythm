@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Show List Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Local font definitions -->
+  <style>
+    @font-face {
+      font-family: 'Faruma';
+      src: url('Fonts/Faruma.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+  </style>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
+  
+  <style>
+    :root {
+      --primary-color: #f5d000;
+      --hover-color: #fced98;
+      --active-color: #E6B800;
+      --text-color: #2b2b2b;
+      --bg-color: #1f1f1f;
+      --card-bg: rgba(43,43,43,0.7);
+      --border-color: #444;
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--primary-color);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      touch-action: pan-x pan-y;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border-radius: 15px;
+      padding: 25px;
+      border: 2px solid var(--border-color);
+    }
+    
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 30px;
+      font-size: 2em;
+    }
+    
+    .back-button {
+      display: inline-block;
+      background: var(--primary-color);
+      color: var(--text-color);
+      padding: 8px 16px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .back-button:hover {
+      background: var(--hover-color);
+    }
+    
+    .input-section {
+      margin-bottom: 30px;
+    }
+    
+    .input-group {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      background: #222;
+      color: var(--primary-color);
+      font-size: 16px;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    
+    .search-input:focus {
+      border-color: var(--primary-color);
+    }
+    
+    .suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #222;
+      border: 2px solid var(--border-color);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+    
+    .suggestion-item {
+      padding: 12px;
+      cursor: pointer;
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.2s;
+    }
+    
+    .suggestion-item:hover {
+      background: var(--hover-color);
+      color: var(--text-color);
+    }
+    
+    .suggestion-item:last-child {
+      border-bottom: none;
+    }
+    
+    .controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      font-size: 14px;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+    
+    .btn-primary {
+      background: var(--primary-color);
+      color: var(--text-color);
+    }
+    
+    .btn-primary:hover {
+      background: var(--hover-color);
+    }
+    
+    .btn-secondary {
+      background: #555;
+      color: var(--primary-color);
+    }
+    
+    .btn-secondary:hover {
+      background: #666;
+    }
+    
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    
+    .btn-danger:hover {
+      background: #c82333;
+    }
+    
+    .song-list {
+      min-height: 120px;
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+    }
+    
+    .song-list.empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #888;
+      font-style: italic;
+    }
+    
+    .song-tile {
+      background: var(--primary-color);
+      color: var(--text-color);
+      padding: 10px 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: move;
+      user-select: none;
+      font-weight: bold;
+      transition: all 0.3s;
+      position: relative;
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .song-tile .song-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    
+    .song-tile:hover {
+      background: var(--hover-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
+    
+    .song-tile.dragging {
+      opacity: 0.5;
+      transform: rotate(5deg);
+    }
+    
+    .song-tile .remove-btn {
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s;
+      flex-shrink: 0;
+    }
+    
+    .song-tile .remove-btn:hover {
+      background: #c82333;
+    }
+    
+    .song-tile .drag-handle {
+      cursor: grab;
+      color: var(--text-color);
+      font-size: 14px;
+    }
+    
+    .song-tile .drag-handle:active {
+      cursor: grabbing;
+    }
+    
+    .output-section {
+      margin-top: 20px;
+    }
+    
+    .output-textarea {
+      width: 100%;
+      height: 120px;
+      padding: 15px;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      background: #222;
+      color: var(--primary-color);
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 15px;
+    }
+    
+    .copy-feedback {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #28a745;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      z-index: 2000;
+      opacity: 0;
+      transform: translateX(100px);
+      transition: all 0.3s;
+    }
+    
+    .copy-feedback.show {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    
+    .stats {
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .stats strong {
+      color: var(--primary-color);
+    }
+    
+    /* Mobile-specific styles */
+    @media (max-width: 768px) {
+      body {
+        padding: 10px;
+      }
+      
+      .container {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      .controls {
+        justify-content: center;
+      }
+      
+      .btn {
+        padding: 12px 16px;
+        font-size: 16px;
+      }
+      
+      .song-tile {
+        padding: 12px;
+        font-size: 14px;
+      }
+      
+      .song-tile .drag-handle {
+        font-size: 16px;
+      }
+      
+      .song-list {
+        min-height: 100px;
+        gap: 6px;
+      }
+    }
+    
+    /* Touch-friendly drag indicators */
+    @media (hover: none) {
+      .song-tile {
+        padding: 12px;
+      }
+      
+      .song-tile .drag-handle::before {
+        content: "≡";
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="admin.html" class="back-button">← Back to Admin</a>
+    
+    <h1>Show List Generator</h1>
+    
+    <div class="stats">
+      <strong>Total Available Songs:</strong> <span id="total-songs">0</span> | 
+      <strong>Songs in List:</strong> <span id="list-count">0</span>
+    </div>
+    
+    <div class="input-section">
+      <div class="input-group">
+        <label for="song-search">Search and Add Songs:</label>
+        <input type="text" id="song-search" class="search-input" placeholder="Type song name to search...">
+        <div class="suggestions" id="suggestions"></div>
+      </div>
+      
+      <div class="controls">
+        <button class="btn btn-secondary" onclick="clearList()">Clear All</button>
+        <button class="btn btn-primary" onclick="copyToClipboard()">Copy to Clipboard</button>
+      </div>
+    </div>
+    
+    <div class="song-list" id="song-list">
+      <div class="empty">Search above to add songs - they'll appear here in a column</div>
+    </div>
+  </div>
+  
+  <div class="copy-feedback" id="copy-feedback">Copied to clipboard!</div>
+  
+  <script>
+    let availableSongs = [];
+    let currentList = [];
+    let draggedElement = null;
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let isDragging = false;
+    
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadSongs();
+      setupEventListeners();
+      loadProgress();
+    });
+    
+    // Load songs from songs.js
+    function loadSongs() {
+      fetch('/songs.js')
+        .then(response => response.text())
+        .then(scriptContent => {
+          // Replace const with window assignment to make it global
+          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+          eval(modifiedScript);
+          
+          availableSongs = window.songs.map(song => song.name).sort();
+          document.getElementById('total-songs').textContent = availableSongs.length;
+          
+          console.log('Loaded', availableSongs.length, 'songs');
+        })
+        .catch(error => {
+          console.error('Failed to load songs:', error);
+          alert('Failed to load songs. Please make sure songs.js is accessible.');
+        });
+    }
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      const searchInput = document.getElementById('song-search');
+      const suggestions = document.getElementById('suggestions');
+      
+      searchInput.addEventListener('input', function() {
+        const query = this.value.toLowerCase().trim();
+        
+        if (query.length === 0) {
+          suggestions.style.display = 'none';
+          return;
+        }
+        
+        const matches = availableSongs.filter(song => 
+          song.toLowerCase().includes(query) && 
+          !currentList.includes(song)
+        ).slice(0, 10);
+        
+        if (matches.length === 0) {
+          suggestions.style.display = 'none';
+          return;
+        }
+        
+        suggestions.innerHTML = matches.map(song => 
+          `<div class="suggestion-item" onclick="addSong('${song.replace(/'/g, "\\'")}')">${song}</div>`
+        ).join('');
+        
+        suggestions.style.display = 'block';
+      });
+      
+      // Hide suggestions when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.input-group')) {
+          suggestions.style.display = 'none';
+        }
+      });
+      
+      // Handle enter key in search
+      searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          const query = this.value.trim();
+          const exactMatch = availableSongs.find(song => 
+            song.toLowerCase() === query.toLowerCase() && 
+            !currentList.includes(song)
+          );
+          
+          if (exactMatch) {
+            addSong(exactMatch);
+            this.value = '';
+            suggestions.style.display = 'none';
+          }
+        }
+      });
+    }
+    
+    // Add a song to the list
+    function addSong(songName) {
+      if (currentList.includes(songName)) {
+        // Show brief feedback that song is already in list
+        const feedback = document.getElementById('copy-feedback');
+        feedback.textContent = 'Song already in list!';
+        feedback.style.background = '#ffc107';
+        feedback.style.color = '#000';
+        feedback.classList.add('show');
+        setTimeout(() => {
+          feedback.classList.remove('show');
+          feedback.textContent = 'Copied to clipboard!';
+          feedback.style.background = '#28a745';
+          feedback.style.color = 'white';
+        }, 1500);
+        return;
+      }
+      
+      currentList.push(songName);
+      updateDisplay();
+      saveProgress();
+      
+      // Clear search input
+      document.getElementById('song-search').value = '';
+      document.getElementById('suggestions').style.display = 'none';
+    }
+    
+    // Remove a song from the list
+    function removeSong(index) {
+      currentList.splice(index, 1);
+      updateDisplay();
+      saveProgress();
+    }
+    
+    // Update the display
+    function updateDisplay() {
+      const songList = document.getElementById('song-list');
+      const listCount = document.getElementById('list-count');
+      
+      listCount.textContent = currentList.length;
+      
+      if (currentList.length === 0) {
+        songList.innerHTML = '<div class="empty">Search above to add songs - they\'ll appear here in a column</div>';
+        songList.classList.add('empty');
+        return;
+      }
+      
+      songList.classList.remove('empty');
+      songList.innerHTML = currentList.map((song, index) => `
+        <div class="song-tile" draggable="true" data-index="${index}">
+          <div class="song-content">
+            <span class="drag-handle" ${isMobile() ? 'style="touch-action: none;"' : ''}>⋮⋮</span>
+            <span class="song-name">${song}</span>
+          </div>
+          <button class="remove-btn" onclick="removeSong(${index})" title="Remove">×</button>
+        </div>
+      `).join('');
+      
+      // Setup drag and drop
+      setupDragAndDrop();
+    }
+    
+    // Setup drag and drop functionality
+    function setupDragAndDrop() {
+      const tiles = document.querySelectorAll('.song-tile');
+      
+      tiles.forEach(tile => {
+        // Desktop drag and drop
+        tile.addEventListener('dragstart', handleDragStart);
+        tile.addEventListener('dragover', handleDragOver);
+        tile.addEventListener('drop', handleDrop);
+        tile.addEventListener('dragend', handleDragEnd);
+        
+        // Mobile touch events
+        if (isMobile()) {
+          tile.addEventListener('touchstart', handleTouchStart, {passive: false});
+          tile.addEventListener('touchmove', handleTouchMove, {passive: false});
+          tile.addEventListener('touchend', handleTouchEnd, {passive: false});
+        }
+      });
+    }
+    
+    // Desktop drag handlers
+    function handleDragStart(e) {
+      draggedElement = this;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/html', this.outerHTML);
+    }
+    
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      
+      const afterElement = getDragAfterElement(document.getElementById('song-list'), e.clientY);
+      if (afterElement == null) {
+        document.getElementById('song-list').appendChild(draggedElement);
+      } else {
+        document.getElementById('song-list').insertBefore(draggedElement, afterElement);
+      }
+    }
+    
+    function handleDrop(e) {
+      e.preventDefault();
+      updateListOrder();
+    }
+    
+    function handleDragEnd(e) {
+      this.classList.remove('dragging');
+      draggedElement = null;
+    }
+    
+    // Mobile touch handlers
+    function handleTouchStart(e) {
+      if (!e.target.closest('.drag-handle')) return;
+      
+      e.preventDefault();
+      draggedElement = this;
+      isDragging = true;
+      
+      const touch = e.touches[0];
+      touchStartY = touch.clientY;
+      touchStartX = touch.clientX;
+      
+      this.classList.add('dragging');
+    }
+    
+    function handleTouchMove(e) {
+      if (!isDragging || !draggedElement) return;
+      
+      e.preventDefault();
+      const touch = e.touches[0];
+      const deltaY = touch.clientY - touchStartY;
+      
+      // Move the element
+      draggedElement.style.transform = `translateY(${deltaY}px)`;
+      
+      // Find the element to insert before
+      const afterElement = getDragAfterElement(document.getElementById('song-list'), touch.clientY);
+      if (afterElement == null) {
+        document.getElementById('song-list').appendChild(draggedElement);
+      } else {
+        document.getElementById('song-list').insertBefore(draggedElement, afterElement);
+      }
+    }
+    
+    function handleTouchEnd(e) {
+      if (!isDragging) return;
+      
+      isDragging = false;
+      if (draggedElement) {
+        draggedElement.classList.remove('dragging');
+        draggedElement.style.transform = '';
+        updateListOrder();
+        draggedElement = null;
+      }
+    }
+    
+    // Helper function to get the element after which to insert
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll('.song-tile:not(.dragging)')];
+      
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+    
+    // Update the list order based on current DOM order
+    function updateListOrder() {
+      const tiles = document.querySelectorAll('.song-tile .song-name');
+      currentList = Array.from(tiles).map(tile => tile.textContent);
+      saveProgress();
+      document.getElementById('list-count').textContent = currentList.length;
+    }
+    
+    // Clear the entire list
+    function clearList() {
+      if (currentList.length === 0) return;
+      
+      if (confirm('Are you sure you want to clear the entire list?')) {
+        currentList = [];
+        updateDisplay();
+        saveProgress();
+      }
+    }
+    
+    // Generate the formatted output
+    function generateOutput() {
+      if (currentList.length === 0) {
+        document.getElementById('output').value = '// No songs in list';
+        return;
+      }
+      
+      const output = currentList.map(song => `"${song}"`).join(',\n');
+      document.getElementById('output').value = output;
+    }
+    
+    // Copy to clipboard
+    function copyToClipboard() {
+      // Generate output on-the-fly
+      if (currentList.length === 0) {
+        // Show feedback that there are no songs
+        const feedback = document.getElementById('copy-feedback');
+        feedback.textContent = 'No songs to copy!';
+        feedback.style.background = '#ffc107';
+        feedback.style.color = '#000';
+        feedback.classList.add('show');
+        setTimeout(() => {
+          feedback.classList.remove('show');
+          feedback.textContent = 'Copied to clipboard!';
+          feedback.style.background = '#28a745';
+          feedback.style.color = 'white';
+        }, 1500);
+        return;
+      }
+      
+      // Create temporary textarea for copying
+      const output = currentList.map(song => `"${song}"`).join(',\n');
+      const textarea = document.createElement('textarea');
+      textarea.value = output;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      
+      // Show feedback
+      const feedback = document.getElementById('copy-feedback');
+      feedback.classList.add('show');
+      setTimeout(() => {
+        feedback.classList.remove('show');
+      }, 2000);
+    }
+    
+    // Save progress to localStorage
+    function saveProgress() {
+      localStorage.setItem('showListGenerator', JSON.stringify({
+        list: currentList,
+        timestamp: Date.now()
+      }));
+    }
+    
+    // Load progress from localStorage
+    function loadProgress() {
+      const saved = localStorage.getItem('showListGenerator');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          currentList = data.list || [];
+          updateDisplay();
+        } catch (e) {
+          console.error('Failed to load progress:', e);
+        }
+      }
+    }
+    
+    // Save to file (backup) - REMOVED
+    // Load from file (backup) - REMOVED
+    // Generate output function - REMOVED (now done in copyToClipboard)
+    
+    // Helper function to detect mobile
+    function isMobile() {
+      return window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    }
+    
+    // Prevent zoom on mobile
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (
+        e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0'
+      )) {
+        e.preventDefault();
+      }
+    });
+    
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+    
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 350) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+  </script>
+</body>
+</html>
