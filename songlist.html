@@ -820,8 +820,8 @@
           const session = JSON.parse(sessionData);
           const sessionAge = Date.now() - session.timestamp;
           
-          // Session is valid if authenticated and less than 3 minutes old
-          if (session.authenticated && sessionAge < sessionTimeout) {
+          // Session is valid if authenticated and less than 3 minutes old (with 10 second buffer for navigation)
+          if (session.authenticated && sessionAge < (sessionTimeout + 10000)) {
             // Valid session found - skip PIN entry and refresh session timestamp
             pinAuthenticated = true;
             // Refresh session timestamp to extend it
@@ -1132,6 +1132,14 @@
             // Save current scroll position before navigating
             localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
             localStorage.setItem('selectedSongId', song.id);
+            // Refresh session before navigating
+            if (pinAuthenticated) {
+              const sessionData = {
+                timestamp: Date.now(),
+                authenticated: true
+              };
+              localStorage.setItem('pinSession', JSON.stringify(sessionData));
+            }
             window.location.href = 'lyrics';
           };
           songList.appendChild(li);

@@ -677,7 +677,17 @@
   <div class="container">
     <h2 id="song-title"></h2>
     <div class="controls-row">
-      <button class="back-button" onclick="window.location.href='songlist'">←</button>
+      <button class="back-button" onclick="
+        // Refresh session before navigating
+        if (pinAuthenticated) {
+          const sessionData = {
+            timestamp: Date.now(),
+            authenticated: true
+          };
+          localStorage.setItem('pinSession', JSON.stringify(sessionData));
+        }
+        window.location.href='songlist'
+      ">←</button>
       <div class="language-toggle">
         <div class="toggle-switch" id="language-toggle" onclick="toggleLanguage()">
           <div class="toggle-slider" id="toggle-slider">ދިވެހި</div>
@@ -978,8 +988,8 @@
           const session = JSON.parse(sessionData);
           const sessionAge = Date.now() - session.timestamp;
           
-          // Session is valid if authenticated and less than 3 minutes old
-          if (session.authenticated && sessionAge < sessionTimeout) {
+          // Session is valid if authenticated and less than 3 minutes old (with 10 second buffer for navigation)
+          if (session.authenticated && sessionAge < (sessionTimeout + 10000)) {
             // Valid session found - skip PIN entry and refresh session timestamp
             pinAuthenticated = true;
             // Refresh session timestamp to extend it
@@ -1192,19 +1202,13 @@
     //     });
     // })();
     
-    function initializeLyrics() {
-    const songTitle = document.getElementById('song-title');
-    const songLyrics = document.getElementById('song-lyrics');
-    const lyricsTemplate = document.getElementById('lyrics-template');
-    const sectionNavBar = document.getElementById('section-nav-bar');
-    const languageToggle = document.getElementById('language-toggle');
-    const toggleSlider = document.getElementById('toggle-slider');
-    const selectedId = localStorage.getItem('selectedSongId');
-    const song = window.songs.find(s => String(s.id) === String(selectedId));
-    
-    let currentLanguage = 'dhivehi'; // Default to Dhivehi
+    // Global variables for language toggle
+    let currentLanguage = 'dhivehi';
     let englishAvailable = true;
+    let songTitle, songLyrics, lyricsTemplate, sectionNavBar, languageToggle, toggleSlider;
+    let currentSong = null;
     
+    // Global toggle function
     function toggleLanguage() {
       if (!englishAvailable) return; // Don't toggle if English not available
       
@@ -1238,7 +1242,7 @@
       }
       
       // Update lyrics display
-      const lyrics = language === 'dhivehi' ? song.lyrics : song.englishLyrics;
+      const lyrics = language === 'dhivehi' ? currentSong.lyrics : currentSong.englishLyrics;
       const { html, orderedSections } = parseSections(lyrics);
       songLyrics.innerHTML = html;
       
@@ -1260,6 +1264,72 @@
       // Create section overlays
       setTimeout(() => createSectionOverlays(orderedSections), 100);
     }
+    
+    // Global switch function
+    function switchLanguage(language) {
+      if (language === 'english' && !englishAvailable) {
+        return; // Don't switch if no English lyrics available
+      }
+      
+      currentLanguage = language;
+      
+      // Update toggle slider
+      if (language === 'english') {
+        toggleSlider.classList.add('english');
+        toggleSlider.textContent = 'English';
+        toggleSlider.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
+        // Move section nav bar to right
+        sectionNavBar.classList.add('english');
+      } else {
+        toggleSlider.classList.remove('english');
+        toggleSlider.textContent = 'ދިވެހި';
+        toggleSlider.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
+        // Move section nav bar to left
+        sectionNavBar.classList.remove('english');
+      }
+      
+      // Update lyrics display
+      if (currentSong) {
+        const lyrics = language === 'dhivehi' ? currentSong.lyrics : currentSong.englishLyrics;
+        const { html, orderedSections } = parseSections(lyrics);
+        songLyrics.innerHTML = html;
+        
+        // Update text direction and font
+        const lyricsContainer = document.getElementById('lyrics-template');
+        if (language === 'english') {
+          lyricsContainer.style.direction = 'ltr';
+          lyricsContainer.style.textAlign = 'left';
+          lyricsContainer.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
+        } else {
+          lyricsContainer.style.direction = 'rtl';
+          lyricsContainer.style.textAlign = 'right';
+          lyricsContainer.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
+        }
+        
+        // Update navigation buttons
+        renderSectionButtons(orderedSections);
+        
+        // Create section overlays
+        setTimeout(() => createSectionOverlays(orderedSections), 100);
+      }
+    }
+    
+    function initializeLyrics() {
+    songTitle = document.getElementById('song-title');
+    songLyrics = document.getElementById('song-lyrics');
+    lyricsTemplate = document.getElementById('lyrics-template');
+    sectionNavBar = document.getElementById('section-nav-bar');
+    languageToggle = document.getElementById('language-toggle');
+    toggleSlider = document.getElementById('toggle-slider');
+    const selectedId = localStorage.getItem('selectedSongId');
+    const song = window.songs.find(s => String(s.id) === String(selectedId));
+    
+    // Store current song globally
+    currentSong = song;
+    
+    // Reset to default language
+    currentLanguage = 'dhivehi';
+    englishAvailable = true;
     
     function renderSectionButtons(orderedSections) {
       sectionNavBar.innerHTML = '';
