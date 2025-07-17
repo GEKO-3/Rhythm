@@ -664,6 +664,14 @@
       // Focus on first digit when user returns
       setTimeout(() => {
         pinDigits[0].focus();
+        
+        // Force keyboard to open on mobile devices
+        if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          pinDigits[0].click();
+          setTimeout(() => {
+            pinDigits[0].focus();
+          }, 100);
+        }
       }, 300);
       
       // Show session expired message
@@ -703,22 +711,43 @@
         // Mobile focus improvements
         digit.addEventListener('focus', function() {
           // Ensure keyboard opens on mobile
-          if (window.innerWidth <= 768) {
+          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             setTimeout(() => {
               digit.focus();
-            }, 100);
+              digit.click();
+            }, 50);
+          }
+        });
+        
+        // Additional mobile keyboard trigger
+        digit.addEventListener('touchstart', function(e) {
+          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            setTimeout(() => {
+              digit.focus();
+            }, 50);
           }
         });
       });
       
       // Auto-focus first digit with delay for mobile
       setTimeout(() => {
-        pinDigits[0].focus();
-        if (window.innerWidth <= 768) {
-          // Force keyboard to open on mobile
-          pinDigits[0].click();
+        if (pinOverlay && !pinOverlay.classList.contains('hidden')) {
+          pinDigits[0].focus();
+          
+          // Force keyboard to open on mobile devices
+          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            // Multiple attempts to ensure keyboard opens
+            pinDigits[0].click();
+            setTimeout(() => {
+              pinDigits[0].focus();
+              pinDigits[0].click();
+            }, 100);
+            setTimeout(() => {
+              pinDigits[0].focus();
+            }, 200);
+          }
         }
-      }, 300);
+      }, 500); // Increased delay to ensure DOM is ready
     }
     
     function handleDigitInput(e, index) {
@@ -849,6 +878,21 @@
       
       // No valid session - show PIN overlay
       pinOverlay.classList.remove('hidden');
+      
+      // Ensure keyboard opens when PIN overlay is shown
+      setTimeout(() => {
+        if (pinDigits[0]) {
+          pinDigits[0].focus();
+          
+          // Force keyboard to open on mobile devices
+          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            pinDigits[0].click();
+            setTimeout(() => {
+              pinDigits[0].focus();
+            }, 100);
+          }
+        }
+      }, 300);
     }
     
     function startLockout() {
@@ -882,6 +926,14 @@
           setTimeout(() => {
             clearPinError();
             pinDigits[0].focus();
+            
+            // Force keyboard to open on mobile devices
+            if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+              pinDigits[0].click();
+              setTimeout(() => {
+                pinDigits[0].focus();
+              }, 100);
+            }
           }, 2000);
           
           return;
@@ -962,7 +1014,17 @@
           const remainingAttempts = maxAttempts - attemptCount;
           showPinError(`Invalid PIN. ${remainingAttempts} attempts remaining.`);
           clearPinInputs();
-          setTimeout(() => pinDigits[0].focus(), 500);
+          setTimeout(() => {
+            pinDigits[0].focus();
+            
+            // Force keyboard to open on mobile devices
+            if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+              pinDigits[0].click();
+              setTimeout(() => {
+                pinDigits[0].focus();
+              }, 100);
+            }
+          }, 500);
         }
       }
     }
