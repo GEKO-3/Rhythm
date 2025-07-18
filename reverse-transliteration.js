@@ -4,7 +4,7 @@ const reverseTransliterationMap = {
     'ވ': 'v', 'މ': 'm', 'ފ': 'f', 'ދ': 'dh', 'ތ': 'th', 'ލ': 'l',
     'ގ': 'g', 'ޏ': 'ny', 'ސ': 's', 'ޑ': 'd', 'ޒ': 'z', 'ޓ': 't', 'ޔ': 'y',
     'ޕ': 'p', 'ޖ': 'j', 'ޗ': 'ch', 'ޝ': 'sh', 'ޙ': 'h', 'ޚ': 'kh',
-    'ޤ': 'q', 'ޣ': 'gh', 'ޒ': 'z', 'ޠ': 'th', 
+    'ޤ': 'q', 'ޣ': 'gh', 'ޒ': 'z', 'ޠ': 'th', 'ޟ': 'l'
 };
 
 // Reverse vowel diacritics map
@@ -65,8 +65,24 @@ const reverseSpecialCases = [
     { input: 'ޢޮ', output: 'o' },
     { input: 'ޢަ', output: 'a' },
     { input: 'ޢް', output: 'h' },
-    
+
+    // { input: '', output: '' },
+    { input: 'ނިއުޔޯކް', output: 'new york' },
+    { input: 'ޓޯކިޔޯ', output: 'tokyo' },
+    { input: 'ރެސްޓޯރެންޓް', output: 'restaurant' },
+    { input: 'އާނއޭ', output: 'aaney' },
+    { input: 'ރާއްޖެ', output: 'raajje' },
+    { input: 'ޑޮލަރުން', output: 'dollarun' },
+    { input: 'ޑޮލަރު', output: 'dollar' },
+    { input: 'ޔޫރޯ', output: 'euro' },
+    { input: 'ކާރެއްގާ', output: 'carehgaa' },
+    { input: 'ކާރަކާ', output: 'carakaa' },
+    { input: 'ބިލިއަން', output: 'billion' },
+    { input: 'މިލިއަން', output: 'million' },
+    { input: 'ﷲ', output: 'allah' },
+    { input: 'ސުބުހާނަﷲ', output: 'subuhaanallah' },
     { input: 'ބިންނަން', output: 'binnan' },
+    { input: 'ރެޑީކޮށް', output: 'readykoh' },
     { input: 'މަސްތުކޮށްލާ ފާނެޔޭ', output: 'masthukohlaafaaneyey' },
     { input: 'ތަކަހޮޅިތައް', output: 'thakaholhithah' },
     { input: 'ނިމިހިނގައިދާނޭ', output: 'nimihingaidhaaney' },
@@ -122,6 +138,8 @@ const reverseSpecialCases = [
     { input: 'ޕާޓީ', output: 'party' },
     { input: 'ޕާޓީގާ', output: 'partygaa' },
     { input: 'ޕާޓީއަށް', output: 'partyah' },
+    { input: 'ސޮރީ', output: 'sorry' },
+    { input: 'އޭމް', output: 'am' },
     { input: 'ންނުވާ', output: 'nnuvaa' }
 ];
 
