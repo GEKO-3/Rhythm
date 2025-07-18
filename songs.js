@@ -3440,7 +3440,7 @@ Kaakutha foruvee kaakutha valhulee
 *ލިބޭނޭ އަރާމު ނުވޭ މަޙުރޫމު
 
 #2
-ޭއޭ މީ ނިހާއީ
+އޭ މީ ނިހާއީ
 *ނިހާއީ
 މިހިތުގެ ޝުއޫރޭ ނޭނގޭ
 *ނޭނގޭ
@@ -14538,5 +14538,74 @@ Thadhaa hoonu dhilayaa veyni shazaadhey muhahbathu dheymee
 *Thadhaa hoonu dhilayaa veyni shazaadhey muhahbathu dheymee
 Udhaahun libeyne hithihaaluge muniyaa
 *Vaaneyhey loabeegaa maafu sajaaniyaa`,
+},
+{
+  id: 241,
+  name: `Mariyam Malaa`,
+  genre: 'Taki',
+  lyrics: `#M
+ޖަންބު މަލެއް ފަދަ ރީތި މަރިޔަމް މަލާ
+*ހަދިޔާ ކުރަމޭ ހިތްމި ނަގާފާ
+
+#1
+ގޭދޮށުން ކީއްވެހޭ މާގިނައިން ފެންނަނީ
+*ފެނިފަ ހީލާނެޔޭ ދެން މަށަށް ހީވަނީ
+އެންމެ ފުރަތަމަ ފަހަރު އިޝްޤުގާ މިޖެހުނީ
+*މަސްތު ކޮއްލައިފިޔޭ ޗާލު ހަރަކާތް ތަކުން
+ޖަޒުބާތު ވަނީ މޭގަ ހިފާފާ
+*ހަދިޔާ ކުރަމޭ ހިތްމި ނަގާފާ
+
+#2
+ސުންދުސީ ރީތި ނަލަ ފަށުވި ފޭރާމުގާ
+*ފިނި ހަވީރަށް ހެމުން ތިޔަ ހިނގާ ފަރި ގޮތުން
+ހުދު ވިލާތައް މަތިން ދޫނި ތައް ދާފަދައިން
+*ހިއްސުތައް ވެސް މަގޭ އުދުހިގެން އެބަދެޔޭ
+ލޯބީގަ ވަނީ ޖިސްމު ދިވާނާ
+*ހަދިޔާ ކުރަމޭ ހިތްމި ނާގާފާ
+
+#3
+ދާ ތަނެއްގާ މަގޭ ހިޔަނި ހުންނާނެޔޭ
+*ހިތް ހަލާކުވެ ދިޔަސް ބަދަލު ނުމެވާނަމޭ
+ތިޔަނަމުން ފެށިނިމޭ ކޮންމެ ދުވަހެއް މަގޭ
+*އިރު އަރާ އޮއްސުނަސް ލޯބި ނޯއްސޭނެޔޭ
+ތިޔަނަން މިވަނީ ޓެޓޫ ޖަހާފާ
+*ހަދިޔާ ކުރަމޭ ހިތްމި ނާގާފާ
+
+#N
+ހަދިޔާ ކުރަމޭ
+*ހިތްމި ނަގާފާ
+ހަދިޔާ ކުރަމޭ
+*ހިތްމި ނަގާފާ`
+,
+
+  englishLyrics: `#M
+Jambu Maleh fadha reethi Mariyam Malaa
+*Hadhiyaa kuramey hiyymi nagaafaa
+#1
+Geydhoshun keevvehey maaginain fennany
+*Fenifa heelaaneyey dhen mashah heevany
+Enme furathama faharu ishqugaa mijehuny
+*Masthu kollaifiyey chaalu harakaaiy thakun
+Jazubaathu vany meyga hifaafaa
+*Hadhiyaa kuramey hiyymi nagaafaa
+#2
+Sundhusee reethi nala fashuvi feyraamugaa
+*Fini haveerah hemun thiya hingaa fari gothun
+Hudhu vilaathah mathin dhooni thah dhaafadhain
+*Hissuthah ves magey udhuhigen ebadheyey
+Loabeega vany jismu dhivaanaa
+*Hadhiyaa kuramey hiyymi naagaafaa
+#3
+Dhaa thanehgaa magey hiyani hunnaaneyey
+*Hiy halaakuve dhiyas badhalu numevaanamey
+Thiyanamun feshinimey konme dhuvaheh magey
+*Iru araa ossunas loabi noahseyneyey
+Thiyanan mivany tattoo jahaafaa
+*Hadhiyaa kuramey hiyymi naagaafaa
+#N
+Hadhiyaa kuramey
+*Hiyymi nagaafaa
+Hadhiyaa kuramey
+*Hiyymi nagaafaa`,
 },
 ]

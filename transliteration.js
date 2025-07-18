@@ -1034,6 +1034,9 @@ const specialCases = [
     { input: 'kashmeeru', output: 'ކަޝްމީރު' },
     { input: 'nishaaney', output: 'ނިޝާނޭ' },
 
+    { input: 'sundhusee', output: 'ސުންދުސީ' },
+
+
     // 8 characters
     { input: 'aeethoa', output: 'އައީތޯ' },
     { input: 'gulshan', output: 'ގުލްޝަން' },
@@ -1258,6 +1261,9 @@ const specialCases = [
     { input: 'nujeheey', output: 'ނުޖެހެއޭ' },
     { input: 'raajjeey', output: 'ރާއްޖެއޭ' },
     { input: 'thibaaah', output: 'ތިބާއަށް' },
+
+    { input: 'ishqugaa', output: 'އިޝްޤުގާ' },
+
     
     // 7 characters
     { input: 'mihithu', output: 'މިހިތު' },
@@ -1641,6 +1647,12 @@ const specialCases = [
     { input: 'eeeves', output: 'އެއީވެސް' },
     { input: 'ohorey', output: 'އޮހޮރޭ' },
 
+    { input: 'faharu', output: 'ފަހަރު' },
+
+    { input: 'tattoo', output: 'ޓެޓޫ' },
+
+
+
     // 5 characters
     { input: 'bahaa', output: 'ބަހާ' },
     { input: 'cream', output: 'ކުރީމު' },
@@ -1736,6 +1748,10 @@ const specialCases = [
     { input: 'heyah', output: 'ހެޔަށް' },
     { input: 'sorry', output: 'ސޮރީ' },
     { input: 'tokyo', output: 'ޓޯކިޔޯ' },
+
+
+    { input: 'jambu', output: 'ޖަންބު' },
+
 
     // 4 characters
     { input: 'bayy', output: 'ބަތް' },
