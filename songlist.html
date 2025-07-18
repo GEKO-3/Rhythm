@@ -471,8 +471,15 @@
           if (navigator.serviceWorker.controller) {
             navigator.serviceWorker.controller.postMessage({
               type: 'UPDATE_CACHE',
-              files: ['/songs.js', '/songlist.html', '/lyrics.html'] // Use original filename
+              files: ['/songs.js', '/showlist.js', '/songlist.html', '/lyrics.html'] // Use original filename
             });
+          }
+          
+          // If authenticated and in web app mode, refresh songs data
+          if (pinAuthenticated) {
+            setTimeout(() => {
+              refreshSongsData();
+            }, 1000);
           }
         });
         
@@ -1066,8 +1073,14 @@
         return;
       }
       
-      // Load songs.js first, then showlist.js
-      fetch('/songs.js') // Use original filename for proper caching
+      // Check if running as web app and force cache refresh
+      const isWebApp = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      const cacheParam = isWebApp ? `?t=${Date.now()}` : '';
+      
+      // Load songs.js first, then showlist.js with cache busting for web apps
+      fetch(`/songs.js${cacheParam}`, {
+        cache: isWebApp ? 'no-cache' : 'default'
+      })
         .then(response => response.text())
         .then(scriptContent => {
           // Replace const with window assignment to make it global
@@ -1075,7 +1088,9 @@
           eval(modifiedScript);
           
           // Now load showlist.js
-          return fetch('/showlist.js');
+          return fetch(`/showlist.js${cacheParam}`, {
+            cache: isWebApp ? 'no-cache' : 'default'
+          });
         })
         .then(response => response.text())
         .then(showlistContent => {
@@ -1088,6 +1103,71 @@
         })
         .catch(error => {
           console.error('Failed to load songs data:', error);
+          // Fallback to cached version if network fails
+          if (isWebApp) {
+            console.log('Retrying with cached version...');
+            fetch('/songs.js')
+              .then(response => response.text())
+              .then(scriptContent => {
+                const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+                eval(modifiedScript);
+                return fetch('/showlist.js');
+              })
+              .then(response => response.text())
+              .then(showlistContent => {
+                const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
+                eval(modifiedShowlist);
+                initializeSongList();
+              })
+              .catch(fallbackError => {
+                console.error('Failed to load cached songs data:', fallbackError);
+              });
+          }
+        });
+    }
+    
+    function refreshSongsData() {
+      // Force refresh songs data - useful for web app mode
+      if (!pinAuthenticated) return;
+      
+      const isWebApp = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      const cacheParam = `?refresh=${Date.now()}`;
+      
+      console.log('Refreshing songs data...');
+      
+      fetch(`/songs.js${cacheParam}`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      })
+        .then(response => response.text())
+        .then(scriptContent => {
+          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+          eval(modifiedScript);
+          
+          return fetch(`/showlist.js${cacheParam}`, {
+            cache: 'no-cache',
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
+        })
+        .then(response => response.text())
+        .then(showlistContent => {
+          const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
+          eval(modifiedShowlist);
+          
+          // Update the UI with fresh data
+          updateFilterDropdown();
+          renderList(searchBox.value, currentGenreFilter);
+          
+          console.log('Songs data refreshed successfully');
+        })
+        .catch(error => {
+          console.error('Failed to refresh songs data:', error);
         });
     }
     
@@ -1123,6 +1203,17 @@
       
       updateFilterDropdown();
       renderList();
+      
+      // Set up periodic refresh for web app mode
+      const isWebApp = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      if (isWebApp) {
+        // Refresh songs data every 5 minutes in web app mode
+        setInterval(() => {
+          if (pinAuthenticated && navigator.onLine) {
+            refreshSongsData();
+          }
+        }, 5 * 60 * 1000); // 5 minutes
+      }
       
       // Toggle dropdown
       filterBtn.addEventListener('click', function(e) {
