@@ -618,7 +618,14 @@
       // Navigate to lyrics.html
       window.location.href = 'lyrics';
     }
+    } // Close initializeSongsDownload function
     
+    // Global variables for the functions
+    let filteredSongs = [];
+    let currentGenreFilter = 'All';
+    let showOnlyNoEnglish = false;
+    
+    // Global functions that need to be accessible from onclick handlers
     function copyLyrics(songId, language) {
       const song = window.songs.find(s => s.id === songId);
       if (!song) return;
@@ -662,22 +669,17 @@
     
     function cleanLyricsText(lyrics) {
       const lines = lyrics.split('\n');
-      let cleanLines = [];
-      let previousWasSection = false;
+      let result = [];
       
       lines.forEach(line => {
-        // Check if this is a section header (lines starting with # or $)
+        // Skip section headers that start with # or $ (both are metadata)
         if (line.startsWith('#') || line.startsWith('$')) {
-          // Add empty line before section if there are already lyrics
-          if (cleanLines.length > 0 && !previousWasSection) {
-            cleanLines.push('');
-          }
-          previousWasSection = true;
           return;
         }
         
-        // Skip break lines (lines starting with -)
+        // Keep break lines (lines starting with -)
         if (line.startsWith('-')) {
+          result.push(line);
           return;
         }
         
@@ -687,14 +689,35 @@
           .replace(/&/g, '') // Remove & symbols
           .trim();
         
-        // Add non-empty lines
-        if (cleanLine !== '') {
-          cleanLines.push(cleanLine);
-          previousWasSection = false;
+        // Add the cleaned line
+        result.push(cleanLine);
+      });
+      
+      // Aggressive empty line removal - no consecutive empty lines at all
+      let finalResult = [];
+      let previousLineEmpty = false;
+      
+      result.forEach(line => {
+        if (line === '') {
+          if (!previousLineEmpty) {
+            finalResult.push(line);
+          }
+          previousLineEmpty = true;
+        } else {
+          finalResult.push(line);
+          previousLineEmpty = false;
         }
       });
       
-      return cleanLines.join('\n');
+      // Remove leading and trailing empty lines
+      while (finalResult.length > 0 && finalResult[0] === '') {
+        finalResult.shift();
+      }
+      while (finalResult.length > 0 && finalResult[finalResult.length - 1] === '') {
+        finalResult.pop();
+      }
+      
+      return finalResult.join('\n');
     }
     
     async function downloadLyrics(songId, language) {
@@ -708,6 +731,16 @@
       button.disabled = true;
       
       try {
+        // Ensure fonts are loaded before proceeding
+        if (language === 'dhivehi') {
+          try {
+            await document.fonts.load('22px Faruma');
+            await document.fonts.load('32px Faruma');
+          } catch (fontError) {
+            console.warn('Faruma font loading failed, using fallback');
+          }
+        }
+        
         const lyrics = language === 'dhivehi' ? song.lyrics : song.englishLyrics;
         const { sections } = parseSections(lyrics);
         
@@ -723,6 +756,14 @@
         const leftMargin = 30;
         const rightMargin = canvas.width - 30;
         const maxTextWidth = canvas.width - 60; // Use canvas width minus margins (30px on each side)
+        
+        // Font selection with fallbacks
+        const titleFont = language === 'dhivehi' ? 
+          '32px Faruma, "MV Elaaf Normal", "Faruma Regular", "Faruma Medium", "Noto Sans Thaana", "Thaana Unicode", Arial, sans-serif' : 
+          '32px Montserrat, Arial, sans-serif';
+        const textFont = language === 'dhivehi' ? 
+          '22px Faruma, "MV Elaaf Normal", "Faruma Regular", "Faruma Medium", "Noto Sans Thaana", "Thaana Unicode", Arial, sans-serif' : 
+          '22px Montserrat, Arial, sans-serif';
         
         // Function to calculate wrapped lines count
         function getWrappedLinesCount(text, font, maxWidth) {
@@ -769,13 +810,11 @@
             } else if (line.startsWith('*')) {
               const text = line.replace(/^\*+/, '').trim();
               if (text) {
-                const font = language === 'dhivehi' ? '22px Faruma' : '22px Montserrat';
-                const wrappedLineCount = getWrappedLinesCount(text, font, maxTextWidth);
+                const wrappedLineCount = getWrappedLinesCount(text, textFont, maxTextWidth);
                 totalHeight += lineHeight * wrappedLineCount;
               }
             } else if (line.trim() !== '') {
-              const font = language === 'dhivehi' ? '22px Faruma' : '22px Montserrat';
-              const wrappedLineCount = getWrappedLinesCount(line.trim(), font, maxTextWidth);
+              const wrappedLineCount = getWrappedLinesCount(line.trim(), textFont, maxTextWidth);
               totalHeight += lineHeight * wrappedLineCount;
             }
           });
@@ -797,13 +836,13 @@
         
         // Determine if song name is in Dhivehi or English and use appropriate font
         const isDhivehi = /[\u0780-\u07BF]/.test(song.name);
-        ctx.font = isDhivehi ? '32px Faruma' : '32px Montserrat';
+        ctx.font = isDhivehi ? titleFont : '32px Montserrat, Arial, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(song.name, canvas.width / 2, 70);
         
         // Add genre
         ctx.fillStyle = '#ccc';
-        ctx.font = '18px Montserrat';
+        ctx.font = '18px Montserrat, Arial, sans-serif';
         ctx.fillText(song.genre, canvas.width / 2, 120);
         
         // Add large watermark overlay across the entire image
@@ -907,7 +946,7 @@
             } else if (line.startsWith('*')) {
               // Chorus or repeated line
               ctx.fillStyle = '#f5d000';
-              ctx.font = language === 'dhivehi' ? '22px Faruma' : '22px Montserrat';
+              ctx.font = textFont;
               ctx.textAlign = 'center';
               const text = line.replace(/^\*+/, '').trim();
               if (text) {
@@ -920,7 +959,7 @@
             } else if (line.trim() !== '') {
               // Regular line
               ctx.fillStyle = '#FFFFFF';
-              ctx.font = language === 'dhivehi' ? '22px Faruma' : '22px Montserrat';
+              ctx.font = textFont;
               ctx.textAlign = 'center';
               const wrappedLines = wrapText(line.trim(), maxTextWidth);
               wrappedLines.forEach(wrappedLine => {
@@ -1041,14 +1080,6 @@
         }))
       };
     }
-    } // Close initializeSongsDownload function
-    
-    // Global variables for the functions
-    let filteredSongs = [];
-    let currentGenreFilter = 'All';
-    let showOnlyNoEnglish = false;
-    
-    // Global functions that need to be accessible from onclick handlers
     function applyFilters() {
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
       
@@ -1059,11 +1090,10 @@
         
         const matchesGenre = currentGenreFilter === 'All' || song.genre === currentGenreFilter;
         
-        const matchesEnglish = !showOnlyNoEnglish || 
-                              !song.englishLyrics || 
-                              song.englishLyrics.trim().length === 0;
+        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
+        const matchesEnglishFilter = !showOnlyNoEnglish || !hasEnglish;
         
-        return matchesSearch && matchesGenre && matchesEnglish;
+        return matchesSearch && matchesGenre && matchesEnglishFilter;
       });
       
       // Sort alphabetically
@@ -1155,159 +1185,6 @@
       window.location.href = 'lyrics.html';
     }
     
-    function copyLyrics(songId, language) {
-      const song = window.songs.find(s => s.id === songId);
-      if (!song) return;
-      
-      const button = event.target;
-      const originalText = button.textContent;
-      
-      let textToCopy = '';
-      
-      if (language === 'dhivehi') {
-        textToCopy = song.lyrics;
-      } else if (language === 'english') {
-        textToCopy = song.englishLyrics || '';
-      }
-      
-      // Clean up the text
-      textToCopy = textToCopy.replace(/#[MR\d]+/g, '').replace(/\*/g, '').trim();
-      
-      navigator.clipboard.writeText(textToCopy).then(() => {
-        button.textContent = 'Copied!';
-        button.style.backgroundColor = '#4CAF50';
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.style.backgroundColor = '';
-        }, 1500);
-      }).catch(err => {
-        console.error('Failed to copy text: ', err);
-      });
-    }
-    
-    async function downloadLyrics(songId, language) {
-      const song = window.songs.find(s => s.id === songId);
-      if (!song) return;
-      
-      const button = event.target;
-      const originalText = button.textContent;
-      
-      try {
-        button.textContent = 'Generating...';
-        button.disabled = true;
-        
-        let lyrics = '';
-        if (language === 'dhivehi') {
-          lyrics = song.lyrics;
-        } else if (language === 'english') {
-          lyrics = song.englishLyrics || '';
-        }
-        
-        const canvas = document.getElementById('lyrics-canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Set canvas size and styling
-        canvas.width = 800;
-        canvas.height = 1000;
-        
-        // Background
-        ctx.fillStyle = '#1f1f1f';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Parse and render lyrics
-        const result = parseLyrics(lyrics);
-        
-        // Title
-        ctx.fillStyle = '#f5d000';
-        ctx.font = '24px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText(song.name, canvas.width/2, 40);
-        
-        // Language indicator
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '16px Arial';
-        ctx.fillText(language === 'dhivehi' ? 'Dhivehi' : 'English', canvas.width/2, 70);
-        
-        // Render lyrics
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '14px Arial';
-        ctx.textAlign = 'left';
-        
-        let yPosition = 100;
-        const lineHeight = 20;
-        const maxWidth = canvas.width - 40;
-        
-        result.orderedSections.forEach(section => {
-          const sectionData = result.sections.find(s => s.name === section.name);
-          
-          // Section header
-          ctx.fillStyle = '#f5d000';
-          ctx.font = 'bold 16px Arial';
-          ctx.fillText(section.name, 20, yPosition);
-          yPosition += lineHeight + 10;
-          
-          // Section content
-          ctx.fillStyle = '#ffffff';
-          ctx.font = '14px Arial';
-          
-          sectionData.lines.forEach(line => {
-            const words = line.split(' ');
-            let currentLine = '';
-            
-            words.forEach(word => {
-              const testLine = currentLine + word + ' ';
-              const metrics = ctx.measureText(testLine);
-              
-              if (metrics.width > maxWidth && currentLine !== '') {
-                ctx.fillText(currentLine, 20, yPosition);
-                yPosition += lineHeight;
-                currentLine = word + ' ';
-              } else {
-                currentLine = testLine;
-              }
-            });
-            
-            if (currentLine) {
-              ctx.fillText(currentLine, 20, yPosition);
-              yPosition += lineHeight;
-            }
-          });
-          
-          yPosition += 20; // Space between sections
-        });
-        
-        // Convert to blob and download
-        canvas.toBlob((blob) => {
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${song.name} - ${language}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        });
-        
-        button.textContent = 'Downloaded!';
-        button.style.backgroundColor = '#4CAF50';
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.style.backgroundColor = '';
-          button.disabled = false;
-        }, 2000);
-        
-      } catch (error) {
-        console.error('Download failed:', error);
-        button.textContent = 'Error';
-        button.style.backgroundColor = '#f44336';
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.style.backgroundColor = '';
-          button.disabled = false;
-        }, 2000);
-      }
-    }
-    
     function applyFilters() {
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
       
@@ -1318,9 +1195,8 @@
         
         const matchesGenre = currentGenreFilter === 'All' || song.genre === currentGenreFilter;
         
-        const matchesEnglish = !showOnlyNoEnglish || 
-                              !song.englishLyrics || 
-                              song.englishLyrics.trim().length === 0;
+        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
+        const matchesEnglish = !showOnlyNoEnglish || !hasEnglish;
         
         return matchesSearch && matchesGenre && matchesEnglish;
       });
@@ -1381,47 +1257,6 @@
       
       // Save scroll position
       saveScrollPosition();
-    }
-    
-    function parseLyrics(lyrics) {
-      const lines = lyrics.split('\\n');
-      const sections = [];
-      let currentSection = null;
-      
-      lines.forEach(line => {
-        line = line.trim();
-        if (line.startsWith('#')) {
-          // New section
-          if (currentSection) {
-            sections.push(currentSection);
-          }
-          currentSection = {
-            name: line.substring(1).trim(),
-            lines: []
-          };
-        } else if (line && currentSection) {
-          // Add line to current section, removing * markers
-          const cleanLine = line.replace(/^\*/, '').trim();
-          if (cleanLine) {
-            currentSection.lines.push(cleanLine);
-          }
-        }
-      });
-      
-      if (currentSection) {
-        sections.push(currentSection);
-      }
-      
-      // Create ordered sections list
-      const orderedSections = sections.map((section, idx) => ({
-        name: section.name,
-        id: `section-${idx}`
-      }));
-      
-      return {
-        sections: sections,
-        orderedSections: orderedSections
-      };
     }
   </script>
 </body>
