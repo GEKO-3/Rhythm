@@ -68,7 +68,7 @@ const vowelConsonants = {
 };
 
 // Shaviyanisukun array - consonants that change "ah" ending to "ަށް"
-const shaviyanisukun = ['m', 'dh', 's', 'd', 'y', 'sh' ];
+const shaviyanisukun = ['m', 'dh', 's', 'd', 'y', 'sh', 'j' ];
 
 // Special cases mapping - words that need exact transliteration
 const specialCases = [
@@ -118,6 +118,8 @@ const specialCases = [
     { input: 'ehandhaannthakey', output: 'އެހަނދާންތަކޭ' },
     { input: 'ehandhaannthekey', output: 'އެހަނދާންތެކޭ' },
     { input: 'hiyyheyokamaaeku', output: 'ހިތްހެޔޮކަމާއެކު' },
+
+    { input: 'mahusharubimugaa', output: 'މަޙުޝަރުބިމުގާ' },
 
     // 15 characters
     { input: 'vaadhuvahunkey', output: 'ވާދުވަހުންކޭ' },
@@ -172,6 +174,8 @@ const specialCases = [
     { input: 'isjeheneethaaey', output: 'އިސްޖެހެނީތާއޭ' },
     { input: 'mahusharugaaves', output: 'މަހުޝަރުގާވެސް' },
 
+    { input: 'ishthashigandun', output: 'އިސްތަށިގަނޑުން' },
+
     // 14 characters
     { input: 'fathihahttakaa', output: 'ފަތިހައްޓަކާ' },
     { input: 'kehiveriveemaa', output: 'ކެހިވެރިވީމާ' },
@@ -201,9 +205,8 @@ const specialCases = [
     { input: 'fatharaaseehey', output: 'ފަތަރާސީހޭ' },
     { input: 'fennboahiyyvey', output: 'ފެންބޯހިތްވޭ' },
     { input: 'haadhahihveyey', output: 'ހާދަހިތްވެޔޭ' },
-
+    { input: 'ihusaaskohdhey', output: 'އިހުސާސްކޮށްދޭ' },
     { input: 'umaruahyaaruge', output: 'އުމަރުއައްޔާރުގެ' },
-
 
     // 13 characters
     { input: 'handhaanuney', output: 'ހަނދާނުނޭ' },
@@ -351,10 +354,12 @@ const specialCases = [
     { input: 'isjeheneethaa', output: 'އިސްޖެހެނީތާ' },
     { input: 'kehidheefatha', output: 'ކެހިދީފަތަ' },
     { input: 'reyakuaraaney', output: 'ރެޔަކުއަރާނޭ' },
-
-
+    { input: 'fasfahathugaa', output: 'ފަސްފަހަތުގާ' },
     { input: 'haalaathuehen', output: 'ހާލާތުއެހެން' },
-
+    { input: 'hoadhannedhey', output: 'ހޯދަންއެދޭ' },
+    { input: 'ihthiyaarugaa', output: 'އިހްތިޔާރުގާ' },
+    { input: 'kaalhuthahais', output: 'ކާޅުތައްއައިސް' },
+    { input: 'loayybahtakaa', output: 'ލޯތްބައްޓަކާ' },
 
     // 12 characters
     { input: 'konthaakuhey', output: 'ކޮންތާކުހޭ' },
@@ -405,9 +410,9 @@ const specialCases = [
     { input: 'unmeedhuthah', output: 'އުންމީދުތައް' },
     { input: 'vashuvandhey', output: 'ވަސްހުވަނދޭ' },
     { input: 'zeenayyvegen', output: 'ޒީނަތްވެގެން' },
-
     { input: 'asthaaaeehey', output: 'އަސްތާއައީހޭ' },
-
+    { input: 'beyrunnaineh', output: 'ބޭރުންއައިނެއް' },
+    { input: 'ishaaraathun', output: 'އިޝާރާތުން' },
 
     // 12 characters
     { input: 'shaheedhunaa', output: 'ޝަހީދުނާ' },
@@ -538,9 +543,14 @@ const specialCases = [
     { input: 'vashuvandhu', output: 'ވަސްހުވަނދު' },
     { input: 'verishaahee', output: 'ވެރިޝާހީ' },
     { input: 'yaahuvahlaa', output: 'ޔާހުވައްލާ' },
-
     { input: 'aduihvaalaa', output: 'އަޑުއިއްވާލާ' },
-
+    { input: 'dhaaberaaoo', output: 'ދާބެރާއޫ' },
+    { input: 'fasfahathun', output: 'ފަސްފަހަތުން' },
+    { input: 'fenilaaneey', output: 'ފެނިލާނެއޭ' },
+    { input: 'funnefushah', output: 'ފުންއެފުށަށް' },
+    { input: 'hekivaaneey', output: 'ހެކިވާނެއޭ' },
+    { input: 'hithaameyah', output: 'ހިތާމެޔަށް' },
+    { input: 'nukulhedhey', output: 'ނުކުޅެދޭ' },
 
     // 10 characters
     { input: 'keyyvaanee', output: 'ކެތްވާނީ' },
@@ -701,9 +711,21 @@ const specialCases = [
     { input: 'hithaharaa', output: 'ހިތައްއަރާ' },
     { input: 'kehidheefa', output: 'ކެހިދީފަ' },
     { input: 'keyymashah', output: 'ކެތްމަށަށް' },
-    
-    // 10 characters
+    { input: 'dhuiaaakee', output: 'ދުޢާއަކީ' },
+    { input: 'ehdhuvahun', output: 'އެއްދުވަހުން' },
+    { input: 'ihusaaskoh', output: 'އިހުސާސްކޮށް' },
+    { input: 'mashoadhan', output: 'މަސްހޯދަން' },
+    { input: 'ahaaleemee', output: 'އަހާލީމީ' },
+    { input: 'ehenvihyaa', output: 'އެހެންވިއްޔާ' },
+    { input: 'eyhithaaey', output: 'އޭހިތާއޭ' },
+    { input: 'iabeeruhey', output: 'ޢަބީރުހޭ' },
+    { input: 'ihthiyaaru', output: 'އިހްތިޔާރު' },
+    { input: 'ihvaalihaa', output: 'އިއްވާލިހާ' },
+    { input: 'kuramaahey', output: 'ކުރަމާހޭ' },
+    { input: 'lhiyaalhaa', output: 'ޅިޔައަޅާ' },
+    { input: 'medhugeyah', output: 'މެދުގެޔަށް' },
 
+    // 10 characters
     { input: 'fanihedhee', output: 'ފަނިހެދީ' },
     { input: 'eahhoadhaa', output: 'އެއައްހޯދާ' },
     { input: 'bashuhtifa', output: 'ބަސްހުއްޓިފަ' },
@@ -967,13 +989,14 @@ const specialCases = [
     { input: 'uhmeeedhu', output: 'އުއްމީދު' },
     { input: 'baruheysa', output: 'ބަރުހޭސަ' },
     { input: 'boahihvey', output: 'ބޯހިތްވޭ' },
-
+    { input: 'ahsidhain', output: 'އައްސިދައިން' },
+    { input: 'ahulihain', output: 'އަހުލިހައިން' },
+    { input: 'ahurenaai', output: 'އަހުރެނާއި' },
     { input: 'ahyaaruge', output: 'އައްޔާރުގެ' },
-
-
+    { input: 'buneenngi', output: 'ބުނެއެންގި' },
+    { input: 'dhiyaihey', output: 'ދިޔައިހޭ' },
     { input: 'dhoonnyaa', output: 'ދޫންޏާ' },
-
-
+    { input: 'eheevamaa', output: 'އެހީވަމާ' },
     { input: 'kashfuvee', output: 'ކަޝްފުވީ' },
 
     // 8 characters
@@ -1170,6 +1193,25 @@ const specialCases = [
     { input: 'uhmeedhu', output: 'އުއްމީދު' },
     { input: 'veeruhey', output: 'ވީރުހޭ' },
     { input: 'uhmeeedh', output: 'އުއްމީދު' },
+    { input: 'aashigee', output: 'އާޝިޤީ' },
+    { input: 'ahpaayaa', output: 'އައްޕާޔާ' },
+    { input: 'aishaage', output: 'އައިޝާގެ' },
+    { input: 'ayyathaa', output: 'އަތްއަތާ' },
+    { input: 'bunedhey', output: 'ބުނެދޭ' },
+    { input: 'dhihleey', output: 'ދިއްލެއޭ' },
+    { input: 'eheethee', output: 'އެހީތީ' },
+    { input: 'eheevaan', output: 'އެހީވާން' },
+    { input: 'ehithuge', output: 'އެހިތުގެ' },
+    { input: 'ehlihyoa', output: 'އެއްލިއްޔޯ' },
+    { input: 'ethakeyy', output: 'އެތަކެތް' },
+    { input: 'ihusaasu', output: 'އިހުސާސު' },
+    { input: 'iruohsey', output: 'އިރުއޮއްސޭ' },
+    { input: 'ishqakee', output: 'އިޝްޤަކީ' },
+    { input: 'lhakeyas', output: 'ޅަކެޔަސް' },
+    { input: 'oahoahoa', output: 'އޯހޯހޯ' },
+    { input: 'ohelumaa', output: 'އޮހެލުމާ' },
+    { input: 'ohennyaa', output: 'އޮހެންޏާ' },
+    { input: 'sangalaa', output: 'ސަނގަލާ' },
 
     // 7 characters
     { input: 'mihithu', output: 'މިހިތު' },
@@ -1350,9 +1392,20 @@ const specialCases = [
     { input: 'ishguge', output: 'އިޝްޤުގެ' },
     { input: 'miaahun', output: 'މިއާހުން' },
     { input: 'thedhey', output: 'ތެދޭ' },
+    { input: 'mulhiin', output: 'މުޅިއިން' },
+    { input: 'joashan', output: 'ޖޯޝަން' },
+    { input: 'aahchaa', output: 'އާއްޗާ' },
+    { input: 'aanhuyy', output: 'އާނހުތް' },
+    { input: 'ehlaali', output: 'އެއްލާލި' },
+    { input: 'falhiin', output: 'ފަޅިއިން' },
+    { input: 'fusaraa', output: 'ފުސްއަރާ' },
+    { input: 'heeveey', output: 'ހީވެއޭ' },
+    { input: 'ihvaane', output: 'އިއްވާނެ' },
+    { input: 'rueemey', output: 'ރުއީމޭ' },
+    { input: 'rulhiin', output: 'ރުޅިއިން' },
+    { input: 'shuooru', output: 'ޝުޢޫރު' },
 
     // 7 characters
-
     { input: 'nanbaru', output: 'ނަންބަރު' },
     { input: 'annbeyy', output: 'އަންބެތް' },
     { input: 'bahakun', output: 'ބަހަކުން' },
@@ -1519,8 +1572,16 @@ const specialCases = [
     { input: 'rondeh', output: 'ރޮނޑެއް' },
     { input: 'roohee', output: 'ރޫހީ' },
     { input: 'vihyaa', output: 'ވިއްޔާ' },
-
+    { input: 'aanbas', output: 'އާނބަސް' },
+    { input: 'aishaa', output: 'އައިޝާ' },
+    { input: 'ishqun', output: 'އިޝްޤުން' },
+    { input: 'bedhey', output: 'ބެދޭ' },
+    { input: 'eheeah', output: 'އެހީއަށް' },
+    { input: 'ehuney', output: 'އެހުނޭ' },
+    { input: 'ehvana', output: 'އެއްވަނަ' },
+    { input: 'kahala', output: 'ކަހަލަ' },
     { input: 'kashfu', output: 'ކަޝްފު' },
+    { input: 'maathu', output: 'މައަތު' },
 
     // 5 characters
     { input: 'bahaa', output: 'ބަހާ' },
@@ -1605,6 +1666,11 @@ const specialCases = [
     { input: 'eevaa', output: 'އީވާ' },
     { input: 'rihun', output: 'ރިހުން' },
     { input: 'ruhun', output: 'ރުހުން' },
+    { input: 'ashee', output: 'އަށީ' },
+    { input: 'ehloa', output: 'އެއްލޯ' },
+    { input: 'iaree', output: 'ޢަރީ' },
+    { input: 'ihvan', output: 'އިއްވަން' },
+    { input: 'preym', output: 'ޕްރޭމް' },
 
     // 4 characters
     { input: 'bayy', output: 'ބަތް' },
@@ -1710,12 +1776,11 @@ const specialCases = [
     { input: 'kehi', output: 'ކެހި' },
     { input: 'keyy', output: 'ކެތް' },
     { input: 'miah', output: 'މިއަށް' },
-
     { input: 'haan', output: 'ހާނ' },
-
+    { input: 'anha', output: 'އަނހަ' },
+    { input: 'ashi', output: 'އަށި' },
 
     // 4 characters
-
     { input: 'sihi', output: 'ސިހި' },
     { input: 'aahu', output: 'އާހު' },
     { input: 'haeh', output: 'ހައެއް' },
@@ -2586,6 +2651,8 @@ function performTransliteration(latinText) {
             // 13-letter patterns// 10-letter patterns// 10-letter patterns// 9-letter patterns// 8-letter patterns// 10-letter patterns// 9-letter patterns// 8-letter patterns// 7-letter patterns{ pattern: 'handhah', output: 'ހަނދަށް', length: 7 },{ pattern: 'lhindhu', output: 'ޅިނދު', length: 7 },// 10-letter patterns// 10-letter patterns// 8-letter patterns// 7-letter patterns
             { pattern: 'thundee', output: 'ތުނޑީ', length: 7 },
 
+            // 9-letter patterns
+            { pattern: 'maahingaa', output: 'މާހިނގާ', length: 9 },
             // 8-letter patterns
             { pattern: 'chaandha', output: 'ޗާނދަ', length: 8 },
             { pattern: 'lhindhaa', output: 'ޅިނދާ', length: 8 },
@@ -2611,6 +2678,7 @@ function performTransliteration(latinText) {
             { pattern: 'dhandu', output: 'ދަނޑު', length: 6 },
             { pattern: 'dhanbu', output: 'ދަނބު', length: 6 },
             { pattern: 'dhandi', output: 'ދަނޑި', length: 6 },
+            { pattern: 'dhanmu', output: 'ދަނމު', length: 6 },
             { pattern: 'gandey', output: 'ގަނޑޭ', length: 6 },
             { pattern: 'hendhu', output: 'ހެނދު', length: 6 },
             { pattern: 'hindha', output: 'ހިނދަ', length: 6 },
@@ -2619,8 +2687,10 @@ function performTransliteration(latinText) {
             { pattern: 'kandaa', output: 'ކަނޑާ', length: 6 },
             { pattern: 'kandeh', output: 'ކަނޑެއް', length: 6 },
             { pattern: 'kandoo', output: 'ކަނޑޫ', length: 6 },
+            { pattern: 'kendee', output: 'ކެނޑީ', length: 6 },
             { pattern: 'kendey', output: 'ކެނޑޭ', length: 6 },
             { pattern: 'kuriah', output: 'ކުރިޔަށް', length: 6 },
+            { pattern: 'lanbaa', output: 'ލަނބާ', length: 6 },
             { pattern: 'lhangu', output: 'ޅަނގު', length: 6 },
             { pattern: 'rondeh', output: 'ރޮނޑެއް', length: 6 },
             { pattern: 'runbaa', output: 'ރުނބާ', length: 6 },
@@ -2654,9 +2724,11 @@ function performTransliteration(latinText) {
             { pattern: 'anbaa', output: 'އަނބާ', length: 5 },
             { pattern: 'andhi', output: 'އަނދި', length: 5 },
             { pattern: 'binmu', output: 'ބިނމު', length: 5 },
+            { pattern: 'bondi', output: 'ބޮނޑި', length: 5 },
             { pattern: 'endhe', output: 'އެނދެ', length: 5 },
             { pattern: 'endhu', output: 'އެނދު', length: 5 },
             { pattern: 'fundu', output: 'ފުނޑު', length: 5 },{ pattern: 'honda', output: 'ހޮނޑަ', length: 5 },
+            { pattern: 'genbi', output: 'ގެނބި', length: 5 },
             { pattern: 'hendu', output: 'ހެނޑު', length: 5 },
             { pattern: 'hingu', output: 'ހިނގު', length: 5 },
             { pattern: 'hungu', output: 'ހުނގު', length: 5 },
@@ -2668,6 +2740,7 @@ function performTransliteration(latinText) {
             { pattern: 'kendu', output: 'ކެނޑު', length: 5 },
             { pattern: 'kunbu', output: 'ކުނބު', length: 5 },
             { pattern: 'kundi', output: 'ކުނޑި', length: 5 },
+            { pattern: 'lanbe', output: 'ލަނބެ', length: 5 },
             { pattern: 'landu', output: 'ލަނޑު', length: 5 },
             { pattern: 'bandu', output: 'ބަނޑު', length: 5 },
             { pattern: 'gandu', output: 'ގަނޑު', length: 5 },
@@ -2677,6 +2750,7 @@ function performTransliteration(latinText) {
             { pattern: 'genbe', output: 'ގެނބެ', length: 5 },
             { pattern: 'langi', output: 'ލަނގި', length: 5 },
             { pattern: 'lenbu', output: 'ލެނބު', length: 5 },
+            { pattern: 'linbe', output: 'ލިނބެ', length: 5 },
             { pattern: 'randi', output: 'ރަނޑި', length: 5 },
             { pattern: 'ranga', output: 'ރަނގަ', length: 5 },
             { pattern: 'rangi', output: 'ރަނގި', length: 5 },

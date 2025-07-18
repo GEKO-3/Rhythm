@@ -1178,6 +1178,16 @@
         text = text.slice(1); // Remove the * prefix
       }
       
+      // Count existing lines in this section (excluding the one we just added)
+      const existingLines = linesDiv.querySelectorAll('.line');
+      const lineIndex = existingLines.length - 1; // 0-based index of current line
+      
+      // For imported text, apply alternating pattern: first line (index 0) = N, second line (index 1) = Z, etc.
+      // Only apply this if the line wasn't already explicitly starred with *
+      if (!starred) {
+        starred = (lineIndex % 2 === 1); // Odd indices (1, 3, 5...) get Z
+      }
+      
       // Set the text value (without the * if it was starred)
       lineInput.value = text;
       

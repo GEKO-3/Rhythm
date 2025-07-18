@@ -548,7 +548,7 @@
           <div class="song-info">
             <div class="song-name" style="font-family: ${songNameFont};">${song.name}</div>
             <div class="song-genre">${song.genre}</div>
-            <div class="song-id">ID: ${song.id}</div>
+            <div class="song-id" onclick="copySongId(${song.id})" style="cursor: pointer;" title="Click to copy ID">ID: ${song.id}</div>
           </div>
           <div class="download-buttons">
             <button class="download-btn view-btn" onclick="viewSong(${song.id})">
@@ -626,6 +626,70 @@
     let showOnlyNoEnglish = false;
     
     // Global functions that need to be accessible from onclick handlers
+    function copySongId(songId) {
+      const idText = `id: ${songId},`;
+      
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(idText).then(() => {
+          // Show a brief visual feedback
+          const idElement = event.target;
+          const originalText = idElement.textContent;
+          const originalColor = idElement.style.color;
+          
+          idElement.textContent = 'Copied!';
+          idElement.style.color = '#4CAF50';
+          
+          setTimeout(() => {
+            idElement.textContent = originalText;
+            idElement.style.color = originalColor;
+          }, 1500);
+        }).catch(err => {
+          console.error('Failed to copy ID: ', err);
+          fallbackCopyIdToClipboard(idText);
+        });
+      } else {
+        fallbackCopyIdToClipboard(idText);
+      }
+    }
+    
+    function fallbackCopyIdToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.top = 0;
+      textArea.style.left = 0;
+      textArea.style.width = '2em';
+      textArea.style.height = '2em';
+      textArea.style.padding = 0;
+      textArea.style.border = 'none';
+      textArea.style.outline = 'none';
+      textArea.style.boxShadow = 'none';
+      textArea.style.background = 'transparent';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        document.execCommand('copy');
+        // Show success feedback
+        const idElement = event.target;
+        const originalText = idElement.textContent;
+        const originalColor = idElement.style.color;
+        
+        idElement.textContent = 'Copied!';
+        idElement.style.color = '#4CAF50';
+        
+        setTimeout(() => {
+          idElement.textContent = originalText;
+          idElement.style.color = originalColor;
+        }, 1500);
+      } catch (err) {
+        console.error('Fallback copy failed: ', err);
+      }
+      
+      document.body.removeChild(textArea);
+    }
+    
     function copyLyrics(songId, language) {
       const song = window.songs.find(s => s.id === songId);
       if (!song) return;
@@ -670,16 +734,23 @@
     function cleanLyricsText(lyrics) {
       const lines = lyrics.split('\n');
       let result = [];
+      let currentSection = [];
+      let sections = [];
       
       lines.forEach(line => {
-        // Skip section headers that start with # or $ (both are metadata)
+        // Detect section headers that start with # or $ (both are metadata)
         if (line.startsWith('#') || line.startsWith('$')) {
+          // If we have content in current section, save it
+          if (currentSection.length > 0) {
+            sections.push([...currentSection]);
+            currentSection = [];
+          }
           return;
         }
         
         // Keep break lines (lines starting with -)
         if (line.startsWith('-')) {
-          result.push(line);
+          currentSection.push(line);
           return;
         }
         
@@ -689,33 +760,52 @@
           .replace(/&/g, '') // Remove & symbols
           .trim();
         
-        // Add the cleaned line
-        result.push(cleanLine);
+        // Add the cleaned line to current section
+        currentSection.push(cleanLine);
       });
       
-      // Aggressive empty line removal - no consecutive empty lines at all
-      let finalResult = [];
-      let previousLineEmpty = false;
+      // Add the last section if it has content
+      if (currentSection.length > 0) {
+        sections.push(currentSection);
+      }
       
-      result.forEach(line => {
-        if (line === '') {
-          if (!previousLineEmpty) {
-            finalResult.push(line);
+      // Process each section to remove excessive empty lines
+      let processedSections = sections.map(section => {
+        let finalSection = [];
+        let previousLineEmpty = false;
+        
+        section.forEach(line => {
+          if (line === '') {
+            if (!previousLineEmpty) {
+              finalSection.push(line);
+            }
+            previousLineEmpty = true;
+          } else {
+            finalSection.push(line);
+            previousLineEmpty = false;
           }
-          previousLineEmpty = true;
-        } else {
-          finalResult.push(line);
-          previousLineEmpty = false;
+        });
+        
+        // Remove leading and trailing empty lines from section
+        while (finalSection.length > 0 && finalSection[0] === '') {
+          finalSection.shift();
+        }
+        while (finalSection.length > 0 && finalSection[finalSection.length - 1] === '') {
+          finalSection.pop();
+        }
+        
+        return finalSection;
+      });
+      
+      // Join sections with exactly one empty line between them
+      let finalResult = [];
+      processedSections.forEach((section, index) => {
+        finalResult.push(...section);
+        // Add empty line after each section except the last one
+        if (index < processedSections.length - 1 && section.length > 0) {
+          finalResult.push('');
         }
       });
-      
-      // Remove leading and trailing empty lines
-      while (finalResult.length > 0 && finalResult[0] === '') {
-        finalResult.shift();
-      }
-      while (finalResult.length > 0 && finalResult[finalResult.length - 1] === '') {
-        finalResult.pop();
-      }
       
       return finalResult.join('\n');
     }

@@ -4,7 +4,7 @@ const reverseTransliterationMap = {
     'ވ': 'v', 'މ': 'm', 'ފ': 'f', 'ދ': 'dh', 'ތ': 'th', 'ލ': 'l',
     'ގ': 'g', 'ޏ': 'ny', 'ސ': 's', 'ޑ': 'd', 'ޒ': 'z', 'ޓ': 't', 'ޔ': 'y',
     'ޕ': 'p', 'ޖ': 'j', 'ޗ': 'ch', 'ޝ': 'sh', 'ޙ': 'h', 'ޚ': 'kh',
-    'ޤ': 'q', 'ޣ': 'gh', 'ޒ': 'z', 'ޢ': 'i', 'ޠ': 'th'
+    'ޤ': 'q', 'ޣ': 'gh', 'ޒ': 'z', 'ޠ': 'th', 
 };
 
 // Reverse vowel diacritics map
@@ -53,6 +53,19 @@ const dhivehiNumbers = {
 
 // Reverse special cases mapping - most common Thaana to Latin special cases
 const reverseSpecialCases = [
+    // Handle ޢ (waw) with vowel diacritics
+    { input: 'ޢޫ', output: 'oo' },
+    { input: 'ޢާ', output: 'aa' },
+    { input: 'ޢީ', output: 'ee' },
+    { input: 'ޢޭ', output: 'ey' },
+    { input: 'ޢޯ', output: 'oa' },
+    { input: 'ޢު', output: 'u' },
+    { input: 'ޢި', output: 'i' },
+    { input: 'ޢެ', output: 'e' },
+    { input: 'ޢޮ', output: 'o' },
+    { input: 'ޢަ', output: 'a' },
+    { input: 'ޢް', output: 'h' },
+    
     { input: 'ބިންނަން', output: 'binnan' },
     { input: 'މަސްތުކޮށްލާ ފާނެޔޭ', output: 'masthukohlaafaaneyey' },
     { input: 'ތަކަހޮޅިތައް', output: 'thakaholhithah' },
@@ -96,6 +109,7 @@ const reverseSpecialCases = [
     { input: 'ތިހިރީތި', output: 'thihireethi' },
     { input: 'ތިހުރީތި', output: 'thihureethi' },
     { input: 'ނޭންގޭހެން', output: 'neyngeyhen' },
+    { input: 'ލެޕްޓޮޕް', output: 'laptop' },
     { input: 'ހެން', output: 'hen' },
     { input: 'ހޭ', output: 'hey' },
     { input: 'ނަ', output: 'na' },

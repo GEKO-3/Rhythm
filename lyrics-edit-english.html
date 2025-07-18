@@ -1069,6 +1069,11 @@
       if (text.startsWith('*')) {
         starred = true;
         text = text.slice(1);
+      } else {
+        // For imported lines without explicit *, use alternating pattern
+        const existingLines = Array.from(linesDiv.querySelectorAll('.line'));
+        const lineIndex = existingLines.length - 1; // Current line index (0-based)
+        starred = (lineIndex % 2 === 1); // 0=N, 1=Z, 2=N, 3=Z, etc.
       }
       
       // Set the text value
