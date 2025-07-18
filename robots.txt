@@ -1,4 +1,8 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://rhyhtmboduberu.com/sitemap.xml
+Sitemap: https://rhythmboduberu.com/sitemap.xml
+
+# Favicon locations for crawlers
+Allow: /favicons/
+Allow: /favicon.ico
