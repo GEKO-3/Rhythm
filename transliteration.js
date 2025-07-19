@@ -18,7 +18,7 @@
 // - 'r' at the end of words after vowels becomes 'ރު'
 // - 'n' uses sukun (ން) when followed by consonant or at end of word, except in "hus noonu" patterns where it uses regular ނ
 // - Apostrophes (') are completely removed from input text
-// - Commas (,) are ignored in input text
+// - Commas (,) are converted to Arabic commas (،)
 // ==================================================================
 
 // Dhivehi Latin to Thaana transliteration logic
@@ -33,8 +33,11 @@ const transliterationMap = {
     'p': 'ޕ', 'j': 'ޖ', 'ch': 'ޗ', 'ny': 'ޏ', 'tt': 'ޓ', 'hh': 'ޙ', 'kh': 'ޚ',
     'q': 'ޤ', 'w': 'ވ', 'gh': 'ޣ', 'x': 'ޚ', 'zh': 'ޒ',
     
+    // Punctuation
+    ',': '،', // English comma to Arabic comma
+    
     // Numbers
-    '0': '߀', '1': '߁', '2': '߂', '3': '߃', '4': '߄', '5': '߅', '6': '߆', '7': '߇', '8': '߈', '9': '߉'
+    '0': '0', '1': '1', '2': '2', '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9'
 };
 
 // Vowel diacritics (used after consonants)
@@ -572,6 +575,8 @@ const specialCases = [
     { input: 'feydheyaraa', output: 'ފޭދޭއަރާ' },
     { input: 'nishaanaaye', output: 'ނިޝާނާޔެ' },
 
+    { input: 'ihusaasugaa', output: 'އިހުސާސުގާ' },
+
     // 10 characters
     { input: 'keyyvaanee', output: 'ކެތްވާނީ' },
     { input: 'keiyvaanee', output: 'ކެތްވާނީ' },
@@ -1036,7 +1041,6 @@ const specialCases = [
 
     { input: 'sundhusee', output: 'ސުންދުސީ' },
 
-
     // 8 characters
     { input: 'aeethoa', output: 'އައީތޯ' },
     { input: 'gulshan', output: 'ގުލްޝަން' },
@@ -1264,7 +1268,9 @@ const specialCases = [
 
     { input: 'ishqugaa', output: 'އިޝްޤުގާ' },
 
-    
+    { input: 'thieeyey', output: 'ތިއީޔޭ' },
+
+
     // 7 characters
     { input: 'mihithu', output: 'މިހިތު' },
     { input: 'aanekey', output: 'އާނއެކޭ' },
@@ -1649,9 +1655,10 @@ const specialCases = [
 
     { input: 'faharu', output: 'ފަހަރު' },
 
+    { input: 'lenbey', output: 'ލެނބޭ' },
+
+
     { input: 'tattoo', output: 'ޓެޓޫ' },
-
-
 
     // 5 characters
     { input: 'bahaa', output: 'ބަހާ' },
@@ -1749,9 +1756,7 @@ const specialCases = [
     { input: 'sorry', output: 'ސޮރީ' },
     { input: 'tokyo', output: 'ޓޯކިޔޯ' },
 
-
     { input: 'jambu', output: 'ޖަންބު' },
-
 
     // 4 characters
     { input: 'bayy', output: 'ބަތް' },
@@ -1945,8 +1950,8 @@ function performTransliteration(latinText) {
         return '';
     }
     
-    // Convert to lowercase and remove all apostrophes and periods completely
-    let processText = latinText.toLowerCase().replace(/['.]/g, '');
+    // Convert to lowercase and remove apostrophes and periods completely, but preserve commas
+    let processText = latinText.toLowerCase().replace(/[']/g, '');
     
     let dhivehiText = '';
     let i = 0;
@@ -2316,10 +2321,14 @@ function performTransliteration(latinText) {
             }
         }
         
-        // Skip spaces, line breaks, punctuation, asterisks, commas, numbers, and #
-        if (processText[i] === ' ' || processText[i] === '\n' || processText[i] === '\r' || /[.,!?;:]/.test(processText[i]) || processText[i] === '*' || processText[i] === ',' || /[0-9]/.test(processText[i]) || processText[i] === '#') {
-            // Skip asterisks, commas, numbers, and # entirely, but include other characters
-            if (processText[i] !== '*' && processText[i] !== ',' && !/[0-9]/.test(processText[i]) && processText[i] !== '#') {
+        // Skip spaces, line breaks, punctuation, asterisks, numbers, and #
+        if (processText[i] === ' ' || processText[i] === '\n' || processText[i] === '\r' || /[.,!?;:]/.test(processText[i]) || processText[i] === '*' || /[0-9]/.test(processText[i]) || processText[i] === '#') {
+            // Handle commas specially - convert them to Arabic commas
+            if (processText[i] === ',') {
+                dhivehiText += '،';
+            }
+            // Skip asterisks, numbers, and # entirely, but include other punctuation
+            else if (processText[i] !== '*' && !/[0-9]/.test(processText[i]) && processText[i] !== '#') {
                 dhivehiText += processText[i];
             }
             i++;
@@ -2336,7 +2345,7 @@ function performTransliteration(latinText) {
                 const charBefore = processText[i - 1];
                 if (charBefore !== ' ' && charBefore !== '\t' && charBefore !== '\n' && 
                     charBefore !== '\r' && charBefore !== '*' && 
-                    charBefore !== ',' && charBefore !== '#' && !/[0-9]/.test(charBefore) && !/[.,!?;:]/.test(charBefore)) {
+                    charBefore !== ',' && charBefore !== '#' && !/[0-9]/.test(charBefore) && !/[.!?;:]/.test(charBefore)) {
                     isWholeWord = false;
                 }
             }
@@ -2346,7 +2355,7 @@ function performTransliteration(latinText) {
                 const charAfter = processText[i + 2];
                 if (charAfter !== ' ' && charAfter !== '\t' && charAfter !== '\n' && 
                     charAfter !== '\r' && charAfter !== '*' && 
-                    charAfter !== ',' && charAfter !== '#' && !/[0-9]/.test(charAfter) && !/[.,!?;:]/.test(charAfter)) {
+                    charAfter !== ',' && charAfter !== '#' && !/[0-9]/.test(charAfter) && !/[.!?;:]/.test(charAfter)) {
                     isWholeWord = false;
                 }
             }
@@ -2370,7 +2379,7 @@ function performTransliteration(latinText) {
                     const charBefore = processText[i - 1];
                     if (charBefore !== ' ' && charBefore !== '\t' && charBefore !== '\n' && 
                         charBefore !== '\r' && charBefore !== '*' && 
-                        charBefore !== ',' && charBefore !== '#' && !/[0-9]/.test(charBefore) && !/[.,!?;:]/.test(charBefore)) {
+                        charBefore !== ',' && charBefore !== '#' && !/[0-9]/.test(charBefore) && !/[.!?;:]/.test(charBefore)) {
                         isWholeWord = false;
                     }
                 }
@@ -2380,7 +2389,7 @@ function performTransliteration(latinText) {
                     const charAfter = processText[i + specialCase.input.length];
                     if (charAfter !== ' ' && charAfter !== '\t' && charAfter !== '\n' && 
                         charAfter !== '\r' && charAfter !== '*' && 
-                        charAfter !== ',' && charAfter !== '#' && !/[0-9]/.test(charAfter) && !/[.,!?;:]/.test(charAfter)) {
+                        charAfter !== ',' && charAfter !== '#' && !/[0-9]/.test(charAfter) && !/[.!?;:]/.test(charAfter)) {
                         isWholeWord = false;
                     }
                 }
@@ -2758,6 +2767,7 @@ function performTransliteration(latinText) {
             { pattern: 'thaanga', output: 'ތާނގަ', length: 7 },
 
             // 7-letter patterns
+            { pattern: 'thandee', output: 'ތަނޑީ', length: 7 },
             { pattern: 'yaandhu', output: 'ޔާނދު', length: 7 },
             // 6-letter patterns{ pattern: 'bondha', output: 'ބޮނދަ', length: 6 },
             { pattern: 'aanhaa', output: 'އާނހާ', length: 6 },
@@ -2786,6 +2796,7 @@ function performTransliteration(latinText) {
             { pattern: 'kendey', output: 'ކެނޑޭ', length: 6 },
             { pattern: 'kuriah', output: 'ކުރިޔަށް', length: 6 },
             { pattern: 'lanbaa', output: 'ލަނބާ', length: 6 },
+            { pattern: 'lenbey', output: 'ލެނބޭ', length: 6 },
             { pattern: 'lhangu', output: 'ޅަނގު', length: 6 },
             { pattern: 'rondeh', output: 'ރޮނޑެއް', length: 6 },
             { pattern: 'runbaa', output: 'ރުނބާ', length: 6 },

@@ -13463,7 +13463,7 @@ Reydhuvaa aalaavedhaa handhaanaaye thiyaa
 },
 {
   id: 220,
-  name: `Fathihuge Himeynkan`,
+  name: `Chakafalu`,
   genre: 'Nala',
   lyrics: `#M
 ފަތިހުގެ ހިމޭންކަންވެ އަލިކަން އުޖާލާ
@@ -14607,5 +14607,294 @@ Hadhiyaa kuramey
 *Hiyymi nagaafaa
 Hadhiyaa kuramey
 *Hiyymi nagaafaa`,
+},
+{
+  id: 242,
+  name: `Vathukiba`,
+  genre: 'Taki',
+  lyrics: `#M
+ޖެހިމާ ހެދުމެއްލާ ފައި ދެއުޅި ހިނގުމެއްގާ
+*ހެދި ރަނިކަން ދަޅަ ދެއިރަށް ދަނީ
+ދައްކަންދޭ އަލިކޮއެއަށް ކައްކަން ބަތް ލާއްސެއްވެސް
+*ނޭންގި އެހެން ތެޅި ހުއްޓާ އަލިފުޅު ދޫވީ
+
+#1
+ހާނ ޗަލާ
+*ހާނ ޗަލާ ކެނޑި އެ ދިޔައީ ވަތުކިބަ މުޅިން އަޅެވާ
+ހާނ ޗަލާ
+*ހާނ ޗަލާ ކެނޑި އެ ދިޔައީ ވަތުކިބަ މުޅިން
+
+#2
+ރޮއެ ނަގައޭ ދޫވީމާ ކަނި ބުރަނީ ގޮސްވަނީމާ
+*ގެޔަކަށް ކަނބުރު ވަނީމާ އަލިފުޅު ތިގެއްލުނީއޭ
+ގެއްލުނީ މަރިޔއަނބު ކަމޭ
+*ގެއްލުނީ ކޮންޑު އޮތް ފުރޯކަމޭ
+ހުސްވެ އަތުގަ ބޭސް ހުރީ
+*ބޭސްވެ އަތުގަ ހުސްފުރި
+ގޭސްވެ ބަނޑުގަ ހުސްފުރީ
+*ފެނު ހަތަރު ޖެހިއްޖެޔޭ މުޅިން`,
+
+  englishLyrics: `#M
+Jehimaa hedhumehlaa fai dheulhi hingumehgaa
+*Hedhi ranikan dhalha dheirah dhanee
+Dhahkanndhey alikoeah kahkan bayy laahsehves
+*Neyngi ehen thelhi huhtaa alifulhu dhoovee
+#1
+Haan chalaa
+*Haan chalaa kendi e dhiyaee vathukiba mulhin alhevaa
+Haan chalaa
+*Haan chalaa kendi e dhiyaee vathukiba mulhin
+#2
+Roe nagaey dhooveemaa kani buranee gosvaneemaa
+*Geyakah kanburu vaneemaa alifulhu thigehluneeey
+Gehlunee mariyanbu kamey
+*Gehlunee kondu oyy furoakamey
+Husve athuga beys huree
+*Beysve athuga husfuri
+Geysve banduga husfuree
+*Fenu hatharu jehihjeyey mulhin`,
+},
+{
+  id: 243,
+  name: `Dairygaa Liyey`,
+  genre: 'Nala',
+  lyrics: `#M
+ޑައިރީގާ ލިޔޭ ހިތާ ވިންދު ދިރުވީ، ހިތާ ވިންދު ދިރުވީ
+*ގައިމޭ އަދު ހިތުގާ މި ރަމްޒު ދިރުވީ
+މީ އުފަލޭ މުނިޔާ ހިތް ފުރާލާ ލޯބި ގެނުވީ
+*މީ އުފަލޭ މުނިޔާ ހިތްފުރާލާ ލޯބި ގެނުވީ
+ލޯބި ގެނުވީ
+*ގައިމޭ އަދު ހިތުގާ މި ވިންދު ދިރުވީ
+
+#1
+ފެންނަ އަސަރާ އިހުސާސުގާ، ފެންނަ އަސަރާ އިހުސާސުގާ
+*މިތުރާގެ ތިޔަފަރި ޖަޒުބާތުގާ
+ސާފު ހިތުންމީ އަންގާގޮތޭ
+*ލޯބީގަ އުފެދޭ ތޫފާނުގާ
+ވައިރޯޅިން ތާޒާ، ވައިރޯޅިން ތާޒާ ޖާނާ ރޫހު ދިރުވީ، ރޫހު ދިރުވީ
+*ގައިމޭ އަދު ހިތުގާ މި ރަމްޒު ދިރުވީ
+
+#2
+ގައިމެ ދުރުވާނޭ ހިތް ވަނީ، ގައިމެ ދުރުވާނޭ ހިތް ވަނީ
+*ބޭނުން ތިޔާރާއޭ ހޯދެނީ
+ހާލު މި ހުރިގޮތް އަންގާދެމޭ
+*ޔާރާގެ ލޯތަބައް ކެތްމަދުވެފާ
+ތެދެކޭ ތިޔަ ލޯތްބޭ، ތެދެކޭ ތިޔަ ލޯތްބޭ ފުރާނަ ދިރުވީ، ފުރާނަ ދިރުވީ
+*ގައިމޭ އަދު ހިތުގާ މި ވިންދު ދިރުވީ`,
+
+  englishLyrics: `#M
+Dairygaa liyey hithaa vinndhu dhiruvee, hithaa vinndhu dhiruvee
+*Gaimey adhu hithugaa mi ramzu dhiruvee
+Mee ufaley muniyaa hiyy furaalaa loabi genuvee
+*Mee ufaley muniyaa hiyyfuraalaa loabi genuvee
+Loabi genuvee
+*Gaimey adhu hithugaa mi vinndhu dhiruvee
+#1
+Fenna asaraa ihusaasugaa, fenna asaraa ihusaasugaa
+*Mithuraage thiyafari jazubaathugaa
+Saafu hithunnmee anngaagothey
+*Loabeega ufedhey thoofaanugaa
+Vairoalhin thaazaa, vairoalhin thaazaa jaanaa roohu dhiruvee, roohu dhiruvee
+*Gaimey adhu hithugaa mi ramzu dhiruvee
+#2
+Gaime dhuruvaaney hiyy vanee, gaime dhuruvaaney hiyy vanee
+*Beynun thiyaaraaey hoadhenee
+Haalu mi hurigoyy anngaadhemey
+*Yaaraage loathabah keyymadhuvefaa
+Thedhekey thiya loayybey, thedhekey thiya loayybey furaana dhiruvee, furaana dhiruvee
+*Gaimey adhu hithugaa mi vinndhu dhiruvee`,
+},
+{
+  id: 244,
+  name: `Githeyo Gulhin`,
+  genre: 'Kaasi',
+  lyrics: `#M
+*ގިތެޔޮ ގުޅިން ނެގި ލޯބި
+ނާނާ
+ބުނެދީ
+ދިންމީ
+އަގުހުރި މީރު ދޭ ރަހަ ގަރުނުގެ ހުރި މޮޅު
+
+#1
+ގުޅި ކަޅު ގިތެލުން މުޅިފުޅު ހަންޑުލުން
+*ކުޅިގަދަ ބިރިޔާނީ ކުކުޅުން
+ބަލަ މުޅި އުމުރަށް ދެމިހުންނަ މި އަސަރުން
+*ފުޅިފުޅިޔަށް އެޅި ބަންޑުންލައިފިޔެ
+
+#2
+ނަންހުރި ނިޔަނެތި ކަންކޮޅުތަކުގާ
+*ރަންކުލަ ވީބާ ނަގާފާ
+ބަލަ ނަންބަރު ދެރަކޮށް މަންޒިލު ކުރުކޮށް
+*ރަންކުލަ ދިރިއުޅުމަށް ގެނުވައިފިޔެ
+
+#3
+ރަނގަ ރަނގަ ތޮޅިޔާ މުރަނގަ ދެތޮޅިޔާ
+*އިތުބާރުން ނެގި ތިން ހުޅިޔާ
+ބަލަ ބއަނގަލާ މަތިމަސް ގޭބަންދު ފުޅިޔާ
+*އަނގަމަތި ހުރި ސިފަ ކުރުވައިދީފިޔެ
+
+-
+$M
+ފިނިފައިބާތީ ކޯނީގާ އިނީމާ
+*ބިނީމޭ ފިނިފެންމާ
+
+$1
+ތެމިފޯވެފާ އެމާ ފިނިބޮޑުވެފާ އިނީ
+*ތެމިފޯވެފާ އެމާ ފިނިބޮޑުވެފާ އިނީ
+ތެމިފޯވެގެން ގޮސް މަ ލޯބިން ބިނިމޭ
+*ބިނީމޭ ފިނިފެންމާ
+
+$2
+ދިއްލޭ އެރީތިމާ ނިންޖެއް ލޮލައްނައޭ
+*ދިއްލޭ އެރީތިމާ ނިންޖެއް ލޮލައްނައޭ
+ދިންހިނދު މަބޮސްދީ ހިފީމޭ ތަނޑީގާ
+*ތަނޑީގާ ފިނިފެންމާ
+
+$3
+ފިނިކަން ހިތަށް ލިބި ހިނިތުންވުމުން އެމާ
+*ފިނިކަން ހިތަށް ލިބި ހިނިތުންވުމުން އެމާ
+ދުނިޔެ ލިބިއްޖޭ އުފާވެރި ބިނީމާ
+*ބިނީމާ ފިނިފެންމާ
+
+$N
+*ބިންނާށޭ
+ފިނިފެންމާ
+ގެންނާށޭ
+ބިންނާނަން
+ދައްކާށޭ`,
+
+  englishLyrics: `#M
+*Githeyo gulhin negi loabi
+Naanaa
+Bunedhee
+Dhinnmee
+Aguhuri meeru dhey raha garunuge huri molhu
+#1
+Gulhi kalhu githelun mulhifulhu handulun
+*Kulhigadha biriyaanee kukulhun
+Bala mulhi umurah dhemihunna mi asarun
+*Fulhifulhiyah elhi banndunnlaifiye
+#2
+Nannhuri niyanethi kannkolhuthakugaa
+*Rannkula veebaa nagaafaa
+Bala nannbaru dherakoh mannzil kurukoh
+*Rannkula dhiriulhumah genuvaifiye
+#3
+Ranga ranga tholhiyaa muranga dhetholhiyaa
+*Ithubaarun negi thin hulhiyaa
+Bala bangalaa mathimas geybanndhu fulhiyaa
+*Angamathi huri sifa kuruvaidheefiye
+-
+$M
+Finifaibaathee koaneegaa ineemaa
+*Bineemey finifennmaa
+$1
+Themifoavefaa emaa finiboduvefaa inee
+*Themifoavefaa emaa finiboduvefaa inee
+Themifoavegen gos ma loabin binimey
+*Bineemey finifennmaa
+$2
+Dhihley ereethimaa ninnjeh lolahnaey
+*Dhihley ereethimaa ninnjeh lolahnaey
+Dhinnhindhu mabosdhee hifeemey thandeegaa
+*Thandeegaa finifennmaa
+$3
+Finikan hithah libi hinithunnvumun emaa
+*Finikan hithah libi hinithunnvumun emaa
+Dhuniye libihjey ufaaveri bineemaa
+*Bineemaa finifennmaa
+$N
+*Binnaashey
+Finifennmaa
+Gennaashey
+Binnaanan
+Dhahkaashey`,
+},
+{
+  id: 245,
+  name: `Goodluck`,
+  genre: 'Nala',
+  lyrics: `#M
+ތި ހޯދާ ގުޑުލަކު މުނިޔާ
+*ބޭނުންވާ ލަކުލަކު މުނިޔާ
+ވާހާ ކޮންމެ ތަނަކު ލޯބިން ގޯނާދޭ މީހަކު
+*ވާހާ ކޮންމެ ތަނަކު ލޯބިން ގޯނާދޭ މީހަކު ދޭނޭ
+ބުނެލާފާ ލޯބިން އެކި އެކި ހަދިޔާ
+*ތި ހޯދާ ގުޑުލަކު މުނިޔާ، ބޭނުންވާ ލަކުލަކު މުނިޔާ
+
+#1
+ޖާދޫއެކޭ ހީވެ ހިތް މިލެނބޭތީ
+*ދީވާނާ ކުރެވައެ ސީދާ މޫނަށް އެ ބަލާތީ
+ވާނޭގޮތް ވެއްޖޭ ދެން މަސްތީ އަވައިގާ
+*ވާނޭގޮތް ވެއްޖޭ ދެން މަސްތީ އަވައިގާ
+ބެހެނީ ހިތް އޮއިގާތާއޭ ހަލަބޮލި ވައިގާ
+*ބެހެނީ ހިތް އޮއިގާތާއޭ ހަލަބޮލި ވައިގާ
+ހިތައްދޭ ގޯނާ، ހިތައްދޭ ގޯނާ ފިނި އަނިޔާ
+*ބޭނުންވާ ފޮނި ފޮނި އަނިޔާ
+
+#2
+ސިއްރުން ނިކަން ޔާރާ ބުނެލީއެ ލޯބިވޭ
+*ސިއްރުން ނިކަން ޔާރާ ބުނެލީއެ ލޯބިވޭ
+ވެވުނީ ޤަބޫލު ސިކުނޑިން ބާރު ދޫވޭ
+*ވެވުނީ ޤަބޫލު ސިކުނޑިން ބާރު ދޫވޭ
+އަތުން ދޫވެއްޖޭ، އަތުން ދޫވެއްޖޭ ރިހި ބަނޑިޔާ
+*ސަހަރޯއޭ އަގު މޮޅު ބަނޑިޔާ`,
+
+  englishLyrics: `#M
+Thi hoadhaa gudulaku muniyaa
+*Beynunnvaa lakulaku muniyaa
+Vaahaa konnme thanaku loabin goanaadhey meehaku
+*Vaahaa konnme thanaku loabin goanaadhey meehaku dheyney
+Bunelaafaa loabin eki eki hadhiyaa
+*Thi hoadhaa gudulaku muniyaa, beynunnvaa lakulaku muniyaa
+#1
+Jaadhooekey heeve hiyy milenbeythee
+*Dheevaanaa kurevae seedhaa moonah e balaathee
+Vaaneygoyy vehjey dhen masthee avaigaa
+*Vaaneygoyy vehjey dhen masthee avaigaa
+Behenee hiyy oigaathaaey halaboli vaigaa
+*Behenee hiyy oigaathaaey halaboli vaigaa
+Hithahdhey goanaa, hithahdhey goanaa fini aniyaa
+*Beynunnvaa foni foni aniyaa
+#2
+Sihrun nikan yaaraa buneleee loabivey
+*Sihrun nikan yaaraa buneleee loabivey
+Vevunee qaboolu sikundin baaru dhoovey
+*Vevunee qaboolu sikundin baaru dhoovey
+Athun dhoovehjey, athun dhoovehjey rihi bandiyaa
+*Saharoaey agu molhu bandiyaa`,
+},
+{
+  id: 246,
+  name: `Dheytho Dheytho`,
+  genre: 'Nala',
+  lyrics: `#M
+ދޭތޯ ދޭތޯ ވީ ބަލަން މިވާ ހިތުގެ ގިލަން
+*ތީޔޭ މަލަކީ އުފާދޭ ނަނަނާ
+
+#1
+ފޮޅުނުހާވެސް މަލަކީ ތިއީޔޭ
+*މަލުގެ ރީތިކަމާއޭ
+
+#2
+އެންމެ ފިޔައެއް ނަމަވެސް ލިބޭތޯ
+*ދެންނެވީމެ އިނގޭތޯ
+
+#3
+ދޭށެ ވާނީ ނޫރަންގުލޭމާ
+*ޗާލުމި މަލުގެ އަރާމާ`,
+
+  englishLyrics: `#M
+Dheythoa dheythoa vee balan mivaa hithuge gilan
+*Theeyey malakee ufaadhey nananaa
+#1
+Folhunuhaaves malakee thieeyey
+*Maluge reethikamaaey
+#2
+Ennme fiyaeh namaves libeythoa
+*Dhenneveeme ingeythoa
+#3
+Dheyshe vaanee noorannguleymaa
+*Chaalumi maluge araamaa`,
 },
 ]
