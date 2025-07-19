@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Carousel</title>
+    
+    <!-- Essential CSS -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 50px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #333;
+        }
+        
+        /* Owl Carousel Essential Styles */
+        .owl-carousel {
+            display: none;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .owl-carousel .owl-stage {
+            position: relative;
+            touch-action: manipulation;
+        }
+        
+        .owl-carousel .owl-stage:after {
+            content: ".";
+            display: block;
+            clear: both;
+            visibility: hidden;
+            line-height: 0;
+            height: 0;
+        }
+        
+        .owl-carousel .owl-stage-outer {
+            position: relative;
+            overflow: hidden;
+            transform: translate3d(0px, 0px, 0px);
+        }
+        
+        .owl-carousel .owl-item {
+            position: relative;
+            min-height: 1px;
+            float: left;
+            backface-visibility: hidden;
+            touch-callout: none;
+        }
+        
+        .owl-carousel.owl-loaded {
+            display: block;
+        }
+        
+        .owl-carousel.owl-loading {
+            opacity: 0;
+            display: block;
+        }
+        
+        .owl-carousel.owl-hidden {
+            opacity: 0;
+        }
+        
+        .owl-carousel.owl-refresh .owl-item {
+            visibility: hidden;
+        }
+        
+        .owl-carousel.owl-drag .owl-item {
+            touch-action: pan-y;
+            user-select: none;
+        }
+        
+        .owl-carousel.owl-grab {
+            cursor: move;
+            cursor: grab;
+        }
+        
+        /* Navigation Dots */
+        .owl-carousel .owl-dots {
+            text-align: center;
+            padding-top: 15px;
+        }
+        
+        .owl-carousel .owl-dot {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #ccc;
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .owl-carousel .owl-dot.active {
+            background: #007bff;
+        }
+        
+        /* Navigation Arrows */
+        .owl-carousel .owl-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        
+        .owl-carousel .owl-nav button {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            pointer-events: auto;
+            transition: background 0.3s;
+        }
+        
+        .owl-carousel .owl-nav button:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        
+        .owl-carousel .owl-nav .owl-prev {
+            left: 10px;
+        }
+        
+        .owl-carousel .owl-nav .owl-next {
+            right: 10px;
+        }
+        
+        /* Carousel Item Styling */
+        .carousel-item {
+            padding: 20px;
+            margin: 0 10px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        .carousel-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+        
+        .carousel-item p {
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .carousel-item.item-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .carousel-item.item-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
+        .carousel-item.item-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
+        .carousel-item.item-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white; }
+        .carousel-item.item-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Infinite Carousel Demo</h1>
+        
+        <!-- Owl Carousel -->
+        <div class="owl-carousel owl-theme" id="infinite-carousel">
+            <div class="carousel-item item-1">
+                <h3>Slide 1</h3>
+                <p>This is the first slide with beautiful gradient background.</p>
+            </div>
+            <div class="carousel-item item-2">
+                <h3>Slide 2</h3>
+                <p>Second slide with a different color scheme and styling.</p>
+            </div>
+            <div class="carousel-item item-3">
+                <h3>Slide 3</h3>
+                <p>Third slide showcasing the infinite loop functionality.</p>
+            </div>
+            <div class="carousel-item item-4">
+                <h3>Slide 4</h3>
+                <p>Fourth slide with smooth transitions and responsiveness.</p>
+            </div>
+            <div class="carousel-item item-5">
+                <h3>Slide 5</h3>
+                <p>Fifth slide demonstrating the carousel's capabilities.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery (required for Owl Carousel) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <!-- Owl Carousel JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    
+    <!-- Initialize Carousel -->
+    <script>
+        $(document).ready(function(){
+            $('#infinite-carousel').owlCarousel({
+                // Essential settings for infinite carousel
+                loop: true,              // Enable infinite loop
+                autoplay: true,          // Enable autoplay
+                autoplayTimeout: 3000,   // 3 seconds per slide
+                autoplayHoverPause: true, // Pause on hover
+                
+                // Responsive settings
+                responsive: {
+                    0: {
+                        items: 1,        // 1 item on mobile
+                        nav: false,      // Hide nav on mobile
+                        dots: true       // Show dots on mobile
+                    },
+                    600: {
+                        items: 2,        // 2 items on tablet
+                        nav: true,       // Show nav on tablet
+                        dots: true
+                    },
+                    1000: {
+                        items: 3,        // 3 items on desktop
+                        nav: true,       // Show nav on desktop
+                        dots: true
+                    }
+                },
+                
+                // Navigation
+                nav: true,
+                navText: ['‹', '›'],     // Custom nav text
+                dots: true,              // Show dots
+                
+                // Animation
+                animateOut: 'fadeOut',   // Fade out animation
+                animateIn: 'fadeIn',     // Fade in animation
+                
+                // Touch and drag
+                touchDrag: true,
+                mouseDrag: true,
+                
+                // Performance
+                smartSpeed: 500,         // Animation speed
+                fluidSpeed: true,        // Smooth speed
+                
+                // Auto height
+                autoHeight: false,       // Fixed height for better performance
+                
+                // Center mode (optional)
+                center: false,           // Set to true for center mode
+                
+                // Margin between items
+                margin: 20,
+                
+                // Stage padding
+                stagePadding: 0,
+                
+                // Lazy loading (if using images)
+                lazyLoad: false,
+                
+                // Video support
+                video: false
+            });
+            
+            // Optional: Custom control buttons
+            $('.custom-prev').click(function() {
+                $('#infinite-carousel').trigger('prev.owl.carousel');
+            });
+            
+            $('.custom-next').click(function() {
+                $('#infinite-carousel').trigger('next.owl.carousel');
+            });
+            
+            // Optional: Pause/Play toggle
+            $('.play-pause').click(function() {
+                var carousel = $('#infinite-carousel');
+                if ($(this).text() === 'Pause') {
+                    carousel.trigger('stop.owl.autoplay');
+                    $(this).text('Play');
+                } else {
+                    carousel.trigger('play.owl.autoplay');
+                    $(this).text('Pause');
+                }
+            });
+        });
+    </script>
+    
+    <!-- Optional: Custom Controls -->
+    <div style="text-align: center; margin-top: 20px;">
+        <button class="custom-prev" style="margin: 0 10px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Previous</button>
+        <button class="play-pause" style="margin: 0 10px; padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Pause</button>
+        <button class="custom-next" style="margin: 0 10px; padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Next</button>
+    </div>
+</body>
+</html>
