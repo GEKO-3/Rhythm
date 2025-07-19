@@ -889,17 +889,34 @@
         }
 
         .custom-play-btn.playing {
-            width: 60px;
-            height: 60px;
-            top: 20px;
-            right: 20px;
+            width: 50px;
+            height: 50px;
+            left: 20px;
+            bottom: 75px;
             position: absolute;
             margin: 0;
+            z-index: 5;
+            pointer-events: auto;
+            /* Inverted colors */
+            background: linear-gradient(135deg, #1f1f1f, #333333);
+            color: var(--primary-color);
+            box-shadow: 0 4px 20px rgba(31, 31, 31, 0.4);
         }
 
         .custom-play-btn.playing svg {
             width: 20px;
             height: 20px;
+        }
+
+        .custom-play-btn.playing:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(31, 31, 31, 0.6);
+            background: linear-gradient(135deg, #2a2a2a, #444444);
+        }
+
+        /* Remove pointer-events blocking - let both elements be clickable */
+        .custom-play-overlay.playing {
+            pointer-events: auto;
         }
 
         .soundcloud-player {
@@ -912,6 +929,7 @@
             left: 0;
             z-index: 4;
             background: transparent;
+            pointer-events: auto; /* Ensure iframe is interactive */
         }
 
         .soundcloud-player iframe {
@@ -920,6 +938,7 @@
             border: none;
             border-radius: 0 0 15px 15px;
             background: transparent;
+            pointer-events: auto; /* Ensure iframe content is interactive */
         }
 
         /* Mobile-specific styles */
@@ -1417,6 +1436,7 @@
             }
             
             console.log('Music data loaded:', musicData.length, 'tracks');
+            console.log('First track data:', musicData[0]);
             
             // Generate indicator dots first
             generateIndicatorDots();
@@ -1425,11 +1445,23 @@
             carousel.innerHTML = '';
             
             // Generate tiles from music data
-            musicData.forEach(track => {
-                carousel.innerHTML += createMusicTile(track);
+            musicData.forEach((track, index) => {
+                console.log(`Generating tile ${index + 1}:`, track.title);
+                const tileHTML = createMusicTile(track);
+                carousel.innerHTML += tileHTML;
             });
             
             console.log('Generated', musicData.length, 'tiles from music data');
+            
+            // Verify buttons were created
+            setTimeout(() => {
+                const buttons = carousel.querySelectorAll('.custom-play-btn');
+                console.log('Play buttons created:', buttons.length);
+                buttons.forEach((btn, i) => {
+                    const src = btn.getAttribute('data-iframe-src');
+                    console.log(`Button ${i + 1} iframe src:`, src ? 'Set' : 'Missing');
+                });
+            }, 100);
         }
         
         function initializeCarousel() {
@@ -1504,8 +1536,9 @@
                     },
                     onInitialized: function(event) {
                         console.log('Owl Carousel initialized successfully');
-                        // Apply centering fix after initialization
+                        // Reattach event listeners after initialization
                         setTimeout(() => {
+                            attachEventListeners();
                             const $carousel = $('#music-carousel');
                             $carousel.trigger('refresh.owl.carousel');
                             $carousel.trigger('to.owl.carousel', [0, 0]);
@@ -1515,8 +1548,9 @@
                         console.log('Owl Carousel initializing...');
                     },
                     onChanged: function(event) {
-                        // Ensure center item is properly highlighted
+                        // Ensure center item is properly highlighted and reattach event listeners
                         setTimeout(() => {
+                            attachEventListeners(); // Reattach listeners after slide change
                             $('.music-tile').removeClass('center-item');
                             $('.owl-item.center .music-tile').addClass('center-item');
                         }, 100);
@@ -1621,21 +1655,48 @@
         }
         
         function attachEventListeners() {
-            // Attach to all play buttons in current tiles
+            // Remove existing event delegation listener if any
+            const carousel = document.getElementById('music-carousel');
+            if (carousel) {
+                // Use event delegation to handle clicks on any play button
+                carousel.removeEventListener('click', handleCarouselClick);
+                carousel.addEventListener('click', handleCarouselClick);
+                console.log('Event delegation attached to carousel');
+            }
+            
+            // Also attach to all current play buttons for immediate functionality
             const customButtons = document.querySelectorAll('.music-tile .custom-play-btn');
             console.log('Attaching listeners to', customButtons.length, 'buttons');
             
-            customButtons.forEach(button => {
+            customButtons.forEach((button, index) => {
                 // Remove existing listeners to prevent duplicates
                 button.removeEventListener('click', handlePlayButtonClick);
                 button.addEventListener('click', handlePlayButtonClick);
+                console.log(`Attached listener to button ${index + 1}`);
             });
+        }
+        
+        function handleCarouselClick(e) {
+            // Check if the clicked element is a play button or inside one
+            const playButton = e.target.closest('.custom-play-btn');
+            if (playButton) {
+                e.preventDefault();
+                const iframeSrc = playButton.getAttribute('data-iframe-src');
+                console.log('Play button clicked via delegation, iframe src:', iframeSrc);
+                togglePlay(playButton, iframeSrc);
+            }
         }
         
         function handlePlayButtonClick(e) {
             e.preventDefault();
+            e.stopPropagation();
+            console.log('=== PLAY BUTTON CLICKED ===');
             const button = e.currentTarget;
             const iframeSrc = button.getAttribute('data-iframe-src');
+            console.log('Play button clicked directly, iframe src:', iframeSrc);
+            console.log('Button element:', button);
+            console.log('Current widget:', currentWidget);
+            console.log('Currently playing:', currentlyPlaying);
             togglePlay(button, iframeSrc);
         }
         
@@ -1687,6 +1748,20 @@
         }
 
         function togglePlay(button, iframeSrc) {
+            console.log('=== TOGGLE PLAY CALLED ===');
+            console.log('Button:', button);
+            console.log('Iframe src:', iframeSrc);
+            
+            if (!button) {
+                console.error('Button is null or undefined');
+                return;
+            }
+            
+            if (!iframeSrc) {
+                console.error('Iframe src is null or undefined');
+                return;
+            }
+            
             const overlay = button.parentElement;
             const playerContainer = overlay.parentElement;
             const soundcloudPlayer = playerContainer.querySelector('.soundcloud-player');
@@ -1695,26 +1770,36 @@
             const pauseIcon = button.querySelector('.pause-icon');
             const playerIndex = Array.from(document.querySelectorAll('.music-tile')).indexOf(playerContainer.closest('.music-tile'));
 
+            console.log('Player container:', playerContainer);
+            console.log('SoundCloud player:', soundcloudPlayer);
+            console.log('Iframe:', iframe);
+            console.log('Player index:', playerIndex);
+
             // If another player is playing, stop it
             if (currentlyPlaying && currentlyPlaying !== playerContainer) {
+                console.log('Stopping currently playing player');
                 stopPlayer(currentlyPlaying);
             }
 
             // Check if this player is currently active
             if (currentlyPlaying === playerContainer && currentWidget) {
-                // Player is active, toggle play/pause using widget
+                // Player is active, use widget controls directly
+                console.log('Player active, using widget controls');
+                
                 if (playStates[playerIndex]) {
+                    console.log('Currently playing, pausing...');
                     currentWidget.pause();
-                    // Immediately update UI state in case event doesn't fire
+                    // Update UI immediately
                     playStates[playerIndex] = false;
-                    playIcon.style.display = 'block';
-                    pauseIcon.style.display = 'none';
+                    if (playIcon) playIcon.style.display = 'block';
+                    if (pauseIcon) pauseIcon.style.display = 'none';
                 } else {
+                    console.log('Currently paused, playing...');
                     currentWidget.play();
-                    // Immediately update UI state in case event doesn't fire
+                    // Update UI immediately
                     playStates[playerIndex] = true;
-                    playIcon.style.display = 'none';
-                    pauseIcon.style.display = 'block';
+                    if (playIcon) playIcon.style.display = 'none';
+                    if (pauseIcon) pauseIcon.style.display = 'block';
                 }
                 return;
             }
@@ -1740,119 +1825,52 @@
             const banner = container.querySelector('.tile-info-banner');
             banner.classList.add('playing');
             
-            // Update play button style and position
+            // Update play button style and position but keep it as play icon (not playing)
             const button = overlay.querySelector('.custom-play-btn');
             button.classList.add('playing');
-            button.querySelector('.play-icon').style.display = 'none';
-            button.querySelector('.pause-icon').style.display = 'block';
+            // Keep the play icon visible since we're not auto-playing
+            button.querySelector('.play-icon').style.display = 'block';
+            button.querySelector('.pause-icon').style.display = 'none';
             
             currentlyPlaying = container;
 
-            // Initialize SoundCloud Widget API
+            // Initialize SoundCloud Widget API without auto-play
             iframe.onload = function() {
+                console.log('Iframe loaded, checking SoundCloud API availability...');
+                
+                if (typeof SC === 'undefined' || !SC.Widget) {
+                    console.error('SoundCloud Widget API not available');
+                    return;
+                }
+                
+                console.log('SoundCloud API available, creating widget...');
                 currentWidget = SC.Widget(iframe);
-                let playAttempts = 0;
-                const maxPlayAttempts = 3;
                 
-                // Function to attempt playback with retries
-                const attemptPlay = () => {
-                    if (playAttempts < maxPlayAttempts) {
-                        playAttempts++;
-                        setTimeout(() => {
-                            if (currentWidget && currentlyPlaying === container) {
-                                currentWidget.play();
-                                console.log('Play attempt', playAttempts, 'for track:', trackId);
-                                
-                                // Check if playing after a short delay
-                                setTimeout(() => {
-                                    if (currentWidget) {
-                                        currentWidget.isPaused(function(paused) {
-                                            if (paused && playAttempts < maxPlayAttempts) {
-                                                console.log('Still paused, retrying play...');
-                                                attemptPlay();
-                                            } else if (!paused) {
-                                                console.log('Successfully playing track:', trackId);
-                                                playStates[playerIndex] = true;
-                                            }
-                                        });
-                                    }
-                                }, 500);
-                            }
-                        }, 200 * playAttempts); // Increasing delay between attempts
-                    }
-                };
-                
-                // Set up widget event listeners
+                // Set up widget event listeners without auto-play
                 currentWidget.bind(SC.Widget.Events.READY, function() {
                     console.log('SoundCloud widget ready for track:', trackId);
                     
-                    let initialPlayMonitoring = true;
-                    let forcePlayTimeout = null;
-                    
-                    // Function to monitor and force initial playback
-                    const monitorInitialPlay = () => {
-                        let checkCount = 0;
-                        const maxChecks = 10; // Check for 2 seconds (200ms * 10)
-                        
-                        const checkPlayState = () => {
-                            if (checkCount < maxChecks && initialPlayMonitoring && currentWidget && currentlyPlaying === container) {
-                                currentWidget.isPaused(function(paused) {
-                                    checkCount++;
-                                    console.log('Initial play check', checkCount, '- Paused:', paused);
-                                    
-                                    if (paused && initialPlayMonitoring) {
-                                        console.log('Player paused during initial play, forcing play...');
-                                        currentWidget.play();
-                                        // Continue monitoring for a bit longer
-                                        setTimeout(checkPlayState, 200);
-                                    } else if (!paused) {
-                                        console.log('Player successfully playing, stopping monitoring');
-                                        initialPlayMonitoring = false;
-                                        playStates[playerIndex] = true;
-                                    } else if (checkCount < maxChecks) {
-                                        // Continue monitoring
-                                        setTimeout(checkPlayState, 200);
-                                    } else {
-                                        // Stop monitoring after max checks
-                                        console.log('Stopped monitoring initial play after', maxChecks, 'checks');
-                                        initialPlayMonitoring = false;
-                                    }
-                                });
-                            }
-                        };
-                        
-                        // Start monitoring after a short delay
-                        setTimeout(checkPlayState, 300);
-                    };
-                    
-                    // Function to ensure playback starts
-                    const startPlayback = () => {
-                        attemptPlay();
-                        // Start monitoring for initial play issues
-                        monitorInitialPlay();
-                    };
-                    
                     // Check if there's a saved position for this track
                     if (trackId && savedPositions[trackId]) {
-                        console.log('Resuming from saved position:', savedPositions[trackId], 'for track:', trackId);
+                        console.log('Seeking to saved position:', savedPositions[trackId], 'for track:', trackId);
                         
                         // Wait a bit for the track to be fully loaded before seeking
                         setTimeout(() => {
                             currentWidget.seekTo(savedPositions[trackId]);
-                            // Start playback after seeking
-                            startPlayback();
                         }, 800);
                     } else {
                         console.log('No saved position found for track:', trackId);
-                        // Auto-play when ready (no saved position)
-                        startPlayback();
                     }
+                    
+                    // Set initial state to paused (no auto-play)
+                    playStates[playerIndex] = false;
+                    button.querySelector('.play-icon').style.display = 'block';
+                    button.querySelector('.pause-icon').style.display = 'none';
                 });
 
                 currentWidget.bind(SC.Widget.Events.PLAY, function() {
                     console.log('SoundCloud PLAY event fired for track:', trackId);
                     playStates[playerIndex] = true;
-                    initialPlayMonitoring = false; // Stop monitoring once we get a play event
                     // Update button to show pause icon
                     button.querySelector('.play-icon').style.display = 'none';
                     button.querySelector('.pause-icon').style.display = 'block';
@@ -1862,27 +1880,17 @@
                     console.log('SoundCloud PAUSE event fired for track:', trackId);
                     playStates[playerIndex] = false;
                     
-                    // If we're still in initial play monitoring and this is an unwanted pause, try to play again
-                    if (initialPlayMonitoring) {
-                        console.log('Unwanted pause during initial play, attempting to resume...');
-                        setTimeout(() => {
-                            if (currentWidget && currentlyPlaying === container && initialPlayMonitoring) {
-                                currentWidget.play();
-                            }
-                        }, 100);
-                    } else {
-                        // Save current position when intentionally paused
-                        if (trackId && currentWidget) {
-                            currentWidget.getPosition(function(position) {
-                                console.log('Saving position:', position, 'for track:', trackId);
-                                savedPositions[trackId] = position;
-                                savePositions();
-                            });
-                        }
-                        // Update button to show play icon
-                        button.querySelector('.play-icon').style.display = 'block';
-                        button.querySelector('.pause-icon').style.display = 'none';
+                    // Save current position when paused
+                    if (trackId && currentWidget) {
+                        currentWidget.getPosition(function(position) {
+                            console.log('Saving position:', position, 'for track:', trackId);
+                            savedPositions[trackId] = position;
+                            savePositions();
+                        });
                     }
+                    // Update button to show play icon
+                    button.querySelector('.play-icon').style.display = 'block';
+                    button.querySelector('.pause-icon').style.display = 'none';
                 });
 
                 currentWidget.bind(SC.Widget.Events.FINISH, function() {
@@ -2004,9 +2012,36 @@
             // Load saved positions on page load
             loadSavedPositions();
             
+            // Check for required dependencies
+            function checkDependencies() {
+                const hasJQuery = typeof jQuery !== 'undefined';
+                const hasOwlCarousel = hasJQuery && typeof jQuery().owlCarousel !== 'undefined';
+                const hasSoundCloudAPI = typeof SC !== 'undefined' && SC.Widget;
+                const hasMusicData = typeof musicData !== 'undefined';
+                
+                console.log('Dependencies check:');
+                console.log('- jQuery:', hasJQuery);
+                console.log('- Owl Carousel:', hasOwlCarousel);
+                console.log('- SoundCloud API:', hasSoundCloudAPI);
+                console.log('- Music Data:', hasMusicData);
+                
+                return { hasJQuery, hasOwlCarousel, hasSoundCloudAPI, hasMusicData };
+            }
+            
             // Wait for jQuery and Owl Carousel to be ready
             $(document).ready(function() {
-                console.log('jQuery ready, initializing Owl Carousel...');
+                console.log('jQuery ready, checking all dependencies...');
+                
+                const deps = checkDependencies();
+                if (!deps.hasMusicData) {
+                    console.error('Music data not loaded, retrying in 1 second...');
+                    setTimeout(() => {
+                        initializeCarousel();
+                    }, 1000);
+                    return;
+                }
+                
+                console.log('All dependencies ready, initializing Owl Carousel...');
                 // Initialize the Owl Carousel
                 initializeCarousel();
                 
