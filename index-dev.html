@@ -343,6 +343,12 @@
             width: 100%;
             max-width: 100vw;
             overflow-x: hidden;
+            /* Add background image with 3px crop from all sides */
+            background-image: url('src/s2bg.jpg');
+            background-size: calc(100% + 6px) calc(100% + 6px); /* Extend by 6px total (3px each side) */
+            background-position: -3px -3px; /* Offset by -3px to crop 3px from each side */
+            background-repeat: no-repeat;
+            background-attachment: scroll;
         }
 
         .section-header {
