@@ -482,11 +482,42 @@
         }
 
         .tile-indicators {
-            display: none; /* Hidden for infinite scroll */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+            gap: 6px;
+            position: relative;
+            height: 20px;
         }
 
         .indicator-dot {
-            display: none; /* Hidden for infinite scroll */
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border: none;
+            position: relative;
+            z-index: 1;
+        }
+
+        .indicator-dot.active {
+            background: var(--primary-color);
+            transform: scale(1.8);
+            box-shadow: 0 0 8px rgba(245, 208, 0, 0.6);
+            z-index: 2;
+        }
+
+        .indicator-dot.next-active {
+            transform: scale(1.3);
+            background: rgba(245, 208, 0, 0.6);
+        }
+
+        .indicator-dot.prev-active {
+            transform: scale(1.3);
+            background: rgba(245, 208, 0, 0.6);
         }
 
         .music-tile {
@@ -757,12 +788,12 @@
             }
 
             .tile-indicators {
-                margin-top: 20px;
+                margin-top: 15px;
             }
 
             .indicator-dot {
-                width: 10px;
-                height: 10px;
+                width: 5px;
+                height: 5px;
             }
             
             /* Navigation arrows responsive adjustments */
@@ -861,8 +892,10 @@
             </div>
         </div>
         
-        <!-- Tile Indicators -->
-        <!-- Dot system removed for true infinite scrolling -->
+        <!-- Tile Indicators (will be dynamically generated) -->
+        <div class="tile-indicators" id="tile-indicators">
+            <!-- Dots will be dynamically generated from music-data.js -->
+        </div>
         
         <!-- Debug button for testing -->
         <div style="text-align: center; margin-top: 20px;">
@@ -896,8 +929,206 @@
         let playStates = {}; // Store play states for each player
         let savedPositions = {}; // Store saved positions for each track
         let currentActiveIndex = 0; // Track which tile is currently active
+        let currentDotIndex = 0; // Start with first dot active (will be updated when dots are generated)
+        let totalDots = 0; // Track total number of dots
+        let isVideoPlaying = true; // Track video state
+        let lastSwipeDirection = null; // Track the last user swipe direction
         
-        // Function to generate SoundCloud widget URL from track ID
+        // Touch/swipe detection variables
+        let startX = 0;
+        let startY = 0;
+        let endX = 0;
+        let endY = 0;
+        
+        // Enhanced dot indicator management with smooth animations
+        function updateDots(direction, animate = true) {
+            const dots = document.querySelectorAll('.indicator-dot');
+            if (dots.length === 0) return; // No dots to update
+            
+            // Determine dot movement based on user swipe direction
+            let dotDirection = direction;
+            if (lastSwipeDirection) {
+                // Move dot opposite to user swipe direction
+                dotDirection = lastSwipeDirection === 'right' ? 'left' : 'right';
+                console.log('User swiped:', lastSwipeDirection, '- Moving dot:', dotDirection);
+            }
+            
+            if (animate) {
+                // Add transition classes for smooth animation
+                dots.forEach((dot, index) => {
+                    dot.classList.remove('active', 'next-active', 'prev-active');
+                    
+                    // Calculate relative position to current active dot
+                    const distance = index - currentDotIndex;
+                    
+                    if (distance === 0) {
+                        dot.classList.add('active');
+                    } else if (distance === 1 || distance === -(totalDots - 1)) { // Next dot (accounting for wrap-around)
+                        dot.classList.add('next-active');
+                    } else if (distance === -1 || distance === (totalDots - 1)) { // Previous dot (accounting for wrap-around)
+                        dot.classList.add('prev-active');
+                    }
+                });
+                
+                // Animate the transition
+                setTimeout(() => {
+                    // Update dot index based on determined direction
+                    if (dotDirection === 'left') { // Move dot left
+                        currentDotIndex = (currentDotIndex - 1 + totalDots) % totalDots;
+                    } else if (dotDirection === 'right') { // Move dot right
+                        currentDotIndex = (currentDotIndex + 1) % totalDots;
+                    }
+                    
+                    // Apply new states
+                    dots.forEach((dot, index) => {
+                        dot.classList.remove('active', 'next-active', 'prev-active');
+                        
+                        const distance = index - currentDotIndex;
+                        
+                        if (distance === 0) {
+                            dot.classList.add('active');
+                        } else if (distance === 1 || distance === -(totalDots - 1)) {
+                            dot.classList.add('next-active');
+                        } else if (distance === -1 || distance === (totalDots - 1)) {
+                            dot.classList.add('prev-active');
+                        }
+                    });
+                    
+                    // Clear the last swipe direction after using it
+                    lastSwipeDirection = null;
+                }, 100);
+            } else {
+                // Immediate update without animation
+                if (dotDirection === 'left') { // Move dot left
+                    currentDotIndex = (currentDotIndex - 1 + totalDots) % totalDots;
+                } else if (dotDirection === 'right') { // Move dot right
+                    currentDotIndex = (currentDotIndex + 1) % totalDots;
+                }
+                
+                dots.forEach((dot, index) => {
+                    dot.classList.remove('active', 'next-active', 'prev-active');
+                    
+                    const distance = index - currentDotIndex;
+                    
+                    if (distance === 0) {
+                        dot.classList.add('active');
+                    } else if (distance === 1 || distance === -(totalDots - 1)) {
+                        dot.classList.add('next-active');
+                    } else if (distance === -1 || distance === (totalDots - 1)) {
+                        dot.classList.add('prev-active');
+                    }
+                });
+                
+                // Clear the last swipe direction after using it
+                lastSwipeDirection = null;
+            }
+        }
+        
+        // Video control functions
+        function pauseVideo() {
+            const video = document.querySelector('.video-background');
+            if (video && !video.paused && isVideoPlaying) {
+                video.pause();
+                isVideoPlaying = false;
+                console.log('Video paused to save resources');
+            }
+        }
+        
+        function resumeVideo() {
+            const video = document.querySelector('.video-background');
+            if (video && video.paused && !isVideoPlaying) {
+                video.play().catch(() => {
+                    // Handle autoplay restrictions
+                    console.log('Video autoplay prevented');
+                });
+                isVideoPlaying = true;
+                console.log('Video resumed');
+            }
+        }
+        
+        // Lazy loading for thumbnails
+        function preloadThumbnails() {
+            if (typeof musicData === 'undefined') return;
+            
+            // Get currently visible tiles
+            const visibleTiles = document.querySelectorAll('.owl-item.active .track-thumbnail, .music-tile .track-thumbnail');
+            const visibleSrcs = Array.from(visibleTiles).map(img => img.src);
+            
+            // Preload thumbnails that aren't currently visible
+            musicData.forEach(track => {
+                if (!visibleSrcs.includes(track.thumbnailUrl)) {
+                    const img = new Image();
+                    img.src = track.thumbnailUrl;
+                    // Optional: add to cache or handle load events
+                    img.onload = () => {
+                        console.log('Preloaded thumbnail:', track.title);
+                    };
+                }
+            });
+        }
+        
+        // Enhanced scroll detection for immediate video restart
+        let lastScrollPosition = 0;
+        function handleScroll() {
+            const scrollPosition = window.scrollY;
+            const windowHeight = window.innerHeight;
+            const documentHeight = document.documentElement.scrollHeight;
+            
+            // Check if we're at the bottom of the page
+            const isAtBottom = scrollPosition + windowHeight >= documentHeight - 50; // Reduced threshold for earlier detection
+            
+            // Restart video immediately if:
+            // 1. Not at bottom AND video is paused AND no music is playing
+            if (!isAtBottom && !isVideoPlaying && !currentlyPlaying) {
+                console.log('Not at bottom - restarting video immediately');
+                resumeVideo();
+            }
+            // Pause video only when actually at bottom
+            else if (isAtBottom && isVideoPlaying) {
+                console.log('At bottom - pausing video');
+                pauseVideo();
+            }
+            
+            // Update last scroll position for future reference
+            lastScrollPosition = scrollPosition;
+        }
+        
+        // Function to generate indicator dots based on music data
+        function generateIndicatorDots() {
+            if (typeof musicData === 'undefined') {
+                console.error('musicData not available for generating dots');
+                return;
+            }
+            
+            const indicatorsContainer = document.getElementById('tile-indicators');
+            if (!indicatorsContainer) {
+                console.error('Indicators container not found');
+                return;
+            }
+            
+            // Clear existing dots
+            indicatorsContainer.innerHTML = '';
+            
+            // Set total dots count
+            totalDots = musicData.length;
+            
+            // Generate dots for each track
+            musicData.forEach((track, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'indicator-dot';
+                dot.setAttribute('data-index', index);
+                
+                // First dot starts as active
+                if (index === 0) {
+                    dot.classList.add('active');
+                    currentDotIndex = 0;
+                }
+                
+                indicatorsContainer.appendChild(dot);
+            });
+            
+            console.log('Generated', totalDots, 'indicator dots');
+        }
         function generateSoundCloudUrl(trackId) {
             const baseUrl = "https://w.soundcloud.com/player/";
             const params = new URLSearchParams({
@@ -973,6 +1204,9 @@
             }
             
             console.log('Music data loaded:', musicData.length, 'tracks');
+            
+            // Generate indicator dots first
+            generateIndicatorDots();
             
             // Clear existing content
             carousel.innerHTML = '';
@@ -1073,6 +1307,12 @@
                             $('.music-tile').removeClass('center-item');
                             $('.owl-item.center .music-tile').addClass('center-item');
                         }, 100);
+                        
+                        // Update dots based on carousel movement - will use lastSwipeDirection if available
+                        updateDots('carousel-changed', true);
+                        
+                        // Preload thumbnails after carousel change
+                        setTimeout(preloadThumbnails, 500);
                     }
                 });
             } catch (error) {
@@ -1141,6 +1381,7 @@
         
         function scrollToNext() {
             if (typeof jQuery !== 'undefined' && $('#music-carousel').data('owl.carousel')) {
+                lastSwipeDirection = 'right'; // Simulate right swipe for next
                 $('#music-carousel').trigger('next.owl.carousel');
             } else {
                 // Fallback for manual carousel
@@ -1148,11 +1389,13 @@
                 if (carousel) {
                     carousel.scrollBy({ left: 320, behavior: 'smooth' });
                 }
+                updateDots('right', false); // Next = move right through dots
             }
         }
         
         function scrollToPrev() {
             if (typeof jQuery !== 'undefined' && $('#music-carousel').data('owl.carousel')) {
+                lastSwipeDirection = 'left'; // Simulate left swipe for prev
                 $('#music-carousel').trigger('prev.owl.carousel');
             } else {
                 // Fallback for manual carousel
@@ -1160,6 +1403,7 @@
                 if (carousel) {
                     carousel.scrollBy({ left: -320, behavior: 'smooth' });
                 }
+                updateDots('left', false); // Prev = move left through dots
             }
         }
         
@@ -1268,6 +1512,9 @@
 
         function startPlayer(container, iframe, iframeSrc, overlay, playerIndex) {
             const trackId = getTrackId(iframeSrc);
+            
+            // Pause video when music starts playing
+            pauseVideo();
             
             // Set the iframe source to start playing
             iframe.src = iframeSrc;
@@ -1509,6 +1756,15 @@
             if (currentlyPlaying === container) {
                 currentlyPlaying = null;
                 currentWidget = null;
+                // Resume video when music stops (if not at bottom of page)
+                const scrollPosition = window.scrollY;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                const isAtBottom = scrollPosition + windowHeight >= documentHeight - 100;
+                
+                if (!isAtBottom) {
+                    resumeVideo();
+                }
             }
         }
 
@@ -1563,6 +1819,17 @@
                 }
             });
             
+            // Add scroll listener for immediate video restart
+            window.addEventListener('scroll', function() {
+                // Call handleScroll immediately without debouncing for instant video restart
+                handleScroll();
+            });
+            
+            // Initial thumbnail preload after carousel loads
+            setTimeout(() => {
+                preloadThumbnails();
+            }, 2000);
+            
             // Prevent vertical scrolling when interacting with carousel on mobile
             const carouselContainer = document.querySelector('.music-tiles-container');
             if (carouselContainer) {
@@ -1570,22 +1837,26 @@
                 
                 carouselContainer.addEventListener('touchstart', function(e) {
                     isCarouselTouch = true;
+                    // Capture start position for swipe detection
+                    const touch = e.touches[0];
+                    startX = touch.clientX;
+                    startY = touch.clientY;
                 }, { passive: true });
                 
                 carouselContainer.addEventListener('touchmove', function(e) {
                     if (isCarouselTouch) {
                         // Allow horizontal movement, prevent vertical
                         const touch = e.touches[0];
-                        const startX = touch.clientX;
-                        const startY = touch.clientY;
+                        const currentX = touch.clientX;
+                        const currentY = touch.clientY;
                         
                         // Store initial touch position
                         if (!this.initialTouch) {
                             this.initialTouch = { x: startX, y: startY };
                         }
                         
-                        const deltaX = Math.abs(startX - this.initialTouch.x);
-                        const deltaY = Math.abs(startY - this.initialTouch.y);
+                        const deltaX = Math.abs(currentX - this.initialTouch.x);
+                        const deltaY = Math.abs(currentY - this.initialTouch.y);
                         
                         // If horizontal movement is greater than vertical, prevent page scroll
                         if (deltaX > deltaY) {
@@ -1595,8 +1866,33 @@
                 }, { passive: false });
                 
                 carouselContainer.addEventListener('touchend', function(e) {
+                    if (isCarouselTouch) {
+                        // Capture end position and determine swipe direction
+                        const touch = e.changedTouches[0];
+                        endX = touch.clientX;
+                        endY = touch.clientY;
+                        
+                        // Calculate swipe direction
+                        const deltaX = endX - startX;
+                        const deltaY = endY - startY;
+                        
+                        // Only consider horizontal swipes (ignore vertical)
+                        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 30) {
+                            if (deltaX > 0) {
+                                lastSwipeDirection = 'right'; // Swiped right
+                                console.log('Detected right swipe');
+                            } else {
+                                lastSwipeDirection = 'left'; // Swiped left
+                                console.log('Detected left swipe');
+                            }
+                        }
+                    }
+                    
                     isCarouselTouch = false;
                     this.initialTouch = null;
+                    
+                    // Preload thumbnails after touch interaction
+                    setTimeout(preloadThumbnails, 300);
                 }, { passive: true });
             }
         });
