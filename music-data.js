@@ -5,6 +5,7 @@ const musicData = [
         title: "Fathis",
         artist: "PILL BRO",
         form: "Boduberu Challenge 2025",
+        original: true,
         trackId: "2114683272",
         thumbnailUrl: "src/thumb/901.jpg"
     },
@@ -13,6 +14,7 @@ const musicData = [
         title: "Dhunfinirey",
         artist: "PILL BRO",
         form: "Boduberu Challenge 2025",
+        original: true,
         trackId: "2115883203",
         thumbnailUrl: "src/thumb/902.jpg"
     },
@@ -21,6 +23,7 @@ const musicData = [
         title: "Fenbandiyaa",
         artist: "PILL BRO",
         form: "Boduberu Challenge 2025",
+        original: true,
         trackId: "2116552962",
         thumbnailUrl: "src/thumb/903.jpg"
     },
@@ -29,6 +32,7 @@ const musicData = [
         title: "Maakunbe",
         artist: "PILL BRO",
         form: "Boduberu Challenge 2025",
+        original: true,
         trackId: "2117659131",
         thumbnailUrl: "src/thumb/904.jpg"
     },
@@ -37,6 +41,7 @@ const musicData = [
         title: "Kos Govaaney",
         artist: "PILL BRO",
         form: "Boduberu Challenge 2025",
+        original: true,
         trackId: "2117664606",
         thumbnailUrl: "src/thumb/905.jpg"
     },
@@ -45,6 +50,7 @@ const musicData = [
         title: "Mee Rhythm",
         artist: "PILL BRO",
         form: "Boduberu Challenge 2025",
+        original: true,
         trackId: "2117667447",
         thumbnailUrl: "src/thumb/906.jpg"
     },
@@ -53,6 +59,7 @@ const musicData = [
         title: "Thiya Goma Feni",
         artist: "PILL BRO",
         form: "Live Performance",
+        original: false,
         trackId: "2132849346",
         thumbnailUrl: "src/thumb/907.jpg"
     },
