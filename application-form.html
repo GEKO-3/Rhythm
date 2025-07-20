@@ -117,7 +117,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(31, 31, 31, 0.8), rgba(42, 42, 42, 0.9));
+            background: linear-gradient(135deg, rgba(31, 31, 31, 0.473), rgba(42, 42, 42, 0.671));
             z-index: -1;
         }
 
@@ -125,7 +125,7 @@
         .header {
             text-align: center;
             padding: 40px 20px 20px;
-            background: rgba(31, 31, 31, 0.95);
+            background: rgba(31, 31, 31, 0);
             backdrop-filter: blur(10px);
             border-bottom: 2px solid var(--primary-color);
         }
@@ -163,7 +163,7 @@
         }
 
         .form-container {
-            background: rgba(42, 42, 42, 0.95);
+            background: rgba(42, 42, 42, 0.26);
             backdrop-filter: blur(15px);
             border-radius: 20px;
             padding: 40px;
@@ -221,12 +221,53 @@
             color: #888888;
         }
 
+        /* Date input specific styling */
+        .form-input[type="date"] {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f5d000'%3e%3cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+            padding-right: 45px;
+            position: relative;
+        }
+
+        /* Ensure date picker works on all devices */
+        .form-input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            width: 20px;
+            height: 20px;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            z-index: 2;
+        }
+
+        /* Make the entire right area clickable for date picker */
+        .form-input[type="date"]::after {
+            content: '';
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            bottom: 10px;
+            width: 30px;
+            cursor: pointer;
+            z-index: 1;
+        }
+
         /* Radio Button Styling */
         .radio-group {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
             gap: 15px;
             margin-top: 10px;
+        }
+
+        /* Location specific styling */
+        .form-group:has(input[name="entry.5566778899"]) .radio-group {
+            grid-template-columns: 1fr 1fr;
+            max-width: 300px;
         }
 
         .radio-item {
@@ -404,6 +445,156 @@
             100% { transform: rotate(360deg); }
         }
 
+        /* Confirmation Dialog */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dialog-box {
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .dialog-overlay.show .dialog-box {
+            transform: scale(1);
+        }
+
+        .dialog-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .dialog-message {
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .dialog-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            min-width: 100px;
+        }
+
+        .dialog-btn.confirm {
+            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
+            color: var(--text-color);
+        }
+
+        .dialog-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 208, 0, 0.4);
+        }
+
+        .dialog-btn.cancel {
+            background: rgba(68, 68, 68, 0.8);
+            color: #ffffff;
+            border: 2px solid var(--border-color);
+        }
+
+        .dialog-btn.cancel:hover {
+            background: rgba(68, 68, 68, 1);
+            border-color: #666666;
+        }
+
+        /* Success Container */
+        .success-container {
+            background: rgba(42, 42, 42, 0.26);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--success-color);
+            text-align: center;
+            display: none;
+        }
+
+        .success-container.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success-color);
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 2rem;
+            color: var(--success-color);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .success-message {
+            font-size: 1.1rem;
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .back-home-btn {
+            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
+            color: var(--text-color);
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 208, 0, 0.4);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header h1 {
@@ -425,6 +616,13 @@
                 left: auto;
                 margin: 20px auto;
                 width: fit-content;
+            }
+
+            /* Ensure date input has consistent height on mobile */
+            .form-input[type="date"] {
+                height: 54px; /* Match other input fields */
+                line-height: 1.4;
+                font-size: 16px; /* Prevent zoom on iOS */
             }
         }
 
@@ -467,73 +665,59 @@
     <!-- Header -->
     <header class="header">
         <img src="src/Logo_1.svg" alt="Rhythm Boduberu" class="logo">
-        <h1>Join Rhythm Boduberu</h1>
-        <p>Ready to be part of our traditional Maldivian music journey? Fill out the application form below and let's create beautiful music together!</p>
+        <h1>Rhythm Member Application Form</h1>
+        <p>Join our community of traditional Maldivian music enthusiasts! Fill out this form to become part of the Rhythm Boduberu family.</p>
     </header>
 
     <!-- Main Content -->
     <main class="main-content">
-        <div class="form-container">
-            <h2 class="form-title">Application Form</h2>
+        <div class="form-container" id="form-container">
             
             <div id="message-container"></div>
             
-            <form id="booking-form" action="https://docs.google.com/forms/d/e/1FAIpQLScbp5A6HXsVo5_8CJUHvZBtb_jANny1k8K6_YPkToQv4NP8rg/formResponse" method="POST" target="hidden_iframe">
+            <form id="booking-form">
                 
                 <!-- Email Field -->
                 <div class="form-group">
-                    <label for="email" class="form-label">Email Address<span class="required">*</span></label>
-                    <input type="email" id="email" name="emailAddress" class="form-input" placeholder="your.email@example.com" required>
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="your.email@example.com">
                 </div>
 
-                <!-- Name Field -->
+                <!-- Full Name Field -->
                 <div class="form-group">
-                    <label for="name" class="form-label">Full Name</label>
-                    <input type="text" id="name" name="entry.737939001" class="form-input" placeholder="Enter your full name">
+                    <label for="name" class="form-label">Full Name<span class="required">*</span></label>
+                    <input type="text" id="name" class="form-input" placeholder="Enter your full name" required>
                 </div>
 
-                <!-- Birthday Field -->
+                <!-- Date of Birth Field -->
                 <div class="form-group">
-                    <label for="birthday" class="form-label">Date of Birth</label>
-                    <input type="date" id="birthday" name="entry.1810732969" class="form-input">
+                    <label for="birthday" class="form-label">Date of Birth<span class="required">*</span></label>
+                    <input type="text" id="birthday-display" class="form-input" placeholder="dd/mm/yyyy" required>
+                    <input type="date" id="birthday" class="form-input" style="display: none;" required>
                 </div>
 
                 <!-- Contact Number Field -->
                 <div class="form-group">
-                    <label for="contact" class="form-label">Contact Number</label>
-                    <input type="tel" id="contact" name="entry.527795664" class="form-input" placeholder="+960 xxx xxxx">
+                    <label for="contact" class="form-label">Contact Number<span class="required">*</span></label>
+                    <input type="tel" id="contact" class="form-input" placeholder="+960 7xx xxxx or +960 9xx xxxx" value="+960 " required>
                 </div>
 
-                <!-- Position Field -->
+                <!-- Location Field -->
                 <div class="form-group">
-                    <label class="form-label">Position/Role Interest</label>
+                    <label class="form-label">Are you residing in L.Gan/Fonadhoo?<span class="required">*</span></label>
                     <div class="radio-group">
                         <div class="radio-item">
-                            <input type="radio" id="beru" name="entry.990057954" value="beru" class="radio-input">
-                            <label for="beru" class="radio-label">
+                            <input type="radio" id="location-yes" name="location" value="Yes" class="radio-input" required>
+                            <label for="location-yes" class="radio-label">
                                 <div class="radio-custom"></div>
-                                Beru
+                                Yes
                             </label>
                         </div>
                         <div class="radio-item">
-                            <input type="radio" id="dance" name="entry.990057954" value="dance" class="radio-input">
-                            <label for="dance" class="radio-label">
+                            <input type="radio" id="location-no" name="location" value="No" class="radio-input" required>
+                            <label for="location-no" class="radio-label">
                                 <div class="radio-custom"></div>
-                                Dance
-                            </label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="vocals" name="entry.990057954" value="vocals" class="radio-input">
-                            <label for="vocals" class="radio-label">
-                                <div class="radio-custom"></div>
-                                Vocals
-                            </label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="media" name="entry.990057954" value="media" class="radio-input">
-                            <label for="media" class="radio-label">
-                                <div class="radio-custom"></div>
-                                Media
+                                No
                             </label>
                         </div>
                     </div>
@@ -549,12 +733,42 @@
                 </div>
             </form>
         </div>
+
+        <!-- Success Container -->
+        <div class="success-container" id="success-container">
+            <div class="success-icon">🎉</div>
+            <h2 class="success-title">Application Submitted Successfully!</h2>
+            <p class="success-message">
+                Thank you for your interest in joining Rhythm Boduberu! Your application has been received and we'll get back to you soon.<br><br>
+                <strong>Important:</strong> You have already submitted your application and cannot submit another one.
+            </p>
+            <a href="index.html" class="back-home-btn">Back to Home</a>
+        </div>
     </main>
 
-    <!-- Hidden iframe for form submission -->
-    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="handleFormSubmit()"></iframe>
+    <!-- Confirmation Dialog -->
+    <div class="dialog-overlay" id="dialog-overlay">
+        <div class="dialog-box">
+            <h3 class="dialog-title">Confirm Submission</h3>
+            <p class="dialog-message">
+                Are you sure all the information you entered is correct?<br><br>
+                <strong>Important:</strong> You can only submit this form once. Please review your details carefully before proceeding.
+            </p>
+            <div class="dialog-buttons">
+                <button class="dialog-btn cancel" id="dialog-cancel">Cancel</button>
+                <button class="dialog-btn confirm" id="dialog-confirm">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
 
     <script>
+        // Check if form was already submitted on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('rhythmFormSubmitted') === 'true') {
+                showSuccessPage();
+            }
+        });
+
         // Video fallback handling
         const video = document.querySelector('.video-background');
         const fallback = document.querySelector('.video-fallback');
@@ -573,6 +787,11 @@
         const submitBtn = document.querySelector('.submit-btn');
         const loading = document.getElementById('loading');
         const messageContainer = document.getElementById('message-container');
+        const dialogOverlay = document.getElementById('dialog-overlay');
+        const dialogCancel = document.getElementById('dialog-cancel');
+        const dialogConfirm = document.getElementById('dialog-confirm');
+        const formContainer = document.getElementById('form-container');
+        const successContainer = document.getElementById('success-container');
         
         let formSubmitted = false;
 
@@ -585,22 +804,145 @@
             messageContainer.innerHTML = '';
         }
 
-        function handleFormSubmit() {
-            if (formSubmitted) {
-                setTimeout(() => {
-                    loading.style.display = 'none';
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Submit Application';
-                    
-                    showMessage('🎉 Thank you! Your application has been submitted successfully. We\'ll get back to you soon!', 'success');
-                    form.reset();
-                    formSubmitted = false;
-                }, 1000);
-            }
+        function showDialog() {
+            dialogOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
         }
 
+        function hideDialog() {
+            dialogOverlay.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showSuccessPage() {
+            formContainer.style.display = 'none';
+            successContainer.classList.add('show');
+        }
+
+        // Dialog event listeners
+        dialogCancel.addEventListener('click', function() {
+            hideDialog();
+            loading.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Application';
+            formSubmitted = false;
+        });
+
+        dialogConfirm.addEventListener('click', function() {
+            hideDialog();
+            
+            // Get form data
+            const email = document.getElementById('email').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const birthday = document.getElementById('birthday').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const location = document.querySelector('input[name="location"]:checked').value;
+            
+            // Submit to Google Form using hidden iframe method
+            submitToGoogleForm(email, name, birthday, contact, location);
+        });
+
+        // Function to submit to Google Form using hidden iframe
+        function submitToGoogleForm(email, name, birthday, contact, location) {
+            // Create hidden iframe
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.name = 'hidden_iframe';
+            document.body.appendChild(iframe);
+
+            // Create form
+            const hiddenForm = document.createElement('form');
+            hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLScbp5A6HXsVo5_8CJUHvZBtb_jANny1k8K6_YPkToQv4NP8rg/formResponse';
+            hiddenForm.method = 'POST';
+            hiddenForm.target = 'hidden_iframe';
+            hiddenForm.style.display = 'none';
+
+            // Add form fields with correct entry names based on Google Form structure
+            const fields = [
+                { name: 'entry.1362927459', value: email },        // Email
+                { name: 'entry.737939001', value: name },          // Full Name  
+                { name: 'entry.1810732969', value: birthday },     // Date of Birth
+                { name: 'entry.527795664', value: contact },       // Contact Number
+                { name: 'entry.2890343', value: location }         // Location (Yes/No question)
+            ];
+
+            fields.forEach(field => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = field.name;
+                input.value = field.value;
+                hiddenForm.appendChild(input);
+            });
+
+            document.body.appendChild(hiddenForm);
+
+            // Handle submission completion
+            let submitted = false;
+            
+            const handleSubmission = () => {
+                if (!submitted) {
+                    submitted = true;
+                    console.log('Form submitted successfully');
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        if (document.body.contains(hiddenForm)) {
+                            document.body.removeChild(hiddenForm);
+                        }
+                        if (document.body.contains(iframe)) {
+                            document.body.removeChild(iframe);
+                        }
+                    }, 1000);
+                    
+                    // Show success
+                    setTimeout(() => {
+                        loading.style.display = 'none';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Submit Application';
+                        
+                        localStorage.setItem('rhythmFormSubmitted', 'true');
+                        localStorage.setItem('rhythmFormSubmissionDate', new Date().toISOString());
+                        showSuccessPage();
+                        formSubmitted = false;
+                    }, 1500);
+                }
+            };
+
+            // Listen for iframe load (indicates submission completion)
+            iframe.addEventListener('load', handleSubmission);
+
+            // Fallback timeout
+            setTimeout(() => {
+                if (!submitted) {
+                    console.log('Form submission timeout - assuming success');
+                    handleSubmission();
+                }
+            }, 5000);
+
+            // Submit the form
+            hiddenForm.submit();
+        }
+
+        // Close dialog on overlay click
+        dialogOverlay.addEventListener('click', function(e) {
+            if (e.target === dialogOverlay) {
+                hideDialog();
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+            }
+        });
+
         form.addEventListener('submit', function(e) {
-            // Don't prevent default - let it submit to Google Forms
+            e.preventDefault(); // Always prevent default first
+            
+            // Check if already submitted
+            if (localStorage.getItem('rhythmFormSubmitted') === 'true') {
+                showMessage('You have already submitted this form and cannot submit it again.', 'error');
+                return;
+            }
+            
             hideMessage();
             formSubmitted = true;
             
@@ -610,10 +952,15 @@
             submitBtn.textContent = 'Submitting...';
             
             // Validate required fields
-            const email = document.getElementById('email').value.trim();
-            if (!email) {
+            const name = document.getElementById('name').value.trim();
+            const birthday = document.getElementById('birthday').value.trim();
+            const birthdayDisplay = document.getElementById('birthday-display').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const location = document.querySelector('input[name="location"]:checked');
+            
+            if (!name) {
                 e.preventDefault();
-                showMessage('Please enter your email address.', 'error');
+                showMessage('Please enter your full name.', 'error');
                 loading.style.display = 'none';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Application';
@@ -621,17 +968,92 @@
                 return;
             }
             
-            // Email validation
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
+            if (!birthdayDisplay || !birthday) {
                 e.preventDefault();
-                showMessage('Please enter a valid email address.', 'error');
+                showMessage('Please enter a valid date of birth in dd/mm/yyyy format.', 'error');
                 loading.style.display = 'none';
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Submit Application';
                 formSubmitted = false;
                 return;
             }
+            
+            if (!contact) {
+                e.preventDefault();
+                showMessage('Please enter your contact number.', 'error');
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+                return;
+            }
+            
+            if (!location) {
+                e.preventDefault();
+                showMessage('Please select whether you reside in L.Gan/Fonadhoo.', 'error');
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+                return;
+            }
+            
+            // Email validation (optional field) - enhanced validation
+            const email = document.getElementById('email').value.trim();
+            if (email) {
+                // More comprehensive email validation
+                const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+                if (!emailRegex.test(email)) {
+                    e.preventDefault();
+                    showMessage('Please enter a valid email address.', 'error');
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    formSubmitted = false;
+                    return;
+                }
+                
+                // Additional checks for common email issues
+                if (email.includes('..') || email.startsWith('.') || email.endsWith('.') || 
+                    email.includes('@.') || email.includes('.@')) {
+                    e.preventDefault();
+                    showMessage('Please enter a valid email address.', 'error');
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    formSubmitted = false;
+                    return;
+                }
+            }
+            
+            // Contact number validation - ensure exactly 7 digits after country code
+            if (contact) {
+                const digitsOnly = contact.replace(/\D/g, '');
+                if (!digitsOnly.startsWith('960') || digitsOnly.length !== 10) {
+                    e.preventDefault();
+                    showMessage('Please enter a valid Maldivian phone number (+960 followed by 7 digits).', 'error');
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    formSubmitted = false;
+                    return;
+                }
+                
+                // Check if the first digit after country code is 7 or 9
+                const phoneNumber = digitsOnly.substring(3);
+                if (phoneNumber.length !== 7 || (phoneNumber[0] !== '7' && phoneNumber[0] !== '9')) {
+                    e.preventDefault();
+                    showMessage('Please enter a valid Maldivian phone number. The number must start with 7 or 9 after +960.', 'error');
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    formSubmitted = false;
+                    return;
+                }
+            }
+            
+            // All validations passed, show confirmation dialog
+            showDialog();
         });
 
         // Enhanced form interactions
@@ -642,16 +1064,107 @@
             });
         });
 
-        // Auto-format phone number
+        // Auto-format phone number to ensure 7 digits after country code
         const contactInput = document.getElementById('contact');
         contactInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
-            if (value.startsWith('960')) {
-                value = '+' + value;
-            } else if (value.length > 0 && !value.startsWith('960')) {
-                value = '+960' + value;
+            
+            // Ensure +960 is always present
+            if (!value.startsWith('960')) {
+                value = '960' + value;
             }
+            
+            // Format as +960 xxx xxxx and limit to 7 digits after country code
+            if (value.length > 3) {
+                let phoneNumber = value.substring(3, 10); // Limit to 7 digits after country code
+                
+                // Ensure the first digit after country code is 7 or 9
+                if (phoneNumber.length > 0 && phoneNumber[0] !== '7' && phoneNumber[0] !== '9') {
+                    // If first digit is not 7 or 9, remove it and let user enter correct digit
+                    phoneNumber = phoneNumber.substring(1);
+                }
+                
+                value = '+960 ' + phoneNumber;
+            } else {
+                value = '+960 ';
+            }
+            
             e.target.value = value;
+        });
+
+        // Date formatting for dd/mm/yyyy display
+        const birthdayDisplay = document.getElementById('birthday-display');
+        const birthdayHidden = document.getElementById('birthday');
+
+        birthdayDisplay.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+            
+            // Format as dd/mm/yyyy
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            if (value.length >= 5) {
+                value = value.substring(0, 5) + '/' + value.substring(5, 9);
+            }
+            
+            e.target.value = value;
+            
+            // Convert to yyyy-mm-dd for the hidden field
+            if (value.length === 10) {
+                const parts = value.split('/');
+                if (parts.length === 3) {
+                    const day = parts[0];
+                    const month = parts[1];
+                    const year = parts[2];
+                    
+                    // Validate the date
+                    const date = new Date(year, month - 1, day);
+                    if (date.getFullYear() == year && date.getMonth() == month - 1 && date.getDate() == day) {
+                        birthdayHidden.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    } else {
+                        birthdayHidden.value = '';
+                    }
+                } else {
+                    birthdayHidden.value = '';
+                }
+            } else {
+                birthdayHidden.value = '';
+            }
+        });
+
+        // Prevent invalid characters in date field
+        birthdayDisplay.addEventListener('keypress', function(e) {
+            // Only allow digits
+            if (!/\d/.test(e.key) && !['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // Limit input length
+        birthdayDisplay.addEventListener('keydown', function(e) {
+            if (e.target.value.length >= 10 && !['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // Prevent deletion of +960 prefix
+        contactInput.addEventListener('keydown', function(e) {
+            const cursorPosition = e.target.selectionStart;
+            
+            // Prevent backspace/delete if it would remove the +960 prefix
+            if ((e.key === 'Backspace' && cursorPosition <= 5) || 
+                (e.key === 'Delete' && cursorPosition < 5)) {
+                e.preventDefault();
+            }
+        });
+
+        // Set cursor position after +960 when field is focused
+        contactInput.addEventListener('focus', function(e) {
+            setTimeout(() => {
+                if (e.target.value === '+960 ') {
+                    e.target.setSelectionRange(5, 5);
+                }
+            }, 0);
         });
 
         // Add smooth scrolling for better UX
