@@ -507,7 +507,7 @@
 <body>
   <div class="pin-overlay" id="pin-overlay">
     <div class="pin-container">
-      <h2 class="pin-title">Enter PIN</h2>
+      <h2 class="pin-title">Enter PIN (Songlist or Admin)</h2>
       <div class="pin-inputs">
         <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-0" maxlength="1" autocomplete="off" />
         <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-1" maxlength="1" autocomplete="off" />
@@ -541,7 +541,8 @@
     // ===========================================
     // PIN CONFIGURATION (Easy to change)
     // ===========================================
-    const pinAuth = 'ODc2NQ=='; // Change this to update PIN
+    const pinAuth = 'ODc2NQ==';
+    const adminPinAuth = 'ODczNA==';
     
     // PIN Security Functions
     function decodePinConfig(encoded) {
@@ -559,11 +560,13 @@
       const checksum = pin.reduce((sum, digit) => sum + digit, 0);
       // Calculate expected checksum based on actual PIN
       const expectedChecksum = actualPinConfig.reduce((sum, digit) => sum + digit, 0);
-      return checksum === expectedChecksum;
+      const adminExpectedChecksum = adminPinConfig.reduce((sum, digit) => sum + digit, 0);
+      return checksum === expectedChecksum || checksum === adminExpectedChecksum;
     }
     
-    // Get actual PIN configuration
+    // Get actual PIN configurations
     const actualPinConfig = decodePinConfig(pinAuth);
+    const adminPinConfig = decodePinConfig(adminPinAuth);
     
     // PIN Protection System
     let pinAuthenticated = false;
@@ -866,7 +869,8 @@
             // Refresh session timestamp to extend it
             const refreshedSession = {
               timestamp: Date.now(),
-              authenticated: true
+              authenticated: true,
+              sessionType: 'songlist'
             };
             sessionStorage.setItem('pinSession', JSON.stringify(refreshedSession));
             updateLastActivity();
@@ -976,20 +980,27 @@
       // Convert entered PIN to array for comparison
       const enteredPinArray = enteredPin.split('').map(Number);
       
-      // Multi-layer validation
-      const basicMatch = enteredPinArray.every((digit, index) => 
+      // Check against both songlist PIN and admin PIN
+      const songlistMatch = enteredPinArray.every((digit, index) => 
         digit === actualPinConfig[index]
+      );
+      
+      const adminMatch = enteredPinArray.every((digit, index) => 
+        digit === adminPinConfig[index]
       );
       
       const structureValid = validatePinStructure(enteredPinArray);
       
-      if (basicMatch && structureValid) {
+      if ((songlistMatch || adminMatch) && structureValid) {
         // Successful authentication
         pinAuthenticated = true;
-        // Store session with timestamp for cross-page access
+        // Determine session type based on which PIN was used
+        const sessionType = adminMatch ? 'admin' : 'songlist';
+        // Store session with timestamp and appropriate type for cross-page access
         const sessionData = {
           timestamp: Date.now(),
-          authenticated: true
+          authenticated: true,
+          sessionType: sessionType
         };
         sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
         
@@ -1351,7 +1362,8 @@
           if (pinAuthenticated) {
             const sessionData = {
               timestamp: Date.now(),
-              authenticated: true
+              authenticated: true,
+              sessionType: 'songlist'
             };
             sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
           }
