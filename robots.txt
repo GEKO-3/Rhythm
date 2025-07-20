@@ -1,8 +1,19 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /js-backups/
+Disallow: /pages/
 
-Sitemap: https://rhythmboduberu.com/sitemap.xml
-
-# Favicon locations for crawlers
+# Important pages for Boduberu searches
+Allow: /index.html
+Allow: /src/
 Allow: /favicons/
 Allow: /favicon.ico
+
+# Sitemap location
+Sitemap: https://rhythmboduberu.com/sitemap.xml
+
+# Crawl delay (be nice to servers)
+Crawl-delay: 1
+
+# Host preference
+Host: rhythmboduberu.com

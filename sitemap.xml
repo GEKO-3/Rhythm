@@ -1,8 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://rhythmboduberu.com/</loc>
-    <lastmod>2025-07-13</lastmod>
+    <lastmod>2025-07-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://rhythmboduberu.com/src/Logo.png</image:loc>
+      <image:title>Rhythm Boduberu - Traditional Maldivian Boduberu Music Group Logo</image:title>
+      <image:caption>Official logo of Rhythm Boduberu, premier traditional Maldivian Boduberu music group</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://rhythmboduberu.com/src/Rhytham Logo.webp</image:loc>
+      <image:title>Rhythm Boduberu Logo</image:title>
+      <image:caption>Rhythm Boduberu traditional Maldivian music group logo</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://rhythmboduberu.com/index.html</loc>
+    <lastmod>2025-07-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

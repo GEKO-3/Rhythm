@@ -3,227 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="description" content="Rhythm Boduberu - Traditional Maldivian Boduberu music group. Contact us for bookings and performances. Phone: 7576784 / 9128889">
-    <meta name="keywords" content="Rhythm Boduberu, Maldivian music, traditional music, boduberu, performances, bookings">
+    <meta name="description" content="Rhythm Boduberu - Premier Traditional Maldivian Boduberu Music Group. Experience authentic Boduberu performances, traditional Maldivian music, and cultural entertainment. Contact us for bookings: 7576784 / 9128889">
+    <meta name="keywords" content="Rhythm Boduberu, Boduberu, Traditional Maldivian Music, Boduberu music, Boduberu group, Maldivian cultural music, traditional music Maldives, Boduberu performances, Maldivian drums, cultural entertainment Maldives, Rhythm, bookings, performances, Beru">
     <meta name="author" content="Rhythm Boduberu">
-    <title>Rhythm Boduberu - Traditional Maldivian Music Group</title>
-    <!-- Local font definitions -->
-    <style>
-        /* Global scrollbar hiding */
-        * {
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* Internet Explorer and Edge */
-        }
-        
-        *::-webkit-scrollbar {
-            display: none; /* Safari and Chrome */
-        }
-        
-        @font-face {
-            font-family: 'Faruma';
-            src: url('Fonts/Faruma.ttf') format('truetype');
-            font-display: swap;
-            font-weight: normal;
-            font-style: normal;
-        }
-        
-        /* Montserrat Regular */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-Regular.ttf') format('truetype');
-            font-display: swap;
-            font-weight: 400;
-            font-style: normal;
-        }
-        
-        /* Montserrat Medium */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-Medium.ttf') format('truetype');
-            font-display: swap;
-            font-weight: 500;
-            font-style: normal;
-        }
-        
-        /* Montserrat SemiBold */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-SemiBold.ttf') format('truetype');
-            font-display: swap;
-            font-weight: 600;
-            font-style: normal;
-        }
-        
-        /* Montserrat Bold */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-Bold.ttf') format('truetype');
-            font-display: swap;
-            font-weight: 700;
-            font-style: normal;
-        }
-        
-        /* Montserrat ExtraBold */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-ExtraBold.ttf') format('truetype');
-            font-display: swap;
-            font-weight: 800;
-            font-style: normal;
-        }
-        
-        /* Montserrat Black */
-        @font-face {
-            font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-Black.ttf') format('truetype');
-            font-display: swap;
-            font-weight: 900;
-            font-style: normal;
-        }
-        
-        /* Loading Screen Styles */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #2b2b2b;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.6s ease-out;
-        }
-        
-        .loading-screen.fade-out {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
-        .loading-logo.fade-out {
-            opacity: 0;
-            transition: opacity 0.4s ease-out;
-        }
-        
-        .loading-logo {
-            width: 80px;
-            height: 80px;
-            animation: spin-and-scale 3s linear infinite;
-            transition: none;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .loading-screen.fade-out .loading-logo {
-            animation: spin-and-scale-smooth 1.5s ease-out infinite;
-        }
-        
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        @keyframes spin-and-scale {
-            from {
-                transform: rotate(0deg) scale(1);
-            }
-            to {
-                transform: rotate(360deg) scale(1);
-            }
-        }
-        
-        @keyframes spin-and-scale-smooth {
-            0% {
-                transform: rotate(0deg);
-                width: 80px;
-                height: 80px;
-            }
-            25% {
-                transform: rotate(90deg);
-                width: 200px;
-                height: 200px;
-            }
-            50% {
-                transform: rotate(180deg);
-                width: 800px;
-                height: 800px;
-            }
-            75% {
-                transform: rotate(270deg);
-                width: 2400px;
-                height: 2400px;
-            }
-            100% {
-                transform: rotate(360deg);
-                width: 4000px;
-                height: 4000px;
-            }
-        }
-        
-        /* Animated Pattern Styles - Optimized */
-        .pattern-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: 1;
-            opacity: 0.25; /* Slightly reduced opacity for subtlety */
-            transition: opacity 0.6s ease-out;
-            /* Performance optimizations */
-            will-change: opacity;
-            transform: translateZ(0); /* Force hardware acceleration */
-        }
-        
-        .pattern-container.fade-out {
-            opacity: 0;
-        }
-        
-        .pattern-line {
-            position: absolute;
-            height: 40px;
-            width: 300vw; /* Reduced from 400vw to 300vw for better performance */
-            background-image: url('src/repeatp.svg');
-            background-repeat: repeat-x;
-            background-size: auto 40px;
-            left: -100vw; /* Start off-screen to the left */
-            /* Performance optimizations */
-            will-change: transform;
-            transform: translateZ(0); /* Force hardware acceleration */
-        }
-        
-        .pattern-line:nth-child(odd) {
-            animation: slideLeft 10s linear infinite; /* Slower animation for better performance */
-        }
-        
-        .pattern-line:nth-child(even) {
-            animation: slideRight 10s linear infinite; /* Slower animation for better performance */
-        }
-        
-        @keyframes slideLeft {
-            0% {
-                transform: translateX(0) translateZ(0);
-            }
-            100% {
-                transform: translateX(-100vw) translateZ(0);
-            }
-        }
-        
-        @keyframes slideRight {
-            0% {
-                transform: translateX(-100vw) translateZ(0);
-            }
-            100% {
-                transform: translateX(0) translateZ(0);
-            }
-        }
-    </style>
+    <title>Rhythm Boduberu - Premier Maldivian Boduberu Group</title>
+    
+    <!-- Performance optimizations: Resource hints -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://w.soundcloud.com">
+    <link rel="dns-prefetch" href="https://api.soundcloud.com">
+    
+    <!-- Critical CSS - moved to external file for better caching -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="Fonts/Montserrat-Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="Fonts/Montserrat-Bold.ttf" as="font" type="font/ttf" crossorigin>
+    
+    <!-- Preload critical images -->
+    <link rel="preload" href="src/Rhytham Logo.webp" as="image">
+    <link rel="preload" href="src/Logo_1.svg" as="image">
+    <link rel="preload" href="src/Background.webp" as="image">
+    <link rel="preload" href="src/Logo.png" as="image">
     
     <!-- Favicon and web app manifest -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -240,32 +41,46 @@
     <!-- Additional meta tags for better SEO and social sharing -->
     <meta name="theme-color" content="#f5d000">
     <meta name="msapplication-TileColor" content="#f5d000">
-    <meta name="msapplication-TileImage" content="favicons/icons-192.png">
-    <meta property="og:title" content="Rhythm Boduberu - Traditional Maldivian Music Group">
-    <meta property="og:description" content="Rhythm Boduberu - Traditional Maldivian Boduberu music group. Contact us for bookings and performances.">
-    <meta property="og:image" content="https://rhythmboduberu.com/favicons/icons-512.png">
+    <meta name="msapplication-TileImage" content="favicons/favicon.png">
+    <meta property="og:title" content="Rhythm Boduberu - Premier Traditional Maldivian Boduberu Music Group">
+    <meta property="og:description" content="Experience authentic Boduberu performances with Rhythm Boduberu - Maldives' premier traditional Boduberu music group. Book us for cultural events and traditional music performances.">
+    <meta property="og:image" content="https://rhythmboduberu.com/favicons/favicon.png">
     <meta property="og:url" content="https://rhythmboduberu.com">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Rhythm Boduberu">
     
     <!-- Twitter Card meta tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Rhythm Boduberu - Traditional Maldivian Music Group">
-    <meta name="twitter:description" content="Rhythm Boduberu - Traditional Maldivian Boduberu music group. Contact us for bookings and performances.">
-    <meta name="twitter:image" content="https://rhythmboduberu.com/favicons/icons-512.png">
+    <meta name="twitter:title" content="Rhythm Boduberu - Premier Traditional Maldivian Boduberu Music Group">
+    <meta name="twitter:description" content="Experience authentic Boduberu performances with Rhythm Boduberu - Maldives' premier traditional Boduberu music group.">
+    <meta name="twitter:image" content="https://rhythmboduberu.com/favicons/favicon.png">
     
     <!-- Canonical URL -->
     <link rel="canonical" href="https://rhythmboduberu.com">
     
-    <!-- jQuery (required for Owl Carousel) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <!-- Additional SEO meta tags for Boduberu searches -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="language" content="en">
+    <meta name="geo.region" content="MV">
+    <meta name="geo.country" content="Maldives">
+    <meta name="geo.placename" content="Maldives">
+    <meta name="ICBM" content="3.2028, 73.2207">
     
-    <!-- Owl Carousel CSS -->
+    <!-- Alternative titles for search engines -->
+    <meta property="og:title" content="Rhythm Boduberu - Premier Traditional Maldivian Boduberu Music Group" />
+    <meta name="twitter:title" content="Rhythm Boduberu - Premier Traditional Maldivian Boduberu Music Group" />
+    <meta property="article:tag" content="Boduberu" />
+    <meta property="article:tag" content="Traditional Maldivian Music" />
+    <meta property="article:tag" content="Rhythm Boduberu" />
+    <meta property="article:tag" content="Maldivian Culture" />
+    
+    <!-- Optimized script loading -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.theme.default.min.css">
-    
-    <!-- Owl Carousel JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js" defer></script>
     
     <!-- JSON-LD structured data for better Google understanding -->
     <script type="application/ld+json">
@@ -273,778 +88,32 @@
       "@context": "https://schema.org",
       "@type": "MusicGroup",
       "name": "Rhythm Boduberu",
-      "description": "Traditional Maldivian Boduberu music group",
+      "description": "Premier Traditional Maldivian Boduberu Music Group - Experience authentic Boduberu performances and traditional Maldivian cultural music",
       "url": "https://rhythmboduberu.com",
-      "logo": "https://rhythmboduberu.com/favicons/icons-512.png",
-      "image": "https://rhythmboduberu.com/src/Rhytham Logo.webp",
+      "logo": "https://rhythmboduberu.com/favicons/favicon.png",
+      "image": [
+        "https://rhythmboduberu.com/favicons/favicon.png"
+      ],
       "telephone": "+9607576784",
-      "alternateName": "Rhythm",
-      "genre": "Traditional Maldivian Music",
+      "alternateName": ["Rhythm", "Boduberu", "Rhythm Boduberu Group"],
+      "genre": ["Traditional Maldivian Music", "Boduberu", "Cultural Music"],
+      "keywords": "Boduberu, Traditional Maldivian Music, Boduberu music, Maldivian cultural music, Rhythm Boduberu",
+      "areaServed": "Maldives",
+      "foundingLocation": "Maldives",
       "sameAs": [
         "https://www.facebook.com/share/15pXtBHaRS/",
         "https://www.instagram.com/rhythm_boduberu__",
         "https://www.tiktok.com/@rhythm_boduberu_",
         "https://on.soundcloud.com/m60NOOoeFiEVGq1dTw",
         "https://www.youtube.com/@rhythmboduberu"
-      ]
+      ],
+      "offers": {
+        "@type": "Service",
+        "name": "Boduberu Performances",
+        "description": "Traditional Maldivian Boduberu music performances for cultural events and entertainment"
+      }
     }
     </script>
-    
-    <style>
-        :root {
-            --primary-color: #f5d000;
-            --hover-color: #fced98;
-            --active-color: #E6B800;
-            --text-color: #2b2b2b;
-            --bg-opacity: rgba(31, 31, 31, 0.0);
-            --hover-color2: #3a3a3a;
-            --active-color2: #111111
-        }
-
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-
-        @keyframes slideIn {
-            0% { transform: translateY(10px); opacity: 0; }
-            100% { transform: translateY(0); opacity: 1; }
-        }
-
-        body {
-            /* Use Montserrat for English text */
-            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            background-color: #2b2b2b;
-            color: var(--primary-color);
-            animation: fadeIn 0.5s ease-in-out;
-            /* Disable overscroll and pinch zoom */
-            overscroll-behavior: none;
-            touch-action: pan-x pan-y;
-            position: relative;
-            /* Prevent horizontal page scrolling */
-            overflow-x: hidden;
-            max-width: 100vw;
-            /* Hide scrollbars on mobile */
-            -webkit-overflow-scrolling: touch;
-            /* Hide all scrollbars */
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* Internet Explorer and Edge */
-        }
-
-        body::-webkit-scrollbar {
-            display: none; /* Safari and Chrome */
-        }
-
-        .video-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -2;
-            opacity: 0.8;
-        }
-
-        .video-fallback {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: url('src/Background.webp');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            z-index: -3;
-            opacity: 0.8;
-        }
-
-        .background-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.6) 100%),
-                rgba(245, 208, 0, 0.15);
-            z-index: -1;
-        }
-
-        .main-section {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px 0;
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 100vw;
-            overflow: hidden;
-        }
-
-        .image-container {
-            width: 100%;
-            text-align: center;
-            margin-bottom: 20px;
-            animation: slideIn 0.5s ease-in-out;
-        }
-
-        .image-container img {
-            max-width: 160px;
-            height: auto;
-            border-radius: 10px;
-            animation: fadeIn 0.5s ease-in-out;
-        }
-
-        .container {
-            text-align: center;
-            position: relative;
-            max-width: 250px;
-            width: 100%; 
-            padding: 10px;
-            background: var(--bg-opacity);
-            border-radius: 10px;
-            transition: transform 0.3s ease;
-            animation: slideIn 0.5s ease-in-out;
-        }
-
-        .container2 {
-            text-align: center;
-            position: relative;
-            max-width: 250px;
-            width: 100%; 
-            padding: 10px;
-            background: var(#242424);
-            border-radius: 10px;
-            transition: transform 0.2s ease;
-        }
-        .container:hover {
-            transform: scale(1.02);
-        }
-        .container2:hover {
-            transform: scale(1.02);
-        }
-
-        .link-button {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 93%;
-            min-height: 30px;
-            height: auto;
-            padding: 10px;
-            margin: 10px 0;
-            text-decoration: none;
-            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
-            text-align: center;
-            border-radius: 5px;
-            transition: transform 0.3s ease, background-color 0.3s;
-            position: relative;
-            overflow: hidden;
-            /* Use Montserrat for button text */
-            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-        }
-
-        .link-button2 {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 93%;
-            max-height: 30px;
-            height: auto;
-            padding: 10px;
-            margin: 10px 0;
-            text-decoration: none;
-            background-color: #29292947;
-            outline-color: #f5d000;
-            outline-style: dashed;
-            outline-width: 00.01cap;
-            text-align: center;
-            border-radius: 5px;
-            transition: transform 0.3s ease, background-color 0.3s;
-            position: relative;
-            overflow: hidden;
-            /* Use Montserrat for button text */
-            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-        }
-
-        .link-button img, .link-button2 img {
-            display: block;
-            max-width: 120px;
-            object-fit: contain;
-        }
-
-        .link-button:hover {
-            background-color: var(--hover-color);
-        }
-
-        .link-button:active {
-            background-color: var(--active-color);
-            transform: scale(0.95);
-        }
-
-        .link-button2:hover {
-            background-color: var(--hover-color2);
-        }
-
-        .link-button2:active {
-            background-color: var(--active-color2);
-            transform: scale(0.95);
-        }
-
-        footer {
-            position: relative;
-            text-align: center;
-            color: var(--primary-color);
-            font-size: 10px;
-            /* Use Montserrat for footer */
-            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-        }
-
-        footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: bold;
-            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Section Two - Music Player */
-        .music-section {
-            min-height: 70vh;
-            padding: 60px 20px;
-            background: #1f1f1f;
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 100vw;
-            overflow-x: hidden;
-            /* Add background image with 3px crop from all sides */
-            background-image: url('src/s2bg.jpg');
-            background-size: calc(100% + 6px) calc(100% + 6px); /* Extend by 6px total (3px each side) */
-            background-position: -3px -3px; /* Offset by -3px to crop 3px from each side */
-            background-repeat: no-repeat;
-            background-attachment: scroll;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .section-header h2 {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-            margin: 0;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        .music-tiles-container {
-            overflow: hidden;
-            padding: 20px 0;
-            max-width: 100%;
-            width: 100%;
-            position: relative;
-            display: flex;
-            justify-content: flex-end; /* Align right on desktop */
-            align-items: center;
-            /* Allow only horizontal touch scrolling in carousel area */
-            touch-action: pan-x;
-        }
-        
-        /* Owl Carousel Styling */
-        .owl-carousel {
-            display: block !important;
-            width: 100%;
-            /* Allow only horizontal touch scrolling */
-            touch-action: pan-x;
-        }
-
-        .owl-carousel.owl-loaded {
-            display: block !important;
-        }
-
-        .owl-stage-outer {
-            overflow: visible;
-            width: 100%;
-            /* Allow only horizontal touch scrolling */
-            touch-action: pan-x;
-        }
-
-        .owl-stage {
-            display: flex !important;
-            align-items: center;
-            width: 100%;
-            /* Allow only horizontal touch scrolling */
-            touch-action: pan-x;
-        }
-
-        .owl-item {
-            display: flex !important;
-            align-items: center;
-            justify-content: center;
-            width: auto;
-        }
-
-        /* Center item highlighting */
-        .owl-item.center .music-tile,
-        .music-tile.center-item {
-            transform: scale(1.05);
-            z-index: 2;
-        }
-
-        .owl-item.center .music-tile:hover,
-        .music-tile.center-item:hover {
-            transform: scale(1.05) translateY(-10px);
-        }
-
-        /* Hide default Owl navigation but keep structure */
-        .owl-nav {
-            display: none !important;
-        }
-
-        .owl-dots {
-            display: none !important;
-        }
-
-        /* Custom Navigation Arrows */
-        .carousel-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            background: rgba(64, 64, 64, 0.7);
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(5px);
-        }
-
-        .carousel-nav:hover {
-            transform: translateY(-50%) scale(1.1);
-            background: rgba(80, 80, 80, 0.8);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        .carousel-nav:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-
-        .carousel-nav svg {
-            width: 24px;
-            height: 24px;
-            fill: #ffffff;
-        }
-
-        .carousel-nav.prev {
-            left: 20px;
-        }
-
-        .carousel-nav.next {
-            right: 20px;
-        }
-
-        .music-tiles-container::-webkit-scrollbar {
-            display: none; /* Safari and Chrome */
-        }
-
-        .tile-indicators {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 15px;
-            gap: 6px;
-            position: relative;
-            height: 20px;
-        }
-
-        .indicator-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.4);
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            border: none;
-            position: relative;
-            z-index: 1;
-        }
-
-        .indicator-dot.active {
-            background: var(--primary-color);
-            transform: scale(1.8);
-            box-shadow: 0 0 8px rgba(245, 208, 0, 0.6);
-            z-index: 2;
-        }
-
-        .indicator-dot.next-active {
-            transform: scale(1.3);
-            background: rgba(245, 208, 0, 0.6);
-        }
-
-        .indicator-dot.prev-active {
-            transform: scale(1.3);
-            background: rgba(245, 208, 0, 0.6);
-        }
-
-        .music-tile {
-            width: 300px;
-            height: 400px;
-            margin-right: 20px;
-            border-radius: 15px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            white-space: normal;
-            overflow: hidden;
-            position: relative;
-            background: transparent;
-            flex: 0 0 300px;
-            display: block !important; /* Force display */
-            visibility: visible !important; /* Force visibility */
-        }
-
-        .music-tile:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 12px 40px rgba(245, 208, 0, 0.2);
-        }
-
-        .music-tile.clone {
-            pointer-events: none;
-            /* Clone styling removed for cleaner infinite scroll */
-        }
-
-        .custom-player {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border-radius: 15px;
-            overflow: hidden;
-            background: transparent;
-        }
-
-        .track-thumbnail {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        .tile-info-banner {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
-            padding: 12px 16px;
-            z-index: 3;
-            border-radius: 0 0 15px 15px;
-            height: auto;
-            min-height: 48px;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            transition: height 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-radius 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), padding 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94), justify-content 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .tile-info-banner.playing {
-            height: 265px;
-            padding: 16px;
-            border-radius: 15px 15px 0 0;
-            justify-content: flex-start;
-        }
-
-        .tile-title {
-            font-size: 1.2rem;
-            color: #2b2b2bcc;
-            margin: 0 0 4px 0;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 900;
-            line-height: 1.2;
-            text-transform: uppercase;
-        }
-
-        .tile-artist {
-            font-size: 0.9rem;
-            color: #2b2b2bcc;
-            margin: 0;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            line-height: 1.1;
-        }
-        .tile-form {
-            font-size: 0.9rem;
-            color: #2b2b2bcc;
-            margin: 0 0 5px 0;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-            font-style: italic;
-            line-height: 1.1;
-            padding-bottom: 4px;
-
-        }
-
-        .tile-original {
-            font-size: 0.9rem;
-            color: #2b2b2bcc;
-            margin: 0 0 2px 0;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 300;
-            font-style: italic;
-            line-height: 1.1;
-        }
-
-        .track-thumbnail {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-
-        .custom-play-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 2;
-            transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), background 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-
-        .custom-play-overlay.playing {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .custom-play-btn {
-            width: 80px;
-            height: 80px;
-            border: none;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
-            color: #1f1f1f;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            box-shadow: 0 4px 20px rgba(245, 208, 0, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .custom-play-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.3));
-            border-radius: 50%;
-        }
-
-        .custom-play-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(245, 208, 0, 0.6);
-        }
-
-        .custom-play-btn:active {
-            transform: scale(0.95);
-        }
-
-        .custom-play-btn svg {
-            width: 30px;
-            height: 30px;
-            z-index: 1;
-        }
-
-        .custom-play-btn.playing {
-            width: 50px;
-            height: 50px;
-            left: 20px;
-            bottom: 75px;
-            position: absolute;
-            margin: 0;
-            z-index: 5;
-            pointer-events: auto;
-            /* Inverted colors */
-            background: linear-gradient(135deg, #1f1f1f, #333333);
-            color: var(--primary-color);
-            box-shadow: 0 4px 20px rgba(31, 31, 31, 0.4);
-        }
-
-        .custom-play-btn.playing svg {
-            width: 20px;
-            height: 20px;
-        }
-
-        .custom-play-btn.playing:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 25px rgba(31, 31, 31, 0.6);
-            background: linear-gradient(135deg, #2a2a2a, #444444);
-        }
-
-        /* Remove pointer-events blocking - let both elements be clickable */
-        .custom-play-overlay.playing {
-            pointer-events: auto;
-        }
-
-        .soundcloud-player {
-            width: 100%;
-            height: 200px;
-            border-radius: 0 0 15px 15px;
-            overflow: hidden;
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            z-index: 4;
-            background: transparent;
-            pointer-events: auto; /* Ensure iframe is interactive */
-        }
-
-        .soundcloud-player iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            border-radius: 0 0 15px 15px;
-            background: transparent;
-            pointer-events: auto; /* Ensure iframe content is interactive */
-        }
-
-        /* Mobile-specific styles */
-        @media (max-width: 768px) {
-            html, body {
-                overflow-x: hidden;
-                -webkit-overflow-scrolling: touch;
-                scrollbar-width: none;
-                -ms-overflow-style: none;
-                max-width: 100vw;
-            }
-            
-            html::-webkit-scrollbar, body::-webkit-scrollbar {
-                display: none;
-            }
-            
-            .main-section {
-                padding: 10px 0;
-                width: 100vw;
-                margin: 0;
-                overflow: hidden;
-            }
-            
-            .video-background {
-                left: 0;
-                transform: none;
-                width: 100vw;
-                min-width: 100vw;
-            }
-            
-            .video-fallback {
-                width: 100vw;
-                min-width: 100vw;
-            }
-            
-            .background-overlay {
-                width: 100vw;
-                min-width: 100vw;
-            }
-            
-            .music-tiles-container {
-                overflow: hidden;
-                padding: 20px;
-                position: relative;
-                width: 100%;
-                display: flex;
-                justify-content: flex-start; /* Align left on mobile */
-                align-items: center;
-                transform: translateX(-20px); /* Move entire element 20px left */
-                /* Mobile: ensure 7th tile is centered */
-                /* Mobile: Allow only horizontal touch scrolling */
-                touch-action: pan-x;
-                /* Disable momentum scrolling to prevent vertical bounce */
-                -webkit-overflow-scrolling: auto;
-            }
-            
-            .tiles-track {
-                display: flex;
-                transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-                will-change: transform;
-                /* Mobile: proper centering for 13 tiles */
-            }
-            
-            .music-tile {
-                flex: 0 0 300px;
-                min-width: 300px;
-                margin: 0 10px;
-                /* Mobile: consistent tile sizing for 13-tile layout */
-            }
-
-            .tile-indicators {
-                margin-top: 15px;
-            }
-
-            .indicator-dot {
-                width: 5px;
-                height: 5px;
-            }
-            
-            /* Navigation arrows responsive adjustments */
-            .carousel-nav {
-                width: 40px;
-                height: 40px;
-            }
-            
-            .carousel-nav svg {
-                width: 20px;
-                height: 20px;
-            }
-            
-            .carousel-nav.prev {
-                left: 10px;
-            }
-            
-            .carousel-nav.next {
-                right: 10px;
-            }
-        }
-        
-        /* Hide navigation arrows on very small screens */
-        @media (max-width: 480px) {
-            .carousel-nav {
-                display: none;
-            }
-        }
-    </style>
 </head>
 <body>
     <!-- Loading Screen -->
@@ -1135,8 +204,29 @@
 
     <!-- Add your additional content sections below this line -->
 
-    <script src="https://w.soundcloud.com/player/api.js"></script>
-    <script src="music-data.js"></script>
+    <script src="https://w.soundcloud.com/player/api.js" defer></script>
+    <script src="music-data.js" defer></script>
+    <script src="music-player.js" defer></script>
+    <script>
+        // Video fallback handling - optimized
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.querySelector('.video-background');
+            const fallback = document.querySelector('.video-fallback');
+            
+            if (video) {
+                video.addEventListener('error', function() {
+                    video.style.display = 'none';
+                    if (fallback) fallback.style.display = 'block';
+                });
+                
+                video.addEventListener('loadeddata', function() {
+                    if (fallback) fallback.style.display = 'none';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
     <script>
         // Video fallback handling
         const video = document.querySelector('.video-background');

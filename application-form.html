@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Rhythm Boduberu - Booking Application Form">
+    <title>Rhythm Boduberu - Join Our Team</title>
+    
+    <!-- Favicon and web app manifest -->
+    <link rel="icon" href="favicons/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="manifest" href="favicons/manifest.webmanifest">
+    
+    <!-- Font loading -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Regular.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Medium.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 500;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-SemiBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 600;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Bold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 700;
+            font-style: normal;
+        }
+    </style>
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #2b2b2b;
+            --bg-color: #1f1f1f;
+            --card-bg: #2a2a2a;
+            --border-color: #444444;
+            --error-color: #ff4444;
+            --success-color: #44ff44;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: var(--bg-color);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Video */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            opacity: 0.3;
+        }
+
+        .video-fallback {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('src/Background.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -3;
+            opacity: 0.3;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(31, 31, 31, 0.8), rgba(42, 42, 42, 0.9));
+            z-index: -1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: rgba(31, 31, 31, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #cccccc;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+        }
+
+        .form-container {
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1rem;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .required {
+            color: var(--error-color);
+            margin-left: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            background: rgba(31, 31, 31, 0.8);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.2);
+            background: rgba(31, 31, 31, 0.9);
+        }
+
+        .form-input::placeholder {
+            color: #888888;
+        }
+
+        /* Radio Button Styling */
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .radio-item {
+            position: relative;
+        }
+
+        .radio-input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(31, 31, 31, 0.8);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .radio-label:hover {
+            border-color: var(--primary-color);
+            background: rgba(245, 208, 0, 0.1);
+        }
+
+        .radio-input:checked + .radio-label {
+            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
+            color: var(--text-color);
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .radio-custom {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .radio-input:checked + .radio-label .radio-custom {
+            border-color: var(--text-color);
+            background: var(--text-color);
+        }
+
+        .radio-custom::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .radio-input:checked + .radio-label .radio-custom::after {
+            opacity: 1;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
+            color: var(--text-color);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            font-family: 'Montserrat', Arial, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 208, 0, 0.4);
+            background: linear-gradient(135deg, #ffed4e, var(--primary-color));
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Back to Home Link */
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            background: rgba(31, 31, 31, 0.9);
+            padding: 12px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            z-index: 100;
+        }
+
+        .back-link:hover {
+            background: rgba(245, 208, 0, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .back-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        /* Success/Error Messages */
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .message.success {
+            background: rgba(68, 255, 68, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .message.error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(245, 208, 0, 0.3);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+                margin: 0 10px;
+            }
+            
+            .radio-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-link {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin: 20px auto;
+                width: fit-content;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 30px 15px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-content {
+                padding: 20px 10px;
+            }
+            
+            .form-container {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Video -->
+    <div class="video-fallback"></div>
+    <video class="video-background" autoplay muted loop playsinline>
+        <source src="src/bg-video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="background-overlay"></div>
+
+    <!-- Back to Home Link -->
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Back to Home
+    </a>
+
+    <!-- Header -->
+    <header class="header">
+        <img src="src/Logo_1.svg" alt="Rhythm Boduberu" class="logo">
+        <h1>Join Rhythm Boduberu</h1>
+        <p>Ready to be part of our traditional Maldivian music journey? Fill out the application form below and let's create beautiful music together!</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="form-container">
+            <h2 class="form-title">Application Form</h2>
+            
+            <div id="message-container"></div>
+            
+            <form id="booking-form" action="https://docs.google.com/forms/d/e/1FAIpQLScbp5A6HXsVo5_8CJUHvZBtb_jANny1k8K6_YPkToQv4NP8rg/formResponse" method="POST" target="hidden_iframe">
+                
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address<span class="required">*</span></label>
+                    <input type="email" id="email" name="emailAddress" class="form-input" placeholder="your.email@example.com" required>
+                </div>
+
+                <!-- Name Field -->
+                <div class="form-group">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" id="name" name="entry.737939001" class="form-input" placeholder="Enter your full name">
+                </div>
+
+                <!-- Birthday Field -->
+                <div class="form-group">
+                    <label for="birthday" class="form-label">Date of Birth</label>
+                    <input type="date" id="birthday" name="entry.1810732969" class="form-input">
+                </div>
+
+                <!-- Contact Number Field -->
+                <div class="form-group">
+                    <label for="contact" class="form-label">Contact Number</label>
+                    <input type="tel" id="contact" name="entry.527795664" class="form-input" placeholder="+960 xxx xxxx">
+                </div>
+
+                <!-- Position Field -->
+                <div class="form-group">
+                    <label class="form-label">Position/Role Interest</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="beru" name="entry.990057954" value="beru" class="radio-input">
+                            <label for="beru" class="radio-label">
+                                <div class="radio-custom"></div>
+                                Beru
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="dance" name="entry.990057954" value="dance" class="radio-input">
+                            <label for="dance" class="radio-label">
+                                <div class="radio-custom"></div>
+                                Dance
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="vocals" name="entry.990057954" value="vocals" class="radio-input">
+                            <label for="vocals" class="radio-label">
+                                <div class="radio-custom"></div>
+                                Vocals
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="media" name="entry.990057954" value="media" class="radio-input">
+                            <label for="media" class="radio-label">
+                                <div class="radio-custom"></div>
+                                Media
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">Submit Application</button>
+                
+                <!-- Loading Animation -->
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Submitting your application...</p>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Hidden iframe for form submission -->
+    <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="handleFormSubmit()"></iframe>
+
+    <script>
+        // Video fallback handling
+        const video = document.querySelector('.video-background');
+        const fallback = document.querySelector('.video-fallback');
+        
+        video.addEventListener('error', function() {
+            video.style.display = 'none';
+            fallback.style.display = 'block';
+        });
+        
+        video.addEventListener('loadeddata', function() {
+            fallback.style.display = 'none';
+        });
+
+        // Form handling
+        const form = document.getElementById('booking-form');
+        const submitBtn = document.querySelector('.submit-btn');
+        const loading = document.getElementById('loading');
+        const messageContainer = document.getElementById('message-container');
+        
+        let formSubmitted = false;
+
+        function showMessage(message, type) {
+            messageContainer.innerHTML = `<div class="message ${type}">${message}</div>`;
+            messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideMessage() {
+            messageContainer.innerHTML = '';
+        }
+
+        function handleFormSubmit() {
+            if (formSubmitted) {
+                setTimeout(() => {
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    
+                    showMessage('🎉 Thank you! Your application has been submitted successfully. We\'ll get back to you soon!', 'success');
+                    form.reset();
+                    formSubmitted = false;
+                }, 1000);
+            }
+        }
+
+        form.addEventListener('submit', function(e) {
+            // Don't prevent default - let it submit to Google Forms
+            hideMessage();
+            formSubmitted = true;
+            
+            // Show loading state
+            loading.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            // Validate required fields
+            const email = document.getElementById('email').value.trim();
+            if (!email) {
+                e.preventDefault();
+                showMessage('Please enter your email address.', 'error');
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                e.preventDefault();
+                showMessage('Please enter a valid email address.', 'error');
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+                return;
+            }
+        });
+
+        // Enhanced form interactions
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                hideMessage();
+            });
+        });
+
+        // Auto-format phone number
+        const contactInput = document.getElementById('contact');
+        contactInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.startsWith('960')) {
+                value = '+' + value;
+            } else if (value.length > 0 && !value.startsWith('960')) {
+                value = '+960' + value;
+            }
+            e.target.value = value;
+        });
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add keyboard navigation for radio buttons
+        const radioGroups = document.querySelectorAll('.radio-group');
+        radioGroups.forEach(group => {
+            const radios = group.querySelectorAll('input[type="radio"]');
+            radios.forEach((radio, index) => {
+                radio.addEventListener('keydown', function(e) {
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const nextIndex = (index + 1) % radios.length;
+                        radios[nextIndex].checked = true;
+                        radios[nextIndex].focus();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prevIndex = (index - 1 + radios.length) % radios.length;
+                        radios[prevIndex].checked = true;
+                        radios[prevIndex].focus();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
