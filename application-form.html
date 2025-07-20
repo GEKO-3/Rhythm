@@ -222,6 +222,74 @@
         }
 
         /* Date input specific styling */
+        .date-input-wrapper {
+            position: relative;
+            width: 100%;
+            display: block;
+            height: auto;
+        }
+
+        .date-display {
+            position: relative;
+            z-index: 2;
+            background: rgba(31, 31, 31, 0.8);
+            cursor: pointer;
+            width: 100%;
+            display: block;
+            margin: 0;
+            padding-right: 50px; /* Make room for calendar button */
+        }
+
+        .date-picker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 6;
+            cursor: pointer;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Calendar button - only show on desktop */
+        .calendar-btn {
+            position: absolute;
+            right: 12px;
+            top: 32%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            background: rgba(245, 208, 0, 0.1);
+            border: 1px solid var(--primary-color);
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .calendar-btn:hover {
+            background: rgba(245, 208, 0, 0.2);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .calendar-btn:active {
+            background: rgba(245, 208, 0, 0.3);
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .calendar-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--primary-color);
+            pointer-events: none;
+        }
+
         .form-input[type="date"] {
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f5d000'%3e%3cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3e%3c/svg%3e");
             background-repeat: no-repeat;
@@ -234,26 +302,13 @@
         /* Ensure date picker works on all devices */
         .form-input[type="date"]::-webkit-calendar-picker-indicator {
             cursor: pointer;
-            width: 20px;
-            height: 20px;
+            width: 100%;
+            height: 100%;
             position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
+            top: 0;
+            left: 0;
             opacity: 0;
-            z-index: 2;
-        }
-
-        /* Make the entire right area clickable for date picker */
-        .form-input[type="date"]::after {
-            content: '';
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            bottom: 10px;
-            width: 30px;
-            cursor: pointer;
-            z-index: 1;
+            z-index: 4;
         }
 
         /* Radio Button Styling */
@@ -619,10 +674,20 @@
             }
 
             /* Ensure date input has consistent height on mobile */
-            .form-input[type="date"] {
+            .form-input[type="date"], .date-display {
                 height: 54px; /* Match other input fields */
                 line-height: 1.4;
                 font-size: 16px; /* Prevent zoom on iOS */
+                padding-right: 15px; /* Remove extra padding on mobile */
+            }
+
+            .date-input-wrapper {
+                height: 54px;
+            }
+
+            /* Hide calendar button on mobile */
+            .calendar-btn {
+                display: none;
             }
         }
 
@@ -692,8 +757,15 @@
                 <!-- Date of Birth Field -->
                 <div class="form-group">
                     <label for="birthday" class="form-label">Date of Birth<span class="required">*</span></label>
-                    <input type="text" id="birthday-display" class="form-input" placeholder="dd/mm/yyyy" required>
-                    <input type="date" id="birthday" class="form-input" style="display: none;" required>
+                    <div class="date-input-wrapper">
+                        <input type="text" id="birthday-display" class="form-input date-display" placeholder="dd/mm/yyyy" required readonly>
+                        <input type="date" id="birthday" class="form-input date-picker" required>
+                        <div class="calendar-btn" id="calendar-btn">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Contact Number Field -->
@@ -1092,11 +1164,54 @@
             e.target.value = value;
         });
 
-        // Date formatting for dd/mm/yyyy display
+        // Date formatting for dd/mm/yyyy display with calendar picker
         const birthdayDisplay = document.getElementById('birthday-display');
-        const birthdayHidden = document.getElementById('birthday');
+        const birthdayPicker = document.getElementById('birthday');
+        const calendarBtn = document.getElementById('calendar-btn');
 
+        // Calendar button click handler
+        calendarBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Try multiple methods to trigger the date picker
+            birthdayPicker.focus();
+            birthdayPicker.showPicker ? birthdayPicker.showPicker() : birthdayPicker.click();
+            
+            // Fallback: simulate click on the date picker
+            setTimeout(() => {
+                const clickEvent = new MouseEvent('click', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true
+                });
+                birthdayPicker.dispatchEvent(clickEvent);
+            }, 10);
+        });
+
+        // When date picker changes, update the display field
+        birthdayPicker.addEventListener('change', function(e) {
+            const dateValue = e.target.value; // This is in yyyy-mm-dd format
+            if (dateValue) {
+                const [year, month, day] = dateValue.split('-');
+                // Display in dd/mm/yyyy format
+                birthdayDisplay.value = `${day}/${month}/${year}`;
+            } else {
+                birthdayDisplay.value = '';
+            }
+        });
+
+        // When display field is clicked, trigger the date picker
+        birthdayDisplay.addEventListener('click', function() {
+            birthdayPicker.focus();
+            birthdayPicker.click();
+        });
+
+        // Allow manual entry in display field with formatting
         birthdayDisplay.addEventListener('input', function(e) {
+            // Remove readonly to allow typing
+            e.target.removeAttribute('readonly');
+            
             let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
             
             // Format as dd/mm/yyyy
@@ -1120,16 +1235,23 @@
                     // Validate the date
                     const date = new Date(year, month - 1, day);
                     if (date.getFullYear() == year && date.getMonth() == month - 1 && date.getDate() == day) {
-                        birthdayHidden.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                        birthdayPicker.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
                     } else {
-                        birthdayHidden.value = '';
+                        birthdayPicker.value = '';
                     }
                 } else {
-                    birthdayHidden.value = '';
+                    birthdayPicker.value = '';
                 }
             } else {
-                birthdayHidden.value = '';
+                birthdayPicker.value = '';
             }
+        });
+
+        // When display field loses focus, make it readonly again
+        birthdayDisplay.addEventListener('blur', function(e) {
+            setTimeout(() => {
+                e.target.setAttribute('readonly', true);
+            }, 100);
         });
 
         // Prevent invalid characters in date field
