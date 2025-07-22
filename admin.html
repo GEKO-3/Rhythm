@@ -100,11 +100,6 @@
         padding-left: calc(20px + env(safe-area-inset-left, 0));
         padding-right: calc(20px + env(safe-area-inset-right, 0));
       }
-      
-      .notification-status {
-        bottom: calc(20px + env(safe-area-inset-bottom, 0));
-        right: calc(20px + env(safe-area-inset-right, 0));
-      }
     }
     
     /* iOS specific adjustments */
@@ -390,32 +385,6 @@
       background: rgba(43, 43, 43, 0.1);
     }
 
-    /* Notification Status Indicator */
-    .notification-status {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: rgba(43, 43, 43, 0.9);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(245, 208, 0, 0.3);
-      border-radius: 10px;
-      padding: 10px 15px;
-      color: #f5d000;
-      font-size: 0.9rem;
-      font-weight: 600;
-      z-index: 100;
-      display: none;
-      font-family: 'Montserrat', Arial, sans-serif;
-    }
-
-    .notification-status.enabled {
-      display: block;
-    }
-
-    .notification-status .status-icon {
-      margin-right: 8px;
-    }
-
     /* Settings Panel Styles */
     .settings-panel {
       position: fixed;
@@ -581,12 +550,6 @@
     <button class="menu-btn" onclick="navigateToPage('lyrics-edit.html')">Lyrics Editor</button>
     <button class="menu-btn" onclick="navigateToPage('show-list-generator.html')">Show List</button>
     <button class="menu-btn" onclick="navigateToPage('applications-list.html')">Applications</button>
-  </div>
-
-  <!-- Notification Status Indicator -->
-  <div id="notification-status-indicator" class="notification-status">
-    <span class="status-icon">🔔</span>
-    <span>Notifications enabled</span>
   </div>
 
   <script>
@@ -810,14 +773,8 @@
 
     // Update notification status indicator
     function updateNotificationStatus() {
-      const statusElement = document.getElementById('notification-status-indicator');
-      const permission = checkNotificationPermission();
-      
-      if (permission === 'granted') {
-        statusElement.classList.add('enabled');
-      } else {
-        statusElement.classList.remove('enabled');
-      }
+      // Status indicator removed - notification status now only shown in settings panel
+      updateSettingsPanel();
     }
 
     // Update settings panel
