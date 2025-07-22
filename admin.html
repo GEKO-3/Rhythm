@@ -558,14 +558,13 @@
         notificationPermission = permission;
         
         if (permission === 'granted') {
-          console.log('Notification permission granted!');
-          
-          // Service worker should already be registered from initializeNotifications
-          // Force a check for new submissions
+          // Register service worker for better notification handling
           if ('serviceWorker' in navigator) {
-            const registration = await navigator.serviceWorker.ready;
-            if (registration.active) {
-              registration.active.postMessage({ type: 'FORCE_CHECK' });
+            try {
+              await navigator.serviceWorker.register('sw-notifications.js');
+              console.log('Notification service worker registered');
+            } catch (error) {
+              console.log('Service worker registration failed:', error);
             }
           }
           
@@ -668,51 +667,15 @@
     }
 
     // Initialize notification system
-    async function initializeNotifications() {
-      console.log('Initializing enhanced notification system...');
-      
+    function initializeNotifications() {
       if (!isNotificationSupported()) {
         console.log('Notifications not supported on this device/browser');
         return;
       }
 
-      // Register service worker FIRST for background notifications
-      try {
-        if ('serviceWorker' in navigator) {
-          const registration = await navigator.serviceWorker.register('/sw-admin-notifications.js', {
-            scope: '/'
-          });
-          
-          console.log('Enhanced notification service worker registered:', registration.scope);
-          
-          // Wait for service worker to be ready
-          await navigator.serviceWorker.ready;
-          
-          // Force a check for new submissions
-          if (registration.active) {
-            registration.active.postMessage({ type: 'FORCE_CHECK' });
-          }
-          
-          // Listen for navigation messages from service worker
-          navigator.serviceWorker.addEventListener('message', function(event) {
-            if (event.data && event.data.type === 'navigate') {
-              window.location.href = event.data.url;
-            }
-          });
-        }
-      } catch (error) {
-        console.error('Failed to register notification service worker:', error);
-      }
-
       notificationPermission = checkNotificationPermission();
       updateNotificationStatus();
       updateSettingsPanel();
-
-      // Request permission immediately if not granted
-      if (notificationPermission === 'default') {
-        console.log('Requesting notification permission immediately...');
-        await requestNotificationPermission();
-      }
 
       // Show banner after PIN authentication if permission not yet decided
       if (pinAuthenticated && notificationPermission === 'default') {
@@ -809,10 +772,6 @@
     
     // Initialize PIN system on page load
     document.addEventListener('DOMContentLoaded', function() {
-      // Initialize notifications FIRST, before PIN check
-      initializeNotifications();
-      
-      // Then initialize PIN system
       decodePinConfig();
       initializePinSystem();
       initializeSessionTimeout();
