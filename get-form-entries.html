@@ -157,7 +157,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🎯 Google Form Entry Names Extractor</h1>
+        <h1>🎯 Google Form Entry Names Extractor - ALL FIELDS</h1>
         
         <div class="instructions">
             <h3>📋 Instructions:</h3>
@@ -179,11 +179,11 @@
             </div>
             <div class="step">
                 <span class="step-number">5</span>
-                Press Enter to run the script
+                Press Enter to run the script - it will find ALL entry fields
             </div>
             <div class="step">
                 <span class="step-number">6</span>
-                Copy the generated entry names and update your JavaScript code
+                Copy the generated entry names and question mappings
             </div>
         </div>
         
@@ -199,30 +199,48 @@
         <h3>🔧 Console Script:</h3>
         <div class="code-box">
             <button class="copy-btn" onclick="copyScript()">📋 Copy Script</button>
-            <code id="consoleScript">// Google Form Entry Names Extractor
-console.log('🎯 Extracting Google Form entry names...');
+            <code id="consoleScript">// Google Form Entry Names Extractor - All Available Entries
+console.log('🎯 Extracting ALL Google Form entry names...');
 
-// Function to extract entry names from form fields
+// Function to extract ALL entry names from form fields
 function extractEntryNames() {
-    const entries = [];
+    const entries = new Set(); // Use Set to avoid duplicates
+    const entryDetails = []; // Store entry details with question text
     
-    // Method 1: Look for data-params attributes
+    // Method 1: Look for data-params attributes (most reliable)
     const dataParams = document.querySelectorAll('[data-params]');
     dataParams.forEach(element => {
         try {
             const params = element.getAttribute('data-params');
             if (params && params.includes('entry.')) {
-                const match = params.match(/entry\.\d+/g);
-                if (match) {
-                    match.forEach(entry => {
-                        if (!entries.includes(entry)) {
-                            entries.push(entry);
+                // Extract all entry numbers from the params
+                const matches = params.match(/entry\.\d+/g);
+                if (matches) {
+                    matches.forEach(entry => {
+                        entries.add(entry);
+                        
+                        // Try to find the question text
+                        let questionText = 'Unknown Question';
+                        const questionElement = element.closest('[role="listitem"]') || 
+                                              element.closest('[data-params]') ||
+                                              element.parentElement;
+                        
+                        if (questionElement) {
+                            const textElements = questionElement.querySelectorAll('[role="heading"], .freebirdFormviewerViewItemsItemItemTitle, [data-value]');
+                            for (let textEl of textElements) {
+                                if (textEl.textContent && textEl.textContent.trim() && !textEl.textContent.includes('entry.')) {
+                                    questionText = textEl.textContent.trim();
+                                    break;
+                                }
+                            }
                         }
+                        
+                        entryDetails.push({ entry, question: questionText });
                     });
                 }
             }
         } catch (e) {
-            // Continue if parsing fails
+            console.log('Error parsing data-params:', e);
         }
     });
     
@@ -231,8 +249,20 @@ function extractEntryNames() {
     nameElements.forEach(element => {
         const name = element.getAttribute('name');
         if (name && name.startsWith('entry.')) {
-            if (!entries.includes(name)) {
-                entries.push(name);
+            entries.add(name);
+            
+            // Try to find associated question text
+            let questionText = 'Form Field';
+            const parent = element.closest('[role="listitem"]') || element.closest('.freebirdFormviewerViewItemsItem');
+            if (parent) {
+                const label = parent.querySelector('[role="heading"], label, .freebirdFormviewerViewItemsItemItemTitle');
+                if (label && label.textContent) {
+                    questionText = label.textContent.trim();
+                }
+            }
+            
+            if (!entryDetails.find(item => item.entry === name)) {
+                entryDetails.push({ entry: name, question: questionText });
             }
         }
     });
@@ -244,43 +274,82 @@ function extractEntryNames() {
             const matches = script.textContent.match(/entry\.\d+/g);
             if (matches) {
                 matches.forEach(entry => {
-                    if (!entries.includes(entry)) {
-                        entries.push(entry);
+                    entries.add(entry);
+                    if (!entryDetails.find(item => item.entry === entry)) {
+                        entryDetails.push({ entry, question: 'From Script' });
                     }
                 });
             }
         }
     });
     
-    // Method 4: Look for question containers and extract entry IDs
-    const questions = document.querySelectorAll('[data-params*="entry"]');
-    questions.forEach(question => {
-        const dataParams = question.getAttribute('data-params');
-        if (dataParams) {
-            try {
-                // Parse the data-params to find entry numbers
-                const entryMatch = dataParams.match(/\[(\d+),/);
+    // Method 4: Look for form elements by various selectors
+    const formElements = document.querySelectorAll('input, textarea, select');
+    formElements.forEach(element => {
+        const name = element.getAttribute('name');
+        const id = element.getAttribute('id');
+        const dataName = element.getAttribute('data-name');
+        
+        [name, id, dataName].forEach(attr => {
+            if (attr && attr.includes('entry.')) {
+                const entryMatch = attr.match(/entry\.\d+/);
                 if (entryMatch) {
-                    const entryNum = entryMatch[1];
-                    const entryName = `entry.${entryNum}`;
-                    if (!entries.includes(entryName)) {
-                        entries.push(entryName);
+                    entries.add(entryMatch[0]);
+                    if (!entryDetails.find(item => item.entry === entryMatch[0])) {
+                        entryDetails.push({ entry: entryMatch[0], question: 'Form Element' });
                     }
                 }
-            } catch (e) {
-                // Continue if parsing fails
+            }
+        });
+    });
+    
+    // Method 5: Deep scan of all text content for entry patterns
+    const allText = document.documentElement.innerHTML;
+    const allMatches = allText.match(/entry\.\d+/g);
+    if (allMatches) {
+        allMatches.forEach(entry => {
+            entries.add(entry);
+            if (!entryDetails.find(item => item.entry === entry)) {
+                entryDetails.push({ entry, question: 'Found in HTML' });
+            }
+        });
+    }
+    
+    // Method 6: Look for question containers specifically
+    const questionContainers = document.querySelectorAll('[data-item-id], [data-question-id], .freebirdFormviewerViewItemsItem');
+    questionContainers.forEach(container => {
+        const allAttributes = container.attributes;
+        for (let attr of allAttributes) {
+            if (attr.value && attr.value.includes('entry.')) {
+                const matches = attr.value.match(/entry\.\d+/g);
+                if (matches) {
+                    matches.forEach(entry => {
+                        entries.add(entry);
+                        if (!entryDetails.find(item => item.entry === entry)) {
+                            const questionText = container.textContent ? 
+                                               container.textContent.trim().split('\n')[0] : 
+                                               'Question Container';
+                            entryDetails.push({ entry, question: questionText });
+                        }
+                    });
+                }
             }
         }
     });
     
-    return entries.sort();
+    return {
+        entries: Array.from(entries).sort(),
+        details: entryDetails.sort((a, b) => a.entry.localeCompare(b.entry))
+    };
 }
 
 // Extract and display results
-const entryNames = extractEntryNames();
+const result = extractEntryNames();
+const entryNames = result.entries;
+const entryDetails = result.details;
 
-console.log('📊 Found entry names:');
-console.log('='.repeat(50));
+console.log('📊 Found ALL entry names:');
+console.log('='.repeat(60));
 
 if (entryNames.length === 0) {
     console.log('❌ No entry names found!');
@@ -288,28 +357,71 @@ if (entryNames.length === 0) {
     console.log('1. Make sure you\'re on the Google Form EDIT page');
     console.log('2. Try refreshing the page and running the script again');
     console.log('3. Check if the form has any questions added');
+    console.log('4. Make sure the form is fully loaded');
 } else {
+    console.log(`✅ Found ${entryNames.length} entry fields:`);
+    console.log('');
+    
+    // Display with question context when available
+    entryDetails.forEach((detail, index) => {
+        const questionPreview = detail.question.length > 50 ? 
+                               detail.question.substring(0, 47) + '...' : 
+                               detail.question;
+        console.log(`${index + 1}. ${detail.entry}`);
+        console.log(`   └─ Question: "${questionPreview}"`);
+    });
+    
+    console.log('='.repeat(60));
+    console.log('📋 All Entry Names (Copy-Ready):');
     entryNames.forEach((entry, index) => {
         console.log(`${index + 1}. ${entry}`);
     });
     
-    console.log('='.repeat(50));
-    console.log('🎯 JavaScript Array Format:');
-    console.log('const fields = [');
+    console.log('='.repeat(60));
+    console.log('🎯 JavaScript Object Format:');
+    console.log('const formFields = {');
     entryNames.forEach((entry, index) => {
-        const fieldName = `field${index + 1}`; // Generic name, user should replace
-        console.log(`    { name: '${entry}', value: ${fieldName} },`);
+        const fieldName = `field${index + 1}`;
+        console.log(`    ${fieldName}: '${entry}', // ${entryDetails[index]?.question || 'Unknown'}`);
+    });
+    console.log('};');
+    
+    console.log('='.repeat(60));
+    console.log('📋 Array Format for Dynamic Forms:');
+    console.log('const entryFields = [');
+    entryNames.forEach((entry, index) => {
+        const question = entryDetails[index]?.question || 'Unknown';
+        console.log(`    { name: '${entry}', label: '${question}' },`);
     });
     console.log('];');
     
-    console.log('='.repeat(50));
-    console.log('📋 Copy-paste ready format for your sponsor form:');
-    console.log(`const fields = [
-    { name: '${entryNames[0] || 'entry.XXXXXXXXX'}', value: name },         // Full Name
-    { name: '${entryNames[1] || 'entry.XXXXXXXXX'}', value: phone },        // Phone Number  
-    { name: '${entryNames[2] || 'entry.XXXXXXXXX'}', value: company },      // Company/Organization
-    { name: '${entryNames[3] || 'entry.XXXXXXXXX'}', value: interest }      // Sponsorship Interest
-];`);
+    console.log('='.repeat(60));
+    console.log('🔥 Form Submission Helper Function:');
+    console.log(`function submitToForm(formData) {
+    const formFields = [${entryNames.map((entry, index) => `
+        { name: '${entry}', value: formData.field${index + 1} || '' }, // ${entryDetails[index]?.question || 'Unknown'}`).join('')}
+    ];
+    
+    // Create and submit form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'YOUR_GOOGLE_FORM_URL/formResponse';
+    form.target = 'hiddenFrame';
+    
+    formFields.forEach(field => {
+        if (field.value) {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = field.name;
+            input.value = field.value;
+            form.appendChild(input);
+        }
+    });
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+}`);
 }
 
 console.log('='.repeat(50));
@@ -341,16 +453,31 @@ console.log('✅ Script completed! Copy the entry names above.');
             </div>
         </div>
         
-        <h3>📝 Current Entry Names in Your Code:</h3>
+        <h3>📝 How to Use the Results:</h3>
         <div class="code-box">
-            <button class="copy-btn" onclick="copyCurrentCode()">📋 Copy Current</button>
-            <code id="currentCode">// Replace these placeholder entry names with the real ones:
-const fields = [
-    { name: 'entry.1234567890', value: name },         // Full Name - REPLACE
-    { name: 'entry.0987654321', value: phone },        // Phone Number - REPLACE
-    { name: 'entry.1122334455', value: company },      // Company/Organization - REPLACE  
-    { name: 'entry.5566778899', value: interest }      // Sponsorship Interest - REPLACE
-];</code>
+            <button class="copy-btn" onclick="copyCurrentCode()">📋 Copy Template</button>
+            <code id="currentCode">// After running the script, you'll get ALL entry names like this:
+// Example output format:
+
+const allFormFields = {
+    field1: 'entry.1234567890', // Full Name
+    field2: 'entry.2345678901', // Email Address  
+    field3: 'entry.3456789012', // Phone Number
+    field4: 'entry.4567890123', // Company/Organization
+    field5: 'entry.5678901234', // Message/Comments
+    // ... and so on for ALL fields in your form
+};
+
+// Or use the dynamic array format:
+const entryFields = [
+    { name: 'entry.1234567890', label: 'Full Name' },
+    { name: 'entry.2345678901', label: 'Email Address' },
+    { name: 'entry.3456789012', label: 'Phone Number' },
+    // ... all fields will be listed automatically
+];
+
+// The script will show you EVERY entry field in your form,
+// not just the ones you're looking for!</code>
         </div>
         
         <div class="warning">
