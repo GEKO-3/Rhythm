@@ -1,0 +1,1374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Rhythm Boduberu - Sponsor Callback List">
+    <title>Rhythm Boduberu - Sponsor Callbacks</title>
+    
+    <!-- Favicon and web app manifest -->
+    <link rel="icon" href="favicons/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="manifest" href="favicons/manifest.webmanifest">
+    
+    <!-- Font loading -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Regular.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Medium.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 500;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-SemiBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 600;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Bold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 700;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-ExtraBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 800;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Light.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 300;
+            font-style: normal;
+        }
+    </style>
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #2b2b2b;
+            --bg-color: #1f1f1f;
+            --card-bg: #2a2a2a;
+            --border-color: #444444;
+            --error-color: #ff4444;
+            --success-color: #44ff44;
+            --callback-color: #00bfff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: var(--bg-color);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: rgba(31, 31, 31, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #cccccc;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Back to Home Link */
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            background: rgba(31, 31, 31, 0.9);
+            padding: 12px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            z-index: 100;
+        }
+
+        .back-link:hover {
+            background: rgba(245, 208, 0, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .back-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Loading and Error States */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(245, 208, 0, 0.3);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .error-container {
+            background: rgba(255, 68, 68, 0.1);
+            border: 2px solid var(--error-color);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .error-title {
+            color: var(--error-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Sponsors Grid */
+        .sponsors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .sponsor-tile {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible;
+        }
+
+        .sponsor-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(245, 208, 0, 0.4);
+        }
+
+        .sponsor-tile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), #ffed4e);
+        }
+
+        .timestamp {
+            font-size: 0.85rem;
+            font-weight: 300;
+            font-style: italic;
+            color: #aaaaaa;
+            margin-bottom: 15px;
+        }
+
+        .sponsor-name {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .company-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .contact-number {
+            font-size: 1rem;
+            font-weight: 400;
+            font-style: italic;
+            color: #ffffff;
+            margin-bottom: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contact-number:hover {
+            color: var(--primary-color);
+            transform: scale(1.02);
+        }
+
+        .email {
+            font-size: 0.9rem;
+            font-weight: 300;
+            font-style: italic;
+            color: #cccccc;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .sponsorship-type {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #cccccc;
+            margin-bottom: 15px;
+        }
+
+        .callback-system {
+            margin-top: 15px;
+        }
+
+        .callback-button {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(0, 191, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(0, 191, 255, 0.1);
+            color: var(--callback-color);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .callback-button:hover {
+            background: rgba(0, 191, 255, 0.2);
+            border-color: rgba(0, 191, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .callback-button.called {
+            background: rgba(68, 255, 68, 0.1);
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .callback-button.pending {
+            background: rgba(255, 170, 0, 0.1);
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .callback-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 191, 255, 0.3);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .callback-dropdown.show {
+            display: block;
+        }
+
+        .callback-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--success-color);
+        }
+
+        .callback-option:hover {
+            background: rgba(0, 191, 255, 0.1);
+        }
+
+        .callback-option:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .callback-option:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* New Entry Tag */
+        .new-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.8); }
+        }
+
+        .stats-container {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .stats-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #cccccc;
+            margin-top: 5px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #666666;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        .empty-message {
+            color: #999999;
+            font-size: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .sponsors-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .sponsor-tile {
+                padding: 20px;
+            }
+            
+            .sponsor-name {
+                font-size: 1.4rem;
+            }
+            
+            .back-link {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin: 20px auto;
+                width: fit-content;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .callback-button {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+
+            .callback-dropdown {
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 30px 15px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .sponsor-tile {
+                padding: 15px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .callback-button {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+
+            .callback-option {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Home Link -->
+    <a href="admin.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Back to Admin
+    </a>
+
+    <!-- Header -->
+    <header class="header">
+        <img src="src/Logo_1.svg" alt="Rhythm Boduberu" class="logo">
+        <h1>Sponsor Callbacks</h1>
+        <p>Track and manage sponsor callback requests for Rhythm Boduberu</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Loading State -->
+        <div id="loading-container" class="loading-container">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading sponsor data...</div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-container" class="error-container" style="display: none;">
+            <div class="error-title">Error Loading Sponsor Data</div>
+            <div class="error-message">Unable to fetch sponsor data. Please check your internet connection and try again.</div>
+        </div>
+
+        <!-- Statistics -->
+        <div id="stats-container" class="stats-container" style="display: none;">
+            <div class="stats-title">Callback Statistics</div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="total-sponsors">0</span>
+                    <div class="stat-label">Total Sponsors</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="called-back-count">0</span>
+                    <div class="stat-label">Called Back</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="pending-callback-count">0</span>
+                    <div class="stat-label">Pending Callback</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sponsors Grid -->
+        <div id="sponsors-grid" class="sponsors-grid" style="display: none;"></div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <div class="empty-icon">📞</div>
+            <div class="empty-title">No Sponsors Yet</div>
+            <div class="empty-message">No sponsor requests have been submitted yet.</div>
+        </div>
+    </main>
+
+    <script>
+        // DOM elements
+        const loadingContainer = document.getElementById('loading-container');
+        const errorContainer = document.getElementById('error-container');
+        const statsContainer = document.getElementById('stats-container');
+        const sponsorsGrid = document.getElementById('sponsors-grid');
+        const emptyState = document.getElementById('empty-state');
+
+        // Statistics elements
+        const totalSponsorsEl = document.getElementById('total-sponsors');
+        const calledBackCountEl = document.getElementById('called-back-count');
+        const pendingCallbackCountEl = document.getElementById('pending-callback-count');
+
+        // CSV URLs
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxUlMKI9FdqfTHjD3yTDiuwlhHwzrfoVEKXsA0ZfTpQLGn_SGvM2uJuz6URA3_GXRFBvofjka-4fJF/pub?output=csv';
+        const STATUS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSorEAhx8LmLD1m8mKDKuZMYWlECA24QqFYt7a_s5B2TaxR1N9XbHHEucKUiUYCLpVF0XVKl14LYa6l/pub?output=csv';
+        const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScojEVbh6JLIepwwQxJtIAB7BmITPp-vp6PDY7JFS51ZrqrFg/formResponse';
+
+        // Store previously loaded sponsors and callback data
+        let previousSponsors = [];
+        let callbackData = new Set(); // Set of UIDs that have been called back
+        let initialLoad = true;
+        
+        // Function to get seen sponsors from localStorage
+        function getSeenSponsors() {
+            try {
+                const seen = localStorage.getItem('rhythmSeenSponsors');
+                return seen ? new Set(JSON.parse(seen)) : new Set();
+            } catch (e) {
+                console.error('Error reading seen sponsors from localStorage:', e);
+                return new Set();
+            }
+        }
+        
+        // Function to save seen sponsors to localStorage
+        function saveSeenSponsors(seenSet) {
+            try {
+                localStorage.setItem('rhythmSeenSponsors', JSON.stringify([...seenSet]));
+            } catch (e) {
+                console.error('Error saving seen sponsors to localStorage:', e);
+            }
+        }
+        
+        // Function to mark sponsor as seen
+        function markSponsorAsSeen(sponsorId) {
+            const seenSponsors = getSeenSponsors();
+            seenSponsors.add(sponsorId);
+            saveSeenSponsors(seenSponsors);
+        }
+        
+        // Function to generate unique ID for sponsor (must be consistent across users)
+        function generateSponsorId(sponsor) {
+            const timestamp = sponsor['Timestamp'] || sponsor['timestamp'] || '';
+            const name = sponsor['Name'] || sponsor['Full Name'] || '';
+            const email = sponsor['Email'] || sponsor['Email Address'] || '';
+            const contact = sponsor['Contact Number'] || sponsor['Phone'] || sponsor['Contact'] || '';
+            
+            // Create a unique identifier using timestamp, name, email, and contact
+            // Using a consistent hash approach
+            const dataString = timestamp + name + email + contact;
+            let hash = 0;
+            if (dataString.length === 0) return hash.toString();
+            for (let i = 0; i < dataString.length; i++) {
+                const char = dataString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash).toString();
+        }
+
+        // Function to fetch callback data from CSV
+        async function fetchCallbackData() {
+            try {
+                console.log('Fetching callback data from CSV...');
+                console.log('Callback CSV URL:', STATUS_CSV_URL);
+                
+                // Use the same approach as fetchSponsorsData
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const targetUrl = STATUS_CSV_URL;
+                
+                let response;
+                try {
+                    // Try direct fetch first
+                    response = await fetch(targetUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'text/csv,text/plain,*/*'
+                        }
+                    });
+                } catch (corsError) {
+                    // If CORS fails, try with proxy
+                    response = await fetch(proxyUrl + targetUrl, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const csvText = await response.text();
+                console.log('Callback CSV data length:', csvText.length);
+                console.log('Callback CSV data preview:', csvText.substring(0, 200));
+                
+                if (!csvText.trim()) {
+                    console.log('Empty callback CSV data received');
+                    return new Set();
+                }
+                
+                const callbackEntries = parseCSV(csvText);
+                console.log('Parsed callback entries count:', callbackEntries.length);
+                console.log('Parsed callback entries:', callbackEntries);
+                
+                const callbackSet = new Set();
+                
+                callbackEntries.forEach((entry, index) => {
+                    console.log(`Processing entry ${index}:`, entry);
+                    const uid = entry['UID'] || entry['uid'] || '';
+                    console.log(`Entry ${index}: UID="${uid}"`);
+                    
+                    if (uid) {
+                        callbackSet.add(uid.toString());
+                        console.log(`✓ Added to callback set: ${uid}`);
+                    } else {
+                        console.log(`✗ Skipping entry ${index} - missing UID`);
+                    }
+                });
+                
+                console.log('Final callback set size:', callbackSet.size);
+                console.log('Final callback set entries:', Array.from(callbackSet));
+                return callbackSet;
+                
+            } catch (error) {
+                console.error('Error fetching callback data:', error);
+                
+                // Try alternative method using a different CORS proxy (same as sponsors)
+                try {
+                    console.log('Trying alternative CORS proxy for callback data...');
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(STATUS_CSV_URL)}`);
+                    const data = await response.json();
+                    
+                    if (data.contents) {
+                        console.log('Alternative method - callback CSV data length:', data.contents.length);
+                        console.log('Alternative method - callback CSV data preview:', data.contents.substring(0, 200));
+                        
+                        const callbackEntries = parseCSV(data.contents);
+                        const callbackSet = new Set();
+                        
+                        callbackEntries.forEach((entry, index) => {
+                            const uid = entry['UID'] || entry['uid'] || '';
+                            if (uid) {
+                                callbackSet.add(uid.toString());
+                            }
+                        });
+                        
+                        console.log('Alternative method - final callback set:', Array.from(callbackSet));
+                        return callbackSet;
+                    }
+                } catch (alternativeError) {
+                    console.error('Alternative callback fetch also failed:', alternativeError);
+                }
+                
+                console.warn('All callback fetch methods failed, returning empty set');
+                return new Set();
+            }
+        }
+
+        // Function to submit callback to Google Form
+        async function submitCallbackToForm(uid) {
+            try {
+                console.log(`Attempting to submit callback: UID=${uid}`);
+                
+                // Create form data
+                const formData = new FormData();
+                formData.append('entry.1886085325', uid); // UID field
+                
+                // Try direct fetch first
+                const response = await fetch(FORM_URL, {
+                    method: 'POST',
+                    mode: 'no-cors', // This is important for Google Forms
+                    body: formData
+                });
+                
+                console.log(`Form submission response status: ${response.status || 'no-cors'}`);
+                
+                // Update local callback data immediately
+                callbackData.add(uid);
+                
+                console.log(`Callback submitted for UID ${uid}`);
+                return true;
+                
+            } catch (error) {
+                console.error('Error submitting callback:', error);
+                
+                // Fallback method using iframe
+                try {
+                    console.log('Trying fallback iframe method...');
+                    
+                    // Create a hidden iframe for form submission
+                    const iframe = document.createElement('iframe');
+                    iframe.style.display = 'none';
+                    iframe.name = 'hidden_iframe';
+                    document.body.appendChild(iframe);
+                    
+                    // Create form
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = FORM_URL;
+                    form.target = 'hidden_iframe';
+                    
+                    // Add UID field
+                    const uidInput = document.createElement('input');
+                    uidInput.type = 'hidden';
+                    uidInput.name = 'entry.1886085325';
+                    uidInput.value = uid;
+                    form.appendChild(uidInput);
+                    
+                    // Submit form
+                    document.body.appendChild(form);
+                    form.submit();
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        document.body.removeChild(form);
+                        document.body.removeChild(iframe);
+                    }, 2000);
+                    
+                    // Update local callback data
+                    callbackData.add(uid);
+                    
+                    console.log(`Fallback method: Callback submitted for UID ${uid}`);
+                    return true;
+                    
+                } catch (fallbackError) {
+                    console.error('Fallback submission also failed:', fallbackError);
+                    return false;
+                }
+            }
+        }
+
+        // Function to parse CSV data
+        function parseCSV(csvText) {
+            console.log('Parsing CSV text:', csvText);
+            const lines = csvText.trim().split('\n');
+            console.log('CSV lines:', lines);
+            
+            if (lines.length === 0) {
+                console.log('No lines found in CSV');
+                return [];
+            }
+            
+            const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+            console.log('CSV headers:', headers);
+            
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let j = 0; j < lines[i].length; j++) {
+                    const char = lines[i][j];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                values.push(current.trim());
+                
+                console.log(`Line ${i} values:`, values);
+                
+                if (values.length === headers.length) {
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index].replace(/"/g, '');
+                    });
+                    console.log(`Parsed row ${i}:`, row);
+                    data.push(row);
+                } else {
+                    console.log(`Skipping line ${i} - value count mismatch. Expected ${headers.length}, got ${values.length}`);
+                }
+            }
+            
+            console.log('Final parsed data:', data);
+            return data;
+        }
+
+        // Function to format timestamp
+        function formatTimestamp(timestampString) {
+            if (!timestampString) return 'Unknown time';
+            
+            try {
+                const date = new Date(timestampString);
+                if (isNaN(date.getTime())) return timestampString;
+                
+                return date.toLocaleDateString('en-GB', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return timestampString;
+            }
+        }
+
+        // Function to format phone number for calling
+        function formatPhoneForCall(phone) {
+            if (!phone) return '';
+            
+            // Remove all non-digit characters except +
+            const cleaned = phone.replace(/[^\d+]/g, '');
+            return cleaned;
+        }
+
+        // Function to create sponsor tile
+        function createSponsorTile(sponsor, isNew = false) {
+            const tile = document.createElement('div');
+            tile.className = 'sponsor-tile';
+            
+            // Store sponsor ID for click handling
+            const sponsorId = generateSponsorId(sponsor);
+            tile.dataset.sponsorId = sponsorId;
+            
+            // Map CSV headers to expected fields (adjust based on actual CSV structure)
+            const timestamp = sponsor['Timestamp'] || sponsor['timestamp'] || '';
+            const name = sponsor['Name'] || sponsor['Full Name'] || sponsor['Sponsor Name'] || '';
+            const companyName = sponsor['Company Name'] || sponsor['Organization'] || sponsor['Business'] || '';
+            const contactNumber = sponsor['Contact Number'] || sponsor['Phone'] || sponsor['Contact'] || '';
+            const email = sponsor['Email'] || sponsor['Email Address'] || '';
+            const sponsorshipType = sponsor['Sponsorship Type'] || sponsor['Type'] || sponsor['Category'] || '';
+            
+            // Get current callback status
+            const hasBeenCalled = callbackData.has(sponsorId);
+            
+            // Format phone number for display and calling
+            const phoneForCall = formatPhoneForCall(contactNumber);
+            const phoneDisplay = contactNumber || 'Not provided';
+            
+            tile.innerHTML = `
+                ${isNew ? '<div class="new-tag">NEW</div>' : ''}
+                <div class="timestamp">${formatTimestamp(timestamp)}</div>
+                <div class="sponsor-name">${name || 'Name not provided'}</div>
+                ${companyName ? `<div class="company-name">${companyName}</div>` : ''}
+                ${contactNumber ? 
+                    `<a href="tel:${phoneForCall}" class="contact-number">📞 ${phoneDisplay}</a>` : 
+                    '<div class="contact-number">📞 Not provided</div>'
+                }
+                <div class="email">${email || 'No email provided'}</div>
+                ${sponsorshipType ? `<div class="sponsorship-type">Type: ${sponsorshipType}</div>` : ''}
+                <div class="callback-system" style="position: relative;">
+                    <button class="callback-button ${hasBeenCalled ? 'called' : 'pending'}" data-uid="${sponsorId}">
+                        <span class="status-icon">${hasBeenCalled ? '✅' : '📞'}</span>
+                        <span class="status-text">${hasBeenCalled ? 'Called Back' : 'Pending Callback'}</span>
+                    </button>
+                    ${!hasBeenCalled ? `
+                    <div class="callback-dropdown">
+                        <div class="callback-option" data-action="callback">
+                            <span>✅</span> Mark as Called Back
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            // Add click handler to mark as seen and remove NEW tag
+            tile.addEventListener('click', function(e) {
+                // Don't trigger if clicking on phone link, callback button, or dropdown
+                if (e.target.tagName === 'A' && e.target.href.startsWith('tel:')) {
+                    return;
+                }
+                if (e.target.closest('.callback-system')) {
+                    return;
+                }
+                
+                // Mark as seen
+                markSponsorAsSeen(sponsorId);
+                
+                // Remove NEW tag if present
+                const newTag = tile.querySelector('.new-tag');
+                if (newTag) {
+                    newTag.style.animation = 'fadeOut 0.3s ease-out forwards';
+                    setTimeout(() => newTag.remove(), 300);
+                }
+            });
+            
+            // Set up callback system event listeners
+            setupCallbackSystem(tile, sponsorId);
+            
+            return tile;
+        }
+
+        // Function to update existing callback buttons with new callback data
+        function updateCallbackButtons() {
+            console.log('Updating callback buttons with new callback data...');
+            const tiles = document.querySelectorAll('.sponsor-tile');
+            
+            tiles.forEach(tile => {
+                const uid = tile.dataset.sponsorId;
+                const button = tile.querySelector('.callback-button');
+                const dropdown = tile.querySelector('.callback-dropdown');
+                
+                if (uid && button) {
+                    // Get the current callback status
+                    const hasBeenCalled = callbackData.has(uid);
+                    
+                    // Update button appearance
+                    button.className = `callback-button ${hasBeenCalled ? 'called' : 'pending'}`;
+                    button.querySelector('.status-icon').textContent = hasBeenCalled ? '✅' : '📞';
+                    button.querySelector('.status-text').textContent = hasBeenCalled ? 'Called Back' : 'Pending Callback';
+                    
+                    // Hide dropdown if already called back
+                    if (hasBeenCalled && dropdown) {
+                        dropdown.style.display = 'none';
+                    }
+                    
+                    console.log(`Updated button for UID ${uid} to status: ${hasBeenCalled ? 'called' : 'pending'}`);
+                }
+            });
+        }
+
+        // Function to setup callback system for a tile
+        function setupCallbackSystem(tile, uid) {
+            const button = tile.querySelector('.callback-button');
+            const dropdown = tile.querySelector('.callback-dropdown');
+            const option = tile.querySelector('.callback-option');
+            
+            // Only setup if not already called back
+            if (!callbackData.has(uid)) {
+                // Toggle dropdown on button click
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Close all other dropdowns
+                    document.querySelectorAll('.callback-dropdown.show').forEach(dd => {
+                        if (dd !== dropdown) dd.classList.remove('show');
+                    });
+                    
+                    if (dropdown) {
+                        dropdown.classList.toggle('show');
+                    }
+                });
+                
+                // Handle option selection
+                if (option) {
+                    option.addEventListener('click', async function(e) {
+                        e.stopPropagation();
+                        
+                        // Update button appearance
+                        button.className = 'callback-button called';
+                        button.querySelector('.status-icon').textContent = '✅';
+                        button.querySelector('.status-text').textContent = 'Called Back';
+                        
+                        // Hide dropdown
+                        if (dropdown) {
+                            dropdown.classList.remove('show');
+                            dropdown.style.display = 'none';
+                        }
+                        
+                        // Submit to Google Form
+                        const success = await submitCallbackToForm(uid);
+                        
+                        if (success) {
+                            // Show success feedback
+                            button.style.transform = 'scale(0.95)';
+                            setTimeout(() => {
+                                button.style.transform = 'scale(1)';
+                            }, 150);
+                            
+                            // Automatically refresh callback data after a delay to get updated status from Google Sheets
+                            setTimeout(async () => {
+                                console.log('Auto-refreshing callback data after form submission...');
+                                try {
+                                    const updatedCallbackSet = await fetchCallbackData();
+                                    callbackData = updatedCallbackSet;
+                                    updateCallbackButtons(); // Update all buttons with new status
+                                    updateStatistics(previousSponsors); // Update statistics
+                                    console.log('Callback data refreshed automatically');
+                                } catch (error) {
+                                    console.error('Auto-refresh of callback data failed:', error);
+                                }
+                            }, 5000); // Wait 5 seconds for Google Sheets to process
+                            
+                        } else {
+                            // Revert on failure
+                            alert('Failed to update callback status. Please try again.');
+                            button.className = 'callback-button pending';
+                            button.querySelector('.status-icon').textContent = '📞';
+                            button.querySelector('.status-text').textContent = 'Pending Callback';
+                            if (dropdown) {
+                                dropdown.style.display = 'block';
+                            }
+                        }
+                    });
+                }
+            }
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!tile.contains(e.target) && dropdown) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // Function to sort sponsors by timestamp (latest first)
+        function sortSponsorsByTimestamp(sponsors) {
+            return sponsors.sort((a, b) => {
+                // First, prioritize sponsors with NEW tags
+                if (a.isNew && !b.isNew) return -1;
+                if (!a.isNew && b.isNew) return 1;
+                
+                // Then sort by timestamp (newest first)
+                const timestampA = a['Timestamp'] || a['timestamp'] || '';
+                const timestampB = b['Timestamp'] || b['timestamp'] || '';
+                
+                try {
+                    const dateA = new Date(timestampA);
+                    const dateB = new Date(timestampB);
+                    
+                    // If dates are valid, sort by them (newest first)
+                    if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+                        return dateB.getTime() - dateA.getTime();
+                    }
+                    
+                    // Fallback to string comparison
+                    return timestampB.localeCompare(timestampA);
+                } catch (e) {
+                    // Fallback to string comparison
+                    return timestampB.localeCompare(timestampA);
+                }
+            });
+        }
+
+        // Function to identify new sponsors
+        function identifyNewSponsors(currentSponsors) {
+            const seenSponsors = getSeenSponsors();
+            
+            if (initialLoad || previousSponsors.length === 0) {
+                // First load - check against seen sponsors in localStorage
+                const newSponsors = currentSponsors.map(sponsor => ({
+                    ...sponsor,
+                    isNew: !seenSponsors.has(generateSponsorId(sponsor))
+                }));
+                
+                initialLoad = false;
+                return newSponsors;
+            }
+            
+            const previousIds = new Set(previousSponsors.map(generateSponsorId));
+            let newSponsorCount = 0;
+            
+            const sponsorsWithNewFlag = currentSponsors.map(sponsor => {
+                const sponsorId = generateSponsorId(sponsor);
+                const wasNotPreviouslyLoaded = !previousIds.has(sponsorId);
+                const hasNotBeenSeen = !seenSponsors.has(sponsorId);
+                const isNew = wasNotPreviouslyLoaded && hasNotBeenSeen;
+                
+                if (isNew) {
+                    newSponsorCount++;
+                }
+                
+                return {
+                    ...sponsor,
+                    isNew: isNew
+                };
+            });
+            
+            return sponsorsWithNewFlag;
+        }
+
+        // Function to update statistics
+        function updateStatistics(sponsors) {
+            const total = sponsors.length;
+            const calledBack = sponsors.filter(sponsor => {
+                const sponsorId = generateSponsorId(sponsor);
+                return callbackData.has(sponsorId);
+            }).length;
+            const pendingCallback = total - calledBack;
+            
+            totalSponsorsEl.textContent = total;
+            calledBackCountEl.textContent = calledBack;
+            pendingCallbackCountEl.textContent = pendingCallback;
+        }
+
+        // Function to display sponsors
+        function displaySponsors(sponsors) {
+            loadingContainer.style.display = 'none';
+            errorContainer.style.display = 'none';
+            
+            if (sponsors.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            // Sort sponsors by timestamp (latest first)
+            const sortedSponsors = sortSponsorsByTimestamp(sponsors);
+            
+            // Identify new sponsors
+            const sponsorsWithNewFlag = identifyNewSponsors(sortedSponsors);
+            
+            // Sort again after identifying new sponsors to prioritize NEW items
+            const finalSortedSponsors = sortSponsorsByTimestamp(sponsorsWithNewFlag);
+            
+            // Update statistics
+            updateStatistics(finalSortedSponsors);
+            statsContainer.style.display = 'block';
+            
+            // Clear existing tiles
+            sponsorsGrid.innerHTML = '';
+            
+            // Create tiles for each sponsor
+            finalSortedSponsors.forEach((sponsor, index) => {
+                const tile = createSponsorTile(sponsor, sponsor.isNew);
+                sponsorsGrid.appendChild(tile);
+                
+                // Debug log to check if NEW tag should be shown
+                if (sponsor.isNew) {
+                    console.log(`Sponsor ${index} marked as NEW:`, sponsor['Name'] || sponsor['Full Name']);
+                }
+            });
+            
+            sponsorsGrid.style.display = 'grid';
+            
+            // Store current sponsors for next comparison
+            previousSponsors = [...finalSortedSponsors];
+            
+            // Remove NEW tags after 10 seconds
+            setTimeout(() => {
+                const newTags = document.querySelectorAll('.new-tag');
+                newTags.forEach(tag => {
+                    tag.style.animation = 'fadeOut 0.5s ease-out forwards';
+                    setTimeout(() => tag.remove(), 500);
+                });
+            }, 10000);
+        }
+
+        // Function to show error
+        function showError() {
+            loadingContainer.style.display = 'none';
+            errorContainer.style.display = 'block';
+        }
+
+        // Function to fetch and display sponsors
+        async function fetchSponsors() {
+            try {
+                // Fetch both sponsors and callback data in parallel
+                const [sponsorsData, callbackSet] = await Promise.all([
+                    fetchSponsorsData(),
+                    fetchCallbackData()
+                ]);
+                
+                // Update global callback data
+                callbackData = callbackSet;
+                
+                if (!sponsorsData || sponsorsData.length === 0) {
+                    displaySponsors([]);
+                    return;
+                }
+                
+                displaySponsors(sponsorsData);
+                
+                // Update existing callback buttons if this isn't the first load
+                if (!initialLoad) {
+                    updateCallbackButtons();
+                }
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showError();
+            }
+        }
+
+        // Function to fetch sponsors data
+        async function fetchSponsorsData() {
+            try {
+                // Use a CORS proxy to fetch the CSV data
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const targetUrl = CSV_URL;
+                
+                let response;
+                try {
+                    // Try direct fetch first
+                    response = await fetch(targetUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'text/csv,text/plain,*/*'
+                        }
+                    });
+                } catch (corsError) {
+                    // If CORS fails, try with proxy
+                    response = await fetch(proxyUrl + targetUrl, {
+                        method: 'GET',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const csvText = await response.text();
+                
+                if (!csvText.trim()) {
+                    return [];
+                }
+                
+                return parseCSV(csvText);
+                
+            } catch (error) {
+                console.error('Error fetching sponsors:', error);
+                
+                // Try alternative method using a different CORS proxy
+                try {
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(CSV_URL)}`);
+                    const data = await response.json();
+                    
+                    if (data.contents) {
+                        return parseCSV(data.contents);
+                    }
+                } catch (alternativeError) {
+                    console.error('Alternative fetch also failed:', alternativeError);
+                }
+                
+                throw new Error('Failed to fetch sponsors data');
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch sponsors immediately on load
+            fetchSponsors();
+        });
+
+        // Refresh data every 2 minutes
+        setInterval(fetchSponsors, 2 * 60 * 1000);
+    </script>
+</body>
+</html>
