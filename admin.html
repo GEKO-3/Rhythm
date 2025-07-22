@@ -72,6 +72,10 @@
       .notification-banner {
         top: env(titlebar-area-height, 0);
       }
+      
+      .install-btn {
+        top: calc(60px + env(titlebar-area-height, 0));
+      }
     }
     
     /* Standalone PWA mode adjustments */
@@ -84,6 +88,10 @@
       .settings-panel {
         top: calc(60px + env(safe-area-inset-top, 0));
         right: calc(20px + env(safe-area-inset-right, 0));
+      }
+      
+      .install-btn {
+        top: calc(60px + env(safe-area-inset-top, 0));
       }
       
       .notification-banner {
@@ -103,10 +111,43 @@
         .settings-panel {
           top: calc(60px + max(env(safe-area-inset-top, 0), 44px));
         }
+        
+        .install-btn {
+          top: calc(60px + max(env(safe-area-inset-top, 0), 44px));
+        }
       }
     }
     
-
+    /* PWA install button */
+    .install-btn {
+      position: fixed;
+      top: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(245, 208, 0, 0.9);
+      color: #2b2b2b;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 200;
+      display: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+      backdrop-filter: blur(10px);
+    }
+    
+    .install-btn:hover {
+      background: #f5d000;
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 208, 0, 0.3);
+    }
+    
+    .install-btn.show {
+      display: block !important;
+    }
     .menu-container {
       background: rgba(43,43,43,0.7);
       width: 300px;
@@ -456,6 +497,12 @@
         min-width: 200px;
         right: -50px;
       }
+      
+      .install-btn {
+        top: calc(60px + env(safe-area-inset-top, 0));
+        font-size: 0.85rem;
+        padding: 8px 16px;
+      }
     }
   </style>
 </head>
@@ -473,6 +520,9 @@
       <div class="pin-error" id="pin-error"></div>
     </div>
   </div>
+
+  <!-- PWA Install Button -->
+  <button id="install-btn" class="install-btn">📱 Install Admin App</button>
 
   <!-- Settings Panel -->
   <div class="settings-panel">
@@ -503,6 +553,92 @@
   </div>
 
   <script>
+    // PWA Installation Management
+    let deferredPrompt;
+    let isInstalled = false;
+
+    // Check if app is installed
+    function checkInstallStatus() {
+      // Check if running as installed PWA
+      if (window.matchMedia('(display-mode: standalone)').matches ||
+          window.matchMedia('(display-mode: window-controls-overlay)').matches ||
+          window.navigator.standalone === true) {
+        isInstalled = true;
+        document.getElementById('install-btn').style.display = 'none';
+        return true;
+      }
+      return false;
+    }
+
+    // PWA Install button handling
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('PWA install prompt available');
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Only show install button if not already installed and user is authenticated
+      if (!isInstalled && pinAuthenticated) {
+        const installBtn = document.getElementById('install-btn');
+        installBtn.classList.add('show');
+        console.log('Install button should now be visible');
+      }
+    });
+
+    // Also check if we can show install button on load (for testing)
+    function checkAndShowInstallButton() {
+      console.log('Checking install button conditions:', {
+        isInstalled,
+        pinAuthenticated,
+        protocol: window.location.protocol,
+        hostname: window.location.hostname
+      });
+      
+      if (!isInstalled && pinAuthenticated) {
+        const installBtn = document.getElementById('install-btn');
+        // Show button for testing even without beforeinstallprompt event
+        // This helps with file:// protocol testing and browsers that don't fire the event
+        installBtn.classList.add('show');
+        console.log('Install button shown');
+      }
+    }
+
+    // Handle install button click
+    document.getElementById('install-btn').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+          console.log('PWA installed successfully');
+          document.getElementById('install-btn').classList.remove('show');
+        } else {
+          console.log('PWA installation dismissed');
+        }
+        
+        deferredPrompt = null;
+      } else {
+        // Fallback for browsers that don't support beforeinstallprompt
+        alert('To install this app:\n\n1. Open browser menu (⋮)\n2. Select "Install app" or "Add to Home Screen"\n3. Follow the prompts');
+      }
+    });
+
+    // Listen for app installation
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('PWA was installed');
+      isInstalled = true;
+      document.getElementById('install-btn').classList.remove('show');
+      
+      // Show success notification if notifications are enabled
+      if (checkNotificationPermission() === 'granted') {
+        new Notification('Rhythm Admin Installed!', {
+          body: 'The admin app has been installed successfully',
+          icon: 'favicons/favicon.png',
+          badge: 'favicons/favicon.png',
+          tag: 'app-installed'
+        });
+      }
+    });
+
     // Notification functionality
     let notificationPermission = 'default';
     let hasShownNotificationBanner = false;
@@ -775,6 +911,7 @@
       decodePinConfig();
       initializePinSystem();
       initializeSessionTimeout();
+      checkInstallStatus();
     });
     
     // Decode and validate PIN configuration
@@ -1077,6 +1214,12 @@
             setTimeout(() => {
               initializeNotifications();
               startApplicationMonitoring();
+              
+              // Show install button if PWA can be installed
+              checkAndShowInstallButton();
+              if (deferredPrompt && !isInstalled) {
+                document.getElementById('install-btn').classList.add('show');
+              }
             }, 500);
             return;
           } else {
@@ -1146,6 +1289,12 @@
         setTimeout(() => {
           initializeNotifications();
           startApplicationMonitoring();
+          
+          // Show install button if PWA can be installed
+          checkAndShowInstallButton();
+          if (deferredPrompt && !isInstalled) {
+            document.getElementById('install-btn').classList.add('show');
+          }
         }, 1000);
       } else {
         // Failed authentication
