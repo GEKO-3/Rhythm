@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Rhythm Boduberu - Admin Panel</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Administrative panel for Rhythm Boduberu music group operations">
   <meta name="theme-color" content="#f5d000">
   <meta name="color-scheme" content="dark">
@@ -66,67 +66,18 @@
       }
       
       .settings-panel {
-        top: calc(60px + env(titlebar-area-height, 0));
+        top: calc(20px + env(titlebar-area-height, 0));
       }
       
       .notification-banner {
         top: env(titlebar-area-height, 0);
-      }
-      
-      .install-btn {
-        top: calc(60px + env(titlebar-area-height, 0));
-      }
-    }
-    
-    /* Standalone PWA mode adjustments */
-    @media (display-mode: standalone) {
-      body {
-        /* Add safe area padding for notch/camera cutout */
-        padding-top: env(safe-area-inset-top, 0);
-      }
-      
-      .settings-panel {
-        top: calc(60px + env(safe-area-inset-top, 0));
-        right: calc(20px + env(safe-area-inset-right, 0));
-      }
-      
-      .install-btn {
-        top: calc(60px + env(safe-area-inset-top, 0));
-      }
-      
-      .notification-banner {
-        top: env(safe-area-inset-top, 0);
-        padding-left: calc(20px + env(safe-area-inset-left, 0));
-        padding-right: calc(20px + env(safe-area-inset-right, 0));
-      }
-      
-      .notification-status {
-        bottom: calc(20px + env(safe-area-inset-bottom, 0));
-        right: calc(20px + env(safe-area-inset-right, 0));
-      }
-    }
-    
-    /* iOS specific adjustments */
-    @supports (-webkit-touch-callout: none) {
-      @media (display-mode: standalone) {
-        body {
-          padding-top: max(env(safe-area-inset-top, 0), 44px);
-        }
-        
-        .settings-panel {
-          top: calc(60px + max(env(safe-area-inset-top, 0), 44px));
-        }
-        
-        .install-btn {
-          top: calc(60px + max(env(safe-area-inset-top, 0), 44px));
-        }
       }
     }
     
     /* PWA install button */
     .install-btn {
       position: fixed;
-      top: 60px;
+      top: 20px;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(245, 208, 0, 0.9);
@@ -151,7 +102,7 @@
     }
     
     .install-btn.show {
-      display: block !important;
+      display: block;
     }
     .menu-container {
       background: rgba(43,43,43,0.7);
@@ -418,7 +369,7 @@
     /* Settings Panel Styles */
     .settings-panel {
       position: fixed;
-      top: 60px;
+      top: 20px;
       right: 20px;
       z-index: 150;
     }
@@ -520,19 +471,13 @@
       }
       
       .settings-panel {
-        top: calc(60px + env(safe-area-inset-top, 0));
-        right: calc(15px + env(safe-area-inset-right, 0));
+        top: 15px;
+        right: 15px;
       }
       
       .settings-dropdown {
         min-width: 200px;
         right: -50px;
-      }
-      
-      .install-btn {
-        top: calc(60px + env(safe-area-inset-top, 0));
-        font-size: 0.85rem;
-        padding: 8px 16px;
       }
     }
   </style>
@@ -617,27 +562,8 @@
       if (!isInstalled && pinAuthenticated) {
         const installBtn = document.getElementById('install-btn');
         installBtn.classList.add('show');
-        console.log('Install button should now be visible');
       }
     });
-
-    // Also check if we can show install button on load (for testing)
-    function checkAndShowInstallButton() {
-      console.log('Checking install button conditions:', {
-        isInstalled,
-        pinAuthenticated,
-        protocol: window.location.protocol,
-        hostname: window.location.hostname
-      });
-      
-      if (!isInstalled && pinAuthenticated) {
-        const installBtn = document.getElementById('install-btn');
-        // Show button for testing even without beforeinstallprompt event
-        // This helps with file:// protocol testing and browsers that don't fire the event
-        installBtn.classList.add('show');
-        console.log('Install button shown');
-      }
-    }
 
     // Handle install button click
     document.getElementById('install-btn').addEventListener('click', async () => {
@@ -653,9 +579,6 @@
         }
         
         deferredPrompt = null;
-      } else {
-        // Fallback for browsers that don't support beforeinstallprompt
-        alert('To install this app:\n\n1. Open browser menu (⋮)\n2. Select "Install app" or "Add to Home Screen"\n3. Follow the prompts');
       }
     });
 
@@ -1259,7 +1182,6 @@
               startApplicationMonitoring();
               
               // Show install button if PWA can be installed
-              checkAndShowInstallButton();
               if (deferredPrompt && !isInstalled) {
                 document.getElementById('install-btn').classList.add('show');
               }
@@ -1334,7 +1256,6 @@
           startApplicationMonitoring();
           
           // Show install button if PWA can be installed
-          checkAndShowInstallButton();
           if (deferredPrompt && !isInstalled) {
             document.getElementById('install-btn').classList.add('show');
           }
