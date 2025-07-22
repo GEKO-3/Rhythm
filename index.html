@@ -274,11 +274,92 @@
         let isVideoPlaying = true; // Track video state
         let lastSwipeDirection = null; // Track the last user swipe direction
         
+        // Auto-scroll variables
+        let autoScrollInterval = null;
+        let lastUserInteraction = Date.now();
+        let userHasInteracted = false;
+        let isAutoScrollPaused = false;
+        
         // Touch/swipe detection variables
         let startX = 0;
         let startY = 0;
         let endX = 0;
         let endY = 0;
+        
+        // Auto-scroll functions
+        function startAutoScroll() {
+            if (autoScrollInterval) {
+                clearInterval(autoScrollInterval);
+            }
+            
+            console.log('Starting auto-scroll every 2 seconds');
+            isAutoScrollPaused = false;
+            
+            autoScrollInterval = setInterval(() => {
+                // Check conditions before auto-scrolling
+                if (shouldPauseAutoScroll()) {
+                    console.log('Auto-scroll paused due to conditions');
+                    return;
+                }
+                
+                console.log('Auto-scrolling to next tile');
+                lastSwipeDirection = 'auto'; // Mark as automatic scroll
+                scrollToNext();
+            }, 3000);
+        }
+        
+        function stopAutoScroll() {
+            if (autoScrollInterval) {
+                clearInterval(autoScrollInterval);
+                autoScrollInterval = null;
+                console.log('Auto-scroll stopped');
+            }
+            isAutoScrollPaused = true;
+        }
+        
+        function shouldPauseAutoScroll() {
+            const now = Date.now();
+            const timeSinceLastInteraction = now - lastUserInteraction;
+            
+            // Pause if:
+            // 1. A song is currently playing
+            if (currentlyPlaying) {
+                console.log('Auto-scroll paused: Song is playing');
+                return true;
+            }
+            
+            // 2. User has interacted and less than 13 seconds have passed
+            if (userHasInteracted && timeSinceLastInteraction < 13000) {
+                console.log('Auto-scroll paused: Recent user interaction', timeSinceLastInteraction + 'ms ago');
+                return true;
+            }
+            
+            return false;
+        }
+        
+        function handleUserInteraction() {
+            lastUserInteraction = Date.now();
+            userHasInteracted = true;
+            console.log('User interaction detected, pausing auto-scroll');
+            
+            // Don't stop the interval, just let it check conditions
+            // This allows for automatic resumption after 13 seconds
+        }
+        
+        function resumeAutoScrollIfNeeded() {
+            const now = Date.now();
+            const timeSinceLastInteraction = now - lastUserInteraction;
+            
+            // Resume auto-scroll if:
+            // 1. No song is playing AND
+            // 2. More than 13 seconds since last interaction OR user hasn't interacted
+            if (!currentlyPlaying && (!userHasInteracted || timeSinceLastInteraction >= 13000)) {
+                if (!autoScrollInterval) {
+                    console.log('Resuming auto-scroll after inactivity');
+                    startAutoScroll();
+                }
+            }
+        }
         
         // Enhanced dot indicator management with smooth animations
         function updateDots(direction, animate = true) {
@@ -652,10 +733,20 @@
                             const $carousel = $('#music-carousel');
                             $carousel.trigger('refresh.owl.carousel');
                             $carousel.trigger('to.owl.carousel', [0, 0]);
+                            
+                            // Start auto-scroll after initialization
+                            setTimeout(() => {
+                                startAutoScroll();
+                            }, 1000);
                         }, 200);
                     },
                     onInitialize: function(event) {
                         console.log('Owl Carousel initializing...');
+                    },
+                    onDragged: function(event) {
+                        // User dragged the carousel
+                        console.log('Carousel dragged by user');
+                        handleUserInteraction();
                     },
                     onChanged: function(event) {
                         // Ensure center item is properly highlighted and reattach event listeners
@@ -667,6 +758,11 @@
                         
                         // Update dots based on carousel movement - will use lastSwipeDirection if available
                         updateDots('carousel-changed', true);
+                        
+                        // Clear auto flag after using it
+                        if (lastSwipeDirection === 'auto') {
+                            lastSwipeDirection = null;
+                        }
                         
                         // Preload thumbnails after carousel change
                         setTimeout(preloadThumbnails, 500);
@@ -729,8 +825,14 @@
             }
             
             if (nextButton) {
-                nextButton.removeEventListener('click', scrollToNext);
-                nextButton.addEventListener('click', scrollToNext);
+                nextButton.removeEventListener('click', function() {
+                    handleUserInteraction();
+                    scrollToNext();
+                });
+                nextButton.addEventListener('click', function() {
+                    handleUserInteraction();
+                    scrollToNext();
+                });
             }
             
             console.log('Navigation listeners attached');
@@ -738,7 +840,10 @@
         
         function scrollToNext() {
             if (typeof jQuery !== 'undefined' && $('#music-carousel').data('owl.carousel')) {
-                lastSwipeDirection = 'right'; // Simulate right swipe for next
+                // Only set lastSwipeDirection if it's not already set to 'auto'
+                if (lastSwipeDirection !== 'auto') {
+                    lastSwipeDirection = 'right'; // Simulate right swipe for next
+                }
                 $('#music-carousel').trigger('next.owl.carousel');
             } else {
                 // Fallback for manual carousel
@@ -751,6 +856,9 @@
         }
         
         function scrollToPrev() {
+            // Manual navigation always counts as user interaction
+            handleUserInteraction();
+            
             if (typeof jQuery !== 'undefined' && $('#music-carousel').data('owl.carousel')) {
                 lastSwipeDirection = 'left'; // Simulate left swipe for prev
                 $('#music-carousel').trigger('prev.owl.carousel');
@@ -791,6 +899,8 @@
             const playButton = e.target.closest('.custom-play-btn');
             if (playButton) {
                 e.preventDefault();
+                // User clicked play button - this is an interaction
+                handleUserInteraction();
                 const iframeSrc = playButton.getAttribute('data-iframe-src');
                 console.log('Play button clicked via delegation, iframe src:', iframeSrc);
                 togglePlay(playButton, iframeSrc);
@@ -801,6 +911,8 @@
             e.preventDefault();
             e.stopPropagation();
             console.log('=== PLAY BUTTON CLICKED ===');
+            // User clicked play button - this is an interaction
+            handleUserInteraction();
             const button = e.currentTarget;
             const iframeSrc = button.getAttribute('data-iframe-src');
             console.log('Play button clicked directly, iframe src:', iframeSrc);
@@ -923,6 +1035,9 @@
             
             // Pause video when music starts playing
             pauseVideo();
+            
+            // Stop auto-scroll when music starts
+            console.log('Music starting - stopping auto-scroll');
             
             // Set the iframe source to start playing
             iframe.src = iframeSrc;
@@ -1087,6 +1202,13 @@
             if (currentlyPlaying === container) {
                 currentlyPlaying = null;
                 currentWidget = null;
+                
+                console.log('Music stopped - checking if auto-scroll should resume');
+                // Resume auto-scroll when music stops (after a short delay)
+                setTimeout(() => {
+                    resumeAutoScrollIfNeeded();
+                }, 1000);
+                
                 // Resume video when music stops (if not at bottom of page)
                 const scrollPosition = window.scrollY;
                 const windowHeight = window.innerHeight;
@@ -1195,6 +1317,8 @@
                 
                 carouselContainer.addEventListener('touchstart', function(e) {
                     isCarouselTouch = true;
+                    // User touched carousel - this is an interaction
+                    handleUserInteraction();
                     // Capture start position for swipe detection
                     const touch = e.touches[0];
                     startX = touch.clientX;
@@ -1203,6 +1327,8 @@
                 
                 carouselContainer.addEventListener('touchmove', function(e) {
                     if (isCarouselTouch) {
+                        // User is moving on carousel - this is an interaction
+                        handleUserInteraction();
                         // Allow horizontal movement, prevent vertical
                         const touch = e.touches[0];
                         const currentX = touch.clientX;
@@ -1252,7 +1378,21 @@
                     // Preload thumbnails after touch interaction
                     setTimeout(preloadThumbnails, 300);
                 }, { passive: true });
+                
+                // Add mouse interaction detection for auto-scroll pause
+                carouselContainer.addEventListener('mousedown', function(e) {
+                    handleUserInteraction();
+                });
+                
+                carouselContainer.addEventListener('wheel', function(e) {
+                    handleUserInteraction();
+                });
             }
+            
+            // Set up periodic check for auto-scroll resumption
+            setInterval(() => {
+                resumeAutoScrollIfNeeded();
+            }, 5000); // Check every 5 seconds
         });
         
         // Prevent pinch to zoom
