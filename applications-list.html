@@ -711,122 +711,98 @@
                 console.log('Fetching status data from CSV...');
                 console.log('Status CSV URL:', STATUS_CSV_URL);
                 
-                // Add cache busting parameter
-                const cacheBuster = new Date().getTime();
-                const statusUrlWithCache = `${STATUS_CSV_URL}&cachebust=${cacheBuster}`;
-                console.log('Status URL with cache buster:', statusUrlWithCache);
+                // Use the same approach as fetchApplicationsData
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const targetUrl = STATUS_CSV_URL;
                 
-                // Try direct fetch first since URL is fully public
+                let response;
                 try {
-                    console.log('Trying direct fetch...');
-                    const response = await fetch(statusUrlWithCache, {
+                    // Try direct fetch first
+                    response = await fetch(targetUrl, {
                         method: 'GET',
                         headers: {
-                            'Accept': 'text/csv,text/plain,*/*',
-                            'Cache-Control': 'no-cache, no-store, must-revalidate',
-                            'Pragma': 'no-cache',
-                            'Expires': '0'
+                            'Accept': 'text/csv,text/plain,*/*'
                         }
                     });
-                    
-                    console.log('Direct fetch response status:', response.status);
-                    console.log('Direct fetch response ok:', response.ok);
-                    
-                    if (response.ok) {
-                        const csvText = await response.text();
-                        console.log('Direct fetch CSV data length:', csvText.length);
-                        console.log('Direct fetch CSV data preview:', csvText.substring(0, 200));
-                        
-                        if (csvText.trim()) {
-                            const statusEntries = parseCSV(csvText);
-                            console.log('Parsed status entries count:', statusEntries.length);
-                            console.log('Parsed status entries:', statusEntries);
-                            
-                            const statusMap = new Map();
-                            
-                            statusEntries.forEach((entry, index) => {
-                                console.log(`Processing entry ${index}:`, entry);
-                                const uid = entry['UID'] || entry['uid'] || '';
-                                const status = entry['Status'] || entry['status'] || '';
-                                console.log(`Entry ${index}: UID="${uid}", Status="${status}"`);
-                                
-                                if (uid && status) {
-                                    statusMap.set(uid.toString(), status.toLowerCase().trim());
-                                    console.log(`✓ Mapped: ${uid} -> ${status.toLowerCase().trim()}`);
-                                } else {
-                                    console.log(`✗ Skipping entry ${index} - missing UID or Status`);
-                                }
-                            });
-                            
-                            console.log('Final status map size:', statusMap.size);
-                            console.log('Final status map entries:', Array.from(statusMap.entries()));
-                            return statusMap;
-                        } else {
-                            console.log('Empty CSV data received from direct fetch');
-                        }
-                    }
-                } catch (directError) {
-                    console.error('Direct fetch failed:', directError);
-                }
-                
-                // Try direct fetch with no-cors mode as backup
-                try {
-                    console.log('Trying direct fetch with no-cors mode...');
-                    const response = await fetch(statusUrlWithCache, {
-                        method: 'GET',
-                        mode: 'no-cors'
-                    });
-                    
-                    console.log('No-cors fetch completed, but cannot read response due to CORS restrictions');
-                    // With no-cors mode, we can't read the response, so this is just for triggering cache
-                } catch (noCorsError) {
-                    console.error('No-cors fetch failed:', noCorsError);
-                }
-                
-                // Try CORS proxy as backup
-                try {
-                    console.log('Trying CORS proxy method...');
-                    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                    const response = await fetch(proxyUrl + statusUrlWithCache, {
+                } catch (corsError) {
+                    // If CORS fails, try with proxy
+                    response = await fetch(proxyUrl + targetUrl, {
                         method: 'GET',
                         headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Cache-Control': 'no-cache'
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     });
+                }
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const csvText = await response.text();
+                console.log('Status CSV data length:', csvText.length);
+                console.log('Status CSV data preview:', csvText.substring(0, 200));
+                
+                if (!csvText.trim()) {
+                    console.log('Empty status CSV data received');
+                    return new Map();
+                }
+                
+                const statusEntries = parseCSV(csvText);
+                console.log('Parsed status entries count:', statusEntries.length);
+                console.log('Parsed status entries:', statusEntries);
+                
+                const statusMap = new Map();
+                
+                statusEntries.forEach((entry, index) => {
+                    console.log(`Processing entry ${index}:`, entry);
+                    const uid = entry['UID'] || entry['uid'] || '';
+                    const status = entry['Status'] || entry['status'] || '';
+                    console.log(`Entry ${index}: UID="${uid}", Status="${status}"`);
                     
-                    console.log('CORS proxy response status:', response.status);
-                    
-                    if (response.ok) {
-                        const csvText = await response.text();
-                        console.log('CORS proxy CSV data length:', csvText.length);
-                        console.log('CORS proxy CSV data preview:', csvText.substring(0, 200));
-                        
-                        if (csvText.trim()) {
-                            const statusEntries = parseCSV(csvText);
-                            const statusMap = new Map();
-                            
-                            statusEntries.forEach((entry, index) => {
-                                const uid = entry['UID'] || entry['uid'] || '';
-                                const status = entry['Status'] || entry['status'] || '';
-                                if (uid && status) {
-                                    statusMap.set(uid.toString(), status.toLowerCase().trim());
-                                }
-                            });
-                            
-                            console.log('CORS proxy final status map:', Array.from(statusMap.entries()));
-                            return statusMap;
-                        }
+                    if (uid && status) {
+                        statusMap.set(uid.toString(), status.toLowerCase().trim());
+                        console.log(`✓ Mapped: ${uid} -> ${status.toLowerCase().trim()}`);
+                    } else {
+                        console.log(`✗ Skipping entry ${index} - missing UID or Status`);
                     }
-                } catch (proxyError) {
-                    console.error('CORS proxy method failed:', proxyError);
+                });
+                
+                console.log('Final status map size:', statusMap.size);
+                console.log('Final status map entries:', Array.from(statusMap.entries()));
+                return statusMap;
+                
+            } catch (error) {
+                console.error('Error fetching status data:', error);
+                
+                // Try alternative method using a different CORS proxy (same as applications)
+                try {
+                    console.log('Trying alternative CORS proxy for status data...');
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(STATUS_CSV_URL)}`);
+                    const data = await response.json();
+                    
+                    if (data.contents) {
+                        console.log('Alternative method - status CSV data length:', data.contents.length);
+                        console.log('Alternative method - status CSV data preview:', data.contents.substring(0, 200));
+                        
+                        const statusEntries = parseCSV(data.contents);
+                        const statusMap = new Map();
+                        
+                        statusEntries.forEach((entry, index) => {
+                            const uid = entry['UID'] || entry['uid'] || '';
+                            const status = entry['Status'] || entry['status'] || '';
+                            if (uid && status) {
+                                statusMap.set(uid.toString(), status.toLowerCase().trim());
+                            }
+                        });
+                        
+                        console.log('Alternative method - final status map:', Array.from(statusMap.entries()));
+                        return statusMap;
+                    }
+                } catch (alternativeError) {
+                    console.error('Alternative status fetch also failed:', alternativeError);
                 }
                 
                 console.warn('All status fetch methods failed, returning empty map');
-                return new Map();
-                
-            } catch (error) {
-                console.error('Unexpected error in fetchStatusData:', error);
                 return new Map();
             }
         }
