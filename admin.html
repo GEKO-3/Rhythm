@@ -2,11 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rhythm - Main Menu</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rhythm Boduberu - Admin Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="Administrative panel for Rhythm Boduberu music group operations">
+  <meta name="theme-color" content="#f5d000">
+  <meta name="color-scheme" content="dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rhythm Admin">
+  <meta name="msapplication-TileColor" content="#f5d000">
+  <meta name="msapplication-config" content="favicons/browserconfig.xml">
   <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
-<link rel="manifest" href="favicons/manifest.webmanifest">
+<link rel="manifest" href="favicons/admin-manifest.webmanifest">
+  
+  <!-- Notification Permission Banner -->
+  <div id="notification-banner" class="notification-banner" style="display: none;">
+    <div class="notification-content">
+      <span class="notification-text">Enable notifications to get alerts for new member applications</span>
+      <div class="notification-buttons">
+        <button id="enable-notifications" class="notification-btn enable">Enable</button>
+        <button id="dismiss-notifications" class="notification-btn dismiss">Dismiss</button>
+      </div>
+    </div>
+  </div>
   <style>
     /* Local font definitions */
     @font-face {
@@ -35,6 +55,55 @@
       justify-content: center;
       min-height: 100vh;
       margin: 0;
+      /* Support for window controls overlay */
+      -webkit-app-region: no-drag;
+      app-region: no-drag;
+    }
+    
+    /* Window controls overlay support */
+    @media (display-mode: window-controls-overlay) {
+      body {
+        padding-top: env(titlebar-area-height, 0);
+      }
+      
+      .settings-panel {
+        top: calc(20px + env(titlebar-area-height, 0));
+      }
+      
+      .notification-banner {
+        top: env(titlebar-area-height, 0);
+      }
+    }
+    
+    /* PWA install button */
+    .install-btn {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(245, 208, 0, 0.9);
+      color: #2b2b2b;
+      border: none;
+      border-radius: 25px;
+      padding: 10px 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 200;
+      display: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+      backdrop-filter: blur(10px);
+    }
+    
+    .install-btn:hover {
+      background: #f5d000;
+      transform: translateX(-50%) translateY(-2px);
+      box-shadow: 0 4px 12px rgba(245, 208, 0, 0.3);
+    }
+    
+    .install-btn.show {
+      display: block;
     }
     .menu-container {
       background: rgba(43,43,43,0.7);
@@ -201,6 +270,217 @@
         gap: 10px;
       }
     }
+    
+    /* Notification Banner Styles */
+    .notification-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #f5d000, #ffed4e);
+      color: #2b2b2b;
+      padding: 15px 20px;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .notification-banner.show {
+      transform: translateY(0);
+    }
+
+    .notification-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 600px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .notification-text {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .notification-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .notification-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    .notification-btn.enable {
+      background: #2b2b2b;
+      color: #f5d000;
+    }
+
+    .notification-btn.enable:hover {
+      background: #1a1a1a;
+      transform: translateY(-1px);
+    }
+
+    .notification-btn.dismiss {
+      background: transparent;
+      color: #2b2b2b;
+      border: 1px solid #2b2b2b;
+    }
+
+    .notification-btn.dismiss:hover {
+      background: rgba(43, 43, 43, 0.1);
+    }
+
+    /* Notification Status Indicator */
+    .notification-status {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(43, 43, 43, 0.9);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(245, 208, 0, 0.3);
+      border-radius: 10px;
+      padding: 10px 15px;
+      color: #f5d000;
+      font-size: 0.9rem;
+      font-weight: 600;
+      z-index: 100;
+      display: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    .notification-status.enabled {
+      display: block;
+    }
+
+    .notification-status .status-icon {
+      margin-right: 8px;
+    }
+
+    /* Settings Panel Styles */
+    .settings-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 150;
+    }
+
+    .settings-btn {
+      background: rgba(43, 43, 43, 0.9);
+      border: 1px solid rgba(245, 208, 0, 0.3);
+      color: #f5d000;
+      padding: 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      font-size: 1.2rem;
+    }
+
+    .settings-btn:hover {
+      background: rgba(245, 208, 0, 0.1);
+      transform: rotate(90deg);
+    }
+
+    .settings-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: rgba(43, 43, 43, 0.95);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(245, 208, 0, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 10px;
+      min-width: 250px;
+      display: none;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .settings-dropdown.show {
+      display: block;
+    }
+
+    .settings-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(245, 208, 0, 0.1);
+      font-size: 0.9rem;
+    }
+
+    .settings-item:last-child {
+      border-bottom: none;
+    }
+
+    .settings-label {
+      color: #f5d000;
+      font-weight: 600;
+    }
+
+    .settings-value {
+      color: #cccccc;
+      font-size: 0.85rem;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 50px;
+      height: 25px;
+      background: #444;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-switch.enabled {
+      background: #f5d000;
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 21px;
+      height: 21px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.3s ease;
+    }
+
+    .toggle-switch.enabled::after {
+      transform: translateX(25px);
+    }
+
+    @media (max-width: 600px) {
+      .notification-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+      
+      .settings-panel {
+        top: 15px;
+        right: 15px;
+      }
+      
+      .settings-dropdown {
+        min-width: 200px;
+        right: -50px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -218,6 +498,27 @@
     </div>
   </div>
 
+  <!-- PWA Install Button -->
+  <button id="install-btn" class="install-btn">📱 Install Admin App</button>
+
+  <!-- Settings Panel -->
+  <div class="settings-panel">
+    <button class="settings-btn" id="settings-btn" title="Settings">⚙️</button>
+    <div class="settings-dropdown" id="settings-dropdown">
+      <div class="settings-item">
+        <span class="settings-label">Notifications</span>
+        <div class="toggle-switch" id="notification-toggle" title="Toggle notifications">
+        </div>
+      </div>
+      <div class="settings-item">
+        <div>
+          <div class="settings-label">Status</div>
+          <div class="settings-value" id="notification-status-text">Checking...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <h1 class="page-title">Admin</h1>
   <div class="menu-container">
     <button class="menu-btn" onclick="navigateToPage('members.html')">Members</button>
@@ -227,7 +528,334 @@
     <button class="menu-btn" onclick="navigateToPage('applications-list.html')">Applications</button>
   </div>
 
+  <!-- Notification Status Indicator -->
+  <div id="notification-status-indicator" class="notification-status">
+    <span class="status-icon">🔔</span>
+    <span>Notifications enabled</span>
+  </div>
+
   <script>
+    // PWA Installation Management
+    let deferredPrompt;
+    let isInstalled = false;
+
+    // Check if app is installed
+    function checkInstallStatus() {
+      // Check if running as installed PWA
+      if (window.matchMedia('(display-mode: standalone)').matches ||
+          window.matchMedia('(display-mode: window-controls-overlay)').matches ||
+          window.navigator.standalone === true) {
+        isInstalled = true;
+        document.getElementById('install-btn').style.display = 'none';
+        return true;
+      }
+      return false;
+    }
+
+    // PWA Install button handling
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('PWA install prompt available');
+      e.preventDefault();
+      deferredPrompt = e;
+      
+      // Only show install button if not already installed and user is authenticated
+      if (!isInstalled && pinAuthenticated) {
+        const installBtn = document.getElementById('install-btn');
+        installBtn.classList.add('show');
+      }
+    });
+
+    // Handle install button click
+    document.getElementById('install-btn').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+          console.log('PWA installed successfully');
+          document.getElementById('install-btn').classList.remove('show');
+        } else {
+          console.log('PWA installation dismissed');
+        }
+        
+        deferredPrompt = null;
+      }
+    });
+
+    // Listen for app installation
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('PWA was installed');
+      isInstalled = true;
+      document.getElementById('install-btn').classList.remove('show');
+      
+      // Show success notification if notifications are enabled
+      if (checkNotificationPermission() === 'granted') {
+        new Notification('Rhythm Admin Installed!', {
+          body: 'The admin app has been installed successfully',
+          icon: 'favicons/favicon.png',
+          badge: 'favicons/favicon.png',
+          tag: 'app-installed'
+        });
+      }
+    });
+
+    // Notification functionality
+    let notificationPermission = 'default';
+    let hasShownNotificationBanner = false;
+
+    // Check if notifications are supported
+    function isNotificationSupported() {
+      return 'Notification' in window && 'serviceWorker' in navigator;
+    }
+
+    // Check notification permission status
+    function checkNotificationPermission() {
+      if (!isNotificationSupported()) return 'unsupported';
+      return Notification.permission;
+    }
+
+    // Show notification banner
+    function showNotificationBanner() {
+      if (!isNotificationSupported() || hasShownNotificationBanner) return;
+      
+      const banner = document.getElementById('notification-banner');
+      const permission = checkNotificationPermission();
+      
+      if (permission === 'default') {
+        banner.style.display = 'block';
+        setTimeout(() => banner.classList.add('show'), 100);
+        hasShownNotificationBanner = true;
+        
+        // Auto-hide after 10 seconds if no action taken
+        setTimeout(() => {
+          if (banner.classList.contains('show')) {
+            hideNotificationBanner();
+          }
+        }, 10000);
+      }
+    }
+
+    // Hide notification banner
+    function hideNotificationBanner() {
+      const banner = document.getElementById('notification-banner');
+      banner.classList.remove('show');
+      setTimeout(() => banner.style.display = 'none', 300);
+    }
+
+    // Request notification permission
+    async function requestNotificationPermission() {
+      if (!isNotificationSupported()) {
+        console.log('Notifications not supported');
+        return false;
+      }
+
+      try {
+        const permission = await Notification.requestPermission();
+        notificationPermission = permission;
+        
+        if (permission === 'granted') {
+          // Register service worker for better notification handling
+          if ('serviceWorker' in navigator) {
+            try {
+              await navigator.serviceWorker.register('sw-notifications.js');
+              console.log('Notification service worker registered');
+            } catch (error) {
+              console.log('Service worker registration failed:', error);
+            }
+          }
+          
+          updateNotificationStatus();
+          updateSettingsPanel();
+          showTestNotification();
+          hideNotificationBanner();
+          return true;
+        } else {
+          console.log('Notification permission denied');
+          updateNotificationStatus();
+          updateSettingsPanel();
+          return false;
+        }
+      } catch (error) {
+        console.error('Error requesting notification permission:', error);
+        return false;
+      }
+    }
+
+    // Show test notification
+    function showTestNotification() {
+      if (checkNotificationPermission() !== 'granted') return;
+
+      const notification = new Notification('Rhythm Boduberu - Admin Panel', {
+        body: 'Notifications are now enabled for admin functions',
+        icon: 'favicons/favicon.png',
+        badge: 'favicons/favicon.png',
+        tag: 'admin-test-notification',
+        requireInteraction: false,
+        silent: false
+      });
+
+      // Auto-close after 5 seconds
+      setTimeout(() => notification.close(), 5000);
+    }
+
+    // Show new application notification
+    function showNewApplicationNotification(applicationCount) {
+      if (checkNotificationPermission() !== 'granted') return;
+
+      const title = applicationCount === 1 
+        ? 'New Member Application!' 
+        : `${applicationCount} New Member Applications!`;
+      
+      const body = applicationCount === 1
+        ? 'A new member application has been submitted'
+        : `${applicationCount} new member applications have been submitted`;
+
+      const notification = new Notification(title, {
+        body: body,
+        icon: 'favicons/favicon.png',
+        badge: 'favicons/favicon.png',
+        tag: 'new-application',
+        requireInteraction: true,
+        silent: false
+      });
+
+      // Handle notification click
+      notification.onclick = function() {
+        window.focus();
+        // Navigate to applications if in admin panel
+        navigateToPage('applications-list.html');
+        notification.close();
+      };
+
+      // Auto-close after 15 seconds if not clicked
+      setTimeout(() => notification.close(), 15000);
+    }
+
+    // Update notification status indicator
+    function updateNotificationStatus() {
+      const statusElement = document.getElementById('notification-status-indicator');
+      const permission = checkNotificationPermission();
+      
+      if (permission === 'granted') {
+        statusElement.classList.add('enabled');
+      } else {
+        statusElement.classList.remove('enabled');
+      }
+    }
+
+    // Update settings panel
+    function updateSettingsPanel() {
+      const toggle = document.getElementById('notification-toggle');
+      const statusText = document.getElementById('notification-status-text');
+      const permission = checkNotificationPermission();
+      
+      if (permission === 'granted') {
+        toggle.classList.add('enabled');
+        statusText.textContent = 'Enabled';
+        statusText.style.color = '#44ff44';
+      } else if (permission === 'denied') {
+        toggle.classList.remove('enabled');
+        statusText.textContent = 'Blocked';
+        statusText.style.color = '#ff4444';
+      } else if (permission === 'default') {
+        toggle.classList.remove('enabled');
+        statusText.textContent = 'Not set';
+        statusText.style.color = '#ffaa00';
+      } else {
+        toggle.classList.remove('enabled');
+        statusText.textContent = 'Not supported';
+        statusText.style.color = '#666666';
+      }
+    }
+
+    // Initialize notification system
+    function initializeNotifications() {
+      if (!isNotificationSupported()) {
+        console.log('Notifications not supported on this device/browser');
+        return;
+      }
+
+      notificationPermission = checkNotificationPermission();
+      updateNotificationStatus();
+      updateSettingsPanel();
+
+      // Show banner after PIN authentication if permission not yet decided
+      if (pinAuthenticated && notificationPermission === 'default') {
+        setTimeout(() => {
+          showNotificationBanner();
+        }, 2000);
+      }
+
+      // Set up banner button handlers
+      const enableBtn = document.getElementById('enable-notifications');
+      const dismissBtn = document.getElementById('dismiss-notifications');
+
+      enableBtn?.addEventListener('click', async () => {
+        await requestNotificationPermission();
+      });
+
+      dismissBtn?.addEventListener('click', () => {
+        hasShownNotificationBanner = true;
+        hideNotificationBanner();
+      });
+
+      // Set up settings panel handlers
+      const settingsBtn = document.getElementById('settings-btn');
+      const settingsDropdown = document.getElementById('settings-dropdown');
+      const notificationToggle = document.getElementById('notification-toggle');
+
+      settingsBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        settingsDropdown.classList.toggle('show');
+      });
+
+      // Close settings dropdown when clicking outside
+      document.addEventListener('click', () => {
+        settingsDropdown.classList.remove('show');
+      });
+
+      settingsDropdown?.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      notificationToggle?.addEventListener('click', async () => {
+        const permission = checkNotificationPermission();
+        
+        if (permission === 'default') {
+          await requestNotificationPermission();
+        } else if (permission === 'granted') {
+          // Can't programmatically disable notifications, show info
+          alert('To disable notifications, please use your browser settings:\n\n1. Click the lock/info icon in the address bar\n2. Change notification permission to "Block"\n3. Refresh the page');
+        } else if (permission === 'denied') {
+          // Show instructions to re-enable
+          alert('To enable notifications:\n\n1. Click the lock/info icon in the address bar\n2. Change notification permission to "Allow"\n3. Refresh the page');
+        }
+      });
+
+      // Register service worker if supported and permission granted
+      if (notificationPermission === 'granted' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw-notifications.js')
+          .then(() => console.log('Service worker registered'))
+          .catch(error => console.log('Service worker registration failed:', error));
+      }
+    }
+
+    // Simulate periodic check for new applications (for demo)
+    function startApplicationMonitoring() {
+      if (checkNotificationPermission() !== 'granted') return;
+      
+      // This would normally check your backend/CSV for new applications
+      // For demo purposes, we'll simulate a new application every 2 minutes
+      setInterval(() => {
+        // In real implementation, this would check against your data source
+        const shouldNotify = Math.random() > 0.95; // 5% chance every 2 minutes
+        
+        if (shouldNotify) {
+          showNewApplicationNotification(1);
+        }
+      }, 120000); // 2 minutes
+    }
+
     // PIN Configuration - Admin PIN (base64 encoded: 8734)
     const encodedAdminPin = 'ODczNA==';
     let actualPinArray = [];
@@ -249,6 +877,7 @@
       decodePinConfig();
       initializePinSystem();
       initializeSessionTimeout();
+      checkInstallStatus();
     });
     
     // Decode and validate PIN configuration
@@ -546,6 +1175,17 @@
             sessionStorage.setItem('pinSession', JSON.stringify(refreshedSession));
             updateLastActivity();
             pinOverlay.classList.add('hidden');
+            
+            // Initialize notifications for existing sessions
+            setTimeout(() => {
+              initializeNotifications();
+              startApplicationMonitoring();
+              
+              // Show install button if PWA can be installed
+              if (deferredPrompt && !isInstalled) {
+                document.getElementById('install-btn').classList.add('show');
+              }
+            }, 500);
             return;
           } else {
             // Session expired, remove it
@@ -609,6 +1249,17 @@
         updateLastActivity();
         
         pinOverlay.classList.add('hidden');
+        
+        // Initialize notifications after successful authentication
+        setTimeout(() => {
+          initializeNotifications();
+          startApplicationMonitoring();
+          
+          // Show install button if PWA can be installed
+          if (deferredPrompt && !isInstalled) {
+            document.getElementById('install-btn').classList.add('show');
+          }
+        }, 1000);
       } else {
         // Failed authentication
         attemptCount++;

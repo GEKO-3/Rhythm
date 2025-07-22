@@ -420,6 +420,31 @@
             font-size: 1rem;
         }
 
+        /* Notification Status Indicator */
+        .notification-status {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(42, 42, 42, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            border-radius: 10px;
+            padding: 10px 15px;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 100;
+            display: none;
+        }
+
+        .notification-status.enabled {
+            display: block;
+        }
+
+        .notification-status .status-icon {
+            margin-right: 8px;
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .header h1 {
@@ -535,7 +560,87 @@
         </div>
     </main>
 
+    <!-- Notification Status Indicator -->
+    <div id="notification-status" class="notification-status">
+        <span class="status-icon">🔔</span>
+        <span>Notifications enabled</span>
+    </div>
+
     <script>
+        // Notification functionality
+        let notificationPermission = 'default';
+
+        // Check if notifications are supported
+        function isNotificationSupported() {
+            return 'Notification' in window && 'serviceWorker' in navigator;
+        }
+
+        // Check notification permission status
+        function checkNotificationPermission() {
+            if (!isNotificationSupported()) return 'unsupported';
+            return Notification.permission;
+        }
+
+        // Show new application notification
+        function showNewApplicationNotification(applicationCount) {
+            if (checkNotificationPermission() !== 'granted') return;
+
+            const title = applicationCount === 1 
+                ? 'New Member Application!' 
+                : `${applicationCount} New Member Applications!`;
+            
+            const body = applicationCount === 1
+                ? 'A new member application has been submitted'
+                : `${applicationCount} new member applications have been submitted`;
+
+            const notification = new Notification(title, {
+                body: body,
+                icon: 'favicons/favicon.png',
+                badge: 'favicons/favicon.png',
+                tag: 'new-application',
+                requireInteraction: true,
+                silent: false,
+                actions: [
+                    {
+                        action: 'view',
+                        title: 'View Applications'
+                    }
+                ]
+            });
+
+            // Handle notification click
+            notification.onclick = function() {
+                window.focus();
+                notification.close();
+            };
+
+            // Auto-close after 10 seconds if not clicked
+            setTimeout(() => notification.close(), 10000);
+        }
+
+        // Update notification status indicator
+        function updateNotificationStatus() {
+            const statusElement = document.getElementById('notification-status');
+            const permission = checkNotificationPermission();
+            
+            if (permission === 'granted') {
+                statusElement.classList.add('enabled');
+            } else {
+                statusElement.classList.remove('enabled');
+            }
+        }
+
+        // Initialize notification system
+        function initializeNotifications() {
+            if (!isNotificationSupported()) {
+                console.log('Notifications not supported on this device');
+                return;
+            }
+
+            notificationPermission = checkNotificationPermission();
+            updateNotificationStatus();
+        }
+
         // DOM elements
         const loadingContainer = document.getElementById('loading-container');
         const errorContainer = document.getElementById('error-container');
@@ -553,6 +658,7 @@
 
         // Store previously loaded applications
         let previousApplications = [];
+        let initialLoad = true;
         
         // Function to get seen applications from localStorage
         function getSeenApplications() {
@@ -783,26 +889,42 @@
         function identifyNewApplications(currentApplications) {
             const seenApps = getSeenApplications();
             
-            if (previousApplications.length === 0) {
+            if (initialLoad || previousApplications.length === 0) {
                 // First load - check against seen applications in localStorage
-                return currentApplications.map(app => ({
+                const newApps = currentApplications.map(app => ({
                     ...app,
                     isNew: !seenApps.has(generateApplicationId(app))
                 }));
+                
+                initialLoad = false;
+                return newApps;
             }
             
             const previousIds = new Set(previousApplications.map(generateApplicationId));
+            let newApplicationCount = 0;
             
-            return currentApplications.map(app => {
+            const appsWithNewFlag = currentApplications.map(app => {
                 const appId = generateApplicationId(app);
                 const wasNotPreviouslyLoaded = !previousIds.has(appId);
                 const hasNotBeenSeen = !seenApps.has(appId);
+                const isNew = wasNotPreviouslyLoaded && hasNotBeenSeen;
+                
+                if (isNew) {
+                    newApplicationCount++;
+                }
                 
                 return {
                     ...app,
-                    isNew: wasNotPreviouslyLoaded && hasNotBeenSeen
+                    isNew: isNew
                 };
             });
+            
+            // Show notification for new applications
+            if (newApplicationCount > 0) {
+                showNewApplicationNotification(newApplicationCount);
+            }
+            
+            return appsWithNewFlag;
         }
 
         // Function to update statistics
@@ -941,6 +1063,10 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize notifications first
+            initializeNotifications();
+            
+            // Then fetch applications
             fetchApplications();
         });
 

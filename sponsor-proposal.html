@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="Rhythm Boduberu Sponsor Proposal - Partner with us to promote traditional Maldivian culture through authentic Boduberu performances">
+    <meta name="keywords" content="Rhythm Boduberu, Boduberu, Traditional Maldivian Music, Sponsorship, Partnership, Cultural Events, Maldivian Culture">
+    <meta name="author" content="Rhythm Boduberu">
+    <title>Sponsor Proposal - Rhythm Boduberu</title>
+    
+    <!-- Performance optimizations: Resource hints -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="Fonts/Montserrat-Regular.ttf" as="font" type="font/ttf" crossorigin>
+    <link rel="preload" href="Fonts/Montserrat-Bold.ttf" as="font" type="font/ttf" crossorigin>
+    
+    <!-- Preload critical images -->
+    <link rel="preload" href="src/Rhytham Logo.webp" as="image">
+    <link rel="preload" href="src/Logo_1.svg" as="image">
+    <link rel="preload" href="src/Logo.png" as="image">
+    <link rel="preload" href="src/bg-video.mp4" as="video" type="video/mp4">
+    <link rel="preload" href="src/Background.webp" as="image">
+    
+    <!-- Favicon and web app manifest -->
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="shortcut icon" href="favicons/favicon.ico">
+    <link rel="manifest" href="favicons/manifest.webmanifest">
+    
+    <!-- Additional meta tags for better SEO -->
+    <meta name="theme-color" content="#f5d000">
+    <meta name="msapplication-TileColor" content="#f5d000">
+    <meta name="msapplication-TileImage" content="favicons/favicon.png">
+    <meta property="og:title" content="Sponsor Proposal - Rhythm Boduberu">
+    <meta property="og:description" content="Partner with Rhythm Boduberu to promote traditional Maldivian culture through authentic Boduberu performances">
+    <meta property="og:image" content="https://rhythmboduberu.com/favicons/favicon.png">
+    <meta property="og:url" content="https://rhythmboduberu.com/sponsor-proposal.html">
+    <meta property="og:type" content="website">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://rhythmboduberu.com/sponsor-proposal.html">
+    
+    <style>
+        /* Sponsor-specific styles */
+        .sponsor-main-section {
+            background: linear-gradient(135deg, #1a1a1a 0%, #2b2b2b 50%, #1a1a1a 100%);
+            min-height: 100vh;
+            height: auto;
+            padding: 0;
+            position: relative;
+            overflow: visible;
+        }
+        
+        /* Video and Background */
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            opacity: 0.8;
+            transform: translateX(calc(50% - 50vw));
+        }
+
+        .video-fallback {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100%;
+            background-image: url('src/Background.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -3;
+            opacity: 0.8;
+            transform: translateX(calc(50% - 50vw));
+        }
+
+        /* Yellow tint overlay for video */
+        .sponsor-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, hwb(51 0% 4% / 0.144), rgba(255, 217, 0, 0.034));
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        .sponsor-content {
+            color: var(--primary-color);
+        }
+        
+        .sponsor-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 0;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            padding: 80px calc(50vw - 50%) 80px;
+            min-height: 100vh;
+            height: 100vh;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .sponsor-header .logo {
+            flex-shrink: 0;
+        }
+        
+        .sponsor-header .logo img {
+            max-width: 200px;
+            height: auto;
+            border-radius: 15px;
+        }
+        
+        .sponsor-header .title-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 200px;
+        }
+        
+        .sponsor-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 3.5rem;
+            margin: 0;
+            background: linear-gradient(45deg, var(--primary-color), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1.1;
+        }
+        
+        /* Clean section styles like index page */
+        .sponsor-section {
+            margin-bottom: 0;
+            padding: 80px 20px;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+            transition: none;
+            opacity: 1;
+            transform: none;
+        }
+        
+        .sponsor-section.about {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('src/abtscbg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            padding-left: calc(50vw - 50%);
+            padding-right: calc(50vw - 50%);
+            padding-top: 80px;
+            padding-bottom: 80px;
+            margin-bottom: 0;
+            text-align: right;
+        }
+        
+        .sponsor-section.yearly {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('src/ypscbg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            padding-left: calc(50vw - 50%);
+            padding-right: calc(50vw - 50%);
+            padding-top: 80px;
+            padding-bottom: 80px;
+            margin-bottom: 0;
+            min-height: 100vh;
+            height: auto;
+            position: relative;
+        }
+        
+        .sponsor-section.packages {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('src/spscbg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            padding-left: calc(50vw - 50%);
+            padding-right: calc(50vw - 50%);
+            padding-top: 80px;
+            padding-bottom: 80px;
+            margin-bottom: 0;
+            min-height: 100vh;
+            height: auto;
+            position: relative;
+        }
+        
+        .sponsor-section.contact {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('src/s2bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-left: calc(-50vw + 50%);
+            margin-right: calc(-50vw + 50%);
+            padding-left: calc(50vw - 50%);
+            padding-right: calc(50vw - 50%);
+            padding-top: 80px;
+            padding-bottom: 80px;
+            margin-bottom: 0;
+            min-height: 100vh;
+            height: auto;
+            position: relative;
+        }
+        
+        .sponsor-section.about h2 {
+            text-align: right;
+            max-width: 325px;
+            margin-left: auto;
+            margin-right: 0;
+            margin-bottom: 40px;
+            padding-right: 25px;
+        }
+        
+        .sponsor-section.about p {
+            text-align: right;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: 0;
+            padding-right: 25px;
+        }
+        
+        .sponsor-section:hover {
+            transform: none;
+        }
+        
+        .sponsor-section h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            background: linear-gradient(45deg, var(--primary-color), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .sponsor-section p {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 400;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: #ffffff;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto 30px auto;
+            padding: 0 20px;
+        }
+        
+        .yearly-plan {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 0 20px;
+        }
+        
+        .plan-item {
+            background: transparent;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        /* Alternating alignment - even items left, odd items right */
+        .plan-item:nth-child(odd) {
+            text-align: left;
+        }
+        
+        .plan-item:nth-child(even) {
+            text-align: right;
+        }
+        
+        .plan-item:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+        }
+        
+        .plan-item h3 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: inherit;
+            padding: 0;
+            margin-left: 0;
+            margin-right: 0;
+        }
+        
+        .plan-item p {
+            color: #ffffff;
+            font-size: 1rem;
+            margin: 0;
+            line-height: 1.6;
+            text-align: inherit;
+            padding: 0;
+        }
+        
+        .sponsor-table {
+            width: 100%;
+            max-width: 1200px;
+            margin: 30px auto 0;
+            border-collapse: collapse;
+            background: rgba(128, 128, 128, 0.6);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .sponsor-table th,
+        .sponsor-table td {
+            padding: 20px 15px;
+            text-align: center;
+            border-right: 1px solid rgba(245, 208, 0, 0.2);
+            border-bottom: 1px solid rgba(245, 208, 0, 0.08);
+            font-family: 'Montserrat', sans-serif;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .sponsor-table th:last-child,
+        .sponsor-table td:last-child {
+            border-right: none;
+        }
+        
+        .sponsor-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .sponsor-table th {
+            background: linear-gradient(135deg, rgba(245, 208, 0, 0.2), rgba(245, 208, 0, 0.1));
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* Tier-specific header colors */
+        .sponsor-table th.tier-platinum {
+            background: linear-gradient(135deg, rgba(229, 228, 226, 0.3), rgba(229, 228, 226, 0.15));
+            color: #e5e4e2;
+            border-color: rgba(229, 228, 226, 0.5);
+        }
+        
+        .sponsor-table th.tier-gold {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.15));
+            color: #ffd700;
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+        
+        .sponsor-table th.tier-silver {
+            background: linear-gradient(135deg, rgba(192, 192, 192, 0.3), rgba(192, 192, 192, 0.15));
+            color: #c0c0c0;
+            border-color: rgba(192, 192, 192, 0.5);
+        }
+        
+        .sponsor-table th.tier-bronze {
+            background: linear-gradient(135deg, rgba(205, 127, 50, 0.3), rgba(205, 127, 50, 0.15));
+            color: #cd7f32;
+            border-color: rgba(205, 127, 50, 0.5);
+        }
+        
+        .sponsor-table td {
+            font-weight: 400;
+            color: #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .tier-platinum { background: linear-gradient(135deg, rgba(229, 228, 226, 0.1), rgba(229, 228, 226, 0.05)); }
+        .tier-gold { background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05)); }
+        .tier-silver { background: linear-gradient(135deg, rgba(192, 192, 192, 0.1), rgba(192, 192, 192, 0.05)); }
+        .tier-bronze { background: linear-gradient(135deg, rgba(205, 127, 50, 0.1), rgba(205, 127, 50, 0.05)); }
+        
+        .contact-form {
+            background: rgba(26, 26, 26, 0.9);
+            border: 2px solid rgba(245, 208, 0, 0.4);
+            border-radius: 25px;
+            padding: 50px 40px;
+            max-width: 700px;
+            margin: 50px auto 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        
+        .form-group label {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 18px 20px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            backdrop-filter: blur(5px);
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 20px rgba(245, 208, 0, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .form-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+        
+        .submit-btn,
+        .contact-btn {
+            padding: 18px 40px;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 180px;
+            justify-content: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(45deg, var(--primary-color), #fff);
+            color: #1a1a1a;
+            box-shadow: 0 10px 30px rgba(245, 208, 0, 0.4);
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(245, 208, 0, 0.6);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        .contact-btn {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            box-shadow: 0 5px 20px rgba(245, 208, 0, 0.2);
+        }
+        
+        .contact-btn:hover {
+            background: var(--primary-color);
+            color: #1a1a1a;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(245, 208, 0, 0.4);
+        }
+        
+        .contact-buttons {
+            display: flex;
+            gap: 25px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(245, 208, 0, 0.2);
+        }
+        
+        .contact-buttons .contact-btn {
+            padding: 16px 35px;
+            font-size: 1rem;
+            min-width: 200px;
+            border-radius: 15px;
+            font-weight: 900;
+        }
+        
+        .back-home {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(245, 208, 0, 0.9);
+            color: #2b2b2b;
+            padding: 12px 20px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-home:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        /* Table container - desktop default */
+        .table-container {
+            position: relative;
+            margin: 30px auto 0;
+            max-width: 1200px;
+        }
+        
+        .benefits-column {
+            display: none;
+        }
+        
+        .tiers-container {
+            width: 100%;
+        }
+        
+        /* Desktop table - show benefits column in table */
+        @media (min-width: 769px) {
+            .sponsor-table th:first-child,
+            .sponsor-table td:first-child {
+                text-align: left;
+                padding-left: 20px;
+                font-weight: 600;
+                min-width: 200px;
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            html, body {
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+                scrollbar-width: none;
+                -ms-overflow-style: none;
+                max-width: 100vw;
+                margin-bottom: 0;
+            }
+            
+            html::-webkit-scrollbar, 
+            body::-webkit-scrollbar {
+                display: none;
+            }
+            
+            .sponsor-main-section {
+                padding: 0;
+                width: 100vw;
+                margin: 0;
+                overflow: visible;
+                min-height: 100vh;
+                height: auto;
+            }
+            
+            .sponsor-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+                padding: 60px 10px 40px;
+                min-height: 100vh;
+                margin-bottom: 0;
+                justify-content: center;
+                align-items: center;
+                display: flex;
+                /* Reset full-width margins on mobile */
+                margin-left: 0;
+                margin-right: 0;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            /* Reset video background transform on mobile */
+            .video-background,
+            .video-fallback {
+                transform: none;
+                width: 100%;
+            }
+            
+            .sponsor-header .title-section {
+                height: auto;
+            }
+            
+            .sponsor-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .sponsor-section {
+                padding: 0 10px;
+                margin-bottom: 50px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+            
+            .sponsor-section h2 {
+                font-size: 1.8rem;
+            }
+            
+            .sponsor-section.about h2 {
+                font-size: 2.2rem;
+            }
+            
+            .sponsor-section p {
+                padding: 0 10px;
+                font-size: 1rem;
+            }
+            
+            /* Table container with scroll indicators - mobile only */
+            .table-container {
+                display: flex;
+                position: relative;
+                margin: 30px 0 0;
+                border-radius: 15px;
+                overflow: hidden;
+                background: rgba(128, 128, 128, 0.6);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            }
+            
+            /* Fixed Benefits Column - mobile only */
+            .benefits-column {
+                display: block;
+                width: 140px;
+                background: rgba(26, 26, 26, 0.98);
+                border-right: 2px solid rgba(245, 208, 0, 0.4);
+                flex-shrink: 0;
+                z-index: 10;
+            }
+            
+            .benefit-header {
+                height: 56px;
+                padding: 10px 8px;
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 700;
+                color: var(--primary-color);
+                font-size: 0.7rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                background: linear-gradient(135deg, rgba(245, 208, 0, 0.2), rgba(245, 208, 0, 0.1));
+                border-bottom: 1px solid rgba(245, 208, 0, 0.08);
+                text-align: left;
+                display: flex;
+                align-items: center;
+                box-sizing: border-box;
+            }
+            
+            .benefit-item {
+                height: 52px;
+                padding: 10px 8px;
+                font-family: 'Montserrat', sans-serif;
+                font-size: 0.7rem;
+                line-height: 1.3;
+                color: #e0e0e0;
+                border-bottom: 1px solid rgba(245, 208, 0, 0.08);
+                text-align: left;
+                word-wrap: break-word;
+                hyphens: auto;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                box-sizing: border-box;
+                position: relative;
+            }
+            
+            /* Mobile-specific styles for info buttons in benefits column */
+            .benefits-column .more-info-btn {
+                position: absolute;
+                right: 9px;
+                top: 70%;
+                transform: translateY(-50%);
+                margin-left: 0;
+                flex-shrink: 0;
+                width: 14px;
+                height: 14px;
+                font-size: 9px;
+                line-height: 12px;
+            }
+            
+            .benefits-column .benefit-item {
+                padding-right: 24px; /* Make room for the info button */
+            }
+            
+            .benefit-item:last-child {
+                border-bottom: none;
+            }
+            
+            /* Scrollable Tiers Container - mobile only */
+            .tiers-container {
+                flex: 1;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                border-radius: 0 15px 15px 0;
+            }
+            
+            .table-container::before,
+            .table-container::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                width: 40px;
+                pointer-events: none;
+                z-index: 15;
+                transition: opacity 0.3s ease;
+            }
+            
+            .table-container::before {
+                left: 140px;
+                background: linear-gradient(to right, #ffd9003f, #ffd90017, #ffd90000, transparent);
+                opacity: 0;
+            }
+            
+            .table-container::after {
+                right: 0;
+                background: linear-gradient(to left, #ffd9003f, #ffd90017, #ffd90000, transparent);
+                opacity: 0;
+            }
+            
+            .table-container.scrolled-left::before {
+                opacity: 1;
+            }
+            
+            .table-container.scrolled-right::after {
+                opacity: 1;
+            }
+            
+            .sponsor-table {
+                font-size: 1rem;
+                margin: 0;
+                width: 100%;
+                min-width: 600px;
+                max-width: none;
+                border-collapse: separate;
+                border-spacing: 0;
+                background: transparent;
+                border-radius: 0 15px 15px 0;
+                overflow: hidden;
+            }
+            
+            /* Hide benefits column in table on mobile */
+            .sponsor-table th:first-child,
+            .sponsor-table td:first-child {
+                display: none;
+            }
+            
+            .sponsor-table th,
+            .sponsor-table td {
+                height: 52px;
+                padding: 10px 8px;
+                font-size: 0.85rem;
+                white-space: nowrap;
+                text-align: center;
+                border-right: 1px solid rgba(245, 208, 0, 0.2);
+                border-bottom: 1px solid rgba(245, 208, 0, 0.08);
+                font-family: 'Montserrat', sans-serif;
+                box-sizing: border-box;
+                vertical-align: middle;
+            }
+            
+            .sponsor-table th {
+                height: 56px;
+            }
+            
+            .sponsor-table th:last-child,
+            .sponsor-table td:last-child {
+                border-right: none;
+            }
+            
+            .sponsor-table tr:last-child td {
+                border-bottom: none;
+            }
+            
+            /* Hide mobile card layout */
+            .mobile-packages {
+                display: none;
+            }
+            
+            .yearly-plan {
+                grid-template-columns: 1fr;
+                gap: 15px;
+                padding: 0 10px;
+                margin-top: 30px;
+            }
+            
+            .contact-form {
+                padding: 30px 20px;
+                margin: 30px 10px 0;
+                width: calc(100% - 20px);
+                max-width: none;
+                box-sizing: border-box;
+                border-radius: 20px;
+            }
+            
+            .form-group {
+                margin-bottom: 25px;
+            }
+            
+            .form-group input {
+                padding: 15px 18px;
+                font-size: 0.95rem;
+            }
+            
+            .form-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .submit-btn {
+                width: 100%;
+                max-width: 280px;
+                padding: 16px 30px;
+            }
+            
+            .contact-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                margin-top: 30px;
+            }
+            
+            .contact-buttons .contact-btn {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+        
+        /* Cross highlight effect classes */
+        .sponsor-table .row-highlight td,
+        .sponsor-table .row-highlight th {
+            background: rgba(245, 208, 0, 0.08) !important;
+        }
+        
+        .sponsor-table .col-highlight {
+            background: rgba(245, 208, 0, 0.08) !important;
+        }
+        
+        .sponsor-table .cross-highlight {
+            background: rgba(245, 208, 0, 0.2) !important;
+            transform: scale(1.02);
+            box-shadow: 0 0 10px rgba(245, 208, 0, 0.3);
+        }
+        
+        /* Check mark icon for table */
+        .check-mark {
+            color: #4CAF50;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .cross-mark {
+            color: #f44336;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* More Info Button Styles */
+        .more-info-btn {
+            display: inline-block;
+            margin-left: 8px;
+            width: 16px;
+            height: 16px;
+            background: rgba(245, 208, 0, 0.2);
+            border: 1px solid rgba(245, 208, 0, 0.4);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 14px;
+            font-size: 10px;
+            color: var(--primary-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            vertical-align: middle;
+            position: relative;
+        }
+        
+        .more-info-btn:hover {
+            background: rgba(245, 208, 0, 0.3);
+            border-color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        .more-info-btn::before {
+            content: 'i';
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-style: italic;
+        }
+        
+        /* Info Modal Styles */
+        .info-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(2px);
+        }
+        
+        .info-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2b2b2b 100%);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.247);
+        }
+        
+        .info-modal h3 {
+            color: var(--primary-color);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .info-modal p {
+            color: #e0e0e0;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-align: left;
+            max-width: none;
+            padding: 0;
+        }
+        
+        .info-modal .disclaimer {
+            font-size: 0.9rem;
+            color: #999;
+            font-style: italic;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(245, 208, 0, 0.2);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .close-modal:hover {
+            background: rgba(245, 208, 0, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        /* Hide mobile packages on desktop */
+        .mobile-packages {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Home Button -->
+    <a href="index.html" class="back-home">
+        <span>←</span> Back to Home
+    </a>
+
+    <section class="sponsor-main-section">
+        <div class="sponsor-content">
+            <!-- Header Section -->
+            <div class="sponsor-header">
+                <div class="video-fallback"></div>
+                <video class="video-background" autoplay muted loop playsinline preload="auto">
+                    <source src="src/bg-video.mp4" type="video/mp4">
+                    Your browser does not support the video tag.
+                </video>
+                
+                <div class="logo">
+                    <img src="src/Rhytham Logo.webp" alt="Rhythm Boduberu">
+                </div>
+                <div class="title-section">
+                    <h1>SPONSOR<br>PROPOSAL</h1>
+                </div>
+            </div>
+
+            <!-- About Our Group Section -->
+            <div class="sponsor-section about">
+                <h2>ABOUT RHYTHM BODUBERU</h2>
+                <p>
+                    Rhythm Boduberu is the premier traditional Maldivian Boduberu music group, dedicated to preserving and promoting the rich cultural heritage of the Maldives through authentic performances. Our group consists of talented musicians and performers who are passionate about keeping the traditional art of Boduberu alive for future generations.
+                </p>
+                <br>
+                <p>
+                    We perform at cultural events, festivals, resorts, and private functions, bringing the authentic sound and energy of traditional Maldivian music to audiences both locally and internationally. Our mission is to showcase the beauty of Maldivian culture while creating memorable experiences through our captivating performances.
+                </p>
+            </div>
+
+            <!-- Yearly Plan Section -->
+            <div class="sponsor-section yearly">
+                <h2>OUR YEARLY PLAN</h2>
+                <p>
+                    Join us in our journey to promote traditional Maldivian culture throughout the year with our comprehensive performance and outreach program.
+                </p>
+                
+                <div class="yearly-plan">
+                    <div class="plan-item">
+                        <h3>New Drums</h3>
+                        <p>Our current drums have seen better days, and we aim to acquire new, high-quality instruments to enhance our performances.</p>
+                    </div>
+                    
+                    <div class="plan-item">
+                        <h3>Studio Upgrade</h3>
+                        <p>Invest in upgrading our recording studio to produce high-quality audio and video content that showcases the Boduberu.</p>
+                    </div>
+                    
+                    <div class="plan-item">
+                        <h3>Recording Projects</h3>
+                        <p>Produce a series of audio songs that highlight our unique sound and style.</p>
+                    </div>
+                    
+                    <div class="plan-item">
+                        <h3>Video Song</h3>
+                        <p>Produce and release Boduberu video recordings to document and share our cultural heritage and stories with the world.</p>
+                    </div>
+                    
+                    <div class="plan-item">
+                        <h3>Academy</h3>
+                        <p>Establish an academy to teach and promote traditional Boduberu music to the next generation.</p>
+                    </div>
+                    
+                    <div class="plan-item">
+                        <h3>Brand Outreach</h3>
+                        <p>Expand our online presence to reach larger audiences and share the beauty of traditional Maldivian music.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sponsorship Packages Section -->
+            <div class="sponsor-section packages">
+                <h2>SPONSORSHIP PACKAGES</h2>
+                <p>
+                    Choose from our tier-based sponsorship packages and enjoy exclusive benefits while supporting traditional Maldivian culture.
+                </p>
+                
+                <div class="table-container">
+                    <!-- Fixed Benefits Column -->
+                    <div class="benefits-column">
+                        <div class="benefit-header">Benefits</div>
+                        <div class="benefit-item">Monthly Video Advertisements<span class="more-info-btn" data-info="video-ads"></span></div>
+                        <div class="benefit-item">Logo & Mentions on Website and Social Media<span class="more-info-btn" data-info="logo-social"></span></div>
+                        <div class="benefit-item">Free Live Performances<span class="more-info-btn" data-info="free-performances"></span></div>
+                        <div class="benefit-item">Discounted Performances<span class="more-info-btn" data-info="discounted-performances"></span></div>
+                        <div class="benefit-item">Cross-Promotion on Social Media<span class="more-info-btn" data-info="cross-promotion"></span></div>
+                        <div class="benefit-item">On Location Branding<span class="more-info-btn" data-info="on-location"></span></div>
+                        <div class="benefit-item">Logo Placement on Performance Kits<span class="more-info-btn" data-info="logo-kits"></span></div>
+                    </div>
+                    
+                    <!-- Scrollable Tiers Table -->
+                    <div class="tiers-container">
+                        <table class="sponsor-table">
+                        <thead>
+                            <tr>
+                                <th>Benefits</th>
+                                <th class="tier-platinum">Platinum<br>MVR75,000+</th>
+                                <th class="tier-gold">Gold<br>MVR40,000+</th>
+                                <th class="tier-silver">Silver<br>MVR15,000+</th>
+                                <th class="tier-bronze">Bronze<br>MVR5,000+</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Monthly Video Advertisements<span class="more-info-btn" data-info="video-ads"></span></td>
+                                <td>1 Monthly</td>
+                                <td>3 Yearly</td>
+                                <td class="cross-mark">✗</td>
+                                <td class="cross-mark">✗</td>
+                            </tr>
+                            <tr>
+                                <td>Logo & Mentions on Website and Social Media<span class="more-info-btn" data-info="logo-social"></span></td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td>Limited</td>
+                                <td>Limited</td>
+                            </tr>
+                            <tr>
+                                <td>Free Live Performances<span class="more-info-btn" data-info="free-performances"></span></td>
+                                <td>3 Yearly</td>
+                                <td>3 Yearly</td>
+                                <td class="cross-mark">✗</td>
+                                <td class="cross-mark">✗</td>
+                            </tr>
+                            <tr>
+                                <td>Discounted Performances<span class="more-info-btn" data-info="discounted-performances"></span></td>
+                                <td>50%</td>
+                                <td>25%</td>
+                                <td>50% One Event</td>
+                                <td class="cross-mark">✗</td>
+                            </tr>
+                            <tr>
+                                <td>Cross-Promotion on Social Media<span class="more-info-btn" data-info="cross-promotion"></span></td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="cross-mark">✗</td>
+                            </tr>
+                            <tr>
+                                <td>On Location Branding<span class="more-info-btn" data-info="on-location"></span></td>
+                                <td class="check-mark">✓</td>
+                                <td class="cross-mark">✓</td>
+                                <td>Limited</td>
+                                <td class="cross-mark">✗</td>
+                            </tr>
+                            <tr>
+                                <td>Logo Placement on Performance Kits<span class="more-info-btn" data-info="logo-kits"></span></td>
+                                <td class="check-mark">✓</td>
+                                <td class="check-mark">✓</td>
+                                <td class="cross-mark">✓</td>
+                                <td class="cross-mark">✗</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+                
+                <!-- Mobile Card Layout -->
+                <div class="mobile-packages">
+                    <div class="package-card">
+                        <div class="package-header tier-platinum">
+                            Platinum<br>MVR75,000+
+                        </div>
+                        <div class="package-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-name">Monthly Video Advertisements</span>
+                                <span class="benefit-value">1 Monthly</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Logo & Mentions on Website and Social Media</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Free Live Performances</span>
+                                <span class="benefit-value">3 Yearly</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Discounted Performances</span>
+                                <span class="benefit-value">50%</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Cross-Promotion on Social Media</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">On Location Branding</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Logo Placement on Performance Kits</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="package-card">
+                        <div class="package-header tier-gold">
+                            Gold<br>MVR40,000+
+                        </div>
+                        <div class="package-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-name">Monthly Video Advertisements</span>
+                                <span class="benefit-value">3 Yearly</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Logo & Mentions on Website and Social Media</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Free Live Performances</span>
+                                <span class="benefit-value">3 Yearly</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Discounted Performances</span>
+                                <span class="benefit-value">25%</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Cross-Promotion on Social Media</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">On Location Branding</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Logo Placement on Performance Kits</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="package-card">
+                        <div class="package-header tier-silver">
+                            Silver<br>MVR15,000+
+                        </div>
+                        <div class="package-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-name">Monthly Video Advertisements</span>
+                                <span class="benefit-value cross-mark">✗</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Logo & Mentions on Website and Social Media</span>
+                                <span class="benefit-value">Limited</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Free Live Performances</span>
+                                <span class="benefit-value cross-mark">✗</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Discounted Performances</span>
+                                <span class="benefit-value">50% One Event</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Cross-Promotion on Social Media</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">On Location Branding</span>
+                                <span class="benefit-value">Limited</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Logo Placement on Performance Kits</span>
+                                <span class="benefit-value check-mark">✓</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="package-card">
+                        <div class="package-header tier-bronze">
+                            Bronze<br>MVR5,000+
+                        </div>
+                        <div class="package-benefits">
+                            <div class="benefit-item">
+                                <span class="benefit-name">Monthly Video Advertisements</span>
+                                <span class="benefit-value cross-mark">✗</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Logo & Mentions on Website and Social Media</span>
+                                <span class="benefit-value">Limited</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Free Live Performances</span>
+                                <span class="benefit-value cross-mark">✗</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Discounted Performances</span>
+                                <span class="benefit-value cross-mark">✗</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Cross-Promotion on Social Media</span>
+                                <span class="benefit-value cross-mark">✗</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">On Location Branding</span>
+                                <span class="benefit-value cross-mark">✗</span>
+                            </div>
+                            <div class="benefit-item">
+                                <span class="benefit-name">Logo Placement on Performance Kits</span>
+                                <span class="benefit-value cross-mark">✗</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <p style="margin-top: 40px; color: #e0e0e0; font-family: 'Montserrat', sans-serif; font-size: 1rem; line-height: 1.6; text-align: center; max-width: 800px; margin-left: auto; margin-right: auto;">
+                    Additionally, we are open to sponsorship of any amount or any type. This tailored approach allows sponsors to support specific initiatives that align with their marketing strategies.
+                </p>
+            </div>
+
+            <!-- Contact Form Section -->
+            <div class="sponsor-section contact">
+                <h2>REQUEST A CALL</h2>
+                <p>
+                    Interested in partnering with us? Fill out the form below and we'll get back to you within 24 hours to discuss how we can work together.
+                </p>
+                
+                <form class="contact-form" id="sponsorForm">
+                    <div class="form-group">
+                        <label for="name">Full Name *</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="Enter your phone number">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="company">Company/Organization</label>
+                        <input type="text" id="company" name="company" placeholder="Enter your company name (optional)">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="interest">Sponsorship Interest</label>
+                        <input type="text" id="interest" name="interest" placeholder="Which tier are you interested in? (optional)">
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="submit" class="submit-btn">Request Call Back</button>
+                    </div>
+                </form>
+                
+                <div class="contact-buttons">
+                    <a href="tel:+9609965411" class="contact-btn">
+                        <img src="src/Phone.svg" alt="Call" style="width: 20px; height: 20px; margin-right: 8px;"> Call
+                    </a>
+                    <a href="mailto:info@rhythmboduberu.com" class="contact-btn">
+                        <img src="src/Email.svg" alt="Email" style="width: 20px; height: 20px; margin-right: 8px;"> Email
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Info Modal -->
+    <div id="infoModal" class="info-modal">
+        <div class="info-modal-content">
+            <button class="close-modal">&times;</button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Info Modal Data
+        const infoData = {
+            'video-ads': {
+                title: 'Monthly Video Advertisements',
+                content: `
+                    <p>We will produce and publish creative, skit-style advertisements featuring your brand. These skits are designed to entertain while subtly promoting your business, and they will be shared across our main social media channels for maximum reach.</p>
+                `
+            },
+            'logo-social': {
+                title: 'Logo Placement and Brand Mentions on Social Media',
+                content: `
+                    <p>Your logo will be featured prominently on all or non-exclusive social media posts throughout the sponsorship period. In addition, we will include brand mentions in our captions and relevant content, ensuring continuous visibility to our growing audience.</p>
+                `
+            },
+            'free-performances': {
+                title: 'Free & Discounted Live Performances Per Year',
+                content: `
+                    <p>As part of your sponsorship benefits, you will receive up to three free live performances annually. These can be used for your business events, community outreach programs, or any occasion of your choice.</p>
+                    <p class="disclaimer">Travel and accommodation expenses are not included</p>
+                `
+            },
+            'discounted-performances': {
+                title: 'Discounted Live Performances',
+                content: `
+                    <p>A discount up to 50% will also be applied to additional bookings within the year beyond your free performance allocation.</p>
+                    <p class="disclaimer">Travel and accommodation expenses are not included</p>
+                `
+            },
+            'cross-promotion': {
+                title: 'Cross-Promotion of Your Social Media Content',
+                content: `
+                    <p>We are happy to share selected social media posts from your official pages on our platforms, helping you expand your digital reach and connect with our engaged audience.</p>
+                `
+            },
+            'on-location': {
+                title: 'On-Ground Advertising Opportunities at Events',
+                content: `
+                    <p>You will have the opportunity to place banners, distribute fliers, and showcase promotional materials at our public events. This applies to all general events we organize.</p>
+                    <p class="disclaimer">Excluding exclusive sponsored events where other agreements may apply</p>
+                `
+            },
+            'logo-kits': {
+                title: 'Logo Placement on Non-Exclusive Kits',
+                content: `
+                    <p>Your logo will be included on our non-exclusive performance t-shirts, which are worn during general public events. This provides ongoing brand visibility across various audiences and locations.</p>
+                `
+            }
+        };
+
+        // Modal functionality
+        function showInfoModal(infoType) {
+            const modal = document.getElementById('infoModal');
+            const modalContent = document.getElementById('modalContent');
+            const data = infoData[infoType];
+            
+            if (data) {
+                modalContent.innerHTML = `
+                    <h3>${data.title}</h3>
+                    ${data.content}
+                `;
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function hideInfoModal() {
+            const modal = document.getElementById('infoModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check submission status on page load
+            checkSubmissionStatusOnLoad();
+            
+            // More info button clicks
+            document.querySelectorAll('.more-info-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const infoType = this.getAttribute('data-info');
+                    showInfoModal(infoType);
+                });
+            });
+
+            // Close modal button
+            document.querySelector('.close-modal').addEventListener('click', hideInfoModal);
+
+            // Close modal when clicking outside
+            document.getElementById('infoModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    hideInfoModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    hideInfoModal();
+                }
+            });
+        });
+
+        // Check submission status when page loads
+        function checkSubmissionStatusOnLoad() {
+            if (!canSubmitToday()) {
+                const form = document.getElementById('sponsorForm');
+                const lastSubmission = localStorage.getItem('sponsorFormLastSubmission');
+                const submissionDate = new Date(lastSubmission);
+                const timeRemaining = 24 - ((new Date().getTime() - submissionDate.getTime()) / (1000 * 3600));
+                const hoursLeft = Math.ceil(timeRemaining);
+                
+                form.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <div style="background: linear-gradient(135deg, rgba(245, 208, 0, 0.2), rgba(245, 208, 0, 0.1)); border: 2px solid rgba(245, 208, 0, 0.3); border-radius: 15px; padding: 30px; margin-bottom: 25px;">
+                            <h3 style="color: var(--primary-color); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.5rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Request Submitted</h3>
+                            <p style="color: #e0e0e0; font-family: 'Montserrat', sans-serif; font-size: 1.1rem; line-height: 1.6; margin-bottom: 15px;">We already have a request from you today. We will get back to you as soon as possible, thank you for your patience.</p>
+                            <p style="color: #ccc; font-family: 'Montserrat', sans-serif; font-size: 1rem; line-height: 1.6; margin: 0;">Please wait approximately ${hoursLeft} hour${hoursLeft !== 1 ? 's' : ''} before submitting another request.</p>
+                        </div>
+                        <div style="color: #999; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; font-style: italic;">
+                            <p style="margin: 0;">Thank you for your interest in partnering with us!</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Check if user can submit (once per day limit)
+        function canSubmitToday() {
+            const lastSubmission = localStorage.getItem('sponsorFormLastSubmission');
+            if (!lastSubmission) return true;
+            
+            const lastSubmissionDate = new Date(lastSubmission);
+            const today = new Date();
+            const timeDiff = today.getTime() - lastSubmissionDate.getTime();
+            const daysDiff = timeDiff / (1000 * 3600 * 24);
+            
+            return daysDiff >= 1;
+        }
+
+        // Save submission timestamp
+        function saveSubmissionTimestamp() {
+            localStorage.setItem('sponsorFormLastSubmission', new Date().toISOString());
+        }
+
+        // Show success message in form
+        function showSuccessMessage(name) {
+            const form = document.getElementById('sponsorForm');
+            form.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="background: linear-gradient(135deg, rgba(245, 208, 0, 0.2), rgba(245, 208, 0, 0.1)); border: 2px solid rgba(245, 208, 0, 0.3); border-radius: 15px; padding: 30px; margin-bottom: 25px;">
+                        <h3 style="color: var(--primary-color); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.5rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Thank You ${name}!</h3>
+                        <p style="color: #e0e0e0; font-family: 'Montserrat', sans-serif; font-size: 1.1rem; line-height: 1.6; margin-bottom: 15px;">Your sponsorship request has been successfully submitted.</p>
+                        <p style="color: #ccc; font-family: 'Montserrat', sans-serif; font-size: 1rem; line-height: 1.6; margin: 0;">We will reach out to you as soon as possible to discuss the partnership opportunities.</p>
+                    </div>
+                    <div style="color: #999; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; font-style: italic;">
+                        <p style="margin: 0;">You can submit another request tomorrow if needed.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Form submission handling
+        document.getElementById('sponsorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Check if user can submit today
+            if (!canSubmitToday()) {
+                const form = document.getElementById('sponsorForm');
+                form.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px;">
+                        <div style="background: linear-gradient(135deg, rgba(245, 208, 0, 0.2), rgba(245, 208, 0, 0.1)); border: 2px solid rgba(245, 208, 0, 0.3); border-radius: 15px; padding: 30px; margin-bottom: 25px;">
+                            <h3 style="color: var(--primary-color); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.5rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Request Limit Reached</h3>
+                            <p style="color: #e0e0e0; font-family: 'Montserrat', sans-serif; font-size: 1.1rem; line-height: 1.6; margin-bottom: 15px;">You have already submitted a sponsorship request today.</p>
+                            <p style="color: #ccc; font-family: 'Montserrat', sans-serif; font-size: 1rem; line-height: 1.6; margin: 0;">Please wait 24 hours before submitting another request.</p>
+                        </div>
+                        <div style="color: #999; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; font-style: italic;">
+                            <p style="margin: 0;">Thank you for your interest in partnering with us!</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const company = document.getElementById('company').value.trim();
+            const interest = document.getElementById('interest').value.trim();
+            
+            // Validation
+            if (!name || !phone) {
+                alert('Please fill in all required fields (Name and Phone Number)');
+                return;
+            }
+            
+            // Phone number validation (basic)
+            const phoneRegex = /^[+]?[\d\s\-\(\)]{7,}$/;
+            if (!phoneRegex.test(phone)) {
+                alert('Please enter a valid phone number');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.querySelector('.submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            // Submit to Google Form using hidden iframe method
+            submitToGoogleForm(name, phone, company, interest, submitBtn, originalText);
+        });
+        
+        // Function to submit to Google Form using hidden iframe
+        function submitToGoogleForm(name, phone, company, interest, submitBtn, originalText) {
+            // Create hidden iframe
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.name = 'hidden_iframe';
+            document.body.appendChild(iframe);
+
+            // Create form
+            const hiddenForm = document.createElement('form');
+            hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLScWjYnitFJZl3Yi-e9raSASgAXzla8Gog6_QU0IQrfZ8ZNLTQ/formResponse';
+            hiddenForm.method = 'POST';
+            hiddenForm.target = 'hidden_iframe';
+            hiddenForm.style.display = 'none';
+
+            // Add form fields with correct entry names based on Google Form structure
+            const fields = [
+                { name: 'entry.1365406747', value: name },         // Full Name
+                { name: 'entry.1804991125', value: phone },        // Phone Number  
+                { name: 'entry.578437853', value: company },      // Company/Organization
+                { name: 'entry.940936853', value: interest }      // Sponsorship Interest
+            ];
+
+            fields.forEach(field => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = field.name;
+                input.value = field.value;
+                hiddenForm.appendChild(input);
+            });
+
+            document.body.appendChild(hiddenForm);
+
+            // Handle submission completion
+            let submitted = false;
+            
+            const handleSubmission = () => {
+                if (!submitted) {
+                    submitted = true;
+                    console.log('Form submitted successfully');
+                    
+                    // Save submission timestamp to prevent spam
+                    saveSubmissionTimestamp();
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        if (document.body.contains(hiddenForm)) {
+                            document.body.removeChild(hiddenForm);
+                        }
+                        if (document.body.contains(iframe)) {
+                            document.body.removeChild(iframe);
+                        }
+                    }, 1000);
+                    
+                    // Show success message in form
+                    setTimeout(() => {
+                        showSuccessMessage(name);
+                    }, 1500);
+                }
+            };
+
+            // Listen for iframe load (indicates submission completion)
+            iframe.addEventListener('load', handleSubmission);
+
+            // Fallback timeout
+            setTimeout(() => {
+                if (!submitted) {
+                    console.log('Form submission timeout - assuming success');
+                    handleSubmission();
+                }
+            }, 5000);
+
+            // Submit the form
+            hiddenForm.submit();
+        }
+        
+        // Smooth scrolling for better UX
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scroll behavior with better performance
+            document.documentElement.style.scrollBehavior = 'smooth';
+            
+            // Optimize scroll performance
+            let ticking = false;
+            function updateOnScroll() {
+                ticking = false;
+            }
+            
+            function requestTick() {
+                if (!ticking) {
+                    requestAnimationFrame(updateOnScroll);
+                    ticking = true;
+                }
+            }
+            
+            document.addEventListener('scroll', requestTick, { passive: true });
+            
+            // Video fallback handling
+            const video = document.querySelector('.video-background');
+            const fallback = document.querySelector('.video-fallback');
+            
+            if (video && fallback) {
+                // Show fallback initially
+                fallback.style.display = 'block';
+                
+                video.addEventListener('error', function() {
+                    console.log('Video failed to load, using fallback');
+                    video.style.display = 'none';
+                    fallback.style.display = 'block';
+                });
+                
+                video.addEventListener('loadeddata', function() {
+                    console.log('Video loaded successfully');
+                    fallback.style.display = 'none';
+                    video.style.display = 'block';
+                });
+                
+                video.addEventListener('canplay', function() {
+                    console.log('Video can play');
+                    fallback.style.display = 'none';
+                    video.style.display = 'block';
+                });
+                
+                // Try to load and play the video
+                video.load();
+            }
+            
+            // Video visibility observer to pause/play based on screen visibility
+            if (video) {
+                const videoObserver = new IntersectionObserver(function(entries) {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            // Video is visible, play it
+                            if (video.paused) {
+                                video.play().catch(console.error);
+                            }
+                        } else {
+                            // Video is not visible, pause it
+                            if (!video.paused) {
+                                video.pause();
+                            }
+                        }
+                    });
+                }, {
+                    threshold: 0.1 // Trigger when 10% of the video is visible
+                });
+                
+                videoObserver.observe(video);
+            }
+            
+            // Animate sections on scroll - disabled to prevent stuttering
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            // Simple observer without animation to prevent stuttering
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.visibility = 'visible';
+                    }
+                });
+            }, observerOptions);
+            
+            // Ensure all sections are visible by default
+            document.querySelectorAll('.sponsor-section').forEach(section => {
+                section.style.visibility = 'visible';
+                section.style.opacity = '1';
+                section.style.transform = 'none';
+                observer.observe(section);
+            });
+        });
+        
+        // Prevent zoom on mobile
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchmove', function(event) {
+            if (event.scale && event.scale !== 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+        
+        // Table cross-highlight effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const table = document.querySelector('.sponsor-table');
+            if (table) {
+                const cells = table.querySelectorAll('td, th');
+                
+                cells.forEach(cell => {
+                    cell.addEventListener('mouseenter', function() {
+                        const cellIndex = Array.from(this.parentNode.children).indexOf(this);
+                        const rowIndex = Array.from(this.parentNode.parentNode.children).indexOf(this.parentNode);
+                        
+                        // Highlight entire row
+                        const currentRow = this.parentNode;
+                        currentRow.classList.add('row-highlight');
+                        
+                        // Highlight entire column
+                        const allRows = table.querySelectorAll('tr');
+                        allRows.forEach(row => {
+                            const cellInColumn = row.children[cellIndex];
+                            if (cellInColumn) {
+                                cellInColumn.classList.add('col-highlight');
+                            }
+                        });
+                        
+                        // Add cross highlight to the hovered cell
+                        this.classList.add('cross-highlight');
+                    });
+                    
+                    cell.addEventListener('mouseleave', function() {
+                        const cellIndex = Array.from(this.parentNode.children).indexOf(this);
+                        
+                        // Remove row highlight
+                        const currentRow = this.parentNode;
+                        currentRow.classList.remove('row-highlight');
+                        
+                        // Remove column highlights
+                        const allRows = table.querySelectorAll('tr');
+                        allRows.forEach(row => {
+                            const cellInColumn = row.children[cellIndex];
+                            if (cellInColumn) {
+                                cellInColumn.classList.remove('col-highlight');
+                            }
+                        });
+                        
+                        // Remove cross highlight
+                        this.classList.remove('cross-highlight');
+                    });
+                });
+            }
+            
+            // Table scroll indicators
+            const tableContainer = document.querySelector('.table-container');
+            const tiersContainer = document.querySelector('.tiers-container');
+            if (tableContainer && tiersContainer) {
+                function updateScrollIndicators() {
+                    const { scrollLeft, scrollWidth, clientWidth } = tiersContainer;
+                    const canScrollLeft = scrollLeft > 5;
+                    const canScrollRight = scrollLeft < scrollWidth - clientWidth - 5;
+                    
+                    tableContainer.classList.toggle('scrolled-left', canScrollLeft);
+                    tableContainer.classList.toggle('scrolled-right', canScrollRight);
+                }
+                
+                tiersContainer.addEventListener('scroll', updateScrollIndicators);
+                
+                // Initial check
+                updateScrollIndicators();
+                
+                // Update on resize
+                window.addEventListener('resize', updateScrollIndicators);
+            }
+        });
+    </script>
+</body>
+</html>

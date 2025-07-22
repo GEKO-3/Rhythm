@@ -1,0 +1,152 @@
+{
+  "name": "Rhythm Boduberu - Admin Panel",
+  "short_name": "Rhythm Admin",
+  "description": "Administrative panel for managing Rhythm Boduberu music group operations, member applications, and content",
+  "start_url": "/admin.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "theme_color": "#f5d000",
+  "background_color": "#1f1f1f",
+  "lang": "en",
+  "categories": ["productivity", "business", "utilities"],
+  "prefer_related_applications": false,
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "screenshots": [
+    {
+      "src": "admin-screenshot-wide.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Admin dashboard with PIN authentication"
+    },
+    {
+      "src": "admin-screenshot-narrow.png", 
+      "sizes": "640x1136",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mobile admin interface"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Member Applications",
+      "short_name": "Applications",
+      "description": "View and manage member applications",
+      "url": "/applications-list.html",
+      "icons": [
+        {
+          "src": "icons-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Song List Manager",
+      "short_name": "Songs",
+      "description": "Manage song repertoire and playlists",
+      "url": "/songlist.html",
+      "icons": [
+        {
+          "src": "icons-192.png",
+          "sizes": "192x192", 
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Members Directory",
+      "short_name": "Members",
+      "description": "View and manage group members",
+      "url": "/members.html",
+      "icons": [
+        {
+          "src": "icons-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Lyrics Editor",
+      "short_name": "Lyrics",
+      "description": "Edit and manage song lyrics",
+      "url": "/lyrics-edit.html",
+      "icons": [
+        {
+          "src": "icons-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  "icons": [
+    {
+      "src": "icons-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "32x32",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "protocol_handlers": [
+    {
+      "protocol": "web+rhythm",
+      "url": "/admin.html?action=%s"
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/admin.html",
+      "accept": {
+        "text/csv": [".csv"],
+        "application/json": [".json"]
+      },
+      "icons": [
+        {
+          "src": "icons-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ],
+      "launch_type": "single-client"
+    }
+  ],
+  "permissions": [
+    "notifications",
+    "background-sync",
+    "persistent-storage"
+  ],
+  "related_applications": [
+    {
+      "platform": "webapp",
+      "url": "/manifest.webmanifest",
+      "id": "rhythm-boduberu-main"
+    }
+  ]
+}
