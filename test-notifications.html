@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Test - Rhythm Boduberu</title>
+    <link rel="icon" href="favicons/favicon.ico" type="image/x-icon">
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --text-color: #2b2b2b;
+            --bg-color: #1f1f1f;
+            --card-bg: #2a2a2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: var(--bg-color);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            border: 2px solid var(--primary-color);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .status {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+
+        .status.granted {
+            background: rgba(68, 255, 68, 0.2);
+            border: 1px solid #44ff44;
+            color: #44ff44;
+        }
+
+        .status.denied {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+
+        .status.default {
+            background: rgba(255, 170, 0, 0.2);
+            border: 1px solid #ffaa00;
+            color: #ffaa00;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
+            color: var(--text-color);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--hover-color), #fff);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(42, 42, 42, 0.8);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(245, 208, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .test-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(42, 42, 42, 0.5);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .test-section h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .test-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group label {
+            color: #cccccc;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            padding: 8px 12px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background: #333;
+            color: #fff;
+            width: 80px;
+        }
+
+        .log {
+            margin-top: 20px;
+            padding: 15px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            text-align: left;
+            font-family: monospace;
+            font-size: 0.9rem;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #444;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+        }
+
+        .log-entry.success {
+            color: #44ff44;
+        }
+
+        .log-entry.error {
+            color: #ff4444;
+        }
+
+        .log-entry.info {
+            color: #4499ff;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            background: rgba(31, 31, 31, 0.9);
+            padding: 12px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+        }
+
+        .back-link:hover {
+            background: rgba(245, 208, 0, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .back-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Admin Link -->
+    <a href="admin.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Back to Admin
+    </a>
+
+    <div class="container">
+        <h1>🔔 Notification Test Center</h1>
+        
+        <div id="notification-status" class="status default">
+            Checking notification permission...
+        </div>
+
+        <div class="button-group">
+            <button id="request-permission" class="btn btn-primary">
+                Request Notification Permission
+            </button>
+            
+            <button id="test-notification" class="btn btn-secondary" disabled>
+                Test Basic Notification
+            </button>
+        </div>
+
+        <div class="test-section">
+            <h3>📞 Sponsor Callback Notifications</h3>
+            <p>Test the sponsor callback notification system used in sponsors-list.html</p>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="sponsor-count">Count:</label>
+                    <input type="number" id="sponsor-count" value="1" min="1" max="10">
+                </div>
+                <button id="test-sponsor-notification" class="btn btn-secondary" disabled>
+                    Test Sponsor Notification
+                </button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>📋 Member Application Notifications</h3>
+            <p>Test the member application notification system used in applications-list.html</p>
+            
+            <div class="test-controls">
+                <div class="input-group">
+                    <label for="app-count">Count:</label>
+                    <input type="number" id="app-count" value="1" min="1" max="10">
+                </div>
+                <button id="test-app-notification" class="btn btn-secondary" disabled>
+                    Test Application Notification
+                </button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Dummy Data Submission</h3>
+            <p>Submit dummy sponsor callback data to test the complete system</p>
+            
+            <div class="test-controls">
+                <button id="submit-dummy-sponsor" class="btn btn-secondary">
+                    Submit Dummy Sponsor Data
+                </button>
+                <button id="mark-callback-complete" class="btn btn-secondary">
+                    Mark Random Callback Complete
+                </button>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>⚡ Background Monitoring</h3>
+            <p>Test the background service worker notification system</p>
+            
+            <div class="test-controls">
+                <button id="force-background-check" class="btn btn-secondary">
+                    Force Background Check
+                </button>
+                <button id="test-sw-notification" class="btn btn-secondary">
+                    Test Service Worker Notification
+                </button>
+            </div>
+        </div>
+
+        <div class="log" id="log">
+            <div class="log-entry info">Test log initialized...</div>
+        </div>
+    </div>
+
+    <script>
+        // Log function
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Check notification support
+        function isNotificationSupported() {
+            return 'Notification' in window;
+        }
+
+        // Update notification status display
+        function updateNotificationStatus() {
+            const statusEl = document.getElementById('notification-status');
+            const requestBtn = document.getElementById('request-permission');
+            const testBtn = document.getElementById('test-notification');
+            const sponsorBtn = document.getElementById('test-sponsor-notification');
+            const appBtn = document.getElementById('test-app-notification');
+            
+            if (!isNotificationSupported()) {
+                statusEl.textContent = '❌ Notifications not supported in this browser';
+                statusEl.className = 'status denied';
+                addLog('Notifications not supported', 'error');
+                return;
+            }
+            
+            const permission = Notification.permission;
+            
+            switch (permission) {
+                case 'granted':
+                    statusEl.textContent = '✅ Notifications enabled and ready!';
+                    statusEl.className = 'status granted';
+                    requestBtn.disabled = true;
+                    testBtn.disabled = false;
+                    sponsorBtn.disabled = false;
+                    appBtn.disabled = false;
+                    addLog('Notifications are enabled', 'success');
+                    break;
+                case 'denied':
+                    statusEl.textContent = '❌ Notifications blocked. Please enable in browser settings.';
+                    statusEl.className = 'status denied';
+                    requestBtn.disabled = true;
+                    addLog('Notifications are blocked', 'error');
+                    break;
+                default:
+                    statusEl.textContent = '⚠️ Permission needed. Click the button below to enable notifications.';
+                    statusEl.className = 'status default';
+                    requestBtn.disabled = false;
+                    addLog('Notification permission required', 'info');
+            }
+        }
+
+        // Request notification permission
+        async function requestNotificationPermission() {
+            if (!isNotificationSupported()) {
+                addLog('Cannot request permission - notifications not supported', 'error');
+                return;
+            }
+            
+            try {
+                addLog('Requesting notification permission...', 'info');
+                const permission = await Notification.requestPermission();
+                addLog(`Permission result: ${permission}`, permission === 'granted' ? 'success' : 'error');
+                updateNotificationStatus();
+            } catch (error) {
+                addLog(`Error requesting permission: ${error.message}`, 'error');
+            }
+        }
+
+        // Test basic notification
+        function testBasicNotification() {
+            if (Notification.permission !== 'granted') {
+                addLog('Cannot send notification - permission not granted', 'error');
+                return;
+            }
+            
+            addLog('Sending test notification...', 'info');
+            
+            const notification = new Notification('🎵 Test Notification', {
+                body: 'This is a test notification from Rhythm Boduberu Test Center',
+                icon: 'favicons/favicon.png',
+                badge: 'favicons/favicon.png',
+                tag: 'test-notification',
+                requireInteraction: false,
+                silent: false
+            });
+            
+            notification.onclick = function() {
+                addLog('Test notification clicked', 'success');
+                window.focus();
+                notification.close();
+            };
+            
+            setTimeout(() => {
+                notification.close();
+                addLog('Test notification auto-closed', 'info');
+            }, 5000);
+            
+            addLog('Test notification sent successfully', 'success');
+        }
+
+        // Test sponsor notification (copied from sponsors-list.html)
+        function testSponsorNotification() {
+            if (Notification.permission !== 'granted') {
+                addLog('Cannot send sponsor notification - permission not granted', 'error');
+                return;
+            }
+
+            const sponsorCount = parseInt(document.getElementById('sponsor-count').value) || 1;
+            addLog(`Sending sponsor notification for ${sponsorCount} callback(s)...`, 'info');
+
+            const title = sponsorCount === 1 
+                ? 'New Sponsor Callback Request!' 
+                : `${sponsorCount} New Sponsor Callback Requests!`;
+            
+            const body = sponsorCount === 1
+                ? 'A new sponsor callback request has been submitted'
+                : `${sponsorCount} new sponsor callback requests have been submitted`;
+
+            const notification = new Notification(title, {
+                body: body,
+                icon: 'favicons/favicon.png',
+                badge: 'favicons/favicon.png',
+                tag: 'new-sponsor-callback',
+                requireInteraction: true,
+                silent: false,
+                actions: [
+                    {
+                        action: 'view',
+                        title: 'View Callbacks'
+                    }
+                ]
+            });
+
+            notification.onclick = function() {
+                addLog('Sponsor notification clicked', 'success');
+                window.focus();
+                notification.close();
+            };
+
+            setTimeout(() => {
+                notification.close();
+                addLog('Sponsor notification auto-closed', 'info');
+            }, 10000);
+            
+            addLog('Sponsor notification sent successfully', 'success');
+        }
+
+        // Test application notification (copied from applications-list.html)
+        function testApplicationNotification() {
+            if (Notification.permission !== 'granted') {
+                addLog('Cannot send application notification - permission not granted', 'error');
+                return;
+            }
+
+            const applicationCount = parseInt(document.getElementById('app-count').value) || 1;
+            addLog(`Sending application notification for ${applicationCount} application(s)...`, 'info');
+
+            const title = applicationCount === 1 
+                ? 'New Member Application!' 
+                : `${applicationCount} New Member Applications!`;
+            
+            const body = applicationCount === 1
+                ? 'A new member application has been submitted'
+                : `${applicationCount} new member applications have been submitted`;
+
+            const notification = new Notification(title, {
+                body: body,
+                icon: 'favicons/favicon.png',
+                badge: 'favicons/favicon.png',
+                tag: 'new-application',
+                requireInteraction: true,
+                silent: false,
+                actions: [
+                    {
+                        action: 'view',
+                        title: 'View Applications'
+                    }
+                ]
+            });
+
+            notification.onclick = function() {
+                addLog('Application notification clicked', 'success');
+                window.focus();
+                notification.close();
+            };
+
+            setTimeout(() => {
+                notification.close();
+                addLog('Application notification auto-closed', 'info');
+            }, 10000);
+            
+            addLog('Application notification sent successfully', 'success');
+        }
+
+        // Generate dummy sponsor data
+        function generateDummySponsorData() {
+            const names = ['Ahmed Hassan', 'Fatima Ali', 'Mohamed Ibrahim', 'Aisha Mohamed', 'Ibrahim Waheed', 'Mariyam Ahmed', 'Ali Mohamed', 'Zara Ibrahim'];
+            const businesses = ['Maldives Resort Ltd', 'Ocean View Restaurant', 'Paradise Travel Agency', 'Blue Lagoon Cafe', 'Sunset Tours', 'Coral Island Hotel', 'Dhivehi Heritage Co', 'Atoll Adventures'];
+            const amounts = ['5000', '10000', '15000', '7500', '12000', '8000', '20000', '6000'];
+            
+            const randomName = names[Math.floor(Math.random() * names.length)];
+            const randomBusiness = businesses[Math.floor(Math.random() * businesses.length)];
+            const randomAmount = amounts[Math.floor(Math.random() * amounts.length)];
+            const randomPhone = `${Math.floor(Math.random() * 900) + 100}-${Math.floor(Math.random() * 9000) + 1000}`;
+            const randomEmail = `${randomName.toLowerCase().replace(' ', '.')}@${randomBusiness.toLowerCase().replace(/[^a-z]/g, '')}.mv`;
+            
+            return {
+                timestamp: new Date().toISOString(),
+                name: randomName,
+                business: randomBusiness,
+                phone: randomPhone,
+                email: randomEmail,
+                amount: randomAmount
+            };
+        }
+
+        // Submit dummy sponsor data (actually submits to Google Form)
+        function submitDummySponsorData() {
+            const dummyData = generateDummySponsorData();
+            addLog('Generating dummy sponsor data...', 'info');
+            addLog(`Name: ${dummyData.name}`, 'info');
+            addLog(`Business: ${dummyData.business}`, 'info');
+            addLog(`Amount: MVR ${dummyData.amount}`, 'info');
+            
+            try {
+                // Create hidden iframe for form submission
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.name = 'hiddenFrame';
+                document.body.appendChild(iframe);
+                
+                // Create form to submit to Google Form
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'https://docs.google.com/forms/d/e/1FAIpQLScWjYnitFJZl3Yi-e9raSASgAXzla8Gog6_QU0IQrfZ8ZNLTQ/formResponse';
+                form.target = 'hiddenFrame';
+                
+                // Create input fields for the sponsor form
+                const fields = [
+                    { name: 'entry.1365406747', value: dummyData.name },         // Full Name
+                    { name: 'entry.1804991125', value: dummyData.phone },        // Phone Number  
+                    { name: 'entry.578437853', value: dummyData.business },      // Company/Organization
+                    { name: 'entry.940936853', value: `Test sponsorship - MVR ${dummyData.amount}` }  // Sponsorship Interest
+                ];
+                
+                fields.forEach(field => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = field.name;
+                    input.value = field.value;
+                    form.appendChild(input);
+                });
+                
+                document.body.appendChild(form);
+                addLog('Submitting to Google Form...', 'info');
+                
+                // Submit the form
+                form.submit();
+                
+                // Clean up after a short delay
+                setTimeout(() => {
+                    document.body.removeChild(form);
+                    document.body.removeChild(iframe);
+                    addLog('Form submitted successfully to Google Sheets', 'success');
+                    addLog('Data should appear in sponsors-list.html after CSV refresh (5 min)', 'info');
+                }, 2000);
+                
+            } catch (error) {
+                addLog(`Error submitting to Google Form: ${error.message}`, 'error');
+            }
+        }
+
+        // Actually mark a callback as complete (submits to Google Form)
+        function markCallbackComplete() {
+            // Generate a dummy UID (similar to how sponsors-list.html generates them)
+            const dummyUID = `sponsor_${Math.random().toString(36).substr(2, 9)}`;
+            
+            addLog(`Marking callback complete for UID: ${dummyUID}`, 'info');
+            
+            try {
+                // Create hidden iframe for form submission
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.name = 'hiddenFrame';
+                document.body.appendChild(iframe);
+                
+                // Create form to submit to Google Form (callback completion form)
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = 'https://docs.google.com/forms/d/e/1FAIpQLScojEVbh6JLIepwwQxJtIAB7BmITPp-vp6PDY7JFS51ZrqrFg/formResponse';
+                form.target = 'hiddenFrame';
+                
+                // Create input field for UID using the correct entry field name
+                const uidInput = document.createElement('input');
+                uidInput.type = 'hidden';
+                uidInput.name = 'entry.1886085325'; // Entry field for completed callbacks
+                uidInput.value = dummyUID;
+                
+                form.appendChild(uidInput);
+                document.body.appendChild(form);
+                
+                addLog('Submitting callback completion to Google Form...', 'info');
+                
+                // Submit the form
+                form.submit();
+                
+                // Clean up after a short delay
+                setTimeout(() => {
+                    document.body.removeChild(form);
+                    document.body.removeChild(iframe);
+                    addLog('Callback completion submitted successfully', 'success');
+                    addLog('Status will update in sponsors-list.html after refresh', 'info');
+                }, 2000);
+                
+            } catch (error) {
+                addLog(`Error marking callback complete: ${error.message}`, 'error');
+            }
+        }
+
+        // Force background check via service worker
+        async function forceBackgroundCheck() {
+            addLog('Forcing background service worker check...', 'info');
+            
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.ready;
+                    if (registration.active) {
+                        registration.active.postMessage({ type: 'FORCE_CHECK' });
+                        addLog('Sent force check message to service worker', 'success');
+                        addLog('Check console for service worker activity', 'info');
+                    } else {
+                        addLog('Service worker not active', 'error');
+                    }
+                } catch (error) {
+                    addLog(`Error communicating with service worker: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('Service worker not supported', 'error');
+            }
+        }
+
+        // Test service worker notification directly
+        async function testServiceWorkerNotification() {
+            addLog('Testing service worker notification...', 'info');
+            
+            if ('serviceWorker' in navigator && 'showNotification' in ServiceWorkerRegistration.prototype) {
+                try {
+                    const registration = await navigator.serviceWorker.ready;
+                    
+                    await registration.showNotification('🎵 Service Worker Test', {
+                        body: 'This notification was sent directly from the service worker',
+                        icon: 'favicons/favicon.png',
+                        badge: 'favicons/favicon.png',
+                        tag: 'sw-test-notification',
+                        requireInteraction: false,
+                        silent: false,
+                        actions: [
+                            {
+                                action: 'test',
+                                title: 'Test Action'
+                            }
+                        ]
+                    });
+                    
+                    addLog('Service worker notification sent successfully', 'success');
+                    
+                } catch (error) {
+                    addLog(`Error sending service worker notification: ${error.message}`, 'error');
+                }
+            } else {
+                addLog('Service worker notifications not supported', 'error');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('request-permission').addEventListener('click', requestNotificationPermission);
+        document.getElementById('test-notification').addEventListener('click', testBasicNotification);
+        document.getElementById('test-sponsor-notification').addEventListener('click', testSponsorNotification);
+        document.getElementById('test-app-notification').addEventListener('click', testApplicationNotification);
+        document.getElementById('submit-dummy-sponsor').addEventListener('click', submitDummySponsorData);
+        document.getElementById('mark-callback-complete').addEventListener('click', markCallbackComplete);
+        document.getElementById('force-background-check').addEventListener('click', forceBackgroundCheck);
+        document.getElementById('test-sw-notification').addEventListener('click', testServiceWorkerNotification);
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('Notification Test Center initialized', 'success');
+            updateNotificationStatus();
+        });
+    </script>
+</body>
+</html>
