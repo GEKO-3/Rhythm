@@ -420,30 +420,7 @@
             font-size: 1rem;
         }
 
-        /* Notification Status Indicator */
-        .notification-status {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(42, 42, 42, 0.9);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(245, 208, 0, 0.3);
-            border-radius: 10px;
-            padding: 10px 15px;
-            color: var(--primary-color);
-            font-size: 0.9rem;
-            font-weight: 600;
-            z-index: 100;
-            display: none;
-        }
 
-        .notification-status.enabled {
-            display: block;
-        }
-
-        .notification-status .status-icon {
-            margin-right: 8px;
-        }
 
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -560,12 +537,6 @@
         </div>
     </main>
 
-    <!-- Notification Status Indicator -->
-    <div id="notification-status" class="notification-status">
-        <span class="status-icon">🔔</span>
-        <span>Notifications enabled</span>
-    </div>
-
     <script>
         // Notification functionality
         let notificationPermission = 'default';
@@ -618,18 +589,6 @@
             setTimeout(() => notification.close(), 10000);
         }
 
-        // Update notification status indicator
-        function updateNotificationStatus() {
-            const statusElement = document.getElementById('notification-status');
-            const permission = checkNotificationPermission();
-            
-            if (permission === 'granted') {
-                statusElement.classList.add('enabled');
-            } else {
-                statusElement.classList.remove('enabled');
-            }
-        }
-
         // Initialize notification system
         function initializeNotifications() {
             if (!isNotificationSupported()) {
@@ -638,7 +597,6 @@
             }
 
             notificationPermission = checkNotificationPermission();
-            updateNotificationStatus();
         }
 
         // DOM elements

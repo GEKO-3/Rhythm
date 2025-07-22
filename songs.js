@@ -1432,8 +1432,9 @@ Aadheyhun foavegen dhaanveehey nubunegen angain
 #2
 ތާޒާ މަލޭތީ ގުލްޒާރުގާވާ
 *ތާޒާ މަލޭތީ ގުލްޒާރުގާވާ
-ކުލަރީތި ވަސްމީރު އާޝޯހު ވާހާ
-*ކުލަރީތި ވަސްމީރު އާޝޯހު ވާހާ އާޝޯހު ވާހާ
+ތާޒާ މަލޭތީ ގުލްޒާރުގާވާ
+*ކުލަރީތި ވަސްމީރު އާޝޯހު ވާހާ 
+*ކުލަރީތި ވަސްމީރު އާޝޯހު ވާހާ 
 ހޯ ފިދާވާން ހުރީމޭ މަލާއޭ ޒުވާނާ
 *މި ހިތްވޭ މަސްތާނާ މި ހިތްވޭ މަސްތާނާ
 #3
@@ -1457,8 +1458,9 @@ Hoa annaashe yaaraa ahaashey tharaanaa
 #2
 Thaazaa maleythee gulzaarugaavaa
 *Thaazaa maleythee gulzaarugaavaa
-Kulareethi vasmeeru aashoahu vaahaa
-*Kulareethi vasmeeru aashoahu vaahaa aashoahu vaahaa
+Thaazaa maleythee gulzaarugaavaa
+*Kulareethi vasmeeru aashoahu vaahaa
+*Kulareethi vasmeeru aashoahu vaahaa
 Hoa fidhaavaan hureemey malaaey zuvaanaa
 *Mi hiyyvey masthaanaa mi hiyyvey masthaanaa
 #3
@@ -14187,7 +14189,7 @@ Rahumathah edhi edhi thibumey dhiveheennah rangalhee
   genre: 'Nala',
   lyrics: `#M
 ސީދާ ބަލަނޫ މިދިމެލަށް ކިޔެއްވޫހޭ
-*މީހަކު ބޮނެގެންހޭ ނޯނުއްވާ ލޯބިންހޭ
+*މީހަކު ބޮނެގެންހޭ ނޯނުއްވާ ލޯތްބުންހޭ
 ފޫހި ފެލުވައިލަންހޭ ސީރިޔަސްކޮށް ހޭޅޭއް
 *ގޯހެއް ނަހަދާށޭ ބިރަގަންނަމޭ
 *ސީދާ ބަލަނޫ މިދިމެލަށް ކިޔެއްވޫހޭ
@@ -14206,7 +14208,7 @@ Rahumathah edhi edhi thibumey dhiveheennah rangalhee
 
   englishLyrics: `#M
 Seedhaa balanoo midhimelah kiyehvoohey
-*Meehaku bonegenhey noanuhvaa loabinhey
+*Meehaku bonegenhey noanuhvaa loayybunhey
 Foohi feluvailanhey seariouskohhey lheyh
 *Goaheh nahadhaashey biragannamey
 *Seedhaa balanoo midhimelah kiyehvoohey
