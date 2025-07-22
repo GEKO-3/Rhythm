@@ -17,6 +17,16 @@
 <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
 <link rel="manifest" href="favicons/admin-manifest.webmanifest">
   
+  <!-- Notification Permission Banner -->
+  <div id="notification-banner" class="notification-banner" style="display: none;">
+    <div class="notification-content">
+      <span class="notification-text">Enable notifications to get alerts for new member applications</span>
+      <div class="notification-buttons">
+        <button id="enable-notifications" class="notification-btn enable">Enable</button>
+        <button id="dismiss-notifications" class="notification-btn dismiss">Dismiss</button>
+      </div>
+    </div>
+  </div>
   <style>
     /* Local font definitions */
     @font-face {
@@ -58,6 +68,10 @@
       .settings-panel {
         top: calc(60px + env(titlebar-area-height, 0));
       }
+      
+      .notification-banner {
+        top: env(titlebar-area-height, 0);
+      }
     }
     
     /* Standalone PWA mode adjustments */
@@ -70,6 +84,12 @@
       .settings-panel {
         top: calc(60px + env(safe-area-inset-top, 0));
         right: calc(20px + env(safe-area-inset-right, 0));
+      }
+      
+      .notification-banner {
+        top: env(safe-area-inset-top, 0);
+        padding-left: calc(20px + env(safe-area-inset-left, 0));
+        padding-right: calc(20px + env(safe-area-inset-right, 0));
       }
     }
     
@@ -294,6 +314,76 @@
       }
     }
     
+    /* Notification Banner Styles */
+    .notification-banner {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #f5d000, #ffed4e);
+      color: #2b2b2b;
+      padding: 15px 20px;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .notification-banner.show {
+      transform: translateY(0);
+    }
+
+    .notification-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 600px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .notification-text {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .notification-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .notification-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+
+    .notification-btn.enable {
+      background: #2b2b2b;
+      color: #f5d000;
+    }
+
+    .notification-btn.enable:hover {
+      background: #1a1a1a;
+      transform: translateY(-1px);
+    }
+
+    .notification-btn.dismiss {
+      background: transparent;
+      color: #2b2b2b;
+      border: 1px solid #2b2b2b;
+    }
+
+    .notification-btn.dismiss:hover {
+      background: rgba(43, 43, 43, 0.1);
+    }
+
     /* Settings Panel Styles */
     .settings-panel {
       position: fixed;
@@ -392,17 +482,20 @@
     }
 
     @media (max-width: 600px) {
-      .page-title {
-        font-size: 2em;
-        margin-bottom: 20px;
+      .notification-content {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
       }
-      .menu-container {
-        padding: 24px 6vw;
+      
+      .settings-panel {
+        top: calc(60px + env(safe-area-inset-top, 0));
+        right: calc(15px + env(safe-area-inset-right, 0));
       }
-      .menu-btn {
-        width: 100%;
-        font-size: 1em;
-        padding: 14px 0;
+      
+      .settings-dropdown {
+        min-width: 200px;
+        right: -50px;
       }
     }
   </style>
@@ -422,6 +515,24 @@
     </div>
   </div>
 
+  <!-- Settings Panel -->
+  <div class="settings-panel">
+    <button class="settings-btn" id="settings-btn" title="Settings">⚙️</button>
+    <div class="settings-dropdown" id="settings-dropdown">
+      <div class="settings-item">
+        <span class="settings-label">Notifications</span>
+        <div class="toggle-switch" id="notification-toggle" title="Toggle notifications">
+        </div>
+      </div>
+      <div class="settings-item">
+        <div>
+          <div class="settings-label">Status</div>
+          <div class="settings-value" id="notification-status-text">Checking...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <h1 class="page-title">Admin</h1>
   <div class="menu-container">
     <button class="menu-btn" onclick="navigateToPage('members.html')">Members</button>
@@ -434,11 +545,299 @@
 
   <!-- Version Footer -->
   <div class="version-footer">
-    <span class="version-text">Admin Panel v2.1.1</span>
+    <span class="version-text">Admin Panel v2.1.0</span>
     <span class="version-date">January 2025</span>
   </div>
 
   <script>
+    // Notification functionality
+    let notificationPermission = 'default';
+    let hasShownNotificationBanner = false;
+
+    // Check if notifications are supported
+    function isNotificationSupported() {
+      return 'Notification' in window && 'serviceWorker' in navigator;
+    }
+
+    // Check notification permission status
+    function checkNotificationPermission() {
+      if (!isNotificationSupported()) return 'unsupported';
+      return Notification.permission;
+    }
+
+    // Show notification banner
+    function showNotificationBanner() {
+      if (!isNotificationSupported() || hasShownNotificationBanner) return;
+      
+      const banner = document.getElementById('notification-banner');
+      const permission = checkNotificationPermission();
+      
+      if (permission === 'default') {
+        banner.style.display = 'block';
+        setTimeout(() => banner.classList.add('show'), 100);
+        hasShownNotificationBanner = true;
+        
+        // Auto-hide after 10 seconds if no action taken
+        setTimeout(() => {
+          if (banner.classList.contains('show')) {
+            hideNotificationBanner();
+          }
+        }, 10000);
+      }
+    }
+
+    // Hide notification banner
+    function hideNotificationBanner() {
+      const banner = document.getElementById('notification-banner');
+      banner.classList.remove('show');
+      setTimeout(() => banner.style.display = 'none', 300);
+    }
+
+    // Request notification permission
+    async function requestNotificationPermission() {
+      if (!isNotificationSupported()) {
+        console.log('Notifications not supported');
+        return false;
+      }
+
+      try {
+        const permission = await Notification.requestPermission();
+        notificationPermission = permission;
+        
+        if (permission === 'granted') {
+          console.log('Notification permission granted!');
+          
+          // Service worker should already be registered from initializeNotifications
+          // Force a check for new submissions
+          if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.ready;
+            if (registration.active) {
+              registration.active.postMessage({ type: 'FORCE_CHECK' });
+            }
+          }
+          
+          updateNotificationStatus();
+          updateSettingsPanel();
+          showTestNotification();
+          hideNotificationBanner();
+          return true;
+        } else {
+          console.log('Notification permission denied');
+          updateNotificationStatus();
+          updateSettingsPanel();
+          return false;
+        }
+      } catch (error) {
+        console.error('Error requesting notification permission:', error);
+        return false;
+      }
+    }
+
+    // Show test notification
+    function showTestNotification() {
+      if (checkNotificationPermission() !== 'granted') return;
+
+      const notification = new Notification('Rhythm Boduberu - Admin Panel', {
+        body: 'Notifications are now enabled for admin functions',
+        icon: 'favicons/favicon.png',
+        badge: 'favicons/favicon.png',
+        tag: 'admin-test-notification',
+        requireInteraction: false,
+        silent: false
+      });
+
+      // Auto-close after 5 seconds
+      setTimeout(() => notification.close(), 5000);
+    }
+
+    // Show new application notification
+    function showNewApplicationNotification(applicationCount) {
+      if (checkNotificationPermission() !== 'granted') return;
+
+      const title = applicationCount === 1 
+        ? 'New Member Application!' 
+        : `${applicationCount} New Member Applications!`;
+      
+      const body = applicationCount === 1
+        ? 'A new member application has been submitted'
+        : `${applicationCount} new member applications have been submitted`;
+
+      const notification = new Notification(title, {
+        body: body,
+        icon: 'favicons/favicon.png',
+        badge: 'favicons/favicon.png',
+        tag: 'new-application',
+        requireInteraction: true,
+        silent: false
+      });
+
+      // Handle notification click
+      notification.onclick = function() {
+        window.focus();
+        // Navigate to applications if in admin panel
+        navigateToPage('applications-list.html');
+        notification.close();
+      };
+
+      // Auto-close after 15 seconds if not clicked
+      setTimeout(() => notification.close(), 15000);
+    }
+
+    // Update notification status indicator
+    function updateNotificationStatus() {
+      // Status indicator removed - notification status now only shown in settings panel
+      updateSettingsPanel();
+    }
+
+    // Update settings panel
+    function updateSettingsPanel() {
+      const toggle = document.getElementById('notification-toggle');
+      const statusText = document.getElementById('notification-status-text');
+      const permission = checkNotificationPermission();
+      
+      if (permission === 'granted') {
+        toggle.classList.add('enabled');
+        statusText.textContent = 'Enabled';
+        statusText.style.color = '#44ff44';
+      } else if (permission === 'denied') {
+        toggle.classList.remove('enabled');
+        statusText.textContent = 'Blocked';
+        statusText.style.color = '#ff4444';
+      } else if (permission === 'default') {
+        toggle.classList.remove('enabled');
+        statusText.textContent = 'Not set';
+        statusText.style.color = '#ffaa00';
+      } else {
+        toggle.classList.remove('enabled');
+        statusText.textContent = 'Not supported';
+        statusText.style.color = '#666666';
+      }
+    }
+
+    // Initialize notification system
+    async function initializeNotifications() {
+      console.log('Initializing enhanced notification system...');
+      
+      if (!isNotificationSupported()) {
+        console.log('Notifications not supported on this device/browser');
+        return;
+      }
+
+      // Register service worker FIRST for background notifications
+      try {
+        if ('serviceWorker' in navigator) {
+          const registration = await navigator.serviceWorker.register('/sw-admin-notifications.js', {
+            scope: '/'
+          });
+          
+          console.log('Enhanced notification service worker registered:', registration.scope);
+          
+          // Wait for service worker to be ready
+          await navigator.serviceWorker.ready;
+          
+          // Force a check for new submissions
+          if (registration.active) {
+            registration.active.postMessage({ type: 'FORCE_CHECK' });
+          }
+          
+          // Listen for navigation messages from service worker
+          navigator.serviceWorker.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'navigate') {
+              window.location.href = event.data.url;
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Failed to register notification service worker:', error);
+      }
+
+      notificationPermission = checkNotificationPermission();
+      updateNotificationStatus();
+      updateSettingsPanel();
+
+      // Request permission immediately if not granted
+      if (notificationPermission === 'default') {
+        console.log('Requesting notification permission immediately...');
+        await requestNotificationPermission();
+      }
+
+      // Show banner after PIN authentication if permission not yet decided
+      if (pinAuthenticated && notificationPermission === 'default') {
+        setTimeout(() => {
+          showNotificationBanner();
+        }, 2000);
+      }
+
+      // Set up banner button handlers
+      const enableBtn = document.getElementById('enable-notifications');
+      const dismissBtn = document.getElementById('dismiss-notifications');
+
+      enableBtn?.addEventListener('click', async () => {
+        await requestNotificationPermission();
+      });
+
+      dismissBtn?.addEventListener('click', () => {
+        hasShownNotificationBanner = true;
+        hideNotificationBanner();
+      });
+
+      // Set up settings panel handlers
+      const settingsBtn = document.getElementById('settings-btn');
+      const settingsDropdown = document.getElementById('settings-dropdown');
+      const notificationToggle = document.getElementById('notification-toggle');
+
+      settingsBtn?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        settingsDropdown.classList.toggle('show');
+      });
+
+      // Close settings dropdown when clicking outside
+      document.addEventListener('click', () => {
+        settingsDropdown.classList.remove('show');
+      });
+
+      settingsDropdown?.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      notificationToggle?.addEventListener('click', async () => {
+        const permission = checkNotificationPermission();
+        
+        if (permission === 'default') {
+          await requestNotificationPermission();
+        } else if (permission === 'granted') {
+          // Can't programmatically disable notifications, show info
+          alert('To disable notifications, please use your browser settings:\n\n1. Click the lock/info icon in the address bar\n2. Change notification permission to "Block"\n3. Refresh the page');
+        } else if (permission === 'denied') {
+          // Show instructions to re-enable
+          alert('To enable notifications:\n\n1. Click the lock/info icon in the address bar\n2. Change notification permission to "Allow"\n3. Refresh the page');
+        }
+      });
+
+      // Register service worker if supported and permission granted
+      if (notificationPermission === 'granted' && 'serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw-notifications.js')
+          .then(() => console.log('Service worker registered'))
+          .catch(error => console.log('Service worker registration failed:', error));
+      }
+    }
+
+    // Simulate periodic check for new applications (for demo)
+    function startApplicationMonitoring() {
+      if (checkNotificationPermission() !== 'granted') return;
+      
+      // This would normally check your backend/CSV for new applications
+      // For demo purposes, we'll simulate a new application every 2 minutes
+      setInterval(() => {
+        // In real implementation, this would check against your data source
+        const shouldNotify = Math.random() > 0.95; // 5% chance every 2 minutes
+        
+        if (shouldNotify) {
+          showNewApplicationNotification(1);
+        }
+      }, 120000); // 2 minutes
+    }
+
     // PIN Configuration - Admin PIN (base64 encoded: 8734)
     const encodedAdminPin = 'ODczNA==';
     let actualPinArray = [];
@@ -457,7 +856,10 @@
     
     // Initialize PIN system on page load
     document.addEventListener('DOMContentLoaded', function() {
-      // Initialize PIN system
+      // Initialize notifications FIRST, before PIN check
+      initializeNotifications();
+      
+      // Then initialize PIN system
       decodePinConfig();
       initializePinSystem();
       initializeSessionTimeout();
@@ -483,14 +885,12 @@
       document.addEventListener('visibilitychange', function() {
         if (document.hidden) {
           isPageVisible = false;
-          
           // Start session timeout when page goes out of focus
           if (pinAuthenticated) {
             startSessionTimeout();
           }
         } else {
           isPageVisible = true;
-          
           // Clear session timeout when page comes back into focus
           clearSessionTimeout();
           updateLastActivity();
@@ -763,7 +1163,8 @@
             
             // Initialize notifications for existing sessions
             setTimeout(() => {
-              console.log('Admin access granted');
+              initializeNotifications();
+              startApplicationMonitoring();
             }, 500);
             return;
           } else {
@@ -831,7 +1232,8 @@
         
         // Initialize notifications after successful authentication
         setTimeout(() => {
-          console.log('Admin authentication successful');
+          initializeNotifications();
+          startApplicationMonitoring();
         }, 1000);
       } else {
         // Failed authentication

@@ -538,6 +538,67 @@
     </main>
 
     <script>
+        // Notification functionality
+        let notificationPermission = 'default';
+
+        // Check if notifications are supported
+        function isNotificationSupported() {
+            return 'Notification' in window && 'serviceWorker' in navigator;
+        }
+
+        // Check notification permission status
+        function checkNotificationPermission() {
+            if (!isNotificationSupported()) return 'unsupported';
+            return Notification.permission;
+        }
+
+        // Show new application notification
+        function showNewApplicationNotification(applicationCount) {
+            if (checkNotificationPermission() !== 'granted') return;
+
+            const title = applicationCount === 1 
+                ? 'New Member Application!' 
+                : `${applicationCount} New Member Applications!`;
+            
+            const body = applicationCount === 1
+                ? 'A new member application has been submitted'
+                : `${applicationCount} new member applications have been submitted`;
+
+            const notification = new Notification(title, {
+                body: body,
+                icon: 'favicons/favicon.png',
+                badge: 'favicons/favicon.png',
+                tag: 'new-application',
+                requireInteraction: true,
+                silent: false,
+                actions: [
+                    {
+                        action: 'view',
+                        title: 'View Applications'
+                    }
+                ]
+            });
+
+            // Handle notification click
+            notification.onclick = function() {
+                window.focus();
+                notification.close();
+            };
+
+            // Auto-close after 10 seconds if not clicked
+            setTimeout(() => notification.close(), 10000);
+        }
+
+        // Initialize notification system
+        function initializeNotifications() {
+            if (!isNotificationSupported()) {
+                console.log('Notifications not supported on this device');
+                return;
+            }
+
+            notificationPermission = checkNotificationPermission();
+        }
+
         // DOM elements
         const loadingContainer = document.getElementById('loading-container');
         const errorContainer = document.getElementById('error-container');
@@ -816,6 +877,11 @@
                 };
             });
             
+            // Show notification for new applications
+            if (newApplicationCount > 0) {
+                showNewApplicationNotification(newApplicationCount);
+            }
+            
             return appsWithNewFlag;
         }
 
@@ -894,25 +960,21 @@
         // Function to fetch and display applications
         async function fetchApplications() {
             try {
-                // Add cache busting parameter to ensure fresh data
-                const cacheBuster = `?_t=${Date.now()}`;
-                const targetUrl = CSV_URL + cacheBuster;
+                // Use a CORS proxy to fetch the CSV data
+                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+                const targetUrl = CSV_URL;
                 
                 let response;
                 try {
-                    // Try direct fetch first with cache control
+                    // Try direct fetch first
                     response = await fetch(targetUrl, {
                         method: 'GET',
                         headers: {
-                            'Accept': 'text/csv,text/plain,*/*',
-                            'Cache-Control': 'no-cache, no-store, must-revalidate',
-                            'Pragma': 'no-cache',
-                            'Expires': '0'
+                            'Accept': 'text/csv,text/plain,*/*'
                         }
                     });
                 } catch (corsError) {
                     // If CORS fails, try with proxy
-                    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
                     response = await fetch(proxyUrl + targetUrl, {
                         method: 'GET',
                         headers: {
@@ -959,12 +1021,15 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
-            // Fetch applications
+            // Initialize notifications first
+            initializeNotifications();
+            
+            // Then fetch applications
             fetchApplications();
         });
 
-        // Refresh data every 2 minutes (more frequent)
-        setInterval(fetchApplications, 2 * 60 * 1000);
+        // Refresh data every 5 minutes
+        setInterval(fetchApplications, 5 * 60 * 1000);
     </script>
 </body>
 </html>
