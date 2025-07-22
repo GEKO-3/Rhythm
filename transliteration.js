@@ -2842,6 +2842,7 @@ function performTransliteration(latinText) {
             { pattern: 'kanbi', output: 'ކަނބި', length: 5 },
             { pattern: 'kandu', output: 'ކަނޑު', length: 5 },
             { pattern: 'fandu', output: 'ފަނޑު', length: 5 },
+            { pattern: 'kende', output: 'ކެނޑެ', length: 5 },
             { pattern: 'kendi', output: 'ކެނޑި', length: 5 },
             { pattern: 'kendu', output: 'ކެނޑު', length: 5 },
             { pattern: 'kunbu', output: 'ކުނބު', length: 5 },

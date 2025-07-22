@@ -14192,13 +14192,13 @@ Rahumathah edhi edhi thibumey dhiveheennah rangalhee
 *ގޯހެއް ނަހަދާށޭ ބިރަގަންނަމޭ
 *ސީދާ ބަލަނޫ މިދިމެލަށް ކިޔެއްވޫހޭ
 
-#M
+#1
 ލޯބީގޭ ފެށުމޭ އުނބަތިޔޮ ހަނދާއޭ
 *އޯގާވެ ފިރުމާން އެދެމޭ ހިތާއޭ
 އެހެން އެކަންވޫމާ މިހިތައް މިކެރަން އަސަރުތެކޭ
 *އެހެން އެކަންވޫމާ މިހިތައް މިކެރަން އަސަރުތެކޭ
 
-#M
+#2
 އެހަނދާންތެކޭ އަދު ވެވެނޫ ތެދޭމިޔޯ
 *އެނަމާ އެލޯތްބާ ބޭނުންވެފައިވޫ
 މައާ އެކީ އޮޅިފައި ވަކިވަނީތީ މަދެރަވެޔޭ
@@ -14896,5 +14896,86 @@ Ennme fiyaeh namaves libeythoa
 #3
 Dheyshe vaanee noorannguleymaa
 *Chaalumi maluge araamaa`,
+},
+{
+  id: 247,
+  name: `Fenfali`,
+  genre: 'Kaasi',
+  lyrics: `#M
+ފެންފަލި އޭ ކަނޑު ތެރޭގާ
+*ފަޅުވެރި އެކުދިން ޖަހާލާ
+ކޮޅުފަސް ކޮޅުން ކެޔޮޅާ
+*އޮބި ނެތި ހެސަޔަށް ހިފާލާ
+
+#1
+ޖެހިލާ ހިނދުގާ ނަލަ ވައި
+*ރޯޅިޔާ އެކުގާ
+ފަތިހުގެ އަލިކަން ވަށައިގެން
+*ފެންނަމުން މި ދަނީ
+އަންބާ ކިޔާލަފަ ފަލި ފެނު އަޅުވާލާ
+*އާން ހުތް، އާން ހުތް
+
+#2
+ބަލަ ކޮޅުމުގުލައް އެރީމާ
+*ނާ އަޗާރޭ ވީ
+ކަނޑު ހެޔޮކޮށް ބޭއްވުން
+*ނޫން ގޮތެއް ނެތްތާ
+ހިތްމަތް ކަމާ އެކީގަ ފަހަތަށް ނުޖެހޭނަން
+*އާން ހުތް، އާން ހުތް
+
+-
+$M
+ހިނދު ހިނދު ކޮޅުން ރެދަން ކެންޑެމުން ދަނީ
+*އަސްތާ މިކަން ބޮޑު ކަމަކަށް ވަނީ
+ފަޅުވޭރުންނޭ ބަލަން ނުތިބެ ގޮވާލާ
+*ކެޔޮޅާ އޭ ކެޔޮޅާ އޭ ކިހިނެތް މި ވަނީ
+
+$1
+ކުޅިވަރު ޖެހިފާ މި އޮތީ ކަނު އަނދިރީގާ
+*ނިރުމަޅަ އަޑަކުން ގޮވާ އަޑުވެސް އިވޭ
+ސިއްސައިގެންނޭ ދަނީ ވާކަންތަކުން
+*ނާމާން ކަމޭ މިތާ ފެނިގެން ދަނީ
+
+$2
+އޮޑި ހަރުކޮށް ދުވަން ފެށީ ކުއްލިޔަކަށް ތާ
+*ފެންމަތި އެ ވީ ބޮޑު ތާބޫތެކޭ
+އެދުރާއޭ ހައި ނުކޮށް ކިޔެވެލި ކިޔަވާ
+*ނަދުރެއް ބުނާނަން ރަށު އެންމެނަށް`,
+
+  englishLyrics: `#M
+Fennfali ey kandu thereygaa
+*Falhuveri ekudhin jahaalaa
+Kolhufas kolhun keyolhaa
+*Obi nethi hesayah hifaalaa
+#1
+Jehilaa hindhugaa nala vai
+*Roalhiyaa ekugaa
+Fathihuge alikan vashaigen
+*Fennamun mi dhanee
+Annbaa kiyaalafa fali fenu alhuvaalaa
+*Aan huyy, aan huyy
+#2
+Bala kolhumugulah ereemaa
+*Naa achaarey vee
+Kandu heyokoh beyhvun
+*Noon gotheh neyythaa
+Hiyymayy kamaa ekeega fahathah nujeheynan
+*Aan huyy, aan huyy
+-
+$M
+Hindhu hindhu kolhun redhan kenndemun dhanee
+*Asthaa mikan bodu kamakah vanee
+Falhuveyrunney balan nuthibe govaalaa
+*Keyolhaa ey keyolhaa ey kihineyy mi vanee
+$1
+Kulhivaru jehifaa mi othee kanu andhireegaa
+*Nirumalha adakun govaa aduves ivey
+Sihsaigenney dhanee vaakannthakun
+*Naamaan kamey mithaa fenigen dhanee
+$2
+Odi harukoh dhuvan feshee kuhliyakah thaa
+*Fennmathi e vee bodu thaaboothekey
+Edhuraaey hai nukoh kiyeveli kiyavaa
+*Nadhureh bunaanan rashu ennmenah`,
 },
 ]
