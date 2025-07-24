@@ -236,7 +236,7 @@
       margin-top: 0;
       display: none;
       direction: rtl;
-      font-size: 1.3em;
+      font-size: 1.6em; /* Dhivehi font size */
       white-space: pre-line;
       color: #FFFFFF;
       background: rgba(43,43,43,0.7);
@@ -252,6 +252,13 @@
       -moz-user-select: none;
       opacity: 0;
       transition: opacity 0.3s ease;
+    }
+    
+    .lyrics-template.english {
+      font-size: 1.4em; /* English font size */
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      direction: ltr;
+      text-align: left;
     }
     
     .lyrics-template.ready {
@@ -315,7 +322,7 @@
       border-radius: 0;
       padding: 8px 14px;
       margin: 0;
-      font-size: 0.95em;
+      font-size: 1.1em;
       cursor: pointer;
       font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
       text-align: left;
@@ -438,9 +445,13 @@
         font-size: 0.8em;
       }
       .lyrics-template {
-        font-size: 1.1em;
+        font-size: 1.4em; /* Dhivehi mobile font size */
         padding: 15px;
         line-height: 1.8em;
+      }
+      
+      .lyrics-template.english {
+        font-size: 1.2em; /* English mobile font size */
       }
       .section-nav-bar {
         bottom: 15px;
@@ -451,7 +462,7 @@
       }
       .section-nav-bar button {
         padding: 6px 10px;
-        font-size: 0.85em;
+        font-size: 1.2em;
       }
       .section-nav-bar .yellow-btn,
       .section-nav-bar .white-btn {
@@ -471,7 +482,7 @@
       width: 100%;
       height: 100%;
       background: #1f1f1f;
-      z-index: 1000;
+      z-index: 15000;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -1016,6 +1027,13 @@
       
       // Show PIN overlay again
       pinOverlay.classList.remove('hidden');
+      
+      // Hide loading screen to show PIN overlay
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.style.display = 'none';
+      }
+      
       clearPinInputs();
       
       // Focus on first digit when user returns
@@ -1167,6 +1185,12 @@
       updateLoadingProgress('Please enter PIN');
       pinOverlay.classList.remove('hidden');
       
+      // Hide loading screen temporarily to show PIN overlay
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.style.display = 'none';
+      }
+      
       // Ensure keyboard opens when PIN overlay is shown
       setTimeout(() => {
         pinDigits[0].focus();
@@ -1307,6 +1331,13 @@
     
     function hidePinOverlay() {
       pinOverlay.classList.add('hidden');
+      
+      // Show loading screen again after PIN is verified
+      const loadingScreen = document.getElementById('loading-screen');
+      if (loadingScreen) {
+        loadingScreen.style.display = 'flex';
+      }
+      
       // Don't hide loading screen here - let it persist until lyrics are fully rendered
     }
     
@@ -1573,9 +1604,8 @@
           processedLine = highlightAmpersandParts(processedLine, '#f5d000');
           
           currentSection += processedLine + '\n';
-        } else {
-          currentSection += '\n';
         }
+        // Skip empty lines - don't add them to sections
       });
       
       pushSection();
@@ -1724,10 +1754,12 @@
       // Update text direction and font
       const lyricsContainer = document.getElementById('lyrics-template');
       if (language === 'english') {
+        lyricsContainer.classList.add('english');
         lyricsContainer.style.direction = 'ltr';
         lyricsContainer.style.textAlign = 'left';
         lyricsContainer.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
       } else {
+        lyricsContainer.classList.remove('english');
         lyricsContainer.style.direction = 'rtl';
         lyricsContainer.style.textAlign = 'right';
         lyricsContainer.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
