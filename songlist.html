@@ -4,6 +4,10 @@
   <meta charset="UTF-8">
   <title>Songs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Preload critical fonts -->
+  <link rel="preload" href="Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/truetype" crossorigin>
+  
   <!-- Local font definitions -->
   <style>
     @font-face {
@@ -18,7 +22,7 @@
       font-family: 'Montserrat';
       src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
       font-display: swap;
-      font-weight: normal;
+      font-weight: 100 900;
       font-style: normal;
     }
   </style>
@@ -46,44 +50,67 @@
   <meta name="apple-mobile-web-app-title" content="Rhythm Songs">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="application-name" content="Rhythm Songs">
+  <!-- Optimized CSS Variables and Base Styles -->
   <style>
-    html, body {
-      touch-action: pan-x pan-y;
-      overscroll-behavior: none;
-    }
-    input, textarea, select, button {
-      touch-action: manipulation;
-    }
     :root {
       --primary-color: #f5d000;
       --hover-color: #fced98;
       --active-color: #E6B800;
       --text-color: #2b2b2b;
-      --bg-opacity: rgba(31, 31, 31, 0.0);
-      --hover-color2: #3a3a3a;
-      --active-color2: #111111
+      --bg-color: #1f1f1f;
+      --card-bg: rgba(43, 43, 43, 0.7);
+      --border-color: #444;
+      --error-color: #ff6b6b;
+      --font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      --border-radius: 5px;
+      --transition: all 0.2s ease;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
+
+    /* Reset and base styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      touch-action: pan-x pan-y;
+      overscroll-behavior: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    input, textarea, select, button {
+      touch-action: manipulation;
+    }
+
+    /* Animations */
     @keyframes fadeIn {
-      0% { opacity: 0; }
-      100% { opacity: 1; }
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
+
     @keyframes slideIn {
-      0% { transform: translateY(10px); opacity: 0; }
-      100% { transform: translateY(0); opacity: 1; }
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
     }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+
     body {
-      /* Use Montserrat for English text */
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      font-family: var(--font-family);
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      margin: 0;
-      background-color: #1f1f1f;
-      background-size: cover;
+      background-color: var(--bg-color);
       color: var(--primary-color);
       animation: fadeIn 0.5s ease-in-out;
     }
+
     .container {
       text-align: center;
       position: relative;
@@ -91,11 +118,12 @@
       width: 100%; 
       padding: 10px;
       background: transparent;
-      transition: transform 0.3s ease;
+      transition: var(--transition);
       animation: slideIn 0.5s ease-in-out;
-      margin-top: 0;
       margin-bottom: 40px;
     }
+
+    /* Header and search styles */
     .header-search-wrapper {
       position: fixed;
       top: 0;
@@ -103,10 +131,10 @@
       right: 0;
       z-index: 100;
       background: transparent;
-      padding-top: env(safe-area-inset-top, 0);
-      padding-left: env(safe-area-inset-left, 0);
-      padding-right: env(safe-area-inset-right, 0);
-      padding-bottom: 10px;
+      padding: 10px;
+      padding-top: max(10px, env(safe-area-inset-top, 0));
+      padding-left: max(10px, env(safe-area-inset-left, 0));
+      padding-right: max(10px, env(safe-area-inset-right, 0));
     }
     
     .header-search-wrapper::after {
@@ -125,30 +153,28 @@
       top: 0;
       left: 0;
       right: 0;
-      background: #ff6b6b;
+      background: var(--error-color);
       color: white;
       text-align: center;
       padding: 5px;
       font-size: 0.9em;
       z-index: 200;
       display: none;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      font-family: var(--font-family);
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
     }
     
     .offline-indicator.show {
       display: block;
+      transform: translateY(0);
     }
-    h1 {
-      color: var(--primary-color);
-      margin-bottom: 0.5em;
-      margin-top: 0.5em;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-    }
+
     .search-container {
       background: transparent;
       max-width: 600px;
-      border-radius: 8px;
-      padding: 10px 16px;
+      border-radius: var(--border-radius);
+      padding: 5px 10px;
       margin: 0 auto;
       width: 95%;
       display: flex;
@@ -157,22 +183,24 @@
       position: relative;
       z-index: 101;
       gap: 10px;
-      margin-top: 10px;
     }
+
+    /* Search and filter components */
     .filter-dropdown {
       position: relative;
       display: inline-block;
     }
+
     .filter-btn {
       background: var(--primary-color);
       color: var(--text-color);
       border: none;
-      border-radius: 5px;
+      border-radius: var(--border-radius);
       padding: 10px;
       font-size: 1.2em;
       cursor: pointer;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-      transition: background-color 0.3s;
+      font-family: var(--font-family);
+      transition: var(--transition);
       width: 40px;
       height: 40px;
       display: flex;
@@ -180,112 +208,107 @@
       justify-content: center;
       flex-shrink: 0;
     }
+
     .filter-btn:hover {
       background: var(--hover-color);
+      transform: scale(1.05);
     }
+
     .filter-content {
       display: none;
       position: absolute;
-      background: rgba(43,43,43,0.98);
-      border: 1px solid #444;
-      border-radius: 5px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      z-index: 1000;
       min-width: 200px;
-      min-width: 200px;
-      width: 200px;
       top: 100%;
       left: 0;
       margin-top: 2px;
+      backdrop-filter: blur(10px);
     }
+
     .filter-content a {
       color: var(--primary-color);
-      padding: 8px 12px;
+      padding: 12px 16px;
       text-decoration: none;
       display: block;
       cursor: pointer;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-      border-bottom: 1px solid #333;
+      font-family: var(--font-family);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition);
     }
+
     .filter-content a:last-child {
       border-bottom: none;
     }
+
     .filter-content a:hover {
       background: var(--hover-color);
       color: var(--text-color);
     }
-    .show {
+
+    .filter-content.show {
       display: block;
+      animation: fadeIn 0.2s ease;
     }
+
     #search-box {
       flex: 1;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #444;
-      margin-bottom: 0;
+      padding: 10px 12px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
       font-size: 1em;
       background: #222;
       color: var(--primary-color);
       outline: none;
-      transition: border-color 0.2s;
-      margin-top: 0;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: var(--transition);
+      font-family: var(--font-family);
     }
+
     #search-box::placeholder {
       color: #999;
     }
+
     #search-box:focus {
       border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
     }
+
+    /* Song list styles */
     ul#song-list {
       list-style: none;
       padding: 0;
       margin: 0;
-      margin-top: calc(env(safe-area-inset-top, 0px) + 105px);
+      margin-top: calc(max(env(safe-area-inset-top, 0px), 0px) + 85px);
     }
+
     ul#song-list li {
       cursor: pointer;
-      padding: 0.7em 0.5em;
-      border-bottom: 1px solid #1d1d1d;
-      transition: background 0.2s, color 0.2s;
+      padding: 12px 16px;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
       color: var(--primary-color);
-      border-radius: 5px;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
       font-size: 1.1em;
-      background: rgba(43,43,43,0.7);
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      background: var(--card-bg);
+      font-family: var(--font-family);
+      border: 1px solid transparent;
+      backdrop-filter: blur(10px);
     }
+
     ul#song-list li:hover {
       background: var(--hover-color);
       color: var(--text-color);
-      font-weight: bold;
+      font-weight: 600;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+      border-color: var(--primary-color);
     }
-    
-    @media (max-width: 700px) {
-      .header-search-wrapper {
-        padding: 10px;
-      }
-      .search-container {
-        padding: 5px 10px;
-        gap: 8px;
-      }
-      .filter-btn {
-        width: 35px;
-        height: 35px;
-        font-size: 1.1em;
-        padding: 8px;
-      }
-      #search-box {
-        padding: 8px 10px;
-        font-size: 1em;
-      }
-      ul#song-list {
-        margin-top: calc(env(safe-area-inset-top, 0px) + 85px);
-      }
-      ul#song-list li {
-        padding: 0.6em 0.4em;
-        font-size: 1em;
-      }
+
+    ul#song-list li:active {
+      transform: translateY(0);
     }
     
     /* PIN Entry Styles */
@@ -295,29 +318,32 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: #1f1f1f;
+      background: var(--bg-color);
       z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
+      backdrop-filter: blur(10px);
     }
     
     .pin-container {
-      background: rgba(43,43,43,0.9);
+      background: var(--card-bg);
       padding: 30px;
       border-radius: 15px;
       text-align: center;
-      border: 2px solid #444;
+      border: 2px solid var(--border-color);
       max-width: 300px;
       width: 85%;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
     }
     
     .pin-title {
       color: var(--primary-color);
       font-size: 1.3em;
       margin-bottom: 25px;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      font-family: var(--font-family);
       font-weight: 600;
     }
     
@@ -334,15 +360,14 @@
       padding: 0;
       font-size: 1.5em;
       text-align: center;
-      border: 2px solid #444;
-      border-radius: 8px;
+      border: 2px solid var(--border-color);
+      border-radius: var(--border-radius);
       background: #222;
       color: var(--primary-color);
       outline: none;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-      transition: all 0.3s ease;
+      font-family: var(--font-family);
+      transition: var(--transition);
       caret-color: transparent;
-      /* Force numerical keyboard on mobile */
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: textfield;
@@ -360,29 +385,182 @@
     }
     
     .pin-digit.error {
-      border-color: #ff6b6b;
+      border-color: var(--error-color);
       animation: shake 0.5s;
     }
     
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-3px); }
-      75% { transform: translateX(3px); }
-    }
-    
     .pin-error {
-      color: #ff6b6b;
+      color: var(--error-color);
       font-size: 0.85em;
       margin-top: 5px;
       min-height: 18px;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      font-family: var(--font-family);
     }
     
     .pin-overlay.hidden {
       display: none;
     }
     
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spin-and-scale {
+      from { transform: rotate(0deg) scale(1); }
+      to { transform: rotate(360deg) scale(1); }
+    }
+
+    @keyframes spin-and-scale-smooth {
+      0% { transform: rotate(0deg); width: 80px; height: 80px; }
+      25% { transform: rotate(90deg); width: 200px; height: 200px; }
+      50% { transform: rotate(180deg); width: 800px; height: 800px; }
+      75% { transform: rotate(270deg); width: 2400px; height: 2400px; }
+      100% { transform: rotate(360deg); width: 4000px; height: 4000px; }
+    }
+
+    @keyframes slideLeft {
+      0% { transform: translateX(0) translateZ(0); }
+      100% { transform: translateX(-100vw) translateZ(0); }
+    }
+
+    @keyframes slideRight {
+      0% { transform: translateX(-100vw) translateZ(0); }
+      100% { transform: translateX(0) translateZ(0); }
+    }
+
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 0.6s ease-out;
+    }
+
+    .loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      animation: spin-and-scale 3s linear infinite;
+      transition: none;
+      position: relative;
+      z-index: 2;
+      margin-bottom: 20px;
+    }
+
+    .loading-logo.fade-out {
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+    }
+
+    .loading-screen.fade-out .loading-logo {
+      animation: spin-and-scale-smooth 1.5s ease-out infinite;
+    }
+
+    .loading-text {
+      color: var(--primary-color);
+      font-family: var(--font-family);
+      font-size: 1.2em;
+      font-weight: 600;
+      z-index: 2;
+      opacity: 0.8;
+      animation: fadeIn 1s ease-in-out infinite alternate;
+    }
+
+    .loading-text.fade-out {
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+    }
+
+    /* Pattern Container */
+    .pattern-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+      opacity: 0.25;
+      transition: opacity 0.6s ease-out;
+      will-change: opacity;
+      transform: translateZ(0);
+    }
+
+    .pattern-container.fade-out {
+      opacity: 0;
+    }
+
+    .pattern-line {
+      position: absolute;
+      height: 40px;
+      width: 300vw;
+      background-image: url('src/repeatp.svg');
+      background-repeat: repeat-x;
+      background-size: auto 40px;
+      left: -100vw;
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    .pattern-line:nth-child(odd) {
+      animation: slideLeft 10s linear infinite;
+    }
+
+    .pattern-line:nth-child(even) {
+      animation: slideRight 10s linear infinite;
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(245, 208, 0, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
     /* Mobile responsive adjustments */
+    @media (max-width: 700px) {
+      .search-container {
+        gap: 8px;
+      }
+      
+      .filter-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1em;
+        padding: 8px;
+      }
+      
+      #search-box {
+        padding: 8px 10px;
+        font-size: 1em;
+      }
+      
+      ul#song-list {
+        margin-top: calc(max(env(safe-area-inset-top, 0px), 0px) + 75px);
+      }
+      
+      ul#song-list li {
+        padding: 10px 12px;
+        font-size: 1em;
+      }
+    }
+    
     @media (max-width: 400px) {
       .pin-container {
         padding: 20px;
@@ -399,84 +577,127 @@
         gap: 8px;
       }
     }
-  </style>
-  <script>
-    // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
-    document.addEventListener('keydown', function(e) {
-      if ((e.ctrlKey || e.metaKey) && (
-        e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0'
-      )) {
-        e.preventDefault();
-      }
-    });
-    document.addEventListener('wheel', function(e) {
-      if (e.ctrlKey) e.preventDefault();
-    }, { passive: false });
-    
-    // Prevent double-tap zoom on mobile
-    let lastTouchEnd = 0;
-    document.addEventListener('touchend', function(e) {
-      const now = (new Date()).getTime();
-      if (now - lastTouchEnd <= 350) {
-        e.preventDefault();
-      }
-      lastTouchEnd = now;
-    }, false);
-    
-    // Prevent pinch-zoom and gesture events on iOS/Safari
-    document.addEventListener('gesturestart', function(e) {
-      e.preventDefault();
-    });
-    document.addEventListener('gesturechange', function(e) {
-      e.preventDefault();
-    });
-    document.addEventListener('gestureend', function(e) {
-      e.preventDefault();
-    });
 
-    // Register service worker for offline functionality
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js')
-          .then(function(registration) {
-            console.log('ServiceWorker registration successful');
+    /* Dark mode and reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .pin-overlay, .header-search-wrapper, .filter-dropdown {
+        display: none !important;
+      }
+      
+      ul#song-list {
+        margin-top: 0;
+      }
+      
+      ul#song-list li {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+      }
+    }
+  </style>
+  <!-- Optimized JavaScript for better performance and security -->
+  <script>
+    // Performance and security optimizations
+    (function() {
+      'use strict';
+      
+      // Optimized zoom prevention with passive listeners where possible
+      const preventZoom = {
+        init() {
+          document.addEventListener('keydown', this.handleKeydown.bind(this));
+          document.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
+          document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+          document.addEventListener('gesturestart', this.preventDefault, { passive: false });
+          document.addEventListener('gesturechange', this.preventDefault, { passive: false });
+          document.addEventListener('gestureend', this.preventDefault, { passive: false });
+        },
+        
+        handleKeydown(e) {
+          if ((e.ctrlKey || e.metaKey) && ['+', '-', '=', '0'].includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+        
+        handleWheel(e) {
+          if (e.ctrlKey) e.preventDefault();
+        },
+        
+        handleTouchEnd(e) {
+          const now = Date.now();
+          if (now - this.lastTouchEnd <= 350) {
+            e.preventDefault();
+          }
+          this.lastTouchEnd = now;
+        },
+        
+        preventDefault(e) {
+          e.preventDefault();
+        },
+        
+        lastTouchEnd: 0
+      };
+
+      // Initialize zoom prevention
+      preventZoom.init();
+
+      // Optimized Service Worker registration with error handling
+      if ('serviceWorker' in navigator && 'caches' in window) {
+        window.addEventListener('load', async () => {
+          try {
+            const registration = await navigator.serviceWorker.register('/sw.js');
+            console.log('ServiceWorker registered successfully');
             
-            // Listen for updates
-            registration.addEventListener('updatefound', function() {
+            registration.addEventListener('updatefound', () => {
               const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', function() {
+              newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New content is available
-                  if (confirm('New content is available. Refresh to update?')) {
+                  if (confirm('New content available. Refresh to update?')) {
                     window.location.reload();
                   }
                 }
               });
             });
-          })
-          .catch(function(error) {
-            console.log('ServiceWorker registration failed: ', error);
-          });
-        
-        updateOfflineStatus();
-      });
-    }
-    
-    // Listen for online/offline events
-    window.addEventListener('online', updateOfflineStatus);
-    window.addEventListener('offline', updateOfflineStatus);
-    
-    function updateOfflineStatus() {
-      const offlineIndicator = document.getElementById('offline-indicator');
-      if (!navigator.onLine) {
-        offlineIndicator.classList.add('show');
-      } else {
-        offlineIndicator.classList.remove('show');
+          } catch (error) {
+            console.warn('ServiceWorker registration failed:', error);
+          }
+          
+          updateOfflineStatus();
+        });
       }
-    }
+      
+      // Optimized online/offline status handling
+      window.addEventListener('online', updateOfflineStatus);
+      window.addEventListener('offline', updateOfflineStatus);
+      
+      function updateOfflineStatus() {
+        const indicator = document.getElementById('offline-indicator');
+        if (indicator) {
+          indicator.classList.toggle('show', !navigator.onLine);
+        }
+      }
+    })();
   </script>
 </head>
 <body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loading-screen">
+    <!-- Animated Pattern Background -->
+    <div class="pattern-container" id="pattern-container">
+      <!-- Pattern lines will be generated by JavaScript -->
+    </div>
+    <img src="src/Logo_1.svg" alt="Rhythm Boduberu Loading" class="loading-logo">
+    <div class="loading-text">Loading Songs...</div>
+  </div>
+
   <div class="pin-overlay" id="pin-overlay">
     <div class="pin-container">
       <h2 class="pin-title">Enter PIN</h2>
@@ -510,944 +731,896 @@
     <ul id="song-list"></ul>
   </div>
   <script>
-    // Global variables
-    let songList, searchBox, filterBtn, filterDropdown, filterContent;
-    let currentGenreFilter = 'all';
-    let songs = []; // Will be populated from CSV
-    window.currentShowList = []; // Will be populated from showlist CSV
-    
-    // ===========================================
-    // PIN CONFIGURATION (Easy to change)
-    // ===========================================
-    const pinAuth = 'ODc2NQ=='; // Change this to update PIN
-    
-    // PIN Security Functions
-    function decodePinConfig(encoded) {
-      try {
-        const decoded = atob(encoded);
-        const reversed = decoded.split('').reverse().join('');
-        return reversed.split('').map(Number);
-      } catch (e) {
-        return [8, 7, 6, 5]; // Fallback PIN
-      }
-    }
-    
-    function validatePinStructure(pin) {
-      // Additional validation layer
-      const checksum = pin.reduce((sum, digit) => sum + digit, 0);
-      // Calculate expected checksum based on actual PIN
-      const expectedChecksum = actualPinConfig.reduce((sum, digit) => sum + digit, 0);
-      return checksum === expectedChecksum;
-    }
-    
-    // Get actual PIN configuration
-    const actualPinConfig = decodePinConfig(pinAuth);
-    
-    // PIN Protection System
-    let pinAuthenticated = false;
-    let pinOverlay, pinDigits, pinError;
-    let attemptCount = 0;
-    const maxAttempts = 5;
-    const lockoutDuration = 60 * 60 * 1000; // 1 hour in milliseconds
-    let lockoutTimer = null;
-    
-    // Session timeout system
-    const sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
-    let sessionTimer = null;
-    let lastActivityTime = Date.now();
-    let isPageVisible = true;
-    
-    // Initialize PIN system on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      initializePinSystem();
-      initializeSessionTimeout();
-    });
-    
-    function initializeSessionTimeout() {
-      // Track page visibility
-      document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'visible') {
-          isPageVisible = true;
-          updateLastActivity();
-          // Check if session expired while away
-          if (pinAuthenticated && Date.now() - lastActivityTime > sessionTimeout) {
-            expireSession();
-          }
-        } else {
-          isPageVisible = false;
-          clearSessionTimeout();
+    // Optimized Application Module
+    const RhythmSongList = (function() {
+      'use strict';
+      
+      // Configuration and State
+      const CONFIG = {
+        PIN_AUTH: 'ODc2NQ==',
+        MAX_ATTEMPTS: 5,
+        LOCKOUT_DURATION: 60 * 60 * 1000, // 1 hour
+        SESSION_TIMEOUT: 3 * 60 * 1000, // 3 minutes
+        SEARCH_DEBOUNCE: 300,
+        CSV_ENDPOINTS: {
+          songs: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv',
+          showlist: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2u4Fu2f0bYF_ToPU-digD1jbqNsL7DOJpB_kXlWTsnXcgetsvcHuhnMqtF-gCFi_PnSiWzUwbN3p6/pub?output=csv',
+          cancel: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdKlCFDc1IEQXEgjkX1ULpGLjWitRzaH8Wsa1fNGqGbXkMuShTNmTDsk1fL6F8I3D022zn2HUIrCux/pub?output=csv'
         }
-      });
-      
-      // Track user activity to reset session timer
-      const activityEvents = ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'];
-      activityEvents.forEach(event => {
-        document.addEventListener(event, updateLastActivity, true);
-      });
-      
-      // For mobile apps, also track window focus/blur
-      window.addEventListener('focus', function() {
-        updateLastActivity();
-      });
-      
-      window.addEventListener('blur', function() {
-        clearSessionTimeout();
-      });
-    }
-    
-    function updateLastActivity() {
-      lastActivityTime = Date.now();
-      if (pinAuthenticated && !isPageVisible) {
-        startSessionTimeout();
-      }
-    }
-    
-    function startSessionTimeout() {
-      clearSessionTimeout(); // Clear any existing timeout
-      
-      sessionTimer = setTimeout(() => {
-        expireSession();
-      }, sessionTimeout);
-    }
-    
-    function clearSessionTimeout() {
-      if (sessionTimer) {
-        clearTimeout(sessionTimer);
-        sessionTimer = null;
-      }
-    }
-    
-    function expireSession() {
-      pinAuthenticated = false;
-      sessionStorage.removeItem('pinSession');
-      
-      // Clear session timeout
-      clearSessionTimeout();
-      
-      // Show PIN overlay again
-      pinOverlay.classList.remove('hidden');
-      clearPinInputs();
-      
-      // Focus on first digit when user returns
-      setTimeout(() => {
-        pinDigits[0].focus();
-      }, 300);
-      
-      // Show session expired message
-      showPinError('Session expired. Please enter PIN again.');
-      setTimeout(() => {
-        clearPinError();
-      }, 3000);
-    }
-    
-    function initializePinSystem() {
-      pinOverlay = document.getElementById('pin-overlay');
-      pinDigits = [
-        ...document.querySelectorAll('.pin-digit')
-      ];
-      pinError = document.getElementById('pin-error');
-      
-      // Check if PIN was previously entered (but still require re-entry)
-      checkPinStatus();
-      
-      // Setup event listeners for each digit input
-      pinDigits.forEach((digit, index) => {
-        digit.addEventListener('input', (e) => handleDigitInput(e, index));
-        digit.addEventListener('keydown', (e) => handleDigitKeydown(e, index));
-        digit.addEventListener('paste', handlePaste);
-      });
-      
-      // Auto-focus first digit with delay for mobile
-      setTimeout(() => {
-        pinDigits[0].focus();
-      }, 500); // Increased delay to ensure DOM is ready
-    }
-    
-    function handleDigitInput(e, index) {
-      // Check if locked out
-      if (e.target.disabled) return;
-      
-      const value = e.target.value;
-      
-      // Only allow single digit numbers
-      if (!/^\d$/.test(value)) {
-        e.target.value = '';
-        return;
-      }
-      
-      // Clear any previous errors
-      clearPinError();
-      
-      // Mark as filled
-      e.target.classList.add('filled');
-      
-      // Move to next digit
-      if (index < 3) {
-        pinDigits[index + 1].focus();
-      } else {
-        // Last digit entered, verify PIN
-        verifyPin();
-      }
-    }
-    
-    function handleDigitKeydown(e, index) {
-      // Check if locked out
-      if (e.target.disabled) return;
-      
-      // Handle backspace
-      if (e.key === 'Backspace') {
-        e.target.value = '';
-        e.target.classList.remove('filled');
-        if (index > 0) {
-          pinDigits[index - 1].focus();
-        }
-      }
-      
-      // Handle Enter key
-      if (e.key === 'Enter') {
-        verifyPin();
-      }
-      
-      // Handle arrow keys
-      if (e.key === 'ArrowLeft' && index > 0) {
-        pinDigits[index - 1].focus();
-      }
-      if (e.key === 'ArrowRight' && index < 3) {
-        pinDigits[index + 1].focus();
-      }
-    }
-    
-    function handlePaste(e) {
-      e.preventDefault();
-      const pasteData = e.clipboardData.getData('text');
-      
-      // Check if pasted data is 4 digits
-      if (/^\d{4}$/.test(pasteData)) {
-        pinDigits.forEach((digit, index) => {
-          digit.value = pasteData[index];
-          digit.classList.add('filled');
-        });
-        verifyPin();
-      }
-    }
-    
-    function checkPinStatus() {
-      // Check if currently locked out
-      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
-      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
-        startLockout();
-        return;
-      }
-      
-      // Clear any expired lockout
-      if (lockoutEnd && Date.now() >= parseInt(lockoutEnd)) {
-        localStorage.removeItem('pinLockoutEnd');
-        localStorage.removeItem('pinAttemptCount');
-      }
-      
-      // Restore attempt count if not locked out
-      const savedAttempts = localStorage.getItem('pinAttemptCount');
-      if (savedAttempts) {
-        attemptCount = parseInt(savedAttempts);
-      }
-      
-      // Check for existing valid session
-      const sessionData = sessionStorage.getItem('pinSession');
-      if (sessionData) {
-        try {
-          const session = JSON.parse(sessionData);
-          const sessionAge = Date.now() - session.timestamp;
-          
-          if (session.authenticated && sessionAge < sessionTimeout) {
-            // Valid session exists
-            pinAuthenticated = true;
-            hidePinOverlay();
-            loadSongsData();
-            startSessionTimeout();
-            return;
-          }
-        } catch (e) {
-          // Invalid session data
-          sessionStorage.removeItem('pinSession');
-        }
-      }
-      
-      // No valid session - show PIN overlay
-      pinOverlay.classList.remove('hidden');
-      
-      // Ensure keyboard opens when PIN overlay is shown
-      setTimeout(() => {
-        pinDigits[0].focus();
-      }, 300);
-    }
-    
-    function startLockout() {
-      const lockoutEnd = Date.now() + lockoutDuration;
-      localStorage.setItem('pinLockoutEnd', lockoutEnd.toString());
-      localStorage.setItem('pinAttemptCount', attemptCount.toString());
-      
-      // Disable all inputs
-      pinDigits.forEach(digit => digit.disabled = true);
-      
-      startLockoutTimer(lockoutEnd);
-    }
-    
-    function startLockoutTimer(lockoutEnd) {
-      function updateLockoutDisplay() {
-        const timeLeft = lockoutEnd - Date.now();
-        if (timeLeft <= 0) {
-          // Lockout expired
-          clearInterval(lockoutTimer);
-          localStorage.removeItem('pinLockoutEnd');
-          localStorage.removeItem('pinAttemptCount');
-          attemptCount = 0;
-          
-          // Re-enable inputs
-          pinDigits.forEach(digit => {
-            digit.disabled = false;
-            digit.value = '';
-            digit.classList.remove('filled');
-          });
-          
-          showPinError('Lockout expired. You may try again.');
-          setTimeout(() => {
-            clearPinError();
-            pinDigits[0].focus();
-          }, 2000);
-          return;
-        }
-        
-        const minutes = Math.floor(timeLeft / 60000);
-        const seconds = Math.floor((timeLeft % 60000) / 1000);
-        showPinError(`Too many attempts. Try again in ${minutes}:${seconds.toString().padStart(2, '0')}`);
-      }
-      
-      // Update immediately and then every second
-      updateLockoutDisplay();
-      lockoutTimer = setInterval(updateLockoutDisplay, 1000);
-    }
-    
-    function verifyPin() {
-      const enteredPin = pinDigits.map(digit => digit.value).join('');
-      
-      if (enteredPin.length !== 4) {
-        showPinError('Please enter all 4 digits');
-        return;
-      }
-      
-      // Check if currently locked out
-      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
-      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
-        showPinError('Account locked. Please wait.');
-        return;
-      }
-      
-      // Convert entered PIN to array for comparison
-      const enteredPinArray = enteredPin.split('').map(Number);
-      
-      // Multi-layer validation
-      const basicMatch = enteredPinArray.every((digit, index) => 
-        digit === actualPinConfig[index]
-      );
-      
-      const structureValid = validatePinStructure(enteredPinArray);
-      
-      if (basicMatch && structureValid) {
-        // Correct PIN
-        pinAuthenticated = true;
-        attemptCount = 0;
-        localStorage.removeItem('pinAttemptCount');
-        
-        // Create session
-        const sessionData = {
-          timestamp: Date.now(),
-          authenticated: true,
-          sessionType: 'songlist'
-        };
-        sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
-        
-        hidePinOverlay();
-        loadSongsData();
-        startSessionTimeout();
-      } else {
-        // Incorrect PIN
-        attemptCount++;
-        localStorage.setItem('pinAttemptCount', attemptCount.toString());
-        
-        if (attemptCount >= maxAttempts) {
-          startLockout();
-        } else {
-          const remainingAttempts = maxAttempts - attemptCount;
-          showPinError(`Incorrect PIN. ${remainingAttempts} attempts remaining.`);
-          clearPinInputs();
-          setTimeout(() => {
-            pinDigits[0].focus();
-          }, 1000);
-        }
-      }
-    }
-    
-    function showPinError(message) {
-      pinError.textContent = message;
-      pinDigits.forEach(digit => {
-        digit.classList.add('error');
-      });
-      setTimeout(() => {
-        pinDigits.forEach(digit => {
-          digit.classList.remove('error');
-        });
-      }, 500);
-    }
-    
-    function clearPinError() {
-      pinError.textContent = '';
-      pinDigits.forEach(digit => {
-        digit.classList.remove('error');
-      });
-    }
-    
-    function clearPinInputs() {
-      pinDigits.forEach(digit => {
-        digit.value = '';
-        digit.classList.remove('filled');
-      });
-    }
-    
-    function hidePinOverlay() {
-      pinOverlay.classList.add('hidden');
-    }
-    
-    // CSV Data Loading Functions
-    function parseCSVLine(line) {
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-      let i = 0;
-      
-      while (i < line.length) {
-        const char = line[i];
-        
-        if (char === '"') {
-          if (inQuotes && line[i + 1] === '"') {
-            // Escaped quote
-            current += '"';
-            i += 2;
-          } else {
-            // Toggle quote state
-            inQuotes = !inQuotes;
-            i++;
-          }
-        } else if (char === ',' && !inQuotes) {
-          // End of field
-          result.push(current.trim());
-          current = '';
-          i++;
-        } else {
-          current += char;
-          i++;
-        }
-      }
-      
-      // Add the last field
-      result.push(current.trim());
-      return result;
-    }
+      };
 
-    async function getSongsFromCSV() {
-      try {
-        console.log('Fetching CSV from Google Sheets...');
-        const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv');
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const csvText = await response.text();
-        console.log('CSV text length:', csvText.length);
-        
-        // Cache the CSV data for offline use
-        if ('caches' in window) {
-          const cache = await caches.open('rhythm-csv-data');
-          const csvResponse = new Response(csvText, {
-            headers: { 'Content-Type': 'text/csv' }
-          });
-          await cache.put('csv-songs-data', csvResponse);
-          console.log('CSV data cached for offline use');
-        }
-        
-        // Parse CSV properly using state machine
-        const rows = [];
-        let currentRow = [];
-        let currentField = '';
-        let inQuotes = false;
-        let i = 0;
-        
-        while (i < csvText.length) {
-          const char = csvText[i];
-          const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+      const STATE = {
+        pinAuthenticated: false,
+        songs: [],
+        currentShowList: [],
+        currentGenreFilter: 'all',
+        attemptCount: 0,
+        sessionTimer: null,
+        lockoutTimer: null,
+        lastActivityTime: Date.now(),
+        isPageVisible: true,
+        searchTimeout: null
+      };
+
+      // DOM Elements Cache
+      const ELEMENTS = {};
+
+      // Utility Functions
+      const Utils = {
+        debounce(func, wait) {
+          let timeout;
+          return function executedFunction(...args) {
+            const later = () => {
+              clearTimeout(timeout);
+              func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+          };
+        },
+
+        async fetchWithRetry(url, options = {}, retries = 3) {
+          for (let i = 0; i < retries; i++) {
+            try {
+              const response = await fetch(url, options);
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
+              return response;
+            } catch (error) {
+              if (i === retries - 1) throw error;
+              await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+            }
+          }
+        },
+
+        parseCSV(csvText) {
+          const rows = [];
+          let currentRow = [];
+          let currentField = '';
+          let inQuotes = false;
+          let i = 0;
           
-          if (char === '"') {
-            if (inQuotes && nextChar === '"') {
-              // Escaped quote
-              currentField += '"';
-              i += 2;
-            } else {
-              // Toggle quote state
-              inQuotes = !inQuotes;
-              i++;
-            }
-          } else if (char === ',' && !inQuotes) {
-            // End of field
-            currentRow.push(currentField);
-            currentField = '';
-            i++;
-          } else if ((char === '\n' || char === '\r') && !inQuotes) {
-            // End of row
-            if (currentField || currentRow.length > 0) {
-              currentRow.push(currentField);
-              if (currentRow.length > 0) {
-                rows.push(currentRow);
+          while (i < csvText.length) {
+            const char = csvText[i];
+            const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+            
+            if (char === '"') {
+              if (inQuotes && nextChar === '"') {
+                currentField += '"';
+                i += 2;
+              } else {
+                inQuotes = !inQuotes;
+                i++;
               }
-              currentRow = [];
+            } else if (char === ',' && !inQuotes) {
+              currentRow.push(currentField.trim());
               currentField = '';
-            }
-            // Skip \r\n combinations
-            if (char === '\r' && nextChar === '\n') {
-              i += 2;
-            } else {
               i++;
-            }
-          } else {
-            currentField += char;
-            i++;
-          }
-        }
-        
-        // Add the last row if it exists
-        if (currentField || currentRow.length > 0) {
-          currentRow.push(currentField);
-          if (currentRow.length > 0) {
-            rows.push(currentRow);
-          }
-        }
-        
-        console.log('Parsed rows:', rows.length);
-        
-        // Process data rows and deduplicate by ID
-        const songMap = new Map();
-        
-        for (let i = 1; i < rows.length; i++) { // Skip header row
-          const columns = rows[i];
-          if (columns.length >= 5) { // Ensure we have all required columns
-            const timestamp = columns[0] ? columns[0].trim() : '';
-            const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
-            const name = columns[2] ? columns[2].trim() : '';
-            const genre = columns[3] ? columns[3].trim() : '';
-            const lyrics = columns[4] ? columns[4].trim() : '';
-            
-            if (!isNaN(id) && name && genre && lyrics) {
-              const song = { id, timestamp, name, genre, lyrics };
-              
-              // Keep only the most recent version of each song (by ID)
-              if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
-                songMap.set(id, song);
-              }
-            }
-          }
-        }
-        
-        const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-        console.log('Final songs array:', result.length, 'songs');
-        return result;
-      } catch (error) {
-        console.error('Error fetching CSV:', error);
-        
-        // Try to load from cache if offline
-        if ('caches' in window) {
-          try {
-            const cache = await caches.open('rhythm-csv-data');
-            const cachedResponse = await cache.match('csv-songs-data');
-            
-            if (cachedResponse) {
-              console.log('Loading CSV data from cache (offline mode)');
-              const csvText = await cachedResponse.text();
-              
-              // Reuse the same parsing logic
-              const rows = [];
-              let currentRow = [];
-              let currentField = '';
-              let inQuotes = false;
-              let i = 0;
-              
-              while (i < csvText.length) {
-                const char = csvText[i];
-                const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
-                
-                if (char === '"') {
-                  if (inQuotes && nextChar === '"') {
-                    currentField += '"';
-                    i += 2;
-                  } else {
-                    inQuotes = !inQuotes;
-                    i++;
-                  }
-                } else if (char === ',' && !inQuotes) {
-                  currentRow.push(currentField);
-                  currentField = '';
-                  i++;
-                } else if ((char === '\n' || char === '\r') && !inQuotes) {
-                  if (currentField || currentRow.length > 0) {
-                    currentRow.push(currentField);
-                    if (currentRow.length > 0) {
-                      rows.push(currentRow);
-                    }
-                    currentRow = [];
-                    currentField = '';
-                  }
-                  if (char === '\r' && nextChar === '\n') {
-                    i += 2;
-                  } else {
-                    i++;
-                  }
-                } else {
-                  currentField += char;
-                  i++;
-                }
-              }
-              
+            } else if ((char === '\n' || char === '\r') && !inQuotes) {
               if (currentField || currentRow.length > 0) {
-                currentRow.push(currentField);
+                currentRow.push(currentField.trim());
                 if (currentRow.length > 0) {
                   rows.push(currentRow);
                 }
+                currentRow = [];
+                currentField = '';
               }
-              
-              const songMap = new Map();
-              for (let i = 1; i < rows.length; i++) {
-                const columns = rows[i];
-                if (columns.length >= 5) {
-                  const timestamp = columns[0] ? columns[0].trim() : '';
-                  const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
-                  const name = columns[2] ? columns[2].trim() : '';
-                  const genre = columns[3] ? columns[3].trim() : '';
-                  const lyrics = columns[4] ? columns[4].trim() : '';
-                  
-                  if (!isNaN(id) && name && genre && lyrics) {
-                    const song = { id, timestamp, name, genre, lyrics };
-                    if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
-                      songMap.set(id, song);
-                    }
-                  }
-                }
+              if (char === '\r' && nextChar === '\n') {
+                i += 2;
+              } else {
+                i++;
               }
-              
-              const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-              console.log('Loaded', result.length, 'songs from cache');
-              return result;
+            } else {
+              currentField += char;
+              i++;
             }
-          } catch (cacheError) {
-            console.error('Error loading from cache:', cacheError);
           }
-        }
-        
-        return [];
-      }
-    }
-
-    // Load latest showlist from CSV
-    async function loadLatestShowlist() {
-      try {
-        // First, get the latest showlist
-        const showlistResponse = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vT2u4Fu2f0bYF_ToPU-digD1jbqNsL7DOJpB_kXlWTsnXcgetsvcHuhnMqtF-gCFi_PnSiWzUwbN3p6/pub?output=csv');
-        const showlistCsv = await showlistResponse.text();
-        
-        // Parse the showlist CSV
-        const showlistRows = parseCSV(showlistCsv);
-        if (showlistRows.length <= 1) {
-          window.currentShowList = [];
-          return; // No data beyond headers
-        }
-        
-        // Get the latest entry (last row)
-        const latestRow = showlistRows[showlistRows.length - 1];
-        const latestUID = latestRow[1]; // UID is in column 2 (index 1)
-        const latestShowList = latestRow[2]; // Showlist is in column 3 (index 2)
-        const latestShowName = latestRow[3]; // Show Name is in column 4 (index 3)
-        
-        // Check if this showlist is cancelled
-        const cancelResponse = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQdKlCFDc1IEQXEgjkX1ULpGLjWitRzaH8Wsa1fNGqGbXkMuShTNmTDsk1fL6F8I3D022zn2HUIrCux/pub?output=csv');
-        const cancelCsv = await cancelResponse.text();
-        
-        // Parse the cancel CSV
-        const cancelRows = parseCSV(cancelCsv);
-        const isCancelled = cancelRows.some(row => 
-          row[1] === latestUID && row[2] && row[2].toLowerCase() === 'yes' // Adjusted column indices
-        );
-        
-        if (!isCancelled && latestShowList) {
-          // Parse the showlist (assuming it's newline-separated song names)
-          window.currentShowList = latestShowList.split('\n').map(song => song.trim()).filter(song => song);
-          console.log('Loaded showlist with', window.currentShowList.length, 'songs');
-        } else {
-          window.currentShowList = [];
-          // If current filter is showlist but showlist is cancelled/empty, switch to 'all'
-          if (currentGenreFilter === 'showlist') {
-            currentGenreFilter = 'all';
-            localStorage.setItem('songListFilter', currentGenreFilter);
-          }
-        }
-        
-      } catch (error) {
-        console.error('Failed to load latest showlist:', error);
-        window.currentShowList = [];
-        // If current filter is showlist but failed to load, switch to 'all'
-        if (currentGenreFilter === 'showlist') {
-          currentGenreFilter = 'all';
-          localStorage.setItem('songListFilter', currentGenreFilter);
-        }
-      }
-    }
-
-    // Parse CSV data (reused from show-list-generator)
-    function parseCSV(csvText) {
-      const rows = [];
-      let currentRow = [];
-      let currentField = '';
-      let inQuotes = false;
-      let i = 0;
-      
-      while (i < csvText.length) {
-        const char = csvText[i];
-        const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
-        
-        if (char === '"') {
-          if (inQuotes && nextChar === '"') {
-            currentField += '"';
-            i += 2;
-          } else {
-            inQuotes = !inQuotes;
-            i++;
-          }
-        } else if (char === ',' && !inQuotes) {
-          currentRow.push(currentField.trim());
-          currentField = '';
-          i++;
-        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          
           if (currentField || currentRow.length > 0) {
             currentRow.push(currentField.trim());
             if (currentRow.length > 0) {
               rows.push(currentRow);
             }
-            currentRow = [];
-            currentField = '';
           }
-          if (char === '\r' && nextChar === '\n') {
-            i += 2;
-          } else {
-            i++;
-          }
-        } else {
-          currentField += char;
-          i++;
+          
+          return rows;
         }
-      }
-      
-      if (currentField || currentRow.length > 0) {
-        currentRow.push(currentField.trim());
-        if (currentRow.length > 0) {
-          rows.push(currentRow);
-        }
-      }
-      
-      return rows;
-    }
-    
-    function loadSongsData() {
-      // Only load songs after PIN is verified
-      if (!pinAuthenticated) {
-        console.log('PIN not authenticated - blocking song data load');
-        return;
-      }
-      
-      // Load CSV data and showlist in parallel
-      Promise.all([
-        getSongsFromCSV(),
-        loadLatestShowlist()
-      ])
-        .then(([csvSongs]) => {
-          songs = csvSongs;
-          window.songs = songs; // Make global for compatibility
-          initializeSongList();
-        })
-        .catch(error => {
-          console.error('Failed to load songs data:', error);
-          songs = [];
-          window.songs = songs;
-          window.currentShowList = [];
-          initializeSongList();
-        });
-    }
-    
-    function initializeSongList() {
-      songList = document.getElementById('song-list');
-      searchBox = document.getElementById('search-box');
-      filterBtn = document.getElementById('filter-btn');
-      filterDropdown = document.querySelector('.filter-dropdown');
-      filterContent = document.getElementById('filter-content');
-      
-      // Restore saved filter state
-      const savedFilter = localStorage.getItem('songListFilter');
-      if (savedFilter) {
-        currentGenreFilter = savedFilter;
-      }
-      
-      // Set up event listeners
-      filterBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        filterContent.classList.toggle('show');
-      });
-      
-      // Close dropdown when clicking outside
-      document.addEventListener('click', function() {
-        filterContent.classList.remove('show');
-      });
-      
-      // Prevent dropdown from closing when clicking inside
-      filterContent.addEventListener('click', function(e) {
-        e.stopPropagation();
-      });
-      
-      // Search functionality with debouncing
-      let searchTimeout;
-      searchBox.addEventListener('input', function(e) {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-          renderList(e.target.value, currentGenreFilter);
-        }, 300);
-      });
-      
-      // Focus search box when typing (unless in an input)
-      document.addEventListener('keydown', function(e) {
-        if (e.target.tagName !== 'INPUT' && e.key.match(/[a-zA-Z0-9]/)) {
-          searchBox.focus();
-        }
-      });
-      
-      // Initialize UI
-      updateFilterDropdown();
-      renderList('', currentGenreFilter);
-      
-      // Restore scroll position if returning from lyrics page
-      const savedScrollPosition = localStorage.getItem('songListScrollPosition');
-      if (savedScrollPosition) {
-        setTimeout(() => {
-          window.scrollTo(0, parseInt(savedScrollPosition));
-          localStorage.removeItem('songListScrollPosition');
-        }, 100);
-      }
-    }
-    
-    function updateFilterDropdown() {
-      if (!songs || songs.length === 0) {
-        filterContent.innerHTML = '<a onclick="setFilter(\'all\')">All (0)</a>';
-        return;
-      }
-      
-      // Count songs by genre
-      const genreCounts = {
-        all: songs.length,
-        Baburu: 0,
-        Kaasi: 0,
-        Nala: 0,
-        Taki: 0,
-        Thinberu: 0,
-        Zamaanee: 0,
-        showlist: 0
       };
-      
-      songs.forEach(song => {
-        if (genreCounts.hasOwnProperty(song.genre)) {
-          genreCounts[song.genre]++;
-        }
-      });
 
-      // Count showlist songs
-      if (window.currentShowList && window.currentShowList.length > 0) {
-        genreCounts.showlist = window.currentShowList.length;
-      }
-      
-      // Build dropdown content - only include showlist if there's an active showlist
-      let dropdownContent = `
-        <a onclick="setFilter('all')">All (${genreCounts.all})</a>`;
-      
-      // Only add showlist option if there's an active showlist
-      if (window.currentShowList && window.currentShowList.length > 0) {
-        dropdownContent += `
-        <a onclick="setFilter('showlist')">Show List (${genreCounts.showlist})</a>`;
-      }
-      
-      dropdownContent += `
-        <a onclick="setFilter('Baburu')">Baburu (${genreCounts.Baburu})</a>
-        <a onclick="setFilter('Kaasi')">Kaasi (${genreCounts.Kaasi})</a>
-        <a onclick="setFilter('Nala')">Nala (${genreCounts.Nala})</a>
-        <a onclick="setFilter('Taki')">Taki (${genreCounts.Taki})</a>
-        <a onclick="setFilter('Thinberu')">Thinberu (${genreCounts.Thinberu})</a>
-        <a onclick="setFilter('Zamaanee')">Zamaanee (${genreCounts.Zamaanee})</a>
-      `;
-      
-      // Update dropdown content
-      filterContent.innerHTML = dropdownContent;
-    }
+      // PIN Security Module
+      const PinSecurity = {
+        decodePinConfig(encoded) {
+          try {
+            const decoded = atob(encoded);
+            return decoded.split('').reverse().join('').split('').map(Number);
+          } catch (e) {
+            return [8, 7, 6, 5]; // Fallback PIN
+          }
+        },
 
-    function renderList(searchFilter = '', genreFilter = 'all') {
-      songList.innerHTML = '';
-      
-      if (!songs || songs.length === 0) {
-        const li = document.createElement('li');
-        li.textContent = 'No songs available';
-        li.style.color = '#999';
-        li.style.cursor = 'default';
-        songList.appendChild(li);
-        return;
-      }
-      
-      // Filter songs
-      const filteredSongs = songs
-        .filter(song => {
-          const matchesSearch = song.name.toLowerCase().includes(searchFilter.toLowerCase());
-          let matchesGenre;
+        validatePinStructure(pin) {
+          const actualPin = this.decodePinConfig(CONFIG.PIN_AUTH);
+          const checksum = pin.reduce((sum, digit) => sum + digit, 0);
+          const expectedChecksum = actualPin.reduce((sum, digit) => sum + digit, 0);
+          return checksum === expectedChecksum;
+        },
+
+        init() {
+          this.setupElements();
+          this.setupEventListeners();
+          this.checkPinStatus();
+        },
+
+        setupElements() {
+          ELEMENTS.pinOverlay = document.getElementById('pin-overlay');
+          ELEMENTS.pinDigits = [...document.querySelectorAll('.pin-digit')];
+          ELEMENTS.pinError = document.getElementById('pin-error');
+        },
+
+        setupEventListeners() {
+          ELEMENTS.pinDigits.forEach((digit, index) => {
+            digit.addEventListener('input', (e) => this.handleDigitInput(e, index));
+            digit.addEventListener('keydown', (e) => this.handleDigitKeydown(e, index));
+            digit.addEventListener('paste', this.handlePaste.bind(this));
+          });
+        },
+
+        checkPinStatus() {
+          // Check lockout status
+          const lockoutEnd = localStorage.getItem('pinLockoutEnd');
+          if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
+            this.startLockout();
+            LoadingScreen.hide();
+            return;
+          }
+
+          // Clear expired lockout
+          if (lockoutEnd && Date.now() >= parseInt(lockoutEnd)) {
+            localStorage.removeItem('pinLockoutEnd');
+            localStorage.removeItem('pinAttemptCount');
+          }
+
+          // Restore attempt count
+          const savedAttempts = localStorage.getItem('pinAttemptCount');
+          if (savedAttempts) {
+            STATE.attemptCount = parseInt(savedAttempts);
+          }
+
+          // Check existing session
+          const sessionData = sessionStorage.getItem('pinSession');
+          if (sessionData) {
+            try {
+              const session = JSON.parse(sessionData);
+              const sessionAge = Date.now() - session.timestamp;
+              
+              if (session.authenticated && sessionAge < CONFIG.SESSION_TIMEOUT) {
+                STATE.pinAuthenticated = true;
+                this.hidePinOverlay();
+                DataManager.loadSongsData();
+                SessionManager.startSessionTimeout();
+                return;
+              }
+            } catch (e) {
+              sessionStorage.removeItem('pinSession');
+            }
+          }
+
+          // Show PIN overlay and hide loading screen
+          LoadingScreen.hide();
+          ELEMENTS.pinOverlay.classList.remove('hidden');
+          setTimeout(() => ELEMENTS.pinDigits[0].focus(), 300);
+        },
+
+        handleDigitInput(e, index) {
+          if (e.target.disabled) return;
           
-          if (genreFilter === 'showlist') {
-            // Show only songs that are in the current show list
-            matchesGenre = window.currentShowList && window.currentShowList.includes(song.name);
+          const value = e.target.value;
+          
+          if (!/^\d$/.test(value)) {
+            e.target.value = '';
+            return;
+          }
+
+          this.clearPinError();
+          e.target.classList.add('filled');
+          
+          if (index < 3) {
+            ELEMENTS.pinDigits[index + 1].focus();
           } else {
-            matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
+            this.verifyPin();
+          }
+        },
+
+        handleDigitKeydown(e, index) {
+          if (e.target.disabled) return;
+          
+          if (e.key === 'Backspace') {
+            e.target.value = '';
+            e.target.classList.remove('filled');
+            if (index > 0) {
+              ELEMENTS.pinDigits[index - 1].focus();
+            }
           }
           
-          return matchesSearch && matchesGenre;
-        })
-        .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
-      
-      // Render the filtered songs
-      filteredSongs.forEach(song => {
-        const li = document.createElement('li');
-        li.textContent = song.name;
-        
-        // Note: All songs will be yellow since CSV doesn't have English lyrics
-        li.style.color = '#f5d467';
-        li.addEventListener('mouseenter', () => {
-          li.style.color = 'black';
-        });
-        li.addEventListener('mouseleave', () => {
-          li.style.color = '#f5d467';
-        });
-        
-        li.onclick = () => {
-          // Save current scroll position before navigating
+          if (e.key === 'Enter') {
+            this.verifyPin();
+          }
+          
+          if (e.key === 'ArrowLeft' && index > 0) {
+            ELEMENTS.pinDigits[index - 1].focus();
+          }
+          if (e.key === 'ArrowRight' && index < 3) {
+            ELEMENTS.pinDigits[index + 1].focus();
+          }
+        },
+
+        handlePaste(e) {
+          e.preventDefault();
+          const pasteData = e.clipboardData.getData('text');
+          
+          if (/^\d{4}$/.test(pasteData)) {
+            ELEMENTS.pinDigits.forEach((digit, index) => {
+              digit.value = pasteData[index];
+              digit.classList.add('filled');
+            });
+            this.verifyPin();
+          }
+        },
+
+        verifyPin() {
+          const enteredPin = ELEMENTS.pinDigits.map(digit => digit.value).join('');
+          
+          if (enteredPin.length !== 4) {
+            this.showPinError('Please enter all 4 digits');
+            return;
+          }
+
+          const lockoutEnd = localStorage.getItem('pinLockoutEnd');
+          if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
+            this.showPinError('Account locked. Please wait.');
+            return;
+          }
+
+          const enteredPinArray = enteredPin.split('').map(Number);
+          const actualPinConfig = this.decodePinConfig(CONFIG.PIN_AUTH);
+          
+          const basicMatch = enteredPinArray.every((digit, index) => 
+            digit === actualPinConfig[index]
+          );
+          
+          const structureValid = this.validatePinStructure(enteredPinArray);
+          
+          if (basicMatch && structureValid) {
+            STATE.pinAuthenticated = true;
+            STATE.attemptCount = 0;
+            localStorage.removeItem('pinAttemptCount');
+            
+            const sessionData = {
+              timestamp: Date.now(),
+              authenticated: true,
+              sessionType: 'songlist'
+            };
+            sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
+            
+            this.hidePinOverlay();
+            DataManager.loadSongsData();
+            SessionManager.startSessionTimeout();
+          } else {
+            STATE.attemptCount++;
+            localStorage.setItem('pinAttemptCount', STATE.attemptCount.toString());
+            
+            if (STATE.attemptCount >= CONFIG.MAX_ATTEMPTS) {
+              this.startLockout();
+            } else {
+              const remaining = CONFIG.MAX_ATTEMPTS - STATE.attemptCount;
+              this.showPinError(`Incorrect PIN. ${remaining} attempts remaining.`);
+              this.clearPinInputs();
+              setTimeout(() => ELEMENTS.pinDigits[0].focus(), 1000);
+            }
+          }
+        },
+
+        startLockout() {
+          const lockoutEnd = Date.now() + CONFIG.LOCKOUT_DURATION;
+          localStorage.setItem('pinLockoutEnd', lockoutEnd.toString());
+          localStorage.setItem('pinAttemptCount', STATE.attemptCount.toString());
+          
+          ELEMENTS.pinDigits.forEach(digit => digit.disabled = true);
+          this.startLockoutTimer(lockoutEnd);
+        },
+
+        startLockoutTimer(lockoutEnd) {
+          const updateDisplay = () => {
+            const timeLeft = lockoutEnd - Date.now();
+            if (timeLeft <= 0) {
+              clearInterval(STATE.lockoutTimer);
+              localStorage.removeItem('pinLockoutEnd');
+              localStorage.removeItem('pinAttemptCount');
+              STATE.attemptCount = 0;
+              
+              ELEMENTS.pinDigits.forEach(digit => {
+                digit.disabled = false;
+                digit.value = '';
+                digit.classList.remove('filled');
+              });
+              
+              this.showPinError('Lockout expired. You may try again.');
+              setTimeout(() => {
+                this.clearPinError();
+                ELEMENTS.pinDigits[0].focus();
+              }, 2000);
+              return;
+            }
+            
+            const minutes = Math.floor(timeLeft / 60000);
+            const seconds = Math.floor((timeLeft % 60000) / 1000);
+            this.showPinError(`Too many attempts. Try again in ${minutes}:${seconds.toString().padStart(2, '0')}`);
+          };
+          
+          updateDisplay();
+          STATE.lockoutTimer = setInterval(updateDisplay, 1000);
+        },
+
+        showPinError(message) {
+          ELEMENTS.pinError.textContent = message;
+          ELEMENTS.pinDigits.forEach(digit => digit.classList.add('error'));
+          setTimeout(() => {
+            ELEMENTS.pinDigits.forEach(digit => digit.classList.remove('error'));
+          }, 500);
+        },
+
+        clearPinError() {
+          ELEMENTS.pinError.textContent = '';
+          ELEMENTS.pinDigits.forEach(digit => digit.classList.remove('error'));
+        },
+
+        clearPinInputs() {
+          ELEMENTS.pinDigits.forEach(digit => {
+            digit.value = '';
+            digit.classList.remove('filled');
+          });
+        },
+
+        hidePinOverlay() {
+          ELEMENTS.pinOverlay.classList.add('hidden');
+        }
+      };
+      // Session Management Module
+      const SessionManager = {
+        init() {
+          this.setupVisibilityTracking();
+          this.setupActivityTracking();
+        },
+
+        setupVisibilityTracking() {
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              STATE.isPageVisible = true;
+              this.updateLastActivity();
+              if (STATE.pinAuthenticated && Date.now() - STATE.lastActivityTime > CONFIG.SESSION_TIMEOUT) {
+                this.expireSession();
+              }
+            } else {
+              STATE.isPageVisible = false;
+              this.clearSessionTimeout();
+            }
+          });
+
+          window.addEventListener('focus', () => this.updateLastActivity());
+          window.addEventListener('blur', () => this.clearSessionTimeout());
+        },
+
+        setupActivityTracking() {
+          const activityEvents = ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+          activityEvents.forEach(event => {
+            document.addEventListener(event, () => this.updateLastActivity(), true);
+          });
+        },
+
+        updateLastActivity() {
+          STATE.lastActivityTime = Date.now();
+          if (STATE.pinAuthenticated && STATE.isPageVisible) {
+            this.startSessionTimeout();
+          }
+        },
+
+        startSessionTimeout() {
+          this.clearSessionTimeout();
+          STATE.sessionTimer = setTimeout(() => {
+            this.expireSession();
+          }, CONFIG.SESSION_TIMEOUT);
+        },
+
+        clearSessionTimeout() {
+          if (STATE.sessionTimer) {
+            clearTimeout(STATE.sessionTimer);
+            STATE.sessionTimer = null;
+          }
+        },
+
+        expireSession() {
+          STATE.pinAuthenticated = false;
+          sessionStorage.removeItem('pinSession');
+          this.clearSessionTimeout();
+          
+          LoadingScreen.hide();
+          ELEMENTS.pinOverlay.classList.remove('hidden');
+          PinSecurity.clearPinInputs();
+          
+          setTimeout(() => ELEMENTS.pinDigits[0].focus(), 300);
+          
+          PinSecurity.showPinError('Session expired. Please enter PIN again.');
+          setTimeout(() => PinSecurity.clearPinError(), 3000);
+        }
+      };
+
+      // Loading Screen Module
+      const LoadingScreen = {
+        init() {
+          this.setupElements();
+          this.generatePatternLines();
+          this.setupResizeHandler();
+        },
+
+        setupElements() {
+          ELEMENTS.loadingScreen = document.getElementById('loading-screen');
+          ELEMENTS.patternContainer = document.getElementById('pattern-container');
+          ELEMENTS.loadingLogo = document.querySelector('.loading-logo');
+          ELEMENTS.loadingText = document.querySelector('.loading-text');
+        },
+
+        generatePatternLines() {
+          if (!ELEMENTS.patternContainer) return;
+          
+          try {
+            const viewportHeight = window.innerHeight;
+            const lineHeight = 40;
+            const numberOfLines = Math.ceil(viewportHeight / lineHeight) + 1;
+            
+            ELEMENTS.patternContainer.innerHTML = '';
+            
+            for (let i = 0; i < numberOfLines; i++) {
+              const line = document.createElement('div');
+              line.className = 'pattern-line';
+              line.style.top = (i * lineHeight) + 'px';
+              line.style.willChange = 'transform';
+              line.style.transform = 'translateZ(0)';
+              ELEMENTS.patternContainer.appendChild(line);
+            }
+          } catch (error) {
+            console.warn('Failed to generate pattern lines:', error);
+            // Continue without pattern if it fails
+          }
+        },
+
+        setupResizeHandler() {
+          window.addEventListener('resize', () => {
+            this.generatePatternLines();
+          });
+        },
+
+        show(text = 'Loading Songs...') {
+          if (ELEMENTS.loadingScreen) {
+            ELEMENTS.loadingScreen.classList.remove('fade-out');
+            ELEMENTS.loadingScreen.style.display = 'flex';
+            ELEMENTS.loadingScreen.style.opacity = '1';
+            
+            if (ELEMENTS.loadingText) {
+              ELEMENTS.loadingText.textContent = text;
+            }
+          }
+        },
+
+        hide() {
+          if (!ELEMENTS.loadingScreen) return;
+
+          // Start enlarging animation
+          ELEMENTS.loadingScreen.classList.add('fade-out');
+          ELEMENTS.loadingScreen.style.transition = 'none';
+          ELEMENTS.loadingScreen.style.opacity = '1';
+
+          // Start fade out after a brief delay
+          setTimeout(() => {
+            ELEMENTS.loadingScreen.style.transition = 'opacity 0.6s ease-out';
+            
+            // Fade out logo and text
+            if (ELEMENTS.loadingLogo) {
+              ELEMENTS.loadingLogo.classList.add('fade-out');
+            }
+            if (ELEMENTS.loadingText) {
+              ELEMENTS.loadingText.classList.add('fade-out');
+            }
+            
+            // Fade out pattern container
+            if (ELEMENTS.patternContainer) {
+              ELEMENTS.patternContainer.classList.add('fade-out');
+            }
+            
+            // Fade out background
+            setTimeout(() => {
+              ELEMENTS.loadingScreen.style.opacity = '0';
+            }, 200);
+            
+            // Hide the loading screen completely
+            setTimeout(() => {
+              ELEMENTS.loadingScreen.style.display = 'none';
+              ELEMENTS.loadingScreen.classList.remove('fade-out');
+              if (ELEMENTS.loadingLogo) {
+                ELEMENTS.loadingLogo.classList.remove('fade-out');
+              }
+              if (ELEMENTS.loadingText) {
+                ELEMENTS.loadingText.classList.remove('fade-out');
+              }
+              if (ELEMENTS.patternContainer) {
+                ELEMENTS.patternContainer.classList.remove('fade-out');
+              }
+            }, 1000);
+          }, 200);
+        }
+      };
+
+      // Data Management Module
+      const DataManager = {
+        async loadSongsData() {
+          if (!STATE.pinAuthenticated) {
+            console.warn('PIN not authenticated - blocking song data load');
+            return;
+          }
+
+          // Show loading screen
+          LoadingScreen.show('Loading Songs...');
+
+          try {
+            const [csvSongs] = await Promise.all([
+              this.getSongsFromCSV(),
+              this.loadLatestShowlist()
+            ]);
+            
+            STATE.songs = csvSongs;
+            window.songs = csvSongs; // Global compatibility
+            
+            // Show completion message before hiding
+            LoadingScreen.show('Songs loaded successfully!');
+            
+            // Small delay to ensure smooth loading animation
+            setTimeout(() => {
+              LoadingScreen.hide();
+              UI.initializeSongList();
+            }, 800);
+          } catch (error) {
+            console.error('Failed to load songs data:', error);
+            STATE.songs = [];
+            window.songs = [];
+            STATE.currentShowList = [];
+            
+            LoadingScreen.show('Loading complete');
+            setTimeout(() => {
+              LoadingScreen.hide();
+              UI.initializeSongList();
+            }, 500);
+          }
+        },
+
+        async getSongsFromCSV() {
+          try {
+            LoadingScreen.show('Fetching songs data...');
+            const response = await Utils.fetchWithRetry(CONFIG.CSV_ENDPOINTS.songs);
+            const csvText = await response.text();
+            
+            LoadingScreen.show('Processing songs...');
+            
+            // Cache for offline use
+            if ('caches' in window) {
+              const cache = await caches.open('rhythm-csv-data');
+              await cache.put('csv-songs-data', new Response(csvText, {
+                headers: { 'Content-Type': 'text/csv' }
+              }));
+            }
+            
+            return this.processCSVData(csvText);
+          } catch (error) {
+            console.error('Error fetching CSV:', error);
+            LoadingScreen.show('Loading from cache...');
+            return this.loadFromCache();
+          }
+        },
+
+        async loadFromCache() {
+          if ('caches' in window) {
+            try {
+              const cache = await caches.open('rhythm-csv-data');
+              const cachedResponse = await cache.match('csv-songs-data');
+              
+              if (cachedResponse) {
+                const csvText = await cachedResponse.text();
+                return this.processCSVData(csvText);
+              }
+            } catch (error) {
+              console.error('Error loading from cache:', error);
+            }
+          }
+          return [];
+        },
+
+        processCSVData(csvText) {
+          const rows = Utils.parseCSV(csvText);
+          const songMap = new Map();
+          
+          for (let i = 1; i < rows.length; i++) {
+            const columns = rows[i];
+            if (columns.length >= 5) {
+              const [timestamp, idStr, name, genre, lyrics] = columns.map(col => col.trim());
+              const id = parseInt(idStr, 10);
+              
+              if (!isNaN(id) && name && genre && lyrics) {
+                const song = { id, timestamp, name, genre, lyrics };
+                
+                if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
+                  songMap.set(id, song);
+                }
+              }
+            }
+          }
+          
+          return Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        },
+
+        async loadLatestShowlist() {
+          try {
+            LoadingScreen.show('Loading show list...');
+            const [showlistResponse, cancelResponse] = await Promise.all([
+              Utils.fetchWithRetry(CONFIG.CSV_ENDPOINTS.showlist),
+              Utils.fetchWithRetry(CONFIG.CSV_ENDPOINTS.cancel)
+            ]);
+            
+            const [showlistCsv, cancelCsv] = await Promise.all([
+              showlistResponse.text(),
+              cancelResponse.text()
+            ]);
+            
+            const showlistRows = Utils.parseCSV(showlistCsv);
+            const cancelRows = Utils.parseCSV(cancelCsv);
+            
+            if (showlistRows.length <= 1) {
+              STATE.currentShowList = [];
+              return;
+            }
+            
+            const latestRow = showlistRows[showlistRows.length - 1];
+            const [, latestUID, latestShowList] = latestRow.map(col => col.trim());
+            
+            const isCancelled = cancelRows.some(row => 
+              row[1] === latestUID && row[2] && row[2].toLowerCase() === 'yes'
+            );
+            
+            if (!isCancelled && latestShowList) {
+              STATE.currentShowList = latestShowList.split('\n')
+                .map(song => song.trim())
+                .filter(song => song);
+              window.currentShowList = STATE.currentShowList; // Global compatibility
+            } else {
+              STATE.currentShowList = [];
+              if (STATE.currentGenreFilter === 'showlist') {
+                STATE.currentGenreFilter = 'all';
+                localStorage.setItem('songListFilter', STATE.currentGenreFilter);
+              }
+            }
+          } catch (error) {
+            console.error('Failed to load latest showlist:', error);
+            STATE.currentShowList = [];
+            if (STATE.currentGenreFilter === 'showlist') {
+              STATE.currentGenreFilter = 'all';
+              localStorage.setItem('songListFilter', STATE.currentGenreFilter);
+            }
+          }
+        }
+      };
+      // UI Management Module
+      const UI = {
+        init() {
+          this.cacheElements();
+          this.setupEventListeners();
+        },
+
+        cacheElements() {
+          ELEMENTS.songList = document.getElementById('song-list');
+          ELEMENTS.searchBox = document.getElementById('search-box');
+          ELEMENTS.filterBtn = document.getElementById('filter-btn');
+          ELEMENTS.filterDropdown = document.querySelector('.filter-dropdown');
+          ELEMENTS.filterContent = document.getElementById('filter-content');
+        },
+
+        setupEventListeners() {
+          // Filter dropdown
+          ELEMENTS.filterBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            ELEMENTS.filterContent.classList.toggle('show');
+          });
+          
+          // Close dropdown when clicking outside
+          document.addEventListener('click', () => {
+            ELEMENTS.filterContent.classList.remove('show');
+          });
+          
+          // Prevent dropdown from closing when clicking inside
+          ELEMENTS.filterContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+          
+          // Optimized search with debouncing
+          const debouncedSearch = Utils.debounce((value) => {
+            this.renderList(value, STATE.currentGenreFilter);
+          }, CONFIG.SEARCH_DEBOUNCE);
+          
+          ELEMENTS.searchBox.addEventListener('input', (e) => {
+            debouncedSearch(e.target.value);
+          });
+          
+          // Auto-focus search box when typing
+          document.addEventListener('keydown', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.key.match(/[a-zA-Z0-9]/)) {
+              ELEMENTS.searchBox.focus();
+            }
+          });
+        },
+
+        initializeSongList() {
+          // Restore saved filter state
+          const savedFilter = localStorage.getItem('songListFilter');
+          if (savedFilter) {
+            STATE.currentGenreFilter = savedFilter;
+          }
+          
+          this.updateFilterDropdown();
+          this.renderList('', STATE.currentGenreFilter);
+          
+          // Restore scroll position if returning from lyrics page
+          const savedScrollPosition = localStorage.getItem('songListScrollPosition');
+          if (savedScrollPosition) {
+            setTimeout(() => {
+              window.scrollTo(0, parseInt(savedScrollPosition));
+              localStorage.removeItem('songListScrollPosition');
+            }, 100);
+          }
+        },
+
+        updateFilterDropdown() {
+          if (!STATE.songs || STATE.songs.length === 0) {
+            ELEMENTS.filterContent.innerHTML = '<a onclick="App.setFilter(\'all\')">All (0)</a>';
+            return;
+          }
+          
+          // Count songs by genre
+          const genreCounts = {
+            all: STATE.songs.length,
+            Baburu: 0,
+            Kaasi: 0,
+            Nala: 0,
+            Taki: 0,
+            Thinberu: 0,
+            Zamaanee: 0,
+            showlist: 0
+          };
+          
+          STATE.songs.forEach(song => {
+            if (genreCounts.hasOwnProperty(song.genre)) {
+              genreCounts[song.genre]++;
+            }
+          });
+
+          // Count showlist songs
+          if (STATE.currentShowList && STATE.currentShowList.length > 0) {
+            genreCounts.showlist = STATE.currentShowList.length;
+          }
+          
+          // Build dropdown content
+          let dropdownContent = `<a onclick="App.setFilter('all')">All (${genreCounts.all})</a>`;
+          
+          // Only add showlist option if there's an active showlist
+          if (STATE.currentShowList && STATE.currentShowList.length > 0) {
+            dropdownContent += `<a onclick="App.setFilter('showlist')">Show List (${genreCounts.showlist})</a>`;
+          }
+          
+          dropdownContent += `
+            <a onclick="App.setFilter('Baburu')">Baburu (${genreCounts.Baburu})</a>
+            <a onclick="App.setFilter('Kaasi')">Kaasi (${genreCounts.Kaasi})</a>
+            <a onclick="App.setFilter('Nala')">Nala (${genreCounts.Nala})</a>
+            <a onclick="App.setFilter('Taki')">Taki (${genreCounts.Taki})</a>
+            <a onclick="App.setFilter('Thinberu')">Thinberu (${genreCounts.Thinberu})</a>
+            <a onclick="App.setFilter('Zamaanee')">Zamaanee (${genreCounts.Zamaanee})</a>
+          `;
+          
+          ELEMENTS.filterContent.innerHTML = dropdownContent;
+        },
+
+        renderList(searchFilter = '', genreFilter = 'all') {
+          ELEMENTS.songList.innerHTML = '';
+          
+          if (!STATE.songs || STATE.songs.length === 0) {
+            this.showMessage('No songs available', '#999');
+            return;
+          }
+          
+          // Filter songs with optimized search
+          const searchLower = searchFilter.toLowerCase();
+          const filteredSongs = STATE.songs
+            .filter(song => {
+              const matchesSearch = !searchFilter || song.name.toLowerCase().includes(searchLower);
+              let matchesGenre;
+              
+              if (genreFilter === 'showlist') {
+                matchesGenre = STATE.currentShowList && STATE.currentShowList.includes(song.name);
+              } else {
+                matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
+              }
+              
+              return matchesSearch && matchesGenre;
+            })
+            .sort((a, b) => a.name.localeCompare(b.name));
+          
+          if (filteredSongs.length === 0) {
+            this.showMessage('No songs match your search', '#999');
+            return;
+          }
+
+          // Render songs with DocumentFragment for better performance
+          const fragment = document.createDocumentFragment();
+          
+          filteredSongs.forEach(song => {
+            const li = this.createSongElement(song);
+            fragment.appendChild(li);
+          });
+          
+          ELEMENTS.songList.appendChild(fragment);
+        },
+
+        createSongElement(song) {
+          const li = document.createElement('li');
+          li.textContent = song.name;
+          li.style.color = '#f5d467'; // All songs yellow since CSV doesn't have English lyrics
+          
+          // Optimized hover effects with CSS-in-JS for better performance
+          li.addEventListener('mouseenter', () => {
+            li.style.color = 'black';
+          });
+          
+          li.addEventListener('mouseleave', () => {
+            li.style.color = '#f5d467';
+          });
+          
+          li.addEventListener('click', () => {
+            this.handleSongClick(song);
+          });
+          
+          return li;
+        },
+
+        handleSongClick(song) {
+          // Save current scroll position
           localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
           localStorage.setItem('selectedSongId', song.id);
+          
           // Refresh session before navigating
-          if (pinAuthenticated) {
+          if (STATE.pinAuthenticated) {
             const sessionData = {
               timestamp: Date.now(),
               authenticated: true,
@@ -1455,29 +1628,50 @@
             };
             sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
           }
+          
           window.location.href = 'lyrics-csv';
-        };
-        songList.appendChild(li);
-      });
-      
-      if (filteredSongs.length === 0) {
-        const li = document.createElement('li');
-        li.textContent = 'No songs match your search';
-        li.style.color = '#999';
-        li.style.cursor = 'default';
-        songList.appendChild(li);
-      }
-    }
+        },
 
-    // Global functions for onclick handlers
-    function setFilter(genre) {
-      currentGenreFilter = genre;
-      // Save the filter state to localStorage
-      localStorage.setItem('songListFilter', genre);
-      // Keep the filter icon, don't change button text
-      document.getElementById('filter-content').classList.remove('show');
-      renderList(document.getElementById('search-box').value, currentGenreFilter);
-    }
+        showMessage(message, color = '#999') {
+          const li = document.createElement('li');
+          li.textContent = message;
+          li.style.color = color;
+          li.style.cursor = 'default';
+          ELEMENTS.songList.appendChild(li);
+        }
+      };
+
+      // Main Application Object
+      const App = {
+        init() {
+          document.addEventListener('DOMContentLoaded', () => {
+            LoadingScreen.init();
+            LoadingScreen.show('Initializing...');
+            PinSecurity.init();
+            SessionManager.init();
+            UI.init();
+          });
+        },
+
+        setFilter(genre) {
+          STATE.currentGenreFilter = genre;
+          localStorage.setItem('songListFilter', genre);
+          ELEMENTS.filterContent.classList.remove('show');
+          UI.renderList(ELEMENTS.searchBox.value, STATE.currentGenreFilter);
+        }
+      };
+
+      // Global API for backward compatibility
+      window.setFilter = App.setFilter.bind(App);
+      window.songs = STATE.songs;
+      window.currentShowList = STATE.currentShowList;
+
+      // Initialize the application
+      App.init();
+
+      return App;
+    })();
+  </script>
   </script>
 </body>
 </html>
