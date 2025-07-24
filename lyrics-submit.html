@@ -448,8 +448,7 @@
     <div id="edit-mode-indicator" style="display:none;background:#f5d000;color:#2b2b2b;padding:8px 12px;border-radius:5px;margin-bottom:15px;font-weight:bold;text-align:center;">
       ✏️ EDIT MODE - Updating existing song
     </div>
-    <input id="song-name-input" type="text" placeholder="Song Name (type to search existing songs)" autocomplete="off" list="song-names-list" style="width:calc(100% - 45px);max-width:555px;margin-bottom:18px;font-size:1.2em;padding:10px 12px;border-radius:7px 0 0 7px;border:1px solid #aaa;border-right:none;outline:none;box-sizing:border-box;display:inline-block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
-    <button id="refresh-songs-btn" type="button" onclick="refreshSongSuggestions()" title="Refresh song list" style="width:45px;height:100%;max-width:45px;margin-bottom:18px;font-size:1.2em;padding:10px 8px;border-radius:0 7px 7px 0;border:1px solid #aaa;border-left:none;outline:none;box-sizing:border-box;display:inline-block;font-family:'Montserrat',Arial,sans-serif;background:#333;color:#f5d000;font-weight:bold;cursor:pointer;transition:background-color 0.2s;">↻</button>
+    <input id="song-name-input" type="text" placeholder="Song Name (type to search existing songs)" autocomplete="off" list="song-names-list" style="width:100%;max-width:600px;margin-bottom:18px;font-size:1.2em;padding:10px 12px;border-radius:7px;border:1px solid #aaa;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
     <datalist id="song-names-list"></datalist>
     
     <div class="genre-container" style="width:100%;max-width:600px;margin-bottom:18px;position:relative;">
@@ -1825,19 +1824,6 @@
         populateSongNameSuggestions(true);
       }
     });
-    
-    // Add hover effect to refresh button
-    const refreshBtn = document.getElementById('refresh-songs-btn');
-    if (refreshBtn) {
-      refreshBtn.addEventListener('mouseenter', function() {
-        this.style.backgroundColor = '#f5d000';
-        this.style.color = '#2b2b2b';
-      });
-      refreshBtn.addEventListener('mouseleave', function() {
-        this.style.backgroundColor = '#333';
-        this.style.color = '#f5d000';
-      });
-    }
 
     // Test function to debug CSV loading
     window.testCSVLoading = async function() {
