@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Song Submission</title>
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: #1b1b1b;
+            color: #ffffff;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .control-panel {
+            background: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #f5d000;
+            color: #2b2b2b;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .button:hover {
+            background: #fced98;
+        }
+        .button:disabled {
+            background: #666;
+            color: #999;
+            cursor: not-allowed;
+        }
+        .progress {
+            background: #333;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            background: #f5d000;
+            height: 20px;
+            border-radius: 5px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-top: 10px;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin: 10px 0;
+        }
+        .stat {
+            background: #333;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #f5d000;
+        }
+        .delay-control {
+            margin: 10px 0;
+        }
+        .delay-control input {
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
+            padding: 8px;
+            border-radius: 3px;
+            width: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bulk Song Submission to Google Form</h1>
+        
+        <div class="control-panel">
+            <h3>Control Panel</h3>
+            
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number" id="total-songs">0</div>
+                    <div>Total Songs</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="submitted-count">0</div>
+                    <div>Submitted</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="failed-count">0</div>
+                    <div>Failed</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number" id="remaining-count">0</div>
+                    <div>Remaining</div>
+                </div>
+            </div>
+            
+            <div class="delay-control">
+                <label for="delay-input">Delay between submissions (ms): </label>
+                <input type="number" id="delay-input" value="2000" min="500" max="10000">
+                <small>Recommended: 2000ms to avoid rate limiting</small>
+            </div>
+            
+            <div>
+                <button class="button" id="start-btn" onclick="startBulkSubmission()">Start Bulk Submission</button>
+                <button class="button" id="pause-btn" onclick="pauseSubmission()" disabled>Pause</button>
+                <button class="button" id="resume-btn" onclick="resumeSubmission()" disabled>Resume</button>
+                <button class="button" id="stop-btn" onclick="stopSubmission()" disabled>Stop</button>
+                <button class="button" onclick="clearLog()">Clear Log</button>
+            </div>
+            
+            <div class="progress">
+                <div class="progress-bar" id="progress-bar"></div>
+                <div id="progress-text">Ready to start</div>
+            </div>
+        </div>
+        
+        <div class="log" id="log"></div>
+    </div>
+
+    <!-- Include the songs data -->
+    <script src="songs.js"></script>
+    
+    <script>
+        // URL deobfuscation helper
+        function getUrl(key) {
+            const urls = {
+                'c1': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNWdTVmOXgyZi11Mmhha0xfMXBaeV9oYmVweHRuRmY3TVJXVzlMekd1OFNDcV95UWl0aFBETUJWd1dKZmdjeEJYOVVlY09SaTNlVmpSZC9wdWI/b3V0cHV0PWNzdg==',
+                'f3': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTZG5Kb1JkaHp3VWQ3QmpJQnhwaWZ4QTB0aFFWQVpZVVhCMnZGZnJkbU9oamdZZGx3L2Zvcm1SZXNwb25zZQ=='
+            };
+            return atob(urls[key]);
+        }
+
+        let submissionState = {
+            isRunning: false,
+            isPaused: false,
+            currentIndex: 0,
+            submitted: 0,
+            failed: 0,
+            startingId: null
+        };
+
+        // Function to get and update local highest ID for additional protection
+        function getLocalHighestId() {
+            const stored = localStorage.getItem('lyricsSubmitterHighestId');
+            return stored ? parseInt(stored, 10) : 0;
+        }
+
+        function updateLocalHighestId(id) {
+            const currentHighest = getLocalHighestId();
+            if (id > currentHighest) {
+                localStorage.setItem('lyricsSubmitterHighestId', id.toString());
+                log(`Updated local highest ID to: ${id}`);
+            }
+        }
+
+        // Function to get next available ID from CSV
+        async function getNextAvailableId() {
+            try {
+                log('Fetching CSV to determine next available ID...');
+                const response = await fetch(getUrl('c1'));
+                const csvText = await response.text();
+                
+                // Parse CSV to find the highest ID
+                const rows = [];
+                let currentRow = [];
+                let currentField = '';
+                let inQuotes = false;
+                let i = 0;
+                
+                while (i < csvText.length) {
+                    const char = csvText[i];
+                    const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+                    
+                    if (char === '"') {
+                        if (inQuotes && nextChar === '"') {
+                            currentField += '"';
+                            i += 2;
+                        } else {
+                            inQuotes = !inQuotes;
+                            i++;
+                        }
+                    } else if (char === ',' && !inQuotes) {
+                        currentRow.push(currentField);
+                        currentField = '';
+                        i++;
+                    } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                        if (currentField || currentRow.length > 0) {
+                            currentRow.push(currentField);
+                            if (currentRow.length > 0) {
+                                rows.push(currentRow);
+                            }
+                            currentRow = [];
+                            currentField = '';
+                        }
+                        if (char === '\r' && nextChar === '\n') {
+                            i += 2;
+                        } else {
+                            i++;
+                        }
+                    } else {
+                        currentField += char;
+                        i++;
+                    }
+                }
+                
+                if (currentField || currentRow.length > 0) {
+                    currentRow.push(currentField);
+                    if (currentRow.length > 0) {
+                        rows.push(currentRow);
+                    }
+                }
+                
+                let maxId = 0;
+                
+                // Skip header row and check all data rows for the highest ID
+                for (let i = 1; i < rows.length; i++) {
+                    const columns = rows[i];
+                    if (columns.length >= 2) {
+                        const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
+                        if (!isNaN(id) && id > maxId) {
+                            maxId = id;
+                        }
+                    }
+                }
+                
+                const nextId = maxId + 1;
+                const localHighestId = getLocalHighestId();
+                const finalId = Math.max(nextId, localHighestId + 1);
+                
+                log(`CSV highest ID: ${maxId}, local highest ID: ${localHighestId}`);
+                log(`Next available ID: ${finalId}`);
+                
+                return finalId;
+            } catch (error) {
+                log(`Error fetching CSV: ${error.message}`);
+                // Fallback: return a high number plus current timestamp to avoid conflicts
+                const fallbackId = 1000 + Math.floor(Date.now() / 1000) % 10000;
+                log(`Using fallback ID: ${fallbackId}`);
+                return fallbackId;
+            }
+        }
+
+        // Function to submit a single song
+        async function submitSong(song, assignedId) {
+            try {
+                log(`Submitting: "${song.name}" (ID: ${assignedId}, Genre: ${song.genre})`);
+                
+                // Create form data
+                const formData = new FormData();
+                formData.append('entry.1997798105', assignedId.toString()); // ID
+                formData.append('entry.543765933', song.name); // Name
+                formData.append('entry.320041437', song.genre); // Genre
+                formData.append('entry.269641100', song.lyrics.trim()); // Dhivehi lyrics
+
+                // Submit to Google Form
+                const response = await fetch(getUrl('f3'), {
+                    method: 'POST',
+                    body: formData,
+                    mode: 'no-cors' // Required for Google Forms
+                });
+                
+                // Google Forms always returns an error in no-cors mode, but submission usually succeeds
+                log(`✓ Successfully submitted: "${song.name}" with ID ${assignedId}`);
+                updateLocalHighestId(assignedId);
+                return true;
+            } catch (error) {
+                log(`✗ Failed to submit: "${song.name}" - ${error.message}`);
+                return false;
+            }
+        }
+
+        // Function to log messages
+        function log(message) {
+            const logElement = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logElement.textContent += `[${timestamp}] ${message}\n`;
+            logElement.scrollTop = logElement.scrollHeight;
+        }
+
+        // Function to update UI
+        function updateUI() {
+            document.getElementById('total-songs').textContent = songs.length;
+            document.getElementById('submitted-count').textContent = submissionState.submitted;
+            document.getElementById('failed-count').textContent = submissionState.failed;
+            document.getElementById('remaining-count').textContent = songs.length - submissionState.currentIndex;
+            
+            const progress = (submissionState.currentIndex / songs.length) * 100;
+            document.getElementById('progress-bar').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = 
+                `${submissionState.currentIndex}/${songs.length} songs processed (${progress.toFixed(1)}%)`;
+        }
+
+        // Function to update button states
+        function updateButtonStates() {
+            const startBtn = document.getElementById('start-btn');
+            const pauseBtn = document.getElementById('pause-btn');
+            const resumeBtn = document.getElementById('resume-btn');
+            const stopBtn = document.getElementById('stop-btn');
+            
+            if (submissionState.isRunning && !submissionState.isPaused) {
+                startBtn.disabled = true;
+                pauseBtn.disabled = false;
+                resumeBtn.disabled = true;
+                stopBtn.disabled = false;
+            } else if (submissionState.isRunning && submissionState.isPaused) {
+                startBtn.disabled = true;
+                pauseBtn.disabled = true;
+                resumeBtn.disabled = false;
+                stopBtn.disabled = false;
+            } else {
+                startBtn.disabled = false;
+                pauseBtn.disabled = true;
+                resumeBtn.disabled = true;
+                stopBtn.disabled = true;
+            }
+        }
+
+        // Main bulk submission function
+        async function startBulkSubmission() {
+            if (submissionState.isRunning) {
+                log('Submission already in progress!');
+                return;
+            }
+
+            // Get starting ID
+            submissionState.startingId = await getNextAvailableId();
+            submissionState.isRunning = true;
+            submissionState.isPaused = false;
+            submissionState.currentIndex = 0;
+            submissionState.submitted = 0;
+            submissionState.failed = 0;
+            
+            log(`Starting bulk submission of ${songs.length} songs...`);
+            log(`Starting with ID: ${submissionState.startingId}`);
+            
+            updateButtonStates();
+            await processSongs();
+        }
+
+        // Function to process songs
+        async function processSongs() {
+            const delay = parseInt(document.getElementById('delay-input').value) || 2000;
+            
+            while (submissionState.currentIndex < songs.length && submissionState.isRunning) {
+                if (submissionState.isPaused) {
+                    await new Promise(resolve => {
+                        const checkResume = () => {
+                            if (!submissionState.isPaused || !submissionState.isRunning) {
+                                resolve();
+                            } else {
+                                setTimeout(checkResume, 100);
+                            }
+                        };
+                        checkResume();
+                    });
+                }
+
+                if (!submissionState.isRunning) break;
+
+                const song = songs[submissionState.currentIndex];
+                const assignedId = submissionState.startingId + submissionState.currentIndex;
+                
+                const success = await submitSong(song, assignedId);
+                
+                if (success) {
+                    submissionState.submitted++;
+                } else {
+                    submissionState.failed++;
+                }
+                
+                submissionState.currentIndex++;
+                updateUI();
+                
+                // Add delay between submissions
+                if (submissionState.currentIndex < songs.length && submissionState.isRunning) {
+                    log(`Waiting ${delay}ms before next submission...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+            
+            if (submissionState.isRunning) {
+                finishSubmission();
+            }
+        }
+
+        // Function to finish submission
+        function finishSubmission() {
+            submissionState.isRunning = false;
+            submissionState.isPaused = false;
+            updateButtonStates();
+            
+            log('='.repeat(50));
+            log('BULK SUBMISSION COMPLETED!');
+            log(`Total songs: ${songs.length}`);
+            log(`Successfully submitted: ${submissionState.submitted}`);
+            log(`Failed submissions: ${submissionState.failed}`);
+            log(`Success rate: ${((submissionState.submitted / songs.length) * 100).toFixed(1)}%`);
+            log('='.repeat(50));
+        }
+
+        // Control functions
+        function pauseSubmission() {
+            if (submissionState.isRunning) {
+                submissionState.isPaused = true;
+                updateButtonStates();
+                log('Submission paused');
+            }
+        }
+
+        function resumeSubmission() {
+            if (submissionState.isRunning && submissionState.isPaused) {
+                submissionState.isPaused = false;
+                updateButtonStates();
+                log('Submission resumed');
+            }
+        }
+
+        function stopSubmission() {
+            submissionState.isRunning = false;
+            submissionState.isPaused = false;
+            updateButtonStates();
+            log('Submission stopped by user');
+            log(`Final stats: ${submissionState.submitted} submitted, ${submissionState.failed} failed`);
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUI();
+            updateButtonStates();
+            log('Bulk submission tool loaded');
+            log(`Found ${songs.length} songs in songs.js`);
+            log('Click "Start Bulk Submission" to begin');
+        });
+    </script>
+</body>
+</html>

@@ -834,6 +834,14 @@
     </div>
 
     <script>
+        // URL deobfuscation helper
+        function getUrl(key) {
+            const urls = {
+                'f5': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTY2JwNUE2SFhzVm81XzhDSlVIdlpCdGJfakFObm55MWs4SzZfWVBrVG9RdjROUDhyZy9mb3JtUmVzcG9uc2U='
+            };
+            return atob(urls[key]);
+        }
+
         // Check if form was already submitted on page load
         document.addEventListener('DOMContentLoaded', function() {
             if (localStorage.getItem('rhythmFormSubmitted') === 'true') {
@@ -924,7 +932,7 @@
 
             // Create form
             const hiddenForm = document.createElement('form');
-            hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLScbp5A6HXsVo5_8CJUHvZBtb_jANny1k8K6_YPkToQv4NP8rg/formResponse';
+            hiddenForm.action = getUrl('f5');
             hiddenForm.method = 'POST';
             hiddenForm.target = 'hidden_iframe';
             hiddenForm.style.display = 'none';

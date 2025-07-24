@@ -944,8 +944,8 @@
             // Prepare the text for import
             const textToImport = encodeURIComponent(output.value);
             
-            // Open lyrics editor with imported text and song name
-            let url = `lyrics-edit.html?import=${textToImport}`;
+            // Open lyrics submitter with imported text and song name
+            let url = `lyrics-submit.html?import=${textToImport}`;
             if (songName) {
                 url += `&songName=${encodeURIComponent(songName)}`;
             }
@@ -983,8 +983,8 @@
             // Prepare the text for import
             const textToImport = encodeURIComponent(inputText);
             
-            // Open English lyrics editor with imported text and song name
-            let url = `lyrics-edit-english.html?import=${textToImport}`;
+            // Open lyrics submitter with imported text and song name
+            let url = `lyrics-submit.html?import=${textToImport}`;
             if (songName) {
                 url += `&songName=${encodeURIComponent(songName)}`;
             }

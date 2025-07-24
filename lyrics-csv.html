@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="dv">
+<head>
+  <meta charset="UTF-8">
+  <title>Rhythm Lyrics - CSV</title>
+  <!-- Disable browser zooming completely -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
+<link rel="manifest" href="favicons/manifest.webmanifest">
+  <style>
+    /* Load local fonts from Fonts folder */
+    @font-face {
+      font-family: 'Faruma';
+      src: url('Fonts/Faruma.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    html, body {
+      /* Allow scrolling, but prevent zoom gestures */
+      touch-action: pan-x pan-y;
+      overscroll-behavior: none;
+    }
+    input, textarea, select, button {
+      touch-action: manipulation;
+    }
+    :root {
+      --primary-color: #f5d000;
+      --hover-color: #fced98;
+      --active-color: #E6B800;
+      --text-color: #2b2b2b;
+      --bg-opacity: rgba(31, 31, 31, 0.0);
+      --hover-color2: #3a3a3a;
+      --active-color2: #111111
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes slideIn {
+      0% { transform: translateY(10px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    body {
+      /* Use Montserrat for English text */
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #1f1f1f;
+      background-size: cover;
+      color: var(--primary-color);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .container {
+      text-align: center;
+      position: relative;
+      max-width: 600px;
+      width: 100%; 
+      padding: 20px;
+      background: var(--bg-opacity);
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+      animation: slideIn 0.5s ease-in-out;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ff6b6b;
+      color: white;
+      text-align: center;
+      padding: 5px;
+      font-size: 0.9em;
+      z-index: 200;
+      display: none;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    
+    .offline-indicator.show {
+      display: block;
+    }
+    .back-button {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0;
+      z-index: 10;
+    }
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      gap: 20px;
+    }
+    .back-button:hover {
+      background-color: var(--hover-color);
+      transform: scale(1.1);
+    }
+    .back-button:active {
+      background-color: var(--active-color);
+      transform: scale(0.95);
+    }
+    button {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 5px;
+      padding: 10px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background-color 0.3s, transform 0.2s;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    button:hover {
+      background-color: var(--hover-color);
+      font-weight: bold;
+    }
+    button:active {
+      background-color: var(--active-color);
+      transform: scale(0.97);
+    }
+    .language-toggle {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 0;
+      margin-top: 0;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 200px;
+      height: 50px;
+      background-color: #555;
+      border-radius: 25px;
+      border: 2px solid #666;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .toggle-switch.disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      background-color: #333;
+      border-color: #444;
+    }
+    .toggle-switch.disabled .toggle-label.english {
+      text-decoration: line-through;
+    }
+    .toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 96px;
+      height: 42px;
+      background-color: var(--primary-color);
+      border-radius: 21px;
+      transition: transform 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: var(--text-color);
+      font-size: 0.9em;
+      z-index: 2;
+      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif;
+    }
+    .toggle-slider.english {
+      transform: translateX(96px);
+    }
+    .toggle-labels {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      z-index: 1;
+    }
+    .toggle-label {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9em;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: color 0.3s ease;
+      pointer-events: none;
+    }
+    .toggle-label.dhivehi {
+      color: var(--text-color);
+      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif;
+    }
+    .toggle-label.english {
+      color: #ccc;
+    }
+    .toggle-switch:not(.disabled):hover {
+      border-color: var(--primary-color);
+    }
+    .language-btn {
+      display: none; /* Hide the old buttons */
+    }
+    .lyrics-template {
+      margin-top: 0;
+      display: none;
+      direction: rtl;
+      font-size: 1.3em;
+      white-space: pre-line;
+      color: #FFFFFF;
+      background: rgba(43,43,43,0.7);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      text-align: right;
+      line-height: 2em;
+      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      -moz-user-select: none;
+    }
+    .lyrics-template * {
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      -moz-user-select: none;
+    }
+    h2#song-title {
+      color: var(--primary-color);
+      text-align: center;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      margin: 0 0 20px 0;
+      padding: 0;
+    }
+    .highlight-line {
+      color: #f5d000;
+    }
+    .section-nav-bar {
+      position: fixed;
+      left: 0;
+      bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      z-index: 1000;
+      background: rgba(31,31,31,0.85);
+      box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 0 12px 0;
+      /* Prevent scaling and panning */
+      touch-action: none;
+      pointer-events: auto;
+      will-change: transform;
+      transition: left 0.3s ease, right 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease;
+    }
+    .section-nav-bar.english {
+      left: auto;
+      right: 0;
+      border-radius: 8px 0 0 8px;
+      box-shadow: -2px 0 8px rgba(0,0,0,0.08);
+    }
+    .section-nav-bar,
+    .section-nav-bar * {
+      /* Prevent zoom and scale on nav bar, but allow scrolling elsewhere */
+      touch-action: none !important;
+      user-select: none !important;
+      -webkit-user-drag: none !important;
+      -webkit-touch-callout: none !important;
+    }
+    .section-nav-bar button {
+      border: none;
+      border-radius: 0;
+      padding: 8px 14px;
+      margin: 0;
+      font-size: 0.95em;
+      cursor: pointer;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      text-align: left;
+      transition: background 0.2s;
+      white-space: nowrap;
+      outline: none;
+    }
+    .section-nav-bar .yellow-btn {
+      background: var(--primary-color);
+      color: var(--text-color);
+      border-radius: 0 5px 5px 0;
+      margin-bottom: 5px;
+    }
+    .section-nav-bar.english .yellow-btn {
+      border-radius: 5px 0 0 5px;
+    }
+    .section-nav-bar .yellow-btn:hover {
+      background: var(--hover-color);
+      font-weight: bold;
+    }
+    .section-nav-bar .white-btn {
+      background: #cccccc;
+      color: #222;
+      border-radius: 0 5px 5px 0;
+      margin-bottom: 5px;
+      margin-left: 0;
+    }
+    .section-nav-bar.english .white-btn {
+      border-radius: 5px 0 0 5px;
+    }
+    .section-nav-bar .white-btn:hover {
+      background: #f5f5f5;
+      font-weight: bold;
+
+    }
+    .section-block {
+      background: rgba(43,43,43,0.85);
+      border-radius: 8px;
+      margin-bottom: 24px;
+      padding: 18px 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      transition: background 0.3s;
+      position: relative;
+    }
+    .section-block.flash {
+      background: #464646 !important;
+      transition: background 0.5s;
+    }
+    .section-name-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      font-size: 3em;
+      font-weight: bold;
+      opacity: 0.08;
+      color: #ffffff;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+      -moz-user-select: none;
+      z-index: 10;
+      line-height: 1;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: left 0.3s ease, right 0.3s ease;
+    }
+    .section-name-overlay.english {
+      left: auto;
+      right: 0;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    .break-line {
+      width: 100%;
+      height: 6px;
+      background: var(--primary-color);
+      border-radius: 8px;
+      margin: 24px 0 24px 0;
+      display: flex;
+      align-items: center;
+      position: relative;
+      opacity: 0.85;
+    }
+    .loading-indicator {
+      display: none;
+      color: #f5d000;
+      font-size: 0.9em;
+      margin-top: 10px;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    .loading-indicator.show {
+      display: block;
+    }
+    @media (max-width: 700px) {
+      .container {
+        max-width: 95vw;
+        padding: 10px;
+        margin-top: 20px;
+      }
+      .back-button {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+      }
+      .controls-row {
+        margin-bottom: 10px;
+        gap: 15px;
+      }
+      .toggle-switch {
+        width: 180px;
+        height: 45px;
+      }
+      .toggle-slider {
+        width: 86px;
+        height: 37px;
+      }
+      .toggle-slider.english {
+        transform: translateX(86px);
+      }
+      .toggle-label {
+        font-size: 0.8em;
+      }
+      .lyrics-template {
+        font-size: 1.1em;
+        padding: 15px;
+        line-height: 1.8em;
+      }
+      .section-nav-bar {
+        bottom: 15px;
+        padding: 10px 0;
+      }
+      .section-nav-bar.english {
+        right: 0;
+      }
+      .section-nav-bar button {
+        padding: 6px 10px;
+        font-size: 0.85em;
+      }
+      .section-nav-bar .yellow-btn,
+      .section-nav-bar .white-btn {
+        margin-bottom: 3px;
+      }
+      .section-nav-bar.english .yellow-btn,
+      .section-nav-bar.english .white-btn {
+        margin-bottom: 3px;
+      }
+    }
+    
+    /* PIN Entry Styles */
+    .pin-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #1f1f1f;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    
+    .pin-container {
+      background: rgba(43,43,43,0.9);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      border: 2px solid #444;
+      max-width: 300px;
+      width: 85%;
+    }
+    
+    .pin-title {
+      color: var(--primary-color);
+      font-size: 1.3em;
+      margin-bottom: 25px;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      font-weight: 600;
+    }
+    
+    .pin-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .pin-digit {
+      width: 50px;
+      height: 50px;
+      padding: 0;
+      font-size: 1.5em;
+      text-align: center;
+      border: 2px solid #444;
+      border-radius: 8px;
+      background: #222;
+      color: var(--primary-color);
+      outline: none;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: all 0.3s ease;
+      caret-color: transparent;
+      /* Force numerical keyboard on mobile */
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+    }
+    
+    .pin-digit:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
+      transform: scale(1.05);
+    }
+    
+    .pin-digit.filled {
+      background: rgba(245, 208, 0, 0.1);
+      border-color: var(--primary-color);
+    }
+    
+    .pin-digit.error {
+      border-color: #ff6b6b;
+      animation: shake 0.5s;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+    
+    .pin-error {
+      color: #ff6b6b;
+      font-size: 0.85em;
+      margin-top: 5px;
+      min-height: 18px;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    
+    .pin-overlay.hidden {
+      display: none;
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 400px) {
+      .pin-container {
+        padding: 20px;
+        max-width: 90%;
+      }
+      
+      .pin-digit {
+        width: 45px;
+        height: 45px;
+        font-size: 1.3em;
+      }
+      
+      .pin-inputs {
+        gap: 8px;
+      }
+    }
+  </style>
+  <script>
+    // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (
+        e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0'
+      )) {
+        e.preventDefault();
+      }
+    });
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+    // Prevent double-tap zoom on mobile
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 350) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+    // Prevent pinch-zoom and gesture events on iOS/Safari
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gesturechange', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gestureend', function(e) {
+      e.preventDefault();
+    });
+
+    // Register service worker for offline functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        updateOfflineStatus();
+      });
+    }
+    
+    function updateOfflineStatus() {
+      const offlineIndicator = document.getElementById('offline-indicator');
+      if (!navigator.onLine) {
+        offlineIndicator.classList.add('show');
+      } else {
+        offlineIndicator.classList.remove('show');
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="pin-overlay" id="pin-overlay">
+    <div class="pin-container">
+      <h2 class="pin-title">Enter PIN</h2>
+      <div class="pin-inputs">
+        <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+      </div>
+      <div class="pin-error" id="pin-error"></div>
+    </div>
+  </div>
+  
+  <div class="offline-indicator" id="offline-indicator">
+    You're offline - Using cached content
+  </div>
+  <div class="section-nav-bar" id="section-nav-bar"></div>
+  <div class="container">
+    <h2 id="song-title"></h2>
+    <div class="controls-row">
+      <button class="back-button" onclick="
+        window.location.href='songlist'
+      ">←</button>
+      <div class="language-toggle">
+        <div class="toggle-switch" id="toggle-switch" onclick="toggleLanguage()">
+          <div class="toggle-slider" id="toggle-slider">ދިވެހި</div>
+          <div class="toggle-labels">
+            <div class="toggle-label dhivehi">ދިވެހި</div>
+            <div class="toggle-label english">English</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="loading-indicator" id="loading-indicator">
+      Generating English lyrics...
+    </div>
+    <div id="lyrics-template" class="lyrics-template" dir="rtl">
+      <div id="song-lyrics"></div>
+    </div>
+  </div>
+  <script src="reverse-transliteration.js"></script>
+  <script>
+    // ===========================================
+    // PIN CONFIGURATION (Easy to change)
+    // ===========================================
+    const pinAuth = 'ODc2NQ=='; // Change this to update PIN
+    
+    // PIN Security Functions
+    function decodePinConfig(encoded) {
+      try {
+        const decoded = atob(encoded);
+        const reversed = decoded.split('').reverse().join('');
+        return reversed.split('').map(Number);
+      } catch (e) {
+        return [8, 7, 6, 5]; // Fallback PIN
+      }
+    }
+    
+    function validatePinStructure(pin) {
+      // Additional validation layer
+      const checksum = pin.reduce((sum, digit) => sum + digit, 0);
+      // Calculate expected checksum based on actual PIN
+      const expectedChecksum = actualPinConfig.reduce((sum, digit) => sum + digit, 0);
+      return checksum === expectedChecksum;
+    }
+    
+    // Get actual PIN configuration
+    const actualPinConfig = decodePinConfig(pinAuth);
+    
+    // PIN Protection System
+    let pinAuthenticated = false;
+    let pinOverlay, pinDigits, pinError;
+    let attemptCount = 0;
+    const maxAttempts = 5;
+    const lockoutDuration = 60 * 60 * 1000; // 1 hour in milliseconds
+    let lockoutTimer = null;
+    
+    // Session timeout system
+    const sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
+    let sessionTimer = null;
+    let lastActivityTime = Date.now();
+    let isPageVisible = true;
+    
+    // Note: Using sessionStorage instead of localStorage for PIN session
+    // This ensures users must re-enter PIN when browser/app is completely closed
+    
+    // URL deobfuscation helper
+    function getUrl(key) {
+      const urls = {
+        'c1': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNWdTVmOXgyZi11Mmhha0xfMXBaeV9oYmVweHRuRmY3TVJXVzlMekd1OFNDcV95UWl0aFBETUJWd1dKZmdjeEJYOVVlY09SaTNlVmpSZC9wdWI/b3V0cHV0PWNzdg=='
+      };
+      return atob(urls[key]);
+    }
+    
+    // Initialize PIN system on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      initializePinSystem();
+      initializeSessionTimeout();
+    });
+    
+    function initializeSessionTimeout() {
+      // Track page visibility
+      document.addEventListener('visibilitychange', function() {
+        if (document.visibilityState === 'visible') {
+          isPageVisible = true;
+          updateLastActivity();
+          // Check if session expired while away
+          if (pinAuthenticated && Date.now() - lastActivityTime > sessionTimeout) {
+            expireSession();
+          }
+        } else {
+          isPageVisible = false;
+          clearSessionTimeout();
+        }
+      });
+      
+      // Track user activity to reset session timer
+      const activityEvents = ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+      activityEvents.forEach(event => {
+        document.addEventListener(event, updateLastActivity, true);
+      });
+      
+      // For mobile apps, also track window focus/blur
+      window.addEventListener('focus', function() {
+        updateLastActivity();
+      });
+      
+      window.addEventListener('blur', function() {
+        clearSessionTimeout();
+      });
+    }
+    
+    function updateLastActivity() {
+      lastActivityTime = Date.now();
+      if (pinAuthenticated && !isPageVisible) {
+        startSessionTimeout();
+      }
+    }
+    
+    function startSessionTimeout() {
+      clearSessionTimeout(); // Clear any existing timeout
+      
+      sessionTimer = setTimeout(() => {
+        expireSession();
+      }, sessionTimeout);
+    }
+    
+    function clearSessionTimeout() {
+      if (sessionTimer) {
+        clearTimeout(sessionTimer);
+        sessionTimer = null;
+      }
+    }
+    
+    function expireSession() {
+      pinAuthenticated = false;
+      sessionStorage.removeItem('pinSession');
+      
+      // Clear session timeout
+      clearSessionTimeout();
+      
+      // Show PIN overlay again
+      pinOverlay.classList.remove('hidden');
+      clearPinInputs();
+      
+      // Focus on first digit when user returns
+      setTimeout(() => {
+        pinDigits[0].focus();
+      }, 300);
+      
+      // Show session expired message
+      showPinError('Session expired. Please enter PIN again.');
+      setTimeout(() => {
+        clearPinError();
+      }, 3000);
+    }
+    
+    function initializePinSystem() {
+      pinOverlay = document.getElementById('pin-overlay');
+      pinDigits = [
+        ...document.querySelectorAll('.pin-digit')
+      ];
+      pinError = document.getElementById('pin-error');
+      
+      // Check if PIN was previously entered (but still require re-entry)
+      checkPinStatus();
+      
+      // Setup event listeners for each digit input
+      pinDigits.forEach((digit, index) => {
+        digit.addEventListener('input', (e) => handleDigitInput(e, index));
+        digit.addEventListener('keydown', (e) => handleDigitKeydown(e, index));
+        digit.addEventListener('paste', handlePaste);
+      });
+      
+      // Auto-focus first digit with delay for mobile
+      setTimeout(() => {
+        pinDigits[0].focus();
+      }, 500); // Increased delay to ensure DOM is ready
+    }
+    
+    function handleDigitInput(e, index) {
+      // Check if locked out
+      if (e.target.disabled) return;
+      
+      const value = e.target.value;
+      
+      // Only allow single digit numbers
+      if (!/^\d$/.test(value)) {
+        e.target.value = '';
+        return;
+      }
+      
+      // Clear any previous errors
+      clearPinError();
+      
+      // Mark as filled
+      e.target.classList.add('filled');
+      
+      // Move to next digit
+      if (index < 3) {
+        pinDigits[index + 1].focus();
+      } else {
+        // Last digit entered, verify PIN
+        verifyPin();
+      }
+    }
+    
+    function handleDigitKeydown(e, index) {
+      // Check if locked out
+      if (e.target.disabled) return;
+      
+      // Handle backspace
+      if (e.key === 'Backspace') {
+        e.target.value = '';
+        e.target.classList.remove('filled');
+        if (index > 0) {
+          pinDigits[index - 1].focus();
+        }
+      }
+      
+      // Handle Enter key
+      if (e.key === 'Enter') {
+        verifyPin();
+      }
+      
+      // Handle arrow keys
+      if (e.key === 'ArrowLeft' && index > 0) {
+        pinDigits[index - 1].focus();
+      }
+      if (e.key === 'ArrowRight' && index < 3) {
+        pinDigits[index + 1].focus();
+      }
+    }
+    
+    function handlePaste(e) {
+      e.preventDefault();
+      const pasteData = e.clipboardData.getData('text');
+      
+      // Check if pasted data is 4 digits
+      if (/^\d{4}$/.test(pasteData)) {
+        pinDigits.forEach((digit, index) => {
+          digit.value = pasteData[index];
+          digit.classList.add('filled');
+        });
+        verifyPin();
+      }
+    }
+    
+    function checkPinStatus() {
+      // Check if currently locked out
+      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
+      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
+        startLockout();
+        return;
+      }
+      
+      // Clear any expired lockout
+      if (lockoutEnd && Date.now() >= parseInt(lockoutEnd)) {
+        localStorage.removeItem('pinLockoutEnd');
+        localStorage.removeItem('pinAttemptCount');
+      }
+      
+      // Restore attempt count if not locked out
+      const savedAttempts = localStorage.getItem('pinAttemptCount');
+      if (savedAttempts) {
+        attemptCount = parseInt(savedAttempts);
+      }
+      
+      // Check for existing valid session from songlist.html
+      const sessionData = sessionStorage.getItem('pinSession');
+      if (sessionData) {
+        try {
+          const session = JSON.parse(sessionData);
+          const sessionAge = Date.now() - session.timestamp;
+          
+          if (session.authenticated && sessionAge < sessionTimeout) {
+            // Valid session exists
+            pinAuthenticated = true;
+            hidePinOverlay();
+            loadSongsData();
+            startSessionTimeout();
+            return;
+          }
+        } catch (e) {
+          // Invalid session data
+          sessionStorage.removeItem('pinSession');
+        }
+      }
+      
+      // No valid session - show PIN overlay
+      pinOverlay.classList.remove('hidden');
+      
+      // Ensure keyboard opens when PIN overlay is shown
+      setTimeout(() => {
+        pinDigits[0].focus();
+      }, 300);
+    }
+    
+    function startLockout() {
+      const lockoutEnd = Date.now() + lockoutDuration;
+      localStorage.setItem('pinLockoutEnd', lockoutEnd.toString());
+      localStorage.setItem('pinAttemptCount', attemptCount.toString());
+      
+      // Disable all inputs
+      pinDigits.forEach(digit => digit.disabled = true);
+      
+      startLockoutTimer(lockoutEnd);
+    }
+    
+    function startLockoutTimer(lockoutEnd) {
+      function updateLockoutDisplay() {
+        const timeLeft = lockoutEnd - Date.now();
+        if (timeLeft <= 0) {
+          // Lockout expired
+          clearInterval(lockoutTimer);
+          localStorage.removeItem('pinLockoutEnd');
+          localStorage.removeItem('pinAttemptCount');
+          attemptCount = 0;
+          
+          // Re-enable inputs
+          pinDigits.forEach(digit => {
+            digit.disabled = false;
+            digit.value = '';
+            digit.classList.remove('filled');
+          });
+          
+          showPinError('Lockout expired. You may try again.');
+          setTimeout(() => {
+            clearPinError();
+            pinDigits[0].focus();
+          }, 2000);
+          return;
+        }
+        
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        showPinError(`Too many attempts. Try again in ${minutes}:${seconds.toString().padStart(2, '0')}`);
+      }
+      
+      // Update immediately and then every second
+      updateLockoutDisplay();
+      lockoutTimer = setInterval(updateLockoutDisplay, 1000);
+    }
+    
+    function verifyPin() {
+      const enteredPin = pinDigits.map(digit => digit.value).join('');
+      
+      if (enteredPin.length !== 4) {
+        showPinError('Please enter all 4 digits');
+        return;
+      }
+      
+      // Check if currently locked out
+      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
+      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
+        showPinError('Account locked. Please wait.');
+        return;
+      }
+      
+      // Convert entered PIN to array for comparison
+      const enteredPinArray = enteredPin.split('').map(Number);
+      
+      // Multi-layer validation
+      const basicMatch = enteredPinArray.every((digit, index) => 
+        digit === actualPinConfig[index]
+      );
+      
+      const structureValid = validatePinStructure(enteredPinArray);
+      
+      if (basicMatch && structureValid) {
+        // Correct PIN
+        pinAuthenticated = true;
+        attemptCount = 0;
+        localStorage.removeItem('pinAttemptCount');
+        
+        // Create session
+        const sessionData = {
+          timestamp: Date.now(),
+          authenticated: true,
+          sessionType: 'lyrics'
+        };
+        sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
+        
+        hidePinOverlay();
+        loadSongsData();
+        startSessionTimeout();
+      } else {
+        // Incorrect PIN
+        attemptCount++;
+        localStorage.setItem('pinAttemptCount', attemptCount.toString());
+        
+        if (attemptCount >= maxAttempts) {
+          startLockout();
+        } else {
+          const remainingAttempts = maxAttempts - attemptCount;
+          showPinError(`Incorrect PIN. ${remainingAttempts} attempts remaining.`);
+          clearPinInputs();
+          setTimeout(() => {
+            pinDigits[0].focus();
+          }, 1000);
+        }
+      }
+    }
+    
+    function showPinError(message) {
+      pinError.textContent = message;
+      pinDigits.forEach(digit => {
+        digit.classList.add('error');
+      });
+      setTimeout(() => {
+        pinDigits.forEach(digit => {
+          digit.classList.remove('error');
+        });
+      }, 500);
+    }
+    
+    function clearPinError() {
+      pinError.textContent = '';
+      pinDigits.forEach(digit => {
+        digit.classList.remove('error');
+      });
+    }
+    
+    function clearPinInputs() {
+      pinDigits.forEach(digit => {
+        digit.value = '';
+        digit.classList.remove('filled');
+      });
+    }
+    
+    function hidePinOverlay() {
+      pinOverlay.classList.add('hidden');
+    }
+    
+    // CSV Data Loading Functions
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      let i = 0;
+      
+      while (i < line.length) {
+        const char = line[i];
+        
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            // Escaped quote
+            current += '"';
+            i += 2;
+          } else {
+            // Toggle quote state
+            inQuotes = !inQuotes;
+            i++;
+          }
+        } else if (char === ',' && !inQuotes) {
+          // End of field
+          result.push(current.trim());
+          current = '';
+          i++;
+        } else {
+          current += char;
+          i++;
+        }
+      }
+      
+      // Add the last field
+      result.push(current.trim());
+      return result;
+    }
+
+    async function getSongsFromCSV() {
+      try {
+        console.log('Fetching CSV from Google Sheets...');
+        const response = await fetch(getUrl('c1'));
+        const csvText = await response.text();
+        console.log('CSV text length:', csvText.length);
+        
+        // Parse CSV properly using state machine
+        const rows = [];
+        let currentRow = [];
+        let currentField = '';
+        let inQuotes = false;
+        let i = 0;
+        
+        while (i < csvText.length) {
+          const char = csvText[i];
+          const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+          
+          if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+              // Escaped quote
+              currentField += '"';
+              i += 2;
+            } else {
+              // Toggle quote state
+              inQuotes = !inQuotes;
+              i++;
+            }
+          } else if (char === ',' && !inQuotes) {
+            // End of field
+            currentRow.push(currentField);
+            currentField = '';
+            i++;
+          } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            // End of row
+            if (currentField || currentRow.length > 0) {
+              currentRow.push(currentField);
+              if (currentRow.length > 0) {
+                rows.push(currentRow);
+              }
+              currentRow = [];
+              currentField = '';
+            }
+            // Skip \r\n combinations
+            if (char === '\r' && nextChar === '\n') {
+              i += 2;
+            } else {
+              i++;
+            }
+          } else {
+            currentField += char;
+            i++;
+          }
+        }
+        
+        // Add the last row if it exists
+        if (currentField || currentRow.length > 0) {
+          currentRow.push(currentField);
+          if (currentRow.length > 0) {
+            rows.push(currentRow);
+          }
+        }
+        
+        console.log('Parsed rows:', rows.length);
+        
+        // Process data rows and deduplicate by ID
+        const songMap = new Map();
+        
+        for (let i = 1; i < rows.length; i++) { // Skip header row
+          const columns = rows[i];
+          if (columns.length >= 5) { // Ensure we have all required columns
+            const timestamp = columns[0] ? columns[0].trim() : '';
+            const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
+            const name = columns[2] ? columns[2].trim() : '';
+            const genre = columns[3] ? columns[3].trim() : '';
+            const lyrics = columns[4] ? columns[4].trim() : '';
+            
+            if (!isNaN(id) && name && genre && lyrics) {
+              const song = { id, timestamp, name, genre, lyrics };
+              
+              // Keep only the most recent version of each song (by ID)
+              if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
+                songMap.set(id, song);
+              }
+            }
+          }
+        }
+        
+        const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        console.log('Final songs array:', result.length, 'songs');
+        return result;
+      } catch (error) {
+        console.error('Error fetching CSV:', error);
+        return [];
+      }
+    }
+    
+    function loadSongsData() {
+      // Only load songs after PIN is verified
+      if (!pinAuthenticated) {
+        console.log('PIN not authenticated - blocking song data load');
+        return;
+      }
+      
+      // Load CSV data
+      getSongsFromCSV()
+        .then(csvSongs => {
+          window.songs = csvSongs;
+          initializeLyrics();
+        })
+        .catch(error => {
+          console.error('Failed to load songs data:', error);
+          window.songs = [];
+          initializeLyrics();
+        });
+    }
+
+    // Helper functions for lyrics parsing and section management
+    function slugify(text) {
+      return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    }
+
+    function parseSections(lyrics) {
+      const lines = lyrics.split('\n');
+      // Store all sections in order of appearance
+      let orderedSections = [];
+      let htmlSections = [];
+      let currentSection = null;
+      let sectionType = null;
+      let sectionId = null;
+      let sectionName = null;
+      let yellowCount = 0;
+      let whiteCount = 0;
+
+      function pushSection() {
+        if (currentSection && currentSection.trim()) {
+          const blockClass = sectionType === 'yellow' ? 'section-block' : 'section-block';
+          htmlSections.push(`<div class="${blockClass}" id="${sectionId}"><div class="section-name-overlay">${sectionName}</div>${currentSection}</div>`);
+        }
+      }
+
+      function highlightAmpersandParts(line, highlightColor) {
+        return line.replace(/&([^&]*)&/g, `<span class="highlight-line">$1</span>`);
+      }
+
+      lines.forEach((line, idx) => {
+        const trimmedLine = line.trim();
+        
+        // Check if it's a break line (just dashes)
+        if (/^-+$/.test(trimmedLine)) {
+          pushSection();
+          htmlSections.push('<div class="break-line"></div>');
+          currentSection = null;
+          return;
+        }
+        
+        // Check if it's a section header (starts with # or $)
+        if (/^[#$][A-Za-z0-9]+/.test(trimmedLine)) {
+          pushSection();
+          
+          sectionType = trimmedLine.startsWith('#') ? 'yellow' : 'white';
+          sectionName = trimmedLine.substring(1); // Remove # or $
+          sectionId = slugify(trimmedLine);
+          
+          // Count sections for navigation
+          if (sectionType === 'yellow') {
+            yellowCount++;
+          } else {
+            whiteCount++;
+          }
+          
+          orderedSections.push({
+            id: sectionId,
+            name: sectionName,
+            type: sectionType,
+            fullName: trimmedLine
+          });
+          
+          currentSection = '';
+          return;
+        }
+        
+        // If we don't have a current section, create a default one
+        if (currentSection === null) {
+          yellowCount++;
+          sectionType = 'yellow';
+          sectionName = 'M';
+          sectionId = slugify('#M');
+          
+          orderedSections.push({
+            id: sectionId,
+            name: sectionName,
+            type: sectionType,
+            fullName: '#M'
+          });
+          
+          currentSection = '';
+        }
+        
+        // Process regular lyric lines
+        if (trimmedLine) {
+          let processedLine = trimmedLine;
+          
+          // Handle starred lines (Zuvaabu/highlighted)
+          if (processedLine.startsWith('*')) {
+            processedLine = processedLine.substring(1).trim();
+            processedLine = `<span class="highlight-line">${processedLine}</span>`;
+          }
+          
+          // Handle ampersand highlighting
+          processedLine = highlightAmpersandParts(processedLine, '#f5d000');
+          
+          currentSection += processedLine + '\n';
+        } else {
+          currentSection += '\n';
+        }
+      });
+      
+      pushSection();
+      return { html: htmlSections.join(''), orderedSections };
+    }
+
+    function renderSectionButtons(orderedSections) {
+      window.sectionNavBar.innerHTML = '';
+      orderedSections.forEach((section) => {
+        const btn = document.createElement('button');
+        btn.className = section.type === 'yellow' ? 'yellow-btn' : 'white-btn';
+        btn.textContent = section.name;
+        btn.onclick = () => {
+          const element = document.getElementById(section.id);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // Flash effect
+            element.classList.add('flash');
+            setTimeout(() => element.classList.remove('flash'), 1000);
+          }
+        };
+        window.sectionNavBar.appendChild(btn);
+      });
+    }
+
+    function createSectionOverlays(orderedSections) {
+      // Remove existing overlays
+      document.querySelectorAll('.section-name-overlay').forEach(overlay => overlay.remove());
+      
+      // Create new overlays for each section
+      orderedSections.forEach(section => {
+        const sectionElement = document.getElementById(section.id);
+        if (sectionElement) {
+          const overlay = document.createElement('div');
+          overlay.className = 'section-name-overlay';
+          if (window.currentLanguage === 'english') {
+            overlay.classList.add('english');
+          }
+          overlay.textContent = section.name;
+          sectionElement.appendChild(overlay);
+        }
+      });
+    }
+    
+    // Generate English lyrics using reverse transliteration
+    function generateEnglishLyrics(dhivehiLyrics) {
+      if (!window.reverseTransliterate) {
+        console.error('Reverse transliteration function not available');
+        return dhivehiLyrics; // Fallback to original
+      }
+      
+      const lines = dhivehiLyrics.split('\n');
+      const transliteratedLines = lines.map(line => {
+        const trimmedLine = line.trim();
+        
+        // Keep section headers and breaks as-is
+        if (/^[#$][A-Za-z0-9]+/.test(trimmedLine) || /^-+$/.test(trimmedLine)) {
+          return line;
+        }
+        
+        // Handle starred lines
+        if (trimmedLine.startsWith('*')) {
+          const content = trimmedLine.substring(1).trim();
+          return '*' + window.reverseTransliterate(content);
+        }
+        
+        // Handle empty lines
+        if (!trimmedLine) {
+          return line;
+        }
+        
+        // Transliterate regular lines
+        return window.reverseTransliterate(trimmedLine);
+      });
+      
+      return transliteratedLines.join('\n');
+    }
+    
+    function initializeLyrics() {
+    const songTitle = document.getElementById('song-title');
+    const songLyrics = document.getElementById('song-lyrics');
+    const lyricsTemplate = document.getElementById('lyrics-template');
+    const sectionNavBar = document.getElementById('section-nav-bar');
+    const languageToggle = document.getElementById('language-toggle');
+    const toggleSlider = document.getElementById('toggle-slider');
+    const toggleSwitch = document.getElementById('toggle-switch');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const selectedId = localStorage.getItem('selectedSongId');
+    const song = window.songs.find(s => String(s.id) === String(selectedId));
+    
+    let currentLanguage = 'dhivehi'; // Default to Dhivehi
+    let englishAvailable = false; // Will be set to true after generation
+    let generatedEnglishLyrics = null;
+    
+    // Make these variables global so they can be accessed by the toggle function
+    window.currentSong = song;
+    window.currentLanguage = currentLanguage;
+    window.englishAvailable = englishAvailable;
+    window.sectionNavBar = sectionNavBar;
+    window.toggleSlider = toggleSlider;
+    window.songLyrics = songLyrics;
+    window.lyricsTemplate = lyricsTemplate;
+    window.generatedEnglishLyrics = generatedEnglishLyrics;
+    
+    function switchLanguage(language) {
+      if (language === 'english' && !window.englishAvailable) {
+        return; // Can't switch to English if not available
+      }
+      
+      window.currentLanguage = language;
+      
+      // Update toggle slider
+      if (language === 'english') {
+        window.toggleSlider.classList.add('english');
+        window.toggleSlider.textContent = 'English';
+        window.sectionNavBar.classList.add('english');
+      } else {
+        window.toggleSlider.classList.remove('english');
+        window.toggleSlider.textContent = 'ދިވެހި';
+        window.sectionNavBar.classList.remove('english');
+      }
+      
+      // Update lyrics display
+      const lyrics = language === 'dhivehi' ? window.currentSong.lyrics : window.generatedEnglishLyrics;
+      const { html, orderedSections } = parseSections(lyrics);
+      window.songLyrics.innerHTML = html;
+      
+      // Update text direction and font
+      const lyricsContainer = document.getElementById('lyrics-template');
+      if (language === 'english') {
+        lyricsContainer.style.direction = 'ltr';
+        lyricsContainer.style.textAlign = 'left';
+        lyricsContainer.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
+      } else {
+        lyricsContainer.style.direction = 'rtl';
+        lyricsContainer.style.textAlign = 'right';
+        lyricsContainer.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
+      }
+      
+      // Update navigation buttons
+      renderSectionButtons(orderedSections);
+      
+      // Create section overlays
+      setTimeout(() => createSectionOverlays(orderedSections), 100);
+    }
+    
+    // Make switchLanguage global
+    window.switchLanguage = switchLanguage;
+
+    if (song) {
+      songTitle.textContent = song.name;
+      
+      // Generate English lyrics in the background
+      loadingIndicator.classList.add('show');
+      
+      // Use setTimeout to allow UI to update before heavy processing
+      setTimeout(() => {
+        try {
+          generatedEnglishLyrics = generateEnglishLyrics(song.lyrics);
+          window.generatedEnglishLyrics = generatedEnglishLyrics;
+          
+          englishAvailable = true;
+          window.englishAvailable = englishAvailable;
+          
+          // Enable the toggle switch
+          toggleSwitch.classList.remove('disabled');
+          
+          console.log('English lyrics generated successfully');
+        } catch (error) {
+          console.error('Error generating English lyrics:', error);
+          generatedEnglishLyrics = song.lyrics; // Fallback
+          window.generatedEnglishLyrics = generatedEnglishLyrics;
+        } finally {
+          loadingIndicator.classList.remove('show');
+        }
+      }, 100);
+      
+      // Initially show Dhivehi lyrics
+      const { html, orderedSections } = parseSections(song.lyrics);
+      songLyrics.innerHTML = html;
+      lyricsTemplate.style.display = 'block';
+      
+      // Setup navigation
+      renderSectionButtons(orderedSections);
+      
+      // Create section overlays
+      setTimeout(() => createSectionOverlays(orderedSections), 100);
+    } else {
+      songTitle.textContent = 'Song not found';
+      songLyrics.innerHTML = 'The selected song could not be found.';
+      lyricsTemplate.style.display = 'block';
+    }
+    } // Close initializeLyrics function
+    
+    // Global toggle function that can be called from HTML
+    function toggleLanguage() {
+      if (!window.englishAvailable) {
+        return; // Don't allow toggle if English not available
+      }
+      
+      const newLanguage = window.currentLanguage === 'dhivehi' ? 'english' : 'dhivehi';
+      window.switchLanguage(newLanguage);
+    }
+  </script>
+</body>
+</html>

@@ -22,6 +22,10 @@
       font-style: normal;
     }
   </style>
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="src/Filter.png" as="image">
   <!-- Favicon and web app manifest -->
   <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
   <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
@@ -48,7 +52,6 @@
   <meta name="application-name" content="Rhythm Songs">
   <style>
     html, body {
-      /* Allow scrolling, but prevent zoom gestures */
       touch-action: pan-x pan-y;
       overscroll-behavior: none;
     }
@@ -62,28 +65,45 @@
       --text-color: #2b2b2b;
       --bg-opacity: rgba(31, 31, 31, 0.0);
       --hover-color2: #3a3a3a;
-      --active-color2: #111111
+      --active-color2: #111111;
+      --border-color: #444;
+      --background-dark: #1f1f1f;
+      --card-background: rgba(43,43,43,0.7);
+      --error-color: #ff6b6b;
+      --success-color: #28a745;
     }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
     @keyframes fadeIn {
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
+    
     @keyframes slideIn {
       0% { transform: translateY(10px); opacity: 0; }
       100% { transform: translateY(0); opacity: 1; }
     }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
     body {
-      /* Use Montserrat for English text */
       font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      background-color: #1f1f1f;
+      background-color: var(--background-dark);
       background-size: cover;
       color: var(--primary-color);
       animation: fadeIn 0.5s ease-in-out;
+      will-change: scroll-position;
     }
     .container {
       text-align: center;
@@ -172,8 +192,8 @@
       padding: 10px;
       font-size: 1.2em;
       cursor: pointer;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-      transition: background-color 0.3s;
+      font-family: inherit;
+      transition: background-color 0.3s ease, transform 0.2s ease;
       width: 40px;
       height: 40px;
       display: flex;
@@ -181,228 +201,279 @@
       justify-content: center;
       flex-shrink: 0;
     }
+    
     .filter-btn:hover {
       background: var(--hover-color);
+      transform: scale(1.05);
+    }
+    
+    .filter-btn:active {
+      transform: scale(0.95);
     }
     .filter-content {
       display: none;
       position: absolute;
-      background: rgba(43,43,43,0.98);
-      border: 1px solid #444;
-      border-radius: 5px;
-      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-      z-index: 1;
+      background: var(--card-background);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      z-index: 1000;
       min-width: 200px;
-      min-width: 200px;
-      width: 200px;
       top: 100%;
       left: 0;
-      margin-top: 2px;
+      margin-top: 5px;
+      overflow: hidden;
     }
+    
     .filter-content a {
       color: var(--primary-color);
-      padding: 8px 12px;
+      padding: 12px 16px;
       text-decoration: none;
       display: block;
       cursor: pointer;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-      border-bottom: 1px solid #333;
+      font-family: inherit;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
     }
+    
     .filter-content a:last-child {
       border-bottom: none;
     }
+    
     .filter-content a:hover {
       background: var(--hover-color);
       color: var(--text-color);
+      transform: translateX(4px);
     }
-    .filter-dropdown.show .filter-content {
+    .show {
       display: block;
     }
     #search-box {
       flex: 1;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #444;
+      padding: 10px 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
       margin-bottom: 0;
       font-size: 1em;
       background: #222;
       color: var(--primary-color);
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.3s ease;
       margin-top: 0;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      font-family: inherit;
     }
+    
+    #search-box::placeholder {
+      color: #999;
+      opacity: 0.7;
+    }
+    
     #search-box:focus {
       border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
+      background: #2a2a2a;
     }
     ul#song-list {
       list-style: none;
       padding: 0;
       margin: 0;
       margin-top: calc(env(safe-area-inset-top, 0px) + 105px);
+      contain: layout style;
     }
+    
     ul#song-list li {
       cursor: pointer;
       padding: 0.7em 0.5em;
       border-bottom: 1px solid #1d1d1d;
-      transition: background 0.2s, color 0.2s;
+      transition: all 0.2s ease;
       color: var(--primary-color);
       border-radius: 5px;
       margin-bottom: 5px;
       font-size: 1.1em;
-      background: rgba(43,43,43,0.7);
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-    }      ul#song-list li:hover {
-        background: var(--hover-color);
-        color: var(--text-color);
-        font-weight: bold;
+      background: var(--card-background);
+      font-family: inherit;
+      will-change: transform, background-color;
+      transform: translateZ(0); /* Force GPU acceleration */
+    }
+    
+    ul#song-list li:hover {
+      background: var(--hover-color);
+      color: var(--text-color);
+      font-weight: 600;
+      transform: translateY(-1px) translateZ(0);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    
+    ul#song-list li:active {
+      transform: translateY(0) translateZ(0);
+    }
+    
+    @media (max-width: 700px) {
+      .header-search-wrapper {
+        padding: 10px;
       }
-      
-      /* PIN Entry Styles */
-      .pin-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: #1f1f1f;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
+      .search-container {
+        padding: 5px 10px;
+        gap: 8px;
       }
-      
+      .filter-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1em;
+        padding: 8px;
+      }
+      #search-box {
+        padding: 8px 10px;
+        font-size: 1em;
+      }
+      ul#song-list {
+        margin-top: calc(env(safe-area-inset-top, 0px) + 85px);
+      }
+      ul#song-list li {
+        padding: 0.6em 0.4em;
+        font-size: 1em;
+      }
+    }
+    
+    /* PIN Entry Styles */
+    .pin-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--background-dark);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      backdrop-filter: blur(5px);
+    }
+    
+    .pin-container {
+      background: var(--card-background);
+      backdrop-filter: blur(20px);
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      border: 2px solid var(--border-color);
+      max-width: 300px;
+      width: 85%;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    
+    .pin-title {
+      color: var(--primary-color);
+      font-size: 1.3em;
+      margin-bottom: 25px;
+      font-family: inherit;
+      font-weight: 600;
+    }
+    
+    .pin-inputs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    
+    .pin-digit {
+      width: 50px;
+      height: 50px;
+      padding: 0;
+      font-size: 1.5em;
+      text-align: center;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      background: #222;
+      color: var(--primary-color);
+      outline: none;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      caret-color: transparent;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: textfield;
+    }
+    
+    .pin-digit:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
+      transform: scale(1.05);
+      background: #2a2a2a;
+    }
+    
+    .pin-digit.filled {
+      background: rgba(245, 208, 0, 0.1);
+      border-color: var(--primary-color);
+    }
+    
+    .pin-digit.error {
+      border-color: var(--error-color);
+      animation: shake 0.5s ease-in-out;
+    }
+    
+    .pin-error {
+      color: var(--error-color);
+      font-size: 0.85em;
+      margin-top: 5px;
+      min-height: 18px;
+      font-family: inherit;
+      font-weight: 500;
+    }
+    
+    .pin-overlay.hidden {
+      display: none;
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 400px) {
       .pin-container {
-        background: rgba(43,43,43,0.9);
-        padding: 30px;
-        border-radius: 15px;
-        text-align: center;
-        border: 2px solid #444;
-        max-width: 300px;
-        width: 85%;
-      }
-      
-      .pin-title {
-        color: var(--primary-color);
-        font-size: 1.3em;
-        margin-bottom: 25px;
-        font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-        font-weight: 600;
-      }
-      
-      .pin-inputs {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        margin-bottom: 20px;
+        padding: 20px;
+        max-width: 90%;
       }
       
       .pin-digit {
-        width: 50px;
-        height: 50px;
-        padding: 0;
-        font-size: 1.5em;
-        text-align: center;
-        border: 2px solid #444;
-        border-radius: 8px;
-        background: #222;
-        color: var(--primary-color);
-        outline: none;
-        font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-        transition: all 0.3s ease;
-        caret-color: transparent;
-        /* Force numerical keyboard on mobile */
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: textfield;
+        width: 45px;
+        height: 45px;
+        font-size: 1.3em;
       }
       
-      .pin-digit:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
-        transform: scale(1.05);
-      }
-      
-      .pin-digit.filled {
-        background: rgba(245, 208, 0, 0.1);
-        border-color: var(--primary-color);
-      }
-      
-      .pin-digit.error {
-        border-color: #ff6b6b;
-        animation: shake 0.5s;
-      }
-      
-      @keyframes shake {
-        0%, 100% { transform: translateX(0); }
-        25% { transform: translateX(-3px); }
-        75% { transform: translateX(3px); }
-      }
-      
-      .pin-error {
-        color: #ff6b6b;
-        font-size: 0.85em;
-        margin-top: 5px;
-        min-height: 18px;
-        font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-      }
-      
-      .pin-overlay.hidden {
-        display: none;
-      }
-      
-      /* Mobile responsive adjustments */
-      @media (max-width: 400px) {
-        .pin-container {
-          padding: 25px;
-          max-width: 280px;
-        }
-        
-        .pin-digit {
-          width: 45px;
-          height: 45px;
-          font-size: 1.3em;
-        }
-        
-        .pin-inputs {
-          gap: 10px;
-        }
-      }
-    @media (max-width: 700px) {
-      .container {
-        max-width: 95vw;
-        padding: 5px;
-        margin-top: 0;
-      }
-      #search-box {
-        flex: 1;
-      }
-      .search-container {
-        width: 95%;
-        padding: 8px 10px;
+      .pin-inputs {
         gap: 8px;
-        margin-left: auto;
-        margin-right: auto;
-      }
-      .filter-btn {
-        width: 40px;
-        height: 40px;
-      }
-      .filter-content {
-        right: 0;
-        left: auto;
-        min-width: 120px;
-      }
-      .header-search-wrapper {
-        padding-bottom: 8px;
-      }
-      ul#song-list {
-        margin-top: calc(env(safe-area-inset-top, 0px) + 95px);
       }
     }
   </style>
   <script>
+    // Debounce utility for performance optimization
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Throttle utility for scroll events
+    function throttle(func, limit) {
+      let inThrottle;
+      return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+          func.apply(context, args);
+          inThrottle = true;
+          setTimeout(() => inThrottle = false, limit);
+        }
+      }
+    }
+
     // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
     document.addEventListener('keydown', function(e) {
       if ((e.ctrlKey || e.metaKey) && (
@@ -414,6 +485,7 @@
     document.addEventListener('wheel', function(e) {
       if (e.ctrlKey) e.preventDefault();
     }, { passive: false });
+    
     // Prevent double-tap zoom on mobile
     let lastTouchEnd = 0;
     document.addEventListener('touchend', function(e) {
@@ -423,6 +495,7 @@
       }
       lastTouchEnd = now;
     }, false);
+    
     // Prevent pinch-zoom and gesture events on iOS/Safari
     document.addEventListener('gesturestart', function(e) {
       e.preventDefault();
@@ -438,70 +511,43 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            console.log('Service Worker registered successfully:', registration.scope);
+          .then(function(registration) {
+            console.log('ServiceWorker registration successful');
             
-            // Check for updates
-            registration.addEventListener('updatefound', () => {
+            // Listen for updates
+            registration.addEventListener('updatefound', function() {
               const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', () => {
+              newWorker.addEventListener('statechange', function() {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New content available, activate it
-                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                  // New content is available
+                  if (confirm('New content is available. Refresh to update?')) {
+                    window.location.reload();
+                  }
                 }
               });
             });
           })
-          .catch((error) => {
-            console.log('Service Worker registration failed:', error);
+          .catch(function(error) {
+            console.log('ServiceWorker registration failed: ', error);
           });
         
-        // Listen for messages from service worker
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data && event.data.type === 'CACHE_UPDATED') {
-            console.log('Cache updated for files:', event.data.files);
-            // Optionally reload the page or update UI
-          }
-        });
-        
-        // Update cache when online
-        window.addEventListener('online', () => {
-          console.log('Back online - updating cache');
-          updateOfflineStatus();
-          if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage({
-              type: 'UPDATE_CACHE',
-              files: ['/songs.js', '/showlist.js', '/songlist.html', '/lyrics.html'] // Use original filename
-            });
-          }
-          
-          // If authenticated and in web app mode, refresh songs data
-          if (pinAuthenticated) {
-            setTimeout(() => {
-              refreshSongsData();
-            }, 1000);
-          }
-        });
-        
-        // Handle offline status
-        window.addEventListener('offline', () => {
-          console.log('Gone offline');
-          updateOfflineStatus();
-        });
-        
-        // Initial offline status check
         updateOfflineStatus();
       });
     }
     
-    function updateOfflineStatus() {
+    // Optimized online/offline event handlers
+    const updateOfflineStatus = throttle(() => {
       const offlineIndicator = document.getElementById('offline-indicator');
       if (!navigator.onLine) {
         offlineIndicator.classList.add('show');
       } else {
         offlineIndicator.classList.remove('show');
       }
-    }
+    }, 1000);
+    
+    // Listen for online/offline events
+    window.addEventListener('online', updateOfflineStatus);
+    window.addEventListener('offline', updateOfflineStatus);
   </script>
 </head>
 <body>
@@ -509,10 +555,10 @@
     <div class="pin-container">
       <h2 class="pin-title">Enter PIN</h2>
       <div class="pin-inputs">
-        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-0" maxlength="1" autocomplete="off" />
-        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-1" maxlength="1" autocomplete="off" />
-        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-2" maxlength="1" autocomplete="off" />
-        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-3" maxlength="1" autocomplete="off" />
+        <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
+        <input type="tel" class="pin-digit" maxlength="1" pattern="[0-9]" inputmode="numeric">
       </div>
       <div class="pin-error" id="pin-error"></div>
     </div>
@@ -538,6 +584,12 @@
     <ul id="song-list"></ul>
   </div>
   <script>
+    // Global variables
+    let songList, searchBox, filterBtn, filterDropdown, filterContent;
+    let currentGenreFilter = 'all';
+    let songs = []; // Will be populated from CSV
+    window.currentShowList = []; // Will be populated from showlist CSV
+    
     // ===========================================
     // PIN CONFIGURATION (Easy to change)
     // ===========================================
@@ -550,7 +602,7 @@
         const reversed = decoded.split('').reverse().join('');
         return reversed.split('').map(Number);
       } catch (e) {
-        return [0,0,0,0];
+        return [8, 7, 6, 5]; // Fallback PIN
       }
     }
     
@@ -564,6 +616,16 @@
     
     // Get actual PIN configuration
     const actualPinConfig = decodePinConfig(pinAuth);
+    
+    // URL deobfuscation helper
+    function getUrl(key) {
+      const urls = {
+        'c1': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNWdTVmOXgyZi11Mmhha0xfMXBaeV9oYmVweHRuRmY3TVJXVzlMekd1OFNDcV95UWl0aFBETUJWd1dKZmdjeEJYOVVlY09SaTNlVmpSZC9wdWI/b3V0cHV0PWNzdg==',
+        'c2': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlQydTRGdTJmMGJZRl9Ub1BVLWRpZ0QxamJxTnNMN0RPSnBCX2tYbFdUc25YY2dldHN2Y0h1aG5NcXRGLWdDRmlfUG5TaVd6VXdiTjNwNi9wdWI/b3V0cHV0PWNzdg==',
+        'c3': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlFkS2xDRkRjMUlFUVhFZ2prWDFVTHBHTGpXaXRSemFIOFdzYTFmTkdxR2JYa011U2hUTm1URHNrMWZMNkY4STNEMDIyem4ySFVJckN1eC9wdWI/b3V0cHV0PWNzdg=='
+      };
+      return atob(urls[key]);
+    }
     
     // PIN Protection System
     let pinAuthenticated = false;
@@ -579,13 +641,6 @@
     let lastActivityTime = Date.now();
     let isPageVisible = true;
     
-    // Note: Using sessionStorage instead of localStorage for PIN session
-    // This ensures users must re-enter PIN when browser/app is completely closed
-    
-    // Dynamic script loader to hide from sources
-    let currentGenreFilter = 'all';
-    let songList, searchBox, filterBtn, filterDropdown, filterContent;
-    
     // Initialize PIN system on page load
     document.addEventListener('DOMContentLoaded', function() {
       initializePinSystem();
@@ -595,17 +650,16 @@
     function initializeSessionTimeout() {
       // Track page visibility
       document.addEventListener('visibilitychange', function() {
-        if (document.hidden) {
-          isPageVisible = false;
-          // Start session timeout when page goes out of focus
-          if (pinAuthenticated) {
-            startSessionTimeout();
+        if (document.visibilityState === 'visible') {
+          isPageVisible = true;
+          updateLastActivity();
+          // Check if session expired while away
+          if (pinAuthenticated && Date.now() - lastActivityTime > sessionTimeout) {
+            expireSession();
           }
         } else {
-          isPageVisible = true;
-          // Clear session timeout when page comes back into focus
+          isPageVisible = false;
           clearSessionTimeout();
-          updateLastActivity();
         }
       });
       
@@ -617,24 +671,17 @@
       
       // For mobile apps, also track window focus/blur
       window.addEventListener('focus', function() {
-        isPageVisible = true;
-        clearSessionTimeout();
         updateLastActivity();
       });
       
       window.addEventListener('blur', function() {
-        isPageVisible = false;
-        if (pinAuthenticated) {
-          startSessionTimeout();
-        }
+        clearSessionTimeout();
       });
     }
     
     function updateLastActivity() {
       lastActivityTime = Date.now();
       if (pinAuthenticated && !isPageVisible) {
-        // Reset session timeout if user becomes active while page is hidden
-        clearSessionTimeout();
         startSessionTimeout();
       }
     }
@@ -643,10 +690,7 @@
       clearSessionTimeout(); // Clear any existing timeout
       
       sessionTimer = setTimeout(() => {
-        if (pinAuthenticated && !isPageVisible) {
-          // Session expired - require PIN re-entry
-          expireSession();
-        }
+        expireSession();
       }, sessionTimeout);
     }
     
@@ -671,14 +715,6 @@
       // Focus on first digit when user returns
       setTimeout(() => {
         pinDigits[0].focus();
-        
-        // Force keyboard to open on mobile devices
-        if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          pinDigits[0].click();
-          setTimeout(() => {
-            pinDigits[0].focus();
-          }, 100);
-        }
       }, 300);
       
       // Show session expired message
@@ -691,10 +727,7 @@
     function initializePinSystem() {
       pinOverlay = document.getElementById('pin-overlay');
       pinDigits = [
-        document.getElementById('pin-digit-0'),
-        document.getElementById('pin-digit-1'),
-        document.getElementById('pin-digit-2'),
-        document.getElementById('pin-digit-3')
+        ...document.querySelectorAll('.pin-digit')
       ];
       pinError = document.getElementById('pin-error');
       
@@ -703,57 +736,14 @@
       
       // Setup event listeners for each digit input
       pinDigits.forEach((digit, index) => {
-        digit.addEventListener('input', function(e) {
-          handleDigitInput(e, index);
-        });
-        
-        digit.addEventListener('keydown', function(e) {
-          handleDigitKeydown(e, index);
-        });
-        
-        digit.addEventListener('paste', function(e) {
-          handlePaste(e);
-        });
-        
-        // Mobile focus improvements
-        digit.addEventListener('focus', function() {
-          // Ensure keyboard opens on mobile
-          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            setTimeout(() => {
-              digit.focus();
-              digit.click();
-            }, 50);
-          }
-        });
-        
-        // Additional mobile keyboard trigger
-        digit.addEventListener('touchstart', function(e) {
-          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            setTimeout(() => {
-              digit.focus();
-            }, 50);
-          }
-        });
+        digit.addEventListener('input', (e) => handleDigitInput(e, index));
+        digit.addEventListener('keydown', (e) => handleDigitKeydown(e, index));
+        digit.addEventListener('paste', handlePaste);
       });
       
       // Auto-focus first digit with delay for mobile
       setTimeout(() => {
-        if (pinOverlay && !pinOverlay.classList.contains('hidden')) {
-          pinDigits[0].focus();
-          
-          // Force keyboard to open on mobile devices
-          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            // Multiple attempts to ensure keyboard opens
-            pinDigits[0].click();
-            setTimeout(() => {
-              pinDigits[0].focus();
-              pinDigits[0].click();
-            }, 100);
-            setTimeout(() => {
-              pinDigits[0].focus();
-            }, 200);
-          }
-        }
+        pinDigits[0].focus();
       }, 500); // Increased delay to ensure DOM is ready
     }
     
@@ -779,8 +769,8 @@
       if (index < 3) {
         pinDigits[index + 1].focus();
       } else {
-        // All digits filled, verify PIN
-        setTimeout(() => verifyPin(), 100);
+        // Last digit entered, verify PIN
+        verifyPin();
       }
     }
     
@@ -790,15 +780,10 @@
       
       // Handle backspace
       if (e.key === 'Backspace') {
-        if (e.target.value === '' && index > 0) {
-          // Move to previous digit if current is empty
+        e.target.value = '';
+        e.target.classList.remove('filled');
+        if (index > 0) {
           pinDigits[index - 1].focus();
-          pinDigits[index - 1].value = '';
-          pinDigits[index - 1].classList.remove('filled');
-        } else {
-          // Clear current digit
-          e.target.value = '';
-          e.target.classList.remove('filled');
         }
       }
       
@@ -822,12 +807,11 @@
       
       // Check if pasted data is 4 digits
       if (/^\d{4}$/.test(pasteData)) {
-        const digits = pasteData.split('');
         pinDigits.forEach((digit, index) => {
-          digit.value = digits[index];
+          digit.value = pasteData[index];
           digit.classList.add('filled');
         });
-        setTimeout(() => verifyPin(), 100);
+        verifyPin();
       }
     }
     
@@ -835,7 +819,7 @@
       // Check if currently locked out
       const lockoutEnd = localStorage.getItem('pinLockoutEnd');
       if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
-        startLockoutTimer(parseInt(lockoutEnd));
+        startLockout();
         return;
       }
       
@@ -843,7 +827,6 @@
       if (lockoutEnd && Date.now() >= parseInt(lockoutEnd)) {
         localStorage.removeItem('pinLockoutEnd');
         localStorage.removeItem('pinAttemptCount');
-        attemptCount = 0;
       }
       
       // Restore attempt count if not locked out
@@ -852,34 +835,23 @@
         attemptCount = parseInt(savedAttempts);
       }
       
-      // Check for existing valid session 
+      // Check for existing valid session
       const sessionData = sessionStorage.getItem('pinSession');
       if (sessionData) {
         try {
           const session = JSON.parse(sessionData);
           const sessionAge = Date.now() - session.timestamp;
           
-          // Session is valid if authenticated and less than 3 minutes old (with 10 second buffer for navigation)
-          if (session.authenticated && sessionAge < (sessionTimeout + 10000)) {
-            // Valid session found - skip PIN entry and refresh session timestamp
+          if (session.authenticated && sessionAge < sessionTimeout) {
+            // Valid session exists
             pinAuthenticated = true;
-            // Refresh session timestamp to extend it
-            const refreshedSession = {
-              timestamp: Date.now(),
-              authenticated: true,
-              sessionType: 'songlist'
-            };
-            sessionStorage.setItem('pinSession', JSON.stringify(refreshedSession));
-            updateLastActivity();
             hidePinOverlay();
             loadSongsData();
+            startSessionTimeout();
             return;
-          } else {
-            // Session expired, remove it
-            sessionStorage.removeItem('pinSession');
           }
         } catch (e) {
-          // Invalid session data, remove it
+          // Invalid session data
           sessionStorage.removeItem('pinSession');
         }
       }
@@ -889,17 +861,7 @@
       
       // Ensure keyboard opens when PIN overlay is shown
       setTimeout(() => {
-        if (pinDigits[0]) {
-          pinDigits[0].focus();
-          
-          // Force keyboard to open on mobile devices
-          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            pinDigits[0].click();
-            setTimeout(() => {
-              pinDigits[0].focus();
-            }, 100);
-          }
-        }
+        pinDigits[0].focus();
       }, 300);
     }
     
@@ -916,10 +878,8 @@
     
     function startLockoutTimer(lockoutEnd) {
       function updateLockoutDisplay() {
-        const now = Date.now();
-        const remaining = lockoutEnd - now;
-        
-        if (remaining <= 0) {
+        const timeLeft = lockoutEnd - Date.now();
+        if (timeLeft <= 0) {
           // Lockout expired
           clearInterval(lockoutTimer);
           localStorage.removeItem('pinLockoutEnd');
@@ -927,31 +887,23 @@
           attemptCount = 0;
           
           // Re-enable inputs
-          pinDigits.forEach(digit => digit.disabled = false);
-          clearPinInputs();
-          pinError.textContent = 'Lockout expired. You may try again.';
+          pinDigits.forEach(digit => {
+            digit.disabled = false;
+            digit.value = '';
+            digit.classList.remove('filled');
+          });
           
+          showPinError('Lockout expired. You may try again.');
           setTimeout(() => {
             clearPinError();
             pinDigits[0].focus();
-            
-            // Force keyboard to open on mobile devices
-            if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-              pinDigits[0].click();
-              setTimeout(() => {
-                pinDigits[0].focus();
-              }, 100);
-            }
           }, 2000);
-          
           return;
         }
         
-        // Calculate time remaining
-        const minutes = Math.floor(remaining / (1000 * 60));
-        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-        
-        showPinError(`Locked out. Try again in ${minutes}m ${seconds}s`);
+        const minutes = Math.floor(timeLeft / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        showPinError(`Too many attempts. Try again in ${minutes}:${seconds.toString().padStart(2, '0')}`);
       }
       
       // Update immediately and then every second
@@ -970,7 +922,7 @@
       // Check if currently locked out
       const lockoutEnd = localStorage.getItem('pinLockoutEnd');
       if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
-        showPinError('Account is locked. Please wait.');
+        showPinError('Account locked. Please wait.');
         return;
       }
       
@@ -985,9 +937,12 @@
       const structureValid = validatePinStructure(enteredPinArray);
       
       if (basicMatch && structureValid) {
-        // Successful authentication
+        // Correct PIN
         pinAuthenticated = true;
-        // Store session with timestamp and songlist type for cross-page access
+        attemptCount = 0;
+        localStorage.removeItem('pinAttemptCount');
+        
+        // Create session
         const sessionData = {
           timestamp: Date.now(),
           authenticated: true,
@@ -995,45 +950,23 @@
         };
         sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
         
-        // Clear lockout data on success
-        localStorage.removeItem('pinLockoutEnd');
-        localStorage.removeItem('pinAttemptCount');
-        attemptCount = 0;
-        
-        if (lockoutTimer) {
-          clearInterval(lockoutTimer);
-          lockoutTimer = null;
-        }
-        
-        // Update activity time and start session monitoring
-        updateLastActivity();
-        
         hidePinOverlay();
         loadSongsData();
+        startSessionTimeout();
       } else {
-        // Failed authentication
+        // Incorrect PIN
         attemptCount++;
         localStorage.setItem('pinAttemptCount', attemptCount.toString());
         
         if (attemptCount >= maxAttempts) {
-          // Start lockout
           startLockout();
         } else {
-          // Show remaining attempts
           const remainingAttempts = maxAttempts - attemptCount;
-          showPinError(`Invalid PIN. ${remainingAttempts} attempts remaining.`);
+          showPinError(`Incorrect PIN. ${remainingAttempts} attempts remaining.`);
           clearPinInputs();
           setTimeout(() => {
             pinDigits[0].focus();
-            
-            // Force keyboard to open on mobile devices
-            if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-              pinDigits[0].click();
-              setTimeout(() => {
-                pinDigits[0].focus();
-              }, 100);
-            }
-          }, 500);
+          }, 1000);
         }
       }
     }
@@ -1068,6 +1001,291 @@
       pinOverlay.classList.add('hidden');
     }
     
+    // CSV Data Loading Functions
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      let i = 0;
+      
+      while (i < line.length) {
+        const char = line[i];
+        
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            // Escaped quote
+            current += '"';
+            i += 2;
+          } else {
+            // Toggle quote state
+            inQuotes = !inQuotes;
+            i++;
+          }
+        } else if (char === ',' && !inQuotes) {
+          // End of field
+          result.push(current.trim());
+          current = '';
+          i++;
+        } else {
+          current += char;
+          i++;
+        }
+      }
+      
+      // Add the last field
+      result.push(current.trim());
+      return result;
+    }
+
+    // Optimized CSV parsing with better memory management
+    async function getSongsFromCSV() {
+      try {
+        console.log('Fetching CSV from Google Sheets...');
+        const response = await fetch(getUrl('c1'));
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const csvText = await response.text();
+        console.log('CSV text length:', csvText.length);
+        
+        // Cache the CSV data for offline use
+        if ('caches' in window) {
+          try {
+            const cache = await caches.open('rhythm-csv-data');
+            const csvResponse = new Response(csvText, {
+              headers: { 'Content-Type': 'text/csv' }
+            });
+            await cache.put('csv-songs-data', csvResponse);
+            console.log('CSV data cached for offline use');
+          } catch (cacheError) {
+            console.warn('Failed to cache CSV data:', cacheError);
+          }
+        }
+        
+        // Optimized CSV parsing with streaming approach for large files
+        return parseCSVOptimized(csvText);
+        
+      } catch (error) {
+        console.error('Error fetching CSV:', error);
+        return await loadFromCache();
+      }
+    }
+
+    // Optimized CSV parser with better performance
+    function parseCSVOptimized(csvText) {
+      const rows = [];
+      const songMap = new Map();
+      let currentRow = [];
+      let currentField = '';
+      let inQuotes = false;
+      let rowCount = 0;
+      
+      // Process in chunks to avoid blocking the main thread
+      const processChunk = (startIndex, endIndex) => {
+        for (let i = startIndex; i < endIndex && i < csvText.length; i++) {
+          const char = csvText[i];
+          const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+          
+          if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+              currentField += '"';
+              i++; // Skip next quote
+            } else {
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            currentRow.push(currentField);
+            currentField = '';
+          } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            if (currentField || currentRow.length > 0) {
+              currentRow.push(currentField);
+              if (currentRow.length > 0) {
+                rows.push([...currentRow]); // Create copy to avoid reference issues
+              }
+              currentRow.length = 0; // Clear array efficiently
+              currentField = '';
+              rowCount++;
+            }
+            // Skip \r\n combinations
+            if (char === '\r' && nextChar === '\n') {
+              i++; // Skip \n
+            }
+          } else {
+            currentField += char;
+          }
+        }
+      };
+      
+      // Process the entire text (for small files, chunking isn't necessary)
+      processChunk(0, csvText.length);
+      
+      // Add the last row if it exists
+      if (currentField || currentRow.length > 0) {
+        currentRow.push(currentField);
+        if (currentRow.length > 0) {
+          rows.push(currentRow);
+        }
+      }
+      
+      console.log('Parsed rows:', rows.length);
+      
+      // Process data rows with deduplication
+      for (let i = 1; i < rows.length; i++) { // Skip header row
+        const columns = rows[i];
+        if (columns.length >= 5) { // Ensure we have all required columns
+          const timestamp = columns[0]?.trim() || '';
+          const id = parseInt(columns[1]?.trim() || '0', 10);
+          const name = columns[2]?.trim() || '';
+          const genre = columns[3]?.trim() || '';
+          const lyrics = columns[4]?.trim() || '';
+          
+          if (!isNaN(id) && name && genre && lyrics) {
+            const song = { id, timestamp, name, genre, lyrics };
+            
+            // Keep only the most recent version of each song (by ID)
+            const existing = songMap.get(id);
+            if (!existing || new Date(timestamp) > new Date(existing.timestamp)) {
+              songMap.set(id, song);
+            }
+          }
+        }
+      }
+      
+      const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+      console.log('Final songs array:', result.length, 'songs');
+      return result;
+    }
+
+    // Optimized cache loading
+    async function loadFromCache() {
+      if (!('caches' in window)) return [];
+      
+      try {
+        const cache = await caches.open('rhythm-csv-data');
+        const cachedResponse = await cache.match('csv-songs-data');
+        
+        if (cachedResponse) {
+          console.log('Loading CSV data from cache (offline mode)');
+          const csvText = await cachedResponse.text();
+          return parseCSVOptimized(csvText);
+        }
+      } catch (cacheError) {
+        console.error('Error loading from cache:', cacheError);
+      }
+      
+      return [];
+    }
+
+    // Load latest showlist from CSV
+    async function loadLatestShowlist() {
+      try {
+        // First, get the latest showlist
+        const showlistResponse = await fetch(getUrl('c2'));
+        const showlistCsv = await showlistResponse.text();
+        
+        // Parse the showlist CSV
+        const showlistRows = parseCSV(showlistCsv);
+        if (showlistRows.length <= 1) {
+          window.currentShowList = [];
+          return; // No data beyond headers
+        }
+        
+        // Get the latest entry (last row)
+        const latestRow = showlistRows[showlistRows.length - 1];
+        const latestUID = latestRow[1]; // UID is in column 2 (index 1)
+        const latestShowList = latestRow[2]; // Showlist is in column 3 (index 2)
+        const latestShowName = latestRow[3]; // Show Name is in column 4 (index 3)
+        
+        // Check if this showlist is cancelled
+        const cancelResponse = await fetch(getUrl('c3'));
+        const cancelCsv = await cancelResponse.text();
+        
+        // Parse the cancel CSV
+        const cancelRows = parseCSV(cancelCsv);
+        const isCancelled = cancelRows.some(row => 
+          row[1] === latestUID && row[2] && row[2].toLowerCase() === 'yes' // Adjusted column indices
+        );
+        
+        if (!isCancelled && latestShowList) {
+          // Parse the showlist (assuming it's newline-separated song names)
+          window.currentShowList = latestShowList.split('\n').map(song => song.trim()).filter(song => song);
+          console.log('Loaded showlist with', window.currentShowList.length, 'songs');
+        } else {
+          window.currentShowList = [];
+          // If current filter is showlist but showlist is cancelled/empty, switch to 'all'
+          if (currentGenreFilter === 'showlist') {
+            currentGenreFilter = 'all';
+            localStorage.setItem('songListFilter', currentGenreFilter);
+          }
+        }
+        
+      } catch (error) {
+        console.error('Failed to load latest showlist:', error);
+        window.currentShowList = [];
+        // If current filter is showlist but failed to load, switch to 'all'
+        if (currentGenreFilter === 'showlist') {
+          currentGenreFilter = 'all';
+          localStorage.setItem('songListFilter', currentGenreFilter);
+        }
+      }
+    }
+
+    // Parse CSV data (reused from show-list-generator)
+    function parseCSV(csvText) {
+      const rows = [];
+      let currentRow = [];
+      let currentField = '';
+      let inQuotes = false;
+      let i = 0;
+      
+      while (i < csvText.length) {
+        const char = csvText[i];
+        const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+        
+        if (char === '"') {
+          if (inQuotes && nextChar === '"') {
+            currentField += '"';
+            i += 2;
+          } else {
+            inQuotes = !inQuotes;
+            i++;
+          }
+        } else if (char === ',' && !inQuotes) {
+          currentRow.push(currentField.trim());
+          currentField = '';
+          i++;
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (currentField || currentRow.length > 0) {
+            currentRow.push(currentField.trim());
+            if (currentRow.length > 0) {
+              rows.push(currentRow);
+            }
+            currentRow = [];
+            currentField = '';
+          }
+          if (char === '\r' && nextChar === '\n') {
+            i += 2;
+          } else {
+            i++;
+          }
+        } else {
+          currentField += char;
+          i++;
+        }
+      }
+      
+      if (currentField || currentRow.length > 0) {
+        currentRow.push(currentField.trim());
+        if (currentRow.length > 0) {
+          rows.push(currentRow);
+        }
+      }
+      
+      return rows;
+    }
+    
     function loadSongsData() {
       // Only load songs after PIN is verified
       if (!pinAuthenticated) {
@@ -1075,120 +1293,35 @@
         return;
       }
       
-      // Check if running as web app and force cache refresh
-      const isWebApp = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-      const cacheParam = isWebApp ? `?t=${Date.now()}` : '';
+      // Show loading state
+      showLoadingState();
       
-      // Load songs.js first, then showlist.js with cache busting for web apps
-      fetch(`/songs.js${cacheParam}`, {
-        cache: isWebApp ? 'no-cache' : 'default'
-      })
-        .then(response => response.text())
-        .then(scriptContent => {
-          // Replace const with window assignment to make it global
-          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
-          eval(modifiedScript);
-          
-          // Now load showlist.js
-          return fetch(`/showlist.js${cacheParam}`, {
-            cache: isWebApp ? 'no-cache' : 'default'
-          });
-        })
-        .then(response => response.text())
-        .then(showlistContent => {
-          // Replace const with window assignment to make it global
-          const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
-          eval(modifiedShowlist);
-          
-          // Initialize after both files are loaded
+      // Load CSV data and showlist in parallel with timeout
+      const loadTimeout = setTimeout(() => {
+        console.warn('Loading timeout - proceeding with cached data');
+      }, 10000); // 10 second timeout
+      
+      Promise.all([
+        getSongsFromCSV(),
+        loadLatestShowlist()
+      ])
+        .then(([csvSongs]) => {
+          clearTimeout(loadTimeout);
+          songs = csvSongs;
+          window.songs = songs; // Make global for compatibility
+          hideLoadingState();
           initializeSongList();
         })
         .catch(error => {
+          clearTimeout(loadTimeout);
           console.error('Failed to load songs data:', error);
-          // Fallback to cached version if network fails
-          if (isWebApp) {
-            console.log('Retrying with cached version...');
-            fetch('/songs.js')
-              .then(response => response.text())
-              .then(scriptContent => {
-                const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
-                eval(modifiedScript);
-                return fetch('/showlist.js');
-              })
-              .then(response => response.text())
-              .then(showlistContent => {
-                const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
-                eval(modifiedShowlist);
-                initializeSongList();
-              })
-              .catch(fallbackError => {
-                console.error('Failed to load cached songs data:', fallbackError);
-              });
-          }
+          songs = [];
+          window.songs = songs;
+          window.currentShowList = [];
+          hideLoadingState();
+          initializeSongList();
         });
     }
-    
-    function refreshSongsData() {
-      // Force refresh songs data - useful for web app mode
-      if (!pinAuthenticated) return;
-      
-      const isWebApp = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-      const cacheParam = `?refresh=${Date.now()}`;
-      
-      console.log('Refreshing songs data...');
-      
-      fetch(`/songs.js${cacheParam}`, {
-        cache: 'no-cache',
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      })
-        .then(response => response.text())
-        .then(scriptContent => {
-          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
-          eval(modifiedScript);
-          
-          return fetch(`/showlist.js${cacheParam}`, {
-            cache: 'no-cache',
-            headers: {
-              'Cache-Control': 'no-cache',
-              'Pragma': 'no-cache'
-            }
-          });
-        })
-        .then(response => response.text())
-        .then(showlistContent => {
-          const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
-          eval(modifiedShowlist);
-          
-          // Update the UI with fresh data
-          updateFilterDropdown();
-          renderList(searchBox.value, currentGenreFilter);
-          
-          console.log('Songs data refreshed successfully');
-        })
-        .catch(error => {
-          console.error('Failed to refresh songs data:', error);
-        });
-    }
-    
-    // Remove the immediate execution - now controlled by PIN
-    // (function(){
-    //   // Load script via fetch to hide from sources
-    //   fetch('/songs.js') // Use original filename for proper caching
-    //     .then(response => response.text())
-    //     .then(scriptContent => {
-    //       // Replace const with window assignment to make it global
-    //       const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
-    //       eval(modifiedScript);
-    //       // Initialize after songs.js is loaded
-    //       initializeSongList();
-    //     })
-    //     .catch(error => {
-    //       console.error('Failed to load songs data:', error);
-    //     });
-    // })();
     
     function initializeSongList() {
       songList = document.getElementById('song-list');
@@ -1203,175 +1336,224 @@
         currentGenreFilter = savedFilter;
       }
       
-      updateFilterDropdown();
-      renderList();
-      
-      // Set up periodic refresh for web app mode
-      const isWebApp = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
-      if (isWebApp) {
-        // Refresh songs data every 5 minutes in web app mode
-        setInterval(() => {
-          if (pinAuthenticated && navigator.onLine) {
-            refreshSongsData();
-          }
-        }, 5 * 60 * 1000); // 5 minutes
-      }
-      
-      // Toggle dropdown
+      // Set up event listeners
       filterBtn.addEventListener('click', function(e) {
         e.stopPropagation();
-        filterDropdown.classList.toggle('show');
+        filterContent.classList.toggle('show');
       });
-
+      
       // Close dropdown when clicking outside
       document.addEventListener('click', function() {
-        filterDropdown.classList.remove('show');
-      });
-
-      searchBox.addEventListener('input', e => {
-        renderList(e.target.value, currentGenreFilter);
+        filterContent.classList.remove('show');
       });
       
-      // Restore scroll position when page loads
-      window.addEventListener('load', function() {
-        const savedScrollPosition = localStorage.getItem('songListScrollPosition');
-        if (savedScrollPosition !== null) {
-          // Use setTimeout to ensure content is fully rendered before scrolling
-          setTimeout(() => {
-            window.scrollTo(0, parseInt(savedScrollPosition));
-            // Clear the stored position after restoring it
-            localStorage.removeItem('songListScrollPosition');
-          }, 100);
+      // Prevent dropdown from closing when clicking inside
+      filterContent.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+      
+      // Search functionality with optimized debouncing
+      const debouncedSearch = debounce((searchValue) => {
+        renderList(searchValue, currentGenreFilter);
+      }, 250);
+      
+      searchBox.addEventListener('input', function(e) {
+        debouncedSearch(e.target.value);
+      });
+      
+      // Focus search box when typing (unless in an input)
+      document.addEventListener('keydown', function(e) {
+        if (e.target.tagName !== 'INPUT' && e.key.match(/[a-zA-Z0-9]/)) {
+          searchBox.focus();
         }
       });
+      
+      // Initialize UI
+      updateFilterDropdown();
+      renderList('', currentGenreFilter);
+      
+      // Restore scroll position if returning from lyrics page
+      restoreScrollPosition();
     }
-
+    
+    // Optimized genre counting with caching
     function updateFilterDropdown() {
-      // Count songs by genre
-      const genreCounts = {
-        'Baburu': 0,
-        'Kaasi': 0,
-        'Nala': 0,
-        'Taki': 0,
-        'Thinberu': 0,
-        'Zamaanee': 0
-      };
+      if (!songs || songs.length === 0) {
+        filterContent.innerHTML = '<a onclick="setFilter(\'all\')">All (0)</a>';
+        return;
+      }
       
-      let totalSongs = 0;
-      let showCount = 0;
+      // Use cached counts if songs haven't changed
+      if (updateFilterDropdown.cachedSongs === songs) {
+        return;
+      }
       
-      window.songs.forEach(song => {
-        if (song.genre && genreCounts.hasOwnProperty(song.genre)) {
-          genreCounts[song.genre]++;
+      // Count songs by genre efficiently
+      const genreCounts = songs.reduce((counts, song) => {
+        counts.all++;
+        if (counts.hasOwnProperty(song.genre)) {
+          counts[song.genre]++;
         }
-        totalSongs++;
+        return counts;
+      }, {
+        all: 0,
+        Baburu: 0,
+        Kaasi: 0,
+        Nala: 0,
+        Taki: 0,
+        Thinberu: 0,
+        Zamaanee: 0,
+        showlist: 0
+      });
+
+      // Count showlist songs
+      if (window.currentShowList && window.currentShowList.length > 0) {
+        genreCounts.showlist = window.currentShowList.length;
+      }
+      
+      // Build dropdown content using template literals for better performance
+      const dropdownItems = [
+        `<a onclick="setFilter('all')">All (${genreCounts.all})</a>`
+      ];
+      
+      // Only add showlist option if there's an active showlist
+      if (window.currentShowList && window.currentShowList.length > 0) {
+        dropdownItems.push(`<a onclick="setFilter('showlist')">Show List (${genreCounts.showlist})</a>`);
+      }
+      
+      // Add genre filters
+      ['Baburu', 'Kaasi', 'Nala', 'Taki', 'Thinberu', 'Zamaanee'].forEach(genre => {
+        dropdownItems.push(`<a onclick="setFilter('${genre}')">${genre} (${genreCounts[genre]})</a>`);
       });
       
-      // Count songs in showlist that exist in songs
-      if (window.showList && Array.isArray(window.showList) && window.showList.length > 0) {
-        showCount = window.showList.filter(showSongName => 
-          window.songs.some(song => song.name.toLowerCase() === showSongName.toLowerCase())
-        ).length;
-      }
+      // Update dropdown content in one operation
+      filterContent.innerHTML = dropdownItems.join('');
       
-      // Build dropdown content
-      let dropdownContent = `<a onclick="setFilter('all')">All (${totalSongs})</a>`;
-      
-      // Add SHOW option only if showlist has items
-      if (showCount > 0) {
-        dropdownContent += `<a onclick="setFilter('SHOW')">SHOW (${showCount})</a>`;
-      }
-      
-      dropdownContent += `
-        <a onclick="setFilter('Baburu')">Baburu (${genreCounts.Baburu})</a>
-        <a onclick="setFilter('Kaasi')">Kaasi (${genreCounts.Kaasi})</a>
-        <a onclick="setFilter('Nala')">Nala (${genreCounts.Nala})</a>
-        <a onclick="setFilter('Taki')">Taki (${genreCounts.Taki})</a>
-        <a onclick="setFilter('Thinberu')">Thinberu (${genreCounts.Thinberu})</a>
-        <a onclick="setFilter('Zamaanee')">Zamaanee (${genreCounts.Zamaanee})</a>
-      `;
-      
-      // Update dropdown content
-      filterContent.innerHTML = dropdownContent;
+      // Cache the results
+      updateFilterDropdown.cachedSongs = songs;
     }
 
+    // Optimized list rendering with virtual scrolling considerations
     function renderList(searchFilter = '', genreFilter = 'all') {
-      songList.innerHTML = '';
+      const startTime = performance.now();
       
-      let filteredSongs;
-      
-      if (genreFilter === 'SHOW') {
-        // For SHOW filter, use the order from showlist
-        if (window.showList && Array.isArray(window.showList) && window.showList.length > 0) {
-          filteredSongs = [];
-          
-          // Add songs in the order specified in showlist
-          window.showList.forEach(showSongName => {
-            const song = window.songs.find(s => s.name.toLowerCase() === showSongName.toLowerCase());
-            if (song) {
-              // Apply search filter if provided
-              if (searchFilter === '' || song.name.toLowerCase().includes(searchFilter.toLowerCase())) {
-                filteredSongs.push(song);
-              }
-            }
-          });
-        } else {
-          filteredSongs = [];
-        }
-      } else {
-        // For other filters, use normal filtering and sorting
-        filteredSongs = window.songs
-          .filter(song => {
-            const matchesSearch = song.name.toLowerCase().includes(searchFilter.toLowerCase());
-            const matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
-            return matchesSearch && matchesGenre;
-          })
-          .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+      if (!songs || songs.length === 0) {
+        songList.innerHTML = '<li style="color: #999; cursor: default;">No songs available</li>';
+        return;
       }
       
-      // Render the filtered songs
-      filteredSongs.forEach(song => {
-        const li = document.createElement('li');
-        li.textContent = song.name;
+      // Pre-compile search regex for better performance
+      const searchRegex = searchFilter ? new RegExp(searchFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') : null;
+      
+      // Create showlist lookup set for O(1) lookups
+      const showlistSet = genreFilter === 'showlist' && window.currentShowList 
+        ? new Set(window.currentShowList) 
+        : null;
+      
+      // Filter songs efficiently
+      const filteredSongs = songs.filter(song => {
+        const matchesSearch = !searchRegex || searchRegex.test(song.name);
         
-        // Check if English lyrics are available
-        if (!song.englishLyrics || song.englishLyrics.trim() === '') {
-              li.style.color = '#f5d467';
-              li.addEventListener('mouseenter', () => {
-                li.style.color = 'black';
-              });
-              li.addEventListener('mouseleave', () => {
-                li.style.color = '#f5d467';
-              });
-              }
+        let matchesGenre;
+        if (genreFilter === 'showlist') {
+          matchesGenre = showlistSet && showlistSet.has(song.name);
+        } else {
+          matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
+        }
         
-        li.onclick = () => {
-          // Save current scroll position before navigating
-          localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
-          localStorage.setItem('selectedSongId', song.id);
-          // Refresh session before navigating
-          if (pinAuthenticated) {
-            const sessionData = {
-              timestamp: Date.now(),
-              authenticated: true,
-              sessionType: 'songlist'
-            };
-            sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
-          }
-          window.location.href = 'lyrics';
-        };
-        songList.appendChild(li);
+        return matchesSearch && matchesGenre;
       });
+      
+      // Use DocumentFragment for better performance
+      const fragment = document.createDocumentFragment();
+      
+      if (filteredSongs.length === 0) {
+        const li = document.createElement('li');
+        li.textContent = 'No songs match your search';
+        li.style.cssText = 'color: #999; cursor: default;';
+        fragment.appendChild(li);
+      } else {
+        // Create elements efficiently
+        filteredSongs.forEach(song => {
+          const li = document.createElement('li');
+          li.textContent = song.name;
+          li.style.color = '#f5d467';
+          
+          // Use event delegation for better performance
+          li.dataset.songId = song.id;
+          
+          fragment.appendChild(li);
+        });
+      }
+      
+      // Single DOM update
+      songList.innerHTML = '';
+      songList.appendChild(fragment);
+      
+      console.log(`Rendered ${filteredSongs.length} songs in ${performance.now() - startTime}ms`);
     }
+    
+    // Event delegation for song clicks
+    document.addEventListener('click', function(e) {
+      if (e.target.matches('#song-list li[data-song-id]')) {
+        const songId = e.target.dataset.songId;
+        
+        // Save current scroll position before navigating
+        localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
+        localStorage.setItem('selectedSongId', songId);
+        
+        // Refresh session before navigating
+        if (pinAuthenticated) {
+          const sessionData = {
+            timestamp: Date.now(),
+            authenticated: true,
+            sessionType: 'songlist'
+          };
+          sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
+        }
+        
+        window.location.href = 'lyrics-csv';
+      }
+    });
 
-    // Global functions for onclick handlers
+    // Global functions for onclick handlers (optimized)
     function setFilter(genre) {
+      if (currentGenreFilter === genre) return; // Avoid unnecessary re-renders
+      
       currentGenreFilter = genre;
-      // Save the filter state to localStorage
       localStorage.setItem('songListFilter', genre);
-      // Keep the filter icon, don't change button text
-      document.querySelector('.filter-dropdown').classList.remove('show');
+      
+      // Close dropdown with animation
+      const filterContent = document.getElementById('filter-content');
+      filterContent.classList.remove('show');
+      
+      // Update list
       renderList(document.getElementById('search-box').value, currentGenreFilter);
+    }
+    
+    // Add loading state management
+    function showLoadingState() {
+      const songList = document.getElementById('song-list');
+      songList.innerHTML = '<li style="color: #999; cursor: default; text-align: center;">Loading songs...</li>';
+    }
+    
+    function hideLoadingState() {
+      // Loading state will be replaced by actual content in renderList
+    }
+    
+    // Optimize scroll restoration
+    function restoreScrollPosition() {
+      const savedScrollPosition = localStorage.getItem('songListScrollPosition');
+      if (savedScrollPosition) {
+        // Use requestAnimationFrame for smoother scrolling
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: parseInt(savedScrollPosition),
+            behavior: 'auto' // Instant for better UX on return
+          });
+          localStorage.removeItem('songListScrollPosition');
+        });
+      }
     }
   </script>
 </body>

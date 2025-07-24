@@ -1474,6 +1474,14 @@
             document.body.style.overflow = 'auto';
         }
 
+        // URL deobfuscation helper
+        function getUrl(key) {
+            const urls = {
+                'f7': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTY1dqWW5pdEZKWmwzWWktZTlyYVNBU2dBWHpsYThHb2c2X1FVMElRcmZaOFpOTFRRL2Zvcm1SZXNwb25zZQ=='
+            };
+            return atob(urls[key]);
+        }
+
         // Event listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Check submission status on page load
@@ -1625,7 +1633,7 @@
 
             // Create form
             const hiddenForm = document.createElement('form');
-            hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLScWjYnitFJZl3Yi-e9raSASgAXzla8Gog6_QU0IQrfZ8ZNLTQ/formResponse';
+            hiddenForm.action = getUrl('f7');
             hiddenForm.method = 'POST';
             hiddenForm.target = 'hidden_iframe';
             hiddenForm.style.display = 'none';

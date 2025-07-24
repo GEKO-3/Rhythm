@@ -124,9 +124,10 @@
       padding: 20px;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       border: 1px solid rgba(245, 208, 0, 0.2);
+      gap: 20px;
     }
     
     .song-item:hover {
@@ -159,9 +160,11 @@
     }
     
     .download-buttons {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      max-width: 320px;
+      min-width: 280px;
     }
     
     .download-btn {
@@ -169,13 +172,16 @@
       color: var(--text-color);
       border: none;
       border-radius: 5px;
-      padding: 8px 16px;
-      font-size: 0.9em;
+      padding: 10px 12px;
+      font-size: 0.85em;
       cursor: pointer;
       transition: background-color 0.3s;
       font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
       font-weight: bold;
-      min-width: 80px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     
     .download-btn:hover {
@@ -208,6 +214,15 @@
     
     .download-btn.view-btn:hover {
       background: #45a049;
+    }
+    
+    .download-btn.edit-btn {
+      background: #FF9800;
+      color: white;
+    }
+    
+    .download-btn.edit-btn:hover {
+      background: #F57C00;
     }
     
     .download-btn.downloading {
@@ -363,12 +378,15 @@
       
       .download-buttons {
         width: 100%;
-        justify-content: center;
+        max-width: 100%;
+        min-width: 100%;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
       }
       
       .download-btn {
-        flex: 1;
-        min-width: 100px;
+        font-size: 0.8em;
+        padding: 8px 10px;
       }
     }
   </style>
@@ -552,17 +570,20 @@
           </div>
           <div class="download-buttons">
             <button class="download-btn view-btn" onclick="viewSong(${song.id})">
-              View Song
+              View
+            </button>
+            <button class="download-btn edit-btn" onclick="editSong(${song.id})">
+              Edit
             </button>
             <button class="download-btn" onclick="downloadLyrics(${song.id}, 'dhivehi')">
-              Download ދިވެހި
+              DL ދިވެހި
             </button>
             <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'dhivehi')">
               Copy ދިވެހި
             </button>
             ${hasEnglish ? `
               <button class="download-btn english" onclick="downloadLyrics(${song.id}, 'english')">
-                Download English
+                DL English
               </button>
               <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'english')">
                 Copy English
@@ -650,6 +671,89 @@
       } else {
         fallbackCopyIdToClipboard(idText);
       }
+    }
+
+    function editSong(songId) {
+      const song = window.songs.find(s => s.id === songId);
+      if (!song) {
+        alert('Song not found');
+        return;
+      }
+      
+      // Parse the lyrics structure to preserve sections, breaks, and starred lines
+      const parsedLyrics = parseLyricsForEdit(song.lyrics);
+      
+      // Store the song data in localStorage for lyrics-submit.html to use
+      const songData = {
+        id: song.id,
+        name: song.name,
+        genre: song.genre,
+        lyrics: song.lyrics,
+        parsedLyrics: parsedLyrics
+      };
+      
+      localStorage.setItem('editSongData', JSON.stringify(songData));
+      
+      // Navigate to lyrics-submit.html
+      window.location.href = 'lyrics-submit.html';
+    }
+    
+    // Function to parse lyrics structure for editing
+    function parseLyricsForEdit(lyrics) {
+      const lines = lyrics.split('\n');
+      const sections = [];
+      let currentSection = null;
+      
+      lines.forEach((line, index) => {
+        const trimmedLine = line.trim();
+        
+        // Skip empty lines
+        if (trimmedLine === '') {
+          return;
+        }
+        
+        // Section headers (# or $)
+        if (trimmedLine.startsWith('#') || trimmedLine.startsWith('$')) {
+          // Start new section - keep the full title with prefix
+          currentSection = {
+            type: 'section',
+            title: trimmedLine, // Keep full title including # or $ prefix
+            lines: []
+          };
+          sections.push(currentSection);
+          return;
+        }
+        
+        // Break lines
+        if (trimmedLine.startsWith('-')) {
+          sections.push({
+            type: 'break'
+          });
+          return;
+        }
+        
+        // Regular lines (including starred lines)
+        if (currentSection === null) {
+          // Create default section if no section header exists
+          currentSection = {
+            type: 'section',
+            title: '#M', // Default section with prefix
+            lines: []
+          };
+          sections.push(currentSection);
+        }
+        
+        // Check if line is starred (starts with *)
+        const isStarred = trimmedLine.startsWith('*');
+        const lineText = isStarred ? trimmedLine.substring(1).trim() : trimmedLine;
+        
+        currentSection.lines.push({
+          text: lineText,
+          starred: isStarred
+        });
+      });
+      
+      return sections;
     }
     
     function fallbackCopyIdToClipboard(text) {

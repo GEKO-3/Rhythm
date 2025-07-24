@@ -1,0 +1,2149 @@
+<!DOCTYPE html>
+<html lang="dv">
+<head>
+  <meta charset="UTF-8">
+  <title>Lyrics Submitter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
+<link rel="manifest" href="favicons/manifest.webmanifest">
+  <style>
+    /* Local font definitions */
+    @font-face {
+      font-family: 'Faruma';
+      src: url('Fonts/Faruma.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    html, body {
+      touch-action: pan-x pan-y;
+      overscroll-behavior: none;
+    }
+    input, textarea, select, button {
+      touch-action: manipulation;
+    }
+    :root {
+      --primary-color: #f5d000;
+      --hover-color: #fced98;
+      --active-color: #E6B800;
+      --text-color: #2b2b2b;
+      --bg-opacity: rgba(31, 31, 31, 0.0);
+      --hover-color2: #3a3a3a;
+      --active-color2: #111111
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes slideIn {
+      0% { transform: translateY(10px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    body {
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #1f1f1f;
+      background-size: cover;
+      color: var(--primary-color);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .container {
+      text-align: center;
+      position: relative;
+      max-width: 600px;
+      width: 100%; 
+      padding: 20px;
+      background: var(--bg-opacity);
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+      animation: slideIn 0.5s ease-in-out;
+      margin-top: 40px;
+      margin-bottom: 40px;
+    }
+    button {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 5px;
+      padding: 10px 18px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-bottom: 20px;
+      transition: background-color 0.3s, transform 0.2s;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    button:hover {
+      background-color: var(--hover-color);
+      font-weight: bold;
+    }
+    button:active {
+      background-color: var(--active-color);
+      transform: scale(0.97);
+    }
+    .section {
+      background: rgba(43,43,43,0.7);
+      border: 1px solid #313131;
+      box-shadow: 0 1px 4px #0001;
+      padding: 16px 14px 14px 14px;
+      margin-bottom: 28px;
+      border-radius: 8px;
+      position: relative;
+      text-align: right;
+      direction: rtl;
+    }
+    .section-title {
+      font-weight: 700;
+      font-size: 1.1em;
+      padding: 4px 0 8px 0;
+      border: none;
+      background: none;
+      width: 100%;
+      color: #ffffff;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #494949;
+      border-radius: 0;
+      outline: none;
+      transition: border-color 0.2s;
+      background: transparent;
+      direction: ltr;
+      font-family: 'Montserrat', Arial, sans-serif;
+      text-align: left;
+    }
+    .section-title:focus {
+      border-color: #E6B800;
+      background: #111111;
+    }
+    .line {
+      display: flex;
+      align-items: stretch;
+      margin-bottom: 10px;
+      direction: rtl;
+      flex-direction: row-reverse;
+      gap: 6px;
+    }
+    .line input[type="text"] {
+      flex: 1;
+      max-width: 500px;
+      width: 100%;
+      padding: 7px 12px 7px 5px;
+      border-radius: 5px;
+      border: 1px solid #535353;
+      background: #1b1b1b;
+      font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif;
+      direction: rtl;
+      font-size: 1.1em;
+      color: #ffffff;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      height: 38px;
+      box-sizing: border-box;
+    }
+    .line input[type="checkbox"] {
+      height: 90%;
+      width: 18px;
+      accent-color: #f5d000;
+      margin-left: 2px;
+      align-self: center;
+      display: flex;
+    }
+    .star-line-btn {
+      width: 26px;
+      height: 26px;
+      background: #222;
+      color: #f5d000;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 6px;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .star-line-btn:hover {
+      background: inherit !important;
+      color: inherit !important;
+    }
+    .star-line-btn.active {
+      background: #f5d000 !important;
+      color: #2b2b2b !important;
+      font-weight: bold;
+    }
+    .controls {
+      margin-top: 32px;
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+    }
+    .remove-section-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      background: #ff7920;
+      color: #2b2b2b;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.2s, color 0.2s;
+      z-index: 2;
+      box-shadow: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .remove-section-btn:hover {
+      background: #ff4f4f;
+      color: #fff;
+    }
+    .remove-line-btn {
+      height: 100%;
+      aspect-ratio: 1/1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: #ff7920;
+      color: #2b2b2b;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 6px;
+      transition: background 0.2s, color 0.2s;
+      box-shadow: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .remove-line-btn:hover {
+      background: #ff4f4f;
+      color: #fff;
+    }
+    .move-line-btn {
+      width: 32px;
+      height: 26px;
+      background: #1976d2;
+      color: #ffffff;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.9em;
+      font-weight: bold;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      margin-left: 3px;
+      transition: background 0.2s, color 0.2s, transform 0.1s;
+      box-shadow: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+      min-width: 32px;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+    .move-line-btn:hover {
+      background: #1565c0;
+      color: #fff;
+    }
+    .move-line-btn:active {
+      cursor: grabbing;
+      transform: scale(1.1);
+    }
+    .move-line-btn:disabled {
+      background: #666;
+      color: #999;
+      cursor: not-allowed;
+    }
+    .add-line-btn {
+      width: 28px;
+      height: 28px;
+      background: #f5d000;
+      color: #2b2b2b;
+      border: none;
+      border-radius: 6px;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      transition: background 0.2s, color 0.2s;
+      z-index: 2;
+      box-shadow: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .add-line-btn:hover {
+      background: #fced98;
+      color: #2b2b2b;
+    }
+    .break-line {
+      width: 100%;
+      height: 6px;
+      background: var(--primary-color);
+      border-radius: 8px;
+      margin: 24px 0 24px 0;
+      display: flex;
+      align-items: center;
+      position: relative;
+      opacity: 0.85;
+    }
+    .remove-break-btn {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 22px;
+      height: 22px;
+      background: #ff7920;
+      color: #2b2b2b;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      z-index: 2;
+      box-shadow: none;
+      transition: background 0.2s, color 0.2s;
+    }
+    .remove-break-btn:hover {
+      background: #1976d2;
+      color: #fff;
+    }
+    .notification-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #1976d2;
+      color: #ffffff;
+      padding: 12px 20px;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: bold;
+      text-align: center;
+      font-size: 1.1em;
+      z-index: 1000;
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .notification-bar.show {
+      transform: translateY(0);
+    }
+    .notification-bar.success {
+      background: #4CAF50;
+    }
+    .notification-bar.error {
+      background: #f44336;
+    }
+    .notification-bar.submitting {
+      background: #ff9800;
+      color: #2b2b2b;
+    }
+    @media (max-width: 600px) {
+      html, body {
+        font-size: 18px;
+      }
+      .container {
+        padding: 12px 2vw 18px 2vw;
+        max-width: 98vw;
+        min-width: 0;
+      }
+      h2 {
+        font-size: 1.3em;
+      }
+      .section-title {
+        font-size: 1em;
+        padding: 6px 0 10px 0;
+      }
+      .line input[type="text"] {
+        font-size: 1em;
+        padding: 8px 8px 8px 4px;
+        min-width: 0;
+        max-width: 100%;
+      }
+      .controls {
+        flex-direction: column;
+        gap: 10px;
+      }
+      button, .remove-section-btn, .remove-line-btn {
+        font-size: 1em;
+        padding: 10px 0;
+        min-width: 0;
+      }
+    }
+  </style>
+  <script>
+    // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (
+        e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0'
+      )) {
+        e.preventDefault();
+      }
+    });
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+    // Prevent double-tap zoom on mobile
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 350) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+    // Prevent pinch-zoom and gesture events on iOS/Safari
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gesturechange', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gestureend', function(e) {
+      e.preventDefault();
+    });
+  </script>
+</head>
+<body>
+    <div id="notification-bar" class="notification-bar"></div>
+    <div class="container">
+    <div id="edit-mode-indicator" style="display:none;background:#f5d000;color:#2b2b2b;padding:8px 12px;border-radius:5px;margin-bottom:15px;font-weight:bold;text-align:center;">
+      ✏️ EDIT MODE - Updating existing song
+    </div>
+    <input id="song-name-input" type="text" placeholder="Song Name (type to search existing songs)" autocomplete="off" list="song-names-list" style="width:100%;max-width:600px;margin-bottom:18px;font-size:1.2em;padding:10px 12px;border-radius:7px;border:1px solid #aaa;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
+    <datalist id="song-names-list"></datalist>
+    
+    <div class="genre-container" style="width:100%;max-width:600px;margin-bottom:18px;position:relative;">
+      <button id="genre-btn" type="button" style="width:100%;font-size:1.2em;padding:10px 12px;border-radius:5px;border:1px solid #444;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#222;color:#f5d000;font-weight:bold;text-align:left;cursor:pointer;transition:border-color 0.2s;">
+        Select Genre ▼
+      </button>
+      <div id="genre-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:rgba(43,43,43,0.98);border:1px solid #444;border-radius:5px;z-index:10;box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);margin-top:2px;">
+        <div class="genre-option" data-genre="Baburu" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Baburu</div>
+        <div class="genre-option" data-genre="Kaasi" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Kaasi</div>
+        <div class="genre-option" data-genre="Nala" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Nala</div>
+        <div class="genre-option" data-genre="Taki" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Taki</div>
+        <div class="genre-option" data-genre="Thinberu" style="padding:8px 12px;cursor:pointer;border-bottom:1px solid #333;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Thinberu</div>
+        <div class="genre-option" data-genre="Zamaanee" style="padding:8px 12px;cursor:pointer;border-bottom:none;color:#f5d000;font-family:'Montserrat',Arial,sans-serif;text-decoration:none;display:block;">Zamaanee</div>
+      </div>
+    </div>
+    <div id="sections"></div>
+    <div class="controls">
+      <button onclick="addSection()">Add Section</button>
+      <button onclick="addBreak()">Add Break</button>
+      <button id="submit-btn" onclick="submitToForm()">Submit</button>
+      <button onclick="resetTool()">Reset</button>
+    </div>
+  </div>
+  <script>
+    // Global variables
+    let sectionCount = 0;
+    let selectedGenre = localStorage.getItem('lyricsSubmitterGenre') || '';
+    let currentSongId = null;
+    let isEditMode = false;
+    let songSuggestions = [];
+    
+    function transliterateToThaana(text) {
+      const map = {
+        'A': 'ާ', 'B': 'ޞ', 'C': 'ޝ', 'D': 'ޑ', 'E': 'ޭ', 'F': 'ﷲ', 'G': 'ޣ', 'H': 'ޙ', 'I': 'ީ', 'J': 'ޛ', 'K': 'ޚ', 'L': 'ޅ', 'M': 'ޟ', 'N': 'ޏ', 'O': 'ޯ', 'P': '÷', 'Q': 'ޤ', 'R': 'ޜ', 'S': 'ށ', 'T': 'ޓ', 'U': 'ޫ', 'V': 'ޥ', 'W': 'ޢ', 'X': 'ޘ', 'Y': 'ޠ', 'Z': 'ޡ',
+        'a': 'ަ', 'b': 'ބ', 'c': 'ޗ', 'd': 'ދ', 'e': 'ެ', 'f': 'ފ', 'g': 'ގ', 'h': 'ހ', 'i': 'ި', 'j': 'ޖ', 'k': 'ކ', 'l': 'ލ', 'm': 'މ', 'n': 'ނ', 'o': 'ޮ', 'p': 'ޕ', 'q': 'ް', 'r': 'ރ', 's': 'ސ', 't': 'ތ', 'u': 'ު', 'v': 'ވ', 'w': 'އ', 'x': '×', 'y': 'ޔ', 'z': 'ޒ'
+      };
+      let thaana = text.split('').map(ch => map[ch] || ch).join('');
+      // Remove forbidden Thaana characters if directly after any forbidden
+      const forbidden = ['ާ','ަ','ް','ޭ','ެ','ޯ','ޮ','ީ','ި','ޫ','ު'];
+      let result = '';
+      for (let i = 0; i < thaana.length; i++) {
+        if (
+          i > 0 &&
+          forbidden.includes(thaana[i]) &&
+          forbidden.includes(thaana[i - 1])
+        ) {
+          continue; // skip if previous is forbidden
+        }
+        result += thaana[i];
+      }
+      return result;
+    }
+    function setupThaanaTransliteration(input) {
+      input.addEventListener('input', function(e) {
+        const caret = input.selectionStart;
+        const original = input.value;
+        const thaana = transliterateToThaana(original);
+        if (original !== thaana) {
+          input.value = thaana;
+          input.setSelectionRange(caret, caret);
+        }
+      });
+    }
+    function saveState() {
+      const data = [];
+      const container = document.getElementById('sections');
+      const children = Array.from(container.children);
+      children.forEach(child => {
+        if (child.classList.contains('section')) {
+          const sectionTitle = child.querySelector('.section-title').value;
+          const lines = [];
+          child.querySelectorAll('.line').forEach(line => {
+            lines.push({
+              text: line.querySelector('input[type="text"]').value,
+              starred: line.querySelector('.star-line-btn').classList.contains('active')
+            });
+          });
+          data.push({ type: 'section', title: sectionTitle, lines });
+        } else if (child.classList.contains('break-line')) {
+          data.push({ type: 'break' });
+        }
+      });
+      localStorage.setItem('lyricsSubmitterData', JSON.stringify(data));
+      
+      // Save edit mode state
+      if (isEditMode && currentSongId) {
+        localStorage.setItem('lyricsSubmitterEditMode', JSON.stringify({
+          isEditMode: true,
+          currentSongId: currentSongId,
+          currentSongName: document.getElementById('song-name-input').value.trim()
+        }));
+      } else {
+        localStorage.removeItem('lyricsSubmitterEditMode');
+      }
+    }
+    function setLineHighlight(lineDiv) {
+      const input = lineDiv.querySelector('input[type="text"]');
+      const starBtn = lineDiv.querySelector('.star-line-btn');
+      if (starBtn.classList.contains('active')) {
+        input.style.color = '#f5d000';
+      } else {
+        input.style.color = '#ffffff';
+      }
+    }
+    function loadState() {
+      const data = JSON.parse(localStorage.getItem('lyricsSubmitterData') || 'null');
+      const editModeData = JSON.parse(localStorage.getItem('lyricsSubmitterEditMode') || 'null');
+      
+      // Restore edit mode state first
+      if (editModeData && editModeData.isEditMode) {
+        isEditMode = true;
+        currentSongId = editModeData.currentSongId;
+        
+        // Set the song name if available
+        if (editModeData.currentSongName) {
+          document.getElementById('song-name-input').value = editModeData.currentSongName;
+          localStorage.setItem('lyricsSubmitterSongName', editModeData.currentSongName);
+        }
+        
+        updateEditModeUI();
+        console.log('Restored edit mode for song ID:', currentSongId, 'Name:', editModeData.currentSongName);
+      }
+      
+      if (!data) return false;
+      document.getElementById('sections').innerHTML = '';
+      sectionCount = 0;
+      data.forEach(item => {
+        if (item.type === 'section') {
+          sectionCount++;
+          const sectionsDiv = document.getElementById('sections');
+          const section = document.createElement('div');
+          section.className = 'section';
+          section.dataset.sectionId = sectionCount;
+          section.innerHTML = `
+            <input type="text" class="section-title" placeholder="#M,#1,#2,#4 - $M,$1,$2,$4" />
+            <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
+            <div class="lines"></div>
+            <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
+          `;
+          sectionsDiv.appendChild(section);
+          const sectionTitleInput = section.querySelector('.section-title');
+          sectionTitleInput.value = item.title;
+          const linesDiv = section.querySelector('.lines');
+          item.lines.forEach(lineData => {
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'line';
+            lineDiv.innerHTML = `
+              <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
+              <button class="star-line-btn" title="Nagaa / Zuvaabu">N</button>
+              <button class="move-line-btn" title="Drag to move line">⋮⋮</button>
+              <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+            `;
+            linesDiv.appendChild(lineDiv);
+            const lineInput = lineDiv.querySelector('input[type="text"]');
+            lineInput.value = lineData.text;
+            setupThaanaTransliteration(lineInput);
+            setupInputNavigation(lineInput);
+            const starBtn = lineDiv.querySelector('.star-line-btn');
+            if (lineData && lineData.starred) {
+              starBtn.classList.add('active');
+              starBtn.textContent = 'Z';
+            } else {
+              starBtn.textContent = 'N';
+            }
+            setLineHighlight(lineDiv);
+            lineInput.addEventListener('input', saveState);
+            starBtn.addEventListener('click', function() {
+              starBtn.classList.toggle('active');
+              starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+              setLineHighlight(lineDiv);
+              saveState();
+            });
+            
+            // Setup drag functionality for move button
+            const moveBtn = lineDiv.querySelector('.move-line-btn');
+            moveBtn.addEventListener('mousedown', function(e) {
+              startDrag(e, lineDiv);
+            });
+            moveBtn.addEventListener('touchstart', function(e) {
+              startDrag(e, lineDiv);
+            });
+            
+            lineInput.addEventListener('input', saveState);
+          });
+        } else if (item.type === 'break') {
+          const sectionsDiv = document.getElementById('sections');
+          const breakDiv = document.createElement('div');
+          breakDiv.className = 'break-line';
+          breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+          sectionsDiv.appendChild(breakDiv);
+        }
+      });
+      updateMoveButtons(); // Update move button states after loading
+      return true;
+    }
+
+    // Function to parse CSV with proper handling of quoted fields
+    function parseCSVLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      let i = 0;
+      
+      while (i < line.length) {
+        const char = line[i];
+        
+        if (char === '"') {
+          if (inQuotes && line[i + 1] === '"') {
+            // Escaped quote
+            current += '"';
+            i += 2;
+          } else {
+            // Toggle quote state
+            inQuotes = !inQuotes;
+            i++;
+          }
+        } else if (char === ',' && !inQuotes) {
+          // End of field
+          result.push(current.trim());
+          current = '';
+          i++;
+        } else {
+          current += char;
+          i++;
+        }
+      }
+      
+      // Add the last field
+      result.push(current.trim());
+      return result;
+    }
+
+    // Function to get songs from CSV with deduplication
+    async function getSongsFromCSV() {
+      try {
+        console.log('Fetching CSV from Google Sheets...');
+        const response = await fetch(getUrl('c1'));
+        const csvText = await response.text();
+        console.log('CSV text length:', csvText.length);
+        console.log('First 500 chars:', csvText.substring(0, 500));
+        
+        // Use proper CSV parsing instead of simple line splitting
+        const songs = [];
+        const songMap = new Map(); // For deduplication by ID
+        
+        // Parse CSV properly using a simple state machine
+        const rows = [];
+        let currentRow = [];
+        let currentField = '';
+        let inQuotes = false;
+        let i = 0;
+        
+        while (i < csvText.length) {
+          const char = csvText[i];
+          const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+          
+          if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+              // Escaped quote
+              currentField += '"';
+              i += 2;
+            } else {
+              // Toggle quote state
+              inQuotes = !inQuotes;
+              i++;
+            }
+          } else if (char === ',' && !inQuotes) {
+            // End of field
+            currentRow.push(currentField);
+            currentField = '';
+            i++;
+          } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            // End of row
+            if (currentField || currentRow.length > 0) {
+              currentRow.push(currentField);
+              if (currentRow.length > 0) {
+                rows.push(currentRow);
+              }
+              currentRow = [];
+              currentField = '';
+            }
+            // Skip \r\n combinations
+            if (char === '\r' && nextChar === '\n') {
+              i += 2;
+            } else {
+              i++;
+            }
+          } else {
+            currentField += char;
+            i++;
+          }
+        }
+        
+        // Add the last row if it exists
+        if (currentField || currentRow.length > 0) {
+          currentRow.push(currentField);
+          if (currentRow.length > 0) {
+            rows.push(currentRow);
+          }
+        }
+        
+        console.log('Parsed rows:', rows.length);
+        console.log('First row (headers):', rows[0]);
+        if (rows.length > 1) {
+          console.log('Second row (first song):', rows[1]);
+          console.log('Lyrics column length:', rows[1][4] ? rows[1][4].length : 'undefined');
+        }
+        
+        // Skip header row and process data rows
+        for (let i = 1; i < rows.length; i++) {
+          const columns = rows[i];
+          if (columns.length >= 5) { // Ensure we have all required columns
+            const timestamp = columns[0] ? columns[0].trim() : '';
+            const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
+            const name = columns[2] ? columns[2].trim() : '';
+            const genre = columns[3] ? columns[3].trim() : '';
+            const lyrics = columns[4] ? columns[4].trim() : '';
+            
+            console.log(`Row ${i}: ID=${id}, Name="${name}", Genre="${genre}", Lyrics length=${lyrics.length}`);
+            
+            if (!isNaN(id) && name && genre && lyrics) {
+              const song = { id, timestamp, name, genre, lyrics };
+              
+              // Keep only the most recent version of each song (by ID)
+              if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
+                songMap.set(id, song);
+              }
+            }
+          }
+        }
+        
+        const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        console.log('Final songs array:', result.length, 'songs');
+        return result;
+      } catch (error) {
+        console.error('Error fetching CSV:', error);
+        return [];
+      }
+    }
+
+    // Function to get and update local highest ID for additional protection
+    function getLocalHighestId() {
+      const stored = localStorage.getItem('lyricsSubmitterHighestId');
+      return stored ? parseInt(stored, 10) : 0;
+    }
+
+    function updateLocalHighestId(id) {
+      const currentHighest = getLocalHighestId();
+      if (id > currentHighest) {
+        localStorage.setItem('lyricsSubmitterHighestId', id.toString());
+        console.log(`Updated local highest ID to: ${id}`);
+      }
+    }
+
+    // Function to get next available ID from CSV with fresh data
+    async function getNextId() {
+      try {
+        console.log('Getting next ID - fetching fresh CSV data...');
+        // Always fetch fresh data to ensure we get the most current highest ID
+        const response = await fetch(getUrl('c1'));
+        const csvText = await response.text();
+        
+        // Parse CSV to find the highest ID
+        const rows = [];
+        let currentRow = [];
+        let currentField = '';
+        let inQuotes = false;
+        let i = 0;
+        
+        while (i < csvText.length) {
+          const char = csvText[i];
+          const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+          
+          if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+              currentField += '"';
+              i += 2;
+            } else {
+              inQuotes = !inQuotes;
+              i++;
+            }
+          } else if (char === ',' && !inQuotes) {
+            currentRow.push(currentField);
+            currentField = '';
+            i++;
+          } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            if (currentField || currentRow.length > 0) {
+              currentRow.push(currentField);
+              if (currentRow.length > 0) {
+                rows.push(currentRow);
+              }
+              currentRow = [];
+              currentField = '';
+            }
+            if (char === '\r' && nextChar === '\n') {
+              i += 2;
+            } else {
+              i++;
+            }
+          } else {
+            currentField += char;
+            i++;
+          }
+        }
+        
+        if (currentField || currentRow.length > 0) {
+          currentRow.push(currentField);
+          if (currentRow.length > 0) {
+            rows.push(currentRow);
+          }
+        }
+        
+        let maxId = 0;
+        console.log('Analyzing rows for highest ID...');
+        
+        // Skip header row and check all data rows for the highest ID
+        for (let i = 1; i < rows.length; i++) {
+          const columns = rows[i];
+          if (columns.length >= 2) { // Ensure we have at least timestamp and ID columns
+            const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
+            if (!isNaN(id) && id > maxId) {
+              maxId = id;
+              console.log(`Found higher ID: ${id} in row ${i}`);
+            }
+          }
+        }
+        
+        const nextId = maxId + 1;
+        
+        // Additional check: ensure we don't reuse an ID this device has already used
+        const localHighestId = getLocalHighestId();
+        const finalId = Math.max(nextId, localHighestId + 1);
+        
+        console.log(`CSV highest ID: ${maxId}, local highest ID: ${localHighestId}`);
+        console.log(`Next ID from CSV: ${nextId}, final ID after local check: ${finalId}`);
+        
+        return finalId;
+      } catch (error) {
+        console.error('Error fetching CSV for next ID:', error);
+        // Fallback: return a high number plus current timestamp to avoid conflicts
+        const fallbackId = 1000 + Math.floor(Date.now() / 1000) % 10000;
+        console.log(`Using fallback ID: ${fallbackId}`);
+        return fallbackId;
+      }
+    }
+
+    // Global variables for current song
+    // (Variables declared at top of script)
+
+    // Function to update UI based on edit mode
+    function updateEditModeUI() {
+      const editIndicator = document.getElementById('edit-mode-indicator');
+      const submitBtn = document.getElementById('submit-btn');
+      
+      if (isEditMode) {
+        editIndicator.style.display = 'block';
+        submitBtn.textContent = 'Update Song';
+        submitBtn.style.backgroundColor = '#ff9800'; // Orange color for update
+      } else {
+        editIndicator.style.display = 'none';
+        submitBtn.textContent = 'Submit';
+        submitBtn.style.backgroundColor = ''; // Reset to default
+      }
+    }
+
+    // Function to submit to Google Form
+    async function submitToForm() {
+      const songName = document.getElementById('song-name-input').value.trim();
+      const container = document.getElementById('sections');
+      const children = Array.from(container.children);
+      
+      let missingSections = [];
+      children.forEach(child => {
+        if (child.classList.contains('section')) {
+          const sectionTitle = child.querySelector('.section-title').value.trim();
+          if (!sectionTitle) missingSections.push(child);
+        }
+      });
+      
+      if (!songName || !selectedGenre || missingSections.length > 0) {
+        let msg = '';
+        if (!songName) msg += 'Song name is empty. ';
+        if (!selectedGenre) msg += 'Genre is not selected. ';
+        if (missingSections.length > 0) msg += 'One or more section names are empty.';
+        showNotification(msg.trim(), 'error');
+        return;
+      }
+
+      // Determine the song ID with proper logging and validation
+      let songId;
+      if (isEditMode && currentSongId) {
+        // Edit mode: use existing ID
+        songId = currentSongId;
+        console.log(`Edit mode: Using existing song ID ${songId}`);
+        showNotification(`Updating song ID ${songId}...`, 'submitting');
+      } else {
+        // New song: get fresh next available ID
+        console.log('New song mode: Getting fresh next available ID...');
+        showNotification('Checking CSV for next available ID...', 'submitting');
+        try {
+          songId = await getNextId();
+          console.log(`New song: Assigned ID ${songId}`);
+          
+          // Validate the ID is reasonable (basic sanity check)
+          if (!songId || songId < 1 || songId > 999999) {
+            throw new Error(`Invalid ID generated: ${songId}`);
+          }
+          
+          showNotification(`Submitting new song with ID ${songId}...`, 'submitting');
+        } catch (error) {
+          console.error('Error getting next ID:', error);
+          showNotification('Error determining song ID. Please try again.', 'error');
+          return;
+        }
+      }
+      
+      // Double-check we have a valid ID before proceeding
+      if (!songId || isNaN(songId)) {
+        console.error('Invalid song ID before submission:', songId);
+        showNotification('Invalid song ID generated. Please try again.', 'error');
+        return;
+      }
+      
+      console.log(`Final validation: Proceeding with song ID ${songId} for ${isEditMode ? 'UPDATE' : 'NEW'} submission`);
+      
+      // Build lyrics content
+      let lyrics = '';
+      children.forEach(child => {
+        if (child.classList.contains('section')) {
+          const sectionTitle = child.querySelector('.section-title').value.trim();
+          if (sectionTitle) {
+            lyrics += sectionTitle + '\n';
+          }
+          const lines = child.querySelectorAll('.line');
+          lines.forEach(line => {
+            const input = line.querySelector('input[type="text"]');
+            const starBtn = line.querySelector('.star-line-btn');
+            let text = input.value.trim();
+            if (text) {
+              if (starBtn.classList.contains('active')) text = '*' + text;
+              lyrics += text + '\n';
+            }
+          });
+          lyrics += '\n';
+        } else if (child.classList.contains('break-line')) {
+          lyrics += '-\n';
+        }
+      });
+
+      // Create form data
+      const formData = new FormData();
+      formData.append('entry.1997798105', songId.toString()); // ID
+      formData.append('entry.543765933', songName); // Name
+      formData.append('entry.320041437', selectedGenre); // Genre
+      formData.append('entry.269641100', lyrics.trim()); // Dhivehi lyrics
+
+      console.log('Form data being submitted:', {
+        id: songId.toString(),
+        name: songName,
+        genre: selectedGenre,
+        lyricsLength: lyrics.trim().length
+      });
+
+      try {
+        // Submit to Google Form
+        const response = await fetch(getUrl('f3'), {
+          method: 'POST',
+          body: formData,
+          mode: 'no-cors' // Required for Google Forms
+        });
+        
+        // Google Forms will always return an error in no-cors mode, but the submission usually succeeds
+        const actionText = isEditMode ? 'updated' : 'submitted';
+        showNotification(`Song ${actionText} successfully! ID: ${songId}`, 'success', 5000);
+        console.log(`Submission complete: Song ${actionText} with ID ${songId}`);
+        
+        // Update local highest ID tracker for new submissions (not edits)
+        if (!isEditMode) {
+          updateLocalHighestId(songId);
+        }
+        
+        // Reset edit mode after successful submission
+        isEditMode = false;
+        currentSongId = null;
+        localStorage.removeItem('lyricsSubmitterEditMode'); // Clear edit mode state
+        updateEditModeUI();
+        
+        // Optionally reset the form after successful submission
+        // resetTool();
+        
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        showNotification('There was an error submitting the form. Please try again.', 'error');
+      }
+    }
+
+    function addSection(sectionName, editable, skipInitialLine) {
+      sectionCount++;
+      const sectionsDiv = document.getElementById('sections');
+      // Determine auto section name if not provided
+      if (!sectionName || !sectionName.trim()) {
+        // Find last section or break
+        const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
+        let prefix = '#';
+        let idx = 0;
+        const children = Array.from(sectionsDiv.children);
+        for (let i = children.length - 1; i >= 0; i--) {
+          const child = children[i];
+          if (child.classList.contains('break-line')) {
+            prefix = '$';
+            idx = 0;
+            break;
+          } else if (child.classList.contains('section')) {
+            const lastTitle = child.querySelector('.section-title').value.trim();
+            const match = lastTitle.match(/^(#|\$)([A-Za-z0-9]+)/);
+            if (match) {
+              prefix = match[1];
+              let label = match[2];
+              let lastIdx = sectionOrder.indexOf(label);
+              idx = lastIdx >= 0 ? lastIdx + 1 : 1;
+            }
+            break;
+          }
+        }
+        if (idx >= sectionOrder.length) idx = sectionOrder.length - 1;
+        sectionName = prefix + sectionOrder[idx];
+      }
+      const section = document.createElement('div');
+      section.className = 'section';
+      section.dataset.sectionId = sectionCount;
+      section.innerHTML = `
+        <input type="text" class="section-title" placeholder="#M,#1,#2,#4 - $M,$1,$2,$4" />
+        <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
+        <div class="lines"></div>
+        <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
+      `;
+      sectionsDiv.appendChild(section);
+      const sectionTitleInput = section.querySelector('.section-title');
+      if (sectionName) {
+        sectionTitleInput.value = sectionName;
+      }
+      if (editable === false) {
+        sectionTitleInput.disabled = true;
+        sectionTitleInput.style.background = '#333';
+      } else {
+        sectionTitleInput.focus();
+        sectionTitleInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            let firstLineInput = section.querySelector('.line input[type="text"]');
+            if (!firstLineInput) {
+              addLine(section);
+              firstLineInput = section.querySelector('.line input[type="text"]');
+            }
+            if (firstLineInput) firstLineInput.focus();
+          }
+        });
+      }
+      if (!skipInitialLine) {
+        addLine(section);
+      }
+      saveState();
+      return section;
+    }
+    function addLine(sectionDiv) {
+      const linesDiv = sectionDiv.querySelector('.lines');
+      const lineDiv = document.createElement('div');
+      lineDiv.className = 'line';
+      lineDiv.innerHTML = `
+        <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް"/>
+        <button class="star-line-btn" title="Star this line">N</button>
+        <button class="move-line-btn" title="Drag to move line">⋮⋮</button>
+        <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+      `;
+      linesDiv.appendChild(lineDiv);
+      const lineInput = lineDiv.querySelector('input[type="text"]');
+      setupThaanaTransliteration(lineInput);
+      setupInputNavigation(lineInput);
+      const starBtn = lineDiv.querySelector('.star-line-btn');
+      starBtn.textContent = 'N';
+      setLineHighlight(lineDiv);
+      lineInput.addEventListener('input', saveState);
+      starBtn.addEventListener('click', function() {
+        starBtn.classList.toggle('active');
+        starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+        setLineHighlight(lineDiv);
+        saveState();
+      });
+      
+      // Setup drag functionality for move button
+      const moveBtn = lineDiv.querySelector('.move-line-btn');
+      moveBtn.addEventListener('mousedown', function(e) {
+        startDrag(e, lineDiv);
+      });
+      moveBtn.addEventListener('touchstart', function(e) {
+        startDrag(e, lineDiv);
+      });
+      
+      updateMoveButtons();
+      saveState();
+    }
+    function addBreak() {
+      // Find the currently focused section or default to last section
+      let activeSection = document.activeElement && document.activeElement.closest('.section');
+      if (!activeSection) {
+        const sections = document.querySelectorAll('.section');
+        if (sections.length > 0) activeSection = sections[sections.length - 1];
+      }
+      if (activeSection) {
+        const breakDiv = document.createElement('div');
+        breakDiv.className = 'break-line';
+        breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+        activeSection.parentNode.insertBefore(breakDiv, activeSection.nextSibling);
+      }
+    }
+    function removeLine(lineDiv) {
+      lineDiv.remove();
+      updateMoveButtons();
+      saveState();
+    }
+    function removeSection(sectionDiv) {
+      sectionDiv.remove();
+      saveState();
+    }
+    
+    function moveLineUp(lineDiv) {
+      const linesDiv = lineDiv.parentNode;
+      const prevLine = lineDiv.previousElementSibling;
+      if (prevLine && prevLine.classList.contains('line')) {
+        linesDiv.insertBefore(lineDiv, prevLine);
+        updateMoveButtons();
+        saveState();
+      }
+    }
+    
+    function moveLineDown(lineDiv) {
+      const linesDiv = lineDiv.parentNode;
+      const nextLine = lineDiv.nextElementSibling;
+      if (nextLine && nextLine.classList.contains('line')) {
+        linesDiv.insertBefore(nextLine, lineDiv);
+        updateMoveButtons();
+        saveState();
+      }
+    }
+    
+    let dragState = {
+      isDragging: false,
+      startY: 0,
+      currentLineDiv: null,
+      moveButton: null
+    };
+
+    // Notification system functions
+    function showNotification(message, type = 'info', duration = 3000) {
+      const notificationBar = document.getElementById('notification-bar');
+      
+      // Remove existing classes
+      notificationBar.className = 'notification-bar';
+      
+      // Add type class
+      if (type === 'success') {
+        notificationBar.classList.add('success');
+      } else if (type === 'error') {
+        notificationBar.classList.add('error');
+      } else if (type === 'submitting') {
+        notificationBar.classList.add('submitting');
+      }
+      
+      // Set message and show
+      notificationBar.textContent = message;
+      notificationBar.classList.add('show');
+      
+      // Auto-hide after duration (unless it's a submitting notification)
+      if (type !== 'submitting' && duration > 0) {
+        setTimeout(() => {
+          hideNotification();
+        }, duration);
+      }
+    }
+
+    function hideNotification() {
+      const notificationBar = document.getElementById('notification-bar');
+      notificationBar.classList.remove('show');
+    }
+
+    function startDrag(event, lineDiv) {
+      event.preventDefault();
+      const button = event.target;
+      
+      dragState.isDragging = true;
+      dragState.startY = event.type === 'mousedown' ? event.clientY : event.touches[0].clientY;
+      dragState.currentLineDiv = lineDiv;
+      dragState.moveButton = button;
+      
+      // Add visual feedback
+      button.style.backgroundColor = '#1565c0';
+      button.style.transform = 'scale(1.1)';
+      
+      // Add global event listeners
+      if (event.type === 'mousedown') {
+        document.addEventListener('mousemove', handleDrag);
+        document.addEventListener('mouseup', endDrag);
+      } else {
+        document.addEventListener('touchmove', handleDrag, { passive: false });
+        document.addEventListener('touchend', endDrag);
+      }
+    }
+
+    function handleDrag(event) {
+      if (!dragState.isDragging) return;
+      
+      event.preventDefault();
+      const currentY = event.type === 'mousemove' ? event.clientY : event.touches[0].clientY;
+      const deltaY = currentY - dragState.startY;
+      const threshold = 30; // Minimum drag distance to trigger move
+      
+      if (Math.abs(deltaY) > threshold) {
+        const linesDiv = dragState.currentLineDiv.parentNode;
+        const lines = Array.from(linesDiv.querySelectorAll('.line'));
+        const currentIndex = lines.indexOf(dragState.currentLineDiv);
+        
+        if (deltaY < -threshold && currentIndex > 0) {
+          // Drag up - move line up
+          linesDiv.insertBefore(dragState.currentLineDiv, lines[currentIndex - 1]);
+          dragState.startY = currentY; // Reset start position for continuous dragging
+          updateMoveButtons();
+          saveState();
+        } else if (deltaY > threshold && currentIndex < lines.length - 1) {
+          // Drag down - move line down
+          linesDiv.insertBefore(lines[currentIndex + 1], dragState.currentLineDiv);
+          dragState.startY = currentY; // Reset start position for continuous dragging
+          updateMoveButtons();
+          saveState();
+        }
+      }
+    }
+
+    function endDrag(event) {
+      if (!dragState.isDragging) return;
+      
+      // Reset visual feedback
+      if (dragState.moveButton) {
+        dragState.moveButton.style.backgroundColor = '';
+        dragState.moveButton.style.transform = '';
+      }
+      
+      // Reset drag state
+      dragState.isDragging = false;
+      dragState.startY = 0;
+      dragState.currentLineDiv = null;
+      dragState.moveButton = null;
+      
+      // Remove global event listeners
+      document.removeEventListener('mousemove', handleDrag);
+      document.removeEventListener('mouseup', endDrag);
+      document.removeEventListener('touchmove', handleDrag);
+      document.removeEventListener('touchend', endDrag);
+    }
+    
+    function updateMoveButtons() {
+      // Update all move buttons' text and state
+      document.querySelectorAll('.section').forEach(section => {
+        const lines = Array.from(section.querySelectorAll('.line'));
+        lines.forEach((line, index) => {
+          const moveBtn = line.querySelector('.move-line-btn');
+          
+          if (moveBtn) {
+            const totalLines = lines.length;
+            if (totalLines <= 1) {
+              moveBtn.disabled = true;
+              moveBtn.textContent = '—';
+              moveBtn.title = 'Cannot move (only one line)';
+              moveBtn.style.cursor = 'not-allowed';
+            } else {
+              moveBtn.disabled = false;
+              moveBtn.style.cursor = 'grab';
+              
+              // Show position with drag icon
+              moveBtn.textContent = '⋮⋮';
+              moveBtn.title = `Drag up/down to move line (position ${index + 1} of ${totalLines})`;
+            }
+          }
+        });
+      });
+    }
+    function resetTool() {
+      localStorage.removeItem('lyricsSubmitterData');
+      localStorage.removeItem('lyricsSubmitterSongName');
+      localStorage.removeItem('lyricsSubmitterGenre');
+      localStorage.removeItem('lyricsSubmitterEditMode'); // Clear edit mode state
+      document.getElementById('sections').innerHTML = '';
+      sectionCount = 0;
+      document.getElementById('song-name-input').value = '';
+      selectedGenre = '';
+      updateGenreButton();
+      // Reset edit mode
+      isEditMode = false;
+      currentSongId = null;
+      updateEditModeUI();
+      addSection();
+    }
+    document.addEventListener('input', function(e) {
+      if (e.target.classList && e.target.classList.contains('section-title')) {
+        saveState();
+      }
+    });
+    
+    // Check for edit data first, then load state, then add default section if needed
+    function initializeForm() {
+      const editData = JSON.parse(localStorage.getItem('editSongData') || 'null');
+      if (editData) {
+        handleEditData();
+      } else if (!loadState()) {
+        addSection();
+      }
+    }
+    
+    // Initialize UI
+    updateEditModeUI();
+    function setupInputNavigation(lineInput) {
+      lineInput.addEventListener('keydown', function(e) {
+        const currentLine = lineInput.closest('.line');
+        const lines = Array.from(currentLine.parentNode.querySelectorAll('.line'));
+        const idx = lines.indexOf(currentLine);
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          if (idx < lines.length - 1) {
+            lines[idx + 1].querySelector('input[type="text"]').focus();
+          } else {
+            // Add new line and focus
+            addLine(currentLine.parentNode.parentNode);
+            setTimeout(() => {
+              const newLines = Array.from(currentLine.parentNode.querySelectorAll('.line'));
+              newLines[newLines.length - 1].querySelector('input[type="text"]').focus();
+            }, 0);
+          }
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          if (idx > 0) {
+            lines[idx - 1].querySelector('input[type="text"]').focus();
+          }
+        } else if (e.key === 'Enter') {
+          if (e.shiftKey) {
+            e.preventDefault();
+            addSection();
+            setTimeout(() => {
+              const allSections = document.querySelectorAll('.section');
+              const lastSection = allSections[allSections.length - 1];
+              if (lastSection) {
+                const sectionTitleInput = lastSection.querySelector('.section-title');
+                if (sectionTitleInput) sectionTitleInput.focus();
+              }
+            }, 0);
+          } else {
+            e.preventDefault();
+            // Add new line below
+            const parentSection = currentLine.parentNode.parentNode;
+            const linesDiv = currentLine.parentNode;
+            const newLine = document.createElement('div');
+            newLine.className = 'line';
+            newLine.innerHTML = `
+              <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
+              <button class="star-line-btn" title="Star this line">N</button>
+              <button class="move-line-btn" title="Drag to move line">⋮⋮</button>
+              <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+            `;
+            linesDiv.insertBefore(newLine, lines[idx + 1] || null);
+            const newInput = newLine.querySelector('input[type="text"]');
+            setupThaanaTransliteration(newInput);
+            setupInputNavigation(newInput);
+            const starBtn = newLine.querySelector('.star-line-btn');
+            starBtn.textContent = 'N';
+            setLineHighlight(newLine);
+            newInput.addEventListener('input', saveState);
+            starBtn.addEventListener('click', function() {
+              starBtn.classList.toggle('active');
+              starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+              setLineHighlight(newLine);
+              saveState();
+            });
+            
+            // Setup drag functionality for move button
+            const moveBtn = newLine.querySelector('.move-line-btn');
+            moveBtn.addEventListener('mousedown', function(e) {
+              startDrag(e, newLine);
+            });
+            moveBtn.addEventListener('touchstart', function(e) {
+              startDrag(e, newLine);
+            });
+            
+            saveState();
+            updateMoveButtons(); // Update move button states
+            setTimeout(() => newInput.focus(), 0);
+          }
+        } else if (e.key === 'PageDown') {
+          e.preventDefault();
+          const starBtn = currentLine.querySelector('.star-line-btn');
+          starBtn.classList.toggle('active');
+          starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+          setLineHighlight(currentLine);
+          saveState();
+        } else if (e.key === 'Delete') {
+          e.preventDefault();
+          const lines = Array.from(currentLine.parentNode.querySelectorAll('.line'));
+          const idx = lines.indexOf(currentLine);
+          let focusInput = null;
+          if (lines.length > 1) {
+            if (idx < lines.length - 1) {
+              focusInput = lines[idx + 1].querySelector('input[type="text"]');
+            } else if (idx > 0) {
+              focusInput = lines[idx - 1].querySelector('input[type="text"]');
+            }
+          }
+          removeLine(currentLine);
+          if (focusInput) setTimeout(() => focusInput.focus(), 0);
+        }
+      });
+    }
+    // Song name input save/load with autocomplete functionality
+    const songNameInput = document.getElementById('song-name-input');
+    songNameInput.value = localStorage.getItem('lyricsSubmitterSongName') || '';
+    
+    songNameInput.addEventListener('input', function() {
+      // Don't auto-capitalize when user might be selecting from suggestions
+      const value = songNameInput.value;
+      localStorage.setItem('lyricsSubmitterSongName', value);
+      
+      // Check if the input matches any existing song
+      const matchedSong = songSuggestions.find(s => s.name.toLowerCase() === value.toLowerCase());
+      if (matchedSong && value !== '') {
+        // Auto-load the matched song after a short delay
+        setTimeout(() => {
+          if (songNameInput.value.toLowerCase() === matchedSong.name.toLowerCase()) {
+            songNameInput.value = matchedSong.name; // Set exact case
+            loadSelectedSong(matchedSong.name);
+          }
+        }, 500);
+      } else {
+        // Reset to new song mode if no match
+        isEditMode = false;
+        currentSongId = null;
+        updateEditModeUI();
+      }
+    });
+
+    songNameInput.addEventListener('change', function() {
+      const songName = songNameInput.value.trim();
+      
+      // Check if user selected from datalist
+      const matchedSong = songSuggestions.find(s => s.name === songName);
+      if (matchedSong) {
+        loadSelectedSong(songName);
+      } else {
+        // Capitalize first letter of every word for new songs
+        let value = songName;
+        value = value.replace(/\b\w+/g, function(word) {
+          return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+        });
+        if (songNameInput.value !== value) {
+          songNameInput.value = value;
+        }
+        localStorage.setItem('lyricsSubmitterSongName', value);
+        
+        // Reset to new song mode
+        isEditMode = false;
+        currentSongId = null;
+        updateEditModeUI();
+      }
+    });
+
+    // Genre dropdown functionality
+    // selectedGenre declared at top of script
+    const genreBtn = document.getElementById('genre-btn');
+    const genreDropdown = document.getElementById('genre-dropdown');
+    
+    // Update genre button text
+    function updateGenreButton() {
+      if (selectedGenre) {
+        genreBtn.textContent = selectedGenre + ' ▼';
+        genreBtn.style.color = '#f5d000';
+        genreBtn.style.borderColor = '#f5d000';
+      } else {
+        genreBtn.textContent = 'Select Genre ▼';
+        genreBtn.style.color = '#f5d000';
+        genreBtn.style.borderColor = '#444';
+      }
+    }
+    
+    // Initialize genre button
+    updateGenreButton();
+    
+    // Toggle dropdown
+    genreBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const isVisible = genreDropdown.style.display !== 'none';
+      genreDropdown.style.display = isVisible ? 'none' : 'block';
+    });
+    
+    // Handle genre selection
+    document.querySelectorAll('.genre-option').forEach(option => {
+      option.addEventListener('click', function() {
+        selectedGenre = this.dataset.genre;
+        localStorage.setItem('lyricsSubmitterGenre', selectedGenre);
+        updateGenreButton();
+        genreDropdown.style.display = 'none';
+      });
+      
+      // Add hover effect to match songlist filter style
+      option.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#fced98';
+        this.style.color = '#2b2b2b';
+      });
+      option.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = 'transparent';
+        this.style.color = '#f5d000';
+      });
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function() {
+      genreDropdown.style.display = 'none';
+    });
+
+    // Populate song name suggestions from CSV
+    // songSuggestions declared at top of script
+    async function populateSongNameSuggestions() {
+      try {
+        console.log('Fetching songs from CSV...');
+        const songs = await getSongsFromCSV();
+        console.log('Fetched songs:', songs.length, 'songs');
+        console.log('First few songs:', songs.slice(0, 3));
+        songSuggestions = songs;
+        
+        const datalist = document.getElementById('song-names-list');
+        datalist.innerHTML = '';
+        
+        songs.forEach(song => {
+          const option = document.createElement('option');
+          option.value = song.name;
+          option.setAttribute('data-id', song.id);
+          option.setAttribute('data-genre', song.genre);
+          option.setAttribute('data-lyrics', song.lyrics);
+          datalist.appendChild(option);
+        });
+        
+        console.log('Populated datalist with', songs.length, 'options');
+      } catch (error) {
+        console.error('Error populating song suggestions:', error);
+      }
+    }
+
+    // Load song data when user selects an existing song
+    function loadSelectedSong(songName) {
+      console.log('loadSelectedSong called with:', songName);
+      const song = songSuggestions.find(s => s.name === songName);
+      console.log('Found song:', song);
+      
+      if (song) {
+        console.log('Song lyrics:', song.lyrics);
+        
+        // Set edit mode
+        isEditMode = true;
+        currentSongId = song.id;
+        updateEditModeUI();
+        
+        // Set the genre
+        selectedGenre = song.genre || '';
+        localStorage.setItem('lyricsSubmitterGenre', selectedGenre);
+        updateGenreButton();
+        
+        // Save edit mode state immediately
+        localStorage.setItem('lyricsSubmitterEditMode', JSON.stringify({
+          isEditMode: true,
+          currentSongId: song.id,
+          currentSongName: song.name
+        }));
+        
+        // Clear existing sections
+        document.getElementById('sections').innerHTML = '';
+        sectionCount = 0;
+        
+        // Parse lyrics and create data structure like the original loadState
+        const lines = song.lyrics.split(/\r?\n/);
+        console.log('Split lines:', lines);
+        const data = [];
+        let currentSection = null;
+        
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+          console.log(`Processing line ${i}:`, line);
+          
+          // Skip empty lines
+          if (line === '') {
+            continue;
+          }
+          
+          // Check if line is a break indicator (just dashes)
+          if (/^-+$/.test(line)) {
+            data.push({ type: 'break' });
+            currentSection = null;
+            console.log('Added break');
+            continue;
+          }
+          
+          // Check if line is a section header (starts with # or $)
+          if (/^[#$][A-Za-z0-9]+/.test(line)) {
+            currentSection = {
+              type: 'section',
+              title: line,
+              lines: []
+            };
+            data.push(currentSection);
+            console.log('Added section:', line);
+            continue;
+          }
+          
+          // This is a lyric line
+          if (line) {
+            // If no current section, create one with auto-generated name
+            if (!currentSection) {
+              currentSection = {
+                type: 'section',
+                title: '#M', // Default section name
+                lines: []
+              };
+              data.push(currentSection);
+              console.log('Created default section');
+            }
+            
+            // Check if line starts with * (starred/Zuvaabu)
+            let starred = false;
+            let text = line;
+            if (text.startsWith('*')) {
+              starred = true;
+              text = text.slice(1); // Remove the * prefix
+            }
+            
+            currentSection.lines.push({
+              text: text,
+              starred: starred
+            });
+            console.log('Added line to section:', text, 'starred:', starred);
+          }
+        }
+        
+        console.log('Final data structure:', data);
+        
+        // Now use the same logic as the original loadState function to create the DOM
+        data.forEach((item, index) => {
+          console.log(`Creating DOM for item ${index}:`, item);
+          
+          if (item.type === 'section') {
+            sectionCount++;
+            const sectionsDiv = document.getElementById('sections');
+            const section = document.createElement('div');
+            section.className = 'section';
+            section.dataset.sectionId = sectionCount;
+            section.innerHTML = `
+              <input type="text" class="section-title" placeholder="#M,#1,#2,#4 - $M,$1,$2,$4" />
+              <button class="remove-section-btn" title="Remove Section" onclick="removeSection(this.parentNode)">×</button>
+              <div class="lines"></div>
+              <div style="margin-top: 32px;"><button class="add-line-btn" onclick="addLine(this.parentNode.parentNode)">+</button></div>
+            `;
+            sectionsDiv.appendChild(section);
+            const sectionTitleInput = section.querySelector('.section-title');
+            sectionTitleInput.value = item.title;
+            
+            // Add event listener for section title
+            sectionTitleInput.addEventListener('input', saveState);
+            
+            const linesDiv = section.querySelector('.lines');
+            item.lines.forEach((lineData, lineIndex) => {
+              console.log(`Creating line ${lineIndex}:`, lineData);
+              
+              const lineDiv = document.createElement('div');
+              lineDiv.className = 'line';
+              lineDiv.innerHTML = `
+                <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
+                <button class="star-line-btn" title="Nagaa / Zuvaabu">N</button>
+                <button class="move-line-btn" title="Drag to move line">⋮⋮</button>
+                <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+              `;
+              linesDiv.appendChild(lineDiv);
+              const lineInput = lineDiv.querySelector('input[type="text"]');
+              lineInput.value = lineData.text;
+              setupThaanaTransliteration(lineInput);
+              setupInputNavigation(lineInput);
+              const starBtn = lineDiv.querySelector('.star-line-btn');
+              if (lineData && lineData.starred) {
+                starBtn.classList.add('active');
+                starBtn.textContent = 'Z';
+              } else {
+                starBtn.textContent = 'N';
+              }
+              setLineHighlight(lineDiv);
+              lineInput.addEventListener('input', saveState);
+              starBtn.addEventListener('click', function() {
+                starBtn.classList.toggle('active');
+                starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+                setLineHighlight(lineDiv);
+                saveState();
+              });
+              
+              // Setup drag functionality for move button
+              const moveBtn = lineDiv.querySelector('.move-line-btn');
+              moveBtn.addEventListener('mousedown', function(e) {
+                startDrag(e, lineDiv);
+              });
+              moveBtn.addEventListener('touchstart', function(e) {
+                startDrag(e, lineDiv);
+              });
+            });
+          } else if (item.type === 'break') {
+            const sectionsDiv = document.getElementById('sections');
+            const breakDiv = document.createElement('div');
+            breakDiv.className = 'break-line';
+            breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+            sectionsDiv.appendChild(breakDiv);
+          }
+        });
+        
+        // If no sections were created, add at least one empty section
+        if (document.getElementById('sections').children.length === 0) {
+          console.log('No sections created, adding default section');
+          addSection();
+        }
+        
+        console.log('Sections div final state:', document.getElementById('sections').innerHTML);
+        updateMoveButtons(); // Update move button states after loading song
+        saveState();
+      } else {
+        console.log('No song found with name:', songName);
+      }
+    }
+
+
+
+    // Initialize song suggestions
+    populateSongNameSuggestions();
+
+    // Test function to debug CSV loading
+    window.testCSVLoading = async function() {
+      console.log('=== CSV LOADING TEST ===');
+      try {
+        const songs = await getSongsFromCSV();
+        console.log('Total songs loaded:', songs.length);
+        
+        if (songs.length > 0) {
+          const firstSong = songs[0];
+          console.log('First song:', firstSong);
+          console.log('First song lyrics (full):', firstSong.lyrics);
+          console.log('First song lyrics length:', firstSong.lyrics.length);
+          
+          // Test parsing the lyrics
+          const lines = firstSong.lyrics.split(/\r?\n/);
+          console.log('Lyrics split into lines:', lines.length, 'lines');
+          lines.forEach((line, i) => {
+            console.log(`Line ${i}: "${line}"`);
+          });
+          
+          // Test the loadSelectedSong function with the first song
+          console.log('Testing loadSelectedSong with first song...');
+          loadSelectedSong(firstSong.name);
+        } else {
+          console.log('No songs found in CSV');
+        }
+      } catch (error) {
+        console.error('Error in test:', error);
+      }
+    };
+
+    // Test function to manually load lyrics
+    window.testLyricsLoading = function() {
+      const testLyrics = `#M
+ރީތިކަމުން ތިޔަ ގޮމާ
+*އެއްލި ކަޅިއިން މަގޭ ހިތް ނަގާ
+ރީތިކަމުންނޭ މަލާ
+*މުޅި ހަޔާތް އެކުއެކީ ނިންމުނޭ
+
+#1
+ފައިޖެހުނު އިރު އެރަށު ގޮނޑުދޮށަށް
+*ހުޅުވުނޭ މަގެ ދެލޯ މަންޒަރަށް
+ހިތް އަޖައިބުން ފުރިއްޖޭ އެތާ
+*ކޮސްވެ މަގުމަތި އެޅިހެން ވިޔޭ`;
+
+      console.log('=== MANUAL LYRICS LOADING TEST ===');
+      console.log('Test lyrics:', testLyrics);
+      
+      // Create a fake song object
+      const fakeSong = {
+        id: 999,
+        name: 'Test Song',
+        genre: 'Test',
+        lyrics: testLyrics
+      };
+      
+      // Add it to suggestions temporarily
+      songSuggestions.push(fakeSong);
+      
+      // Try to load it
+      loadSelectedSong('Test Song');
+    };
+
+    // Handle imported text from transliteration tool
+    function handleImportedText() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const importedText = urlParams.get('import');
+      const songName = urlParams.get('songName');
+      
+      if (importedText) {
+        try {
+          const decodedText = decodeURIComponent(importedText);
+          const decodedSongName = songName ? decodeURIComponent(songName) : null;
+          
+          // Import text and lyrics (this will call resetTool internally)
+          importTextToLyrics(decodedText);
+          
+          // Set song name AFTER importTextToLyrics (which calls resetTool)
+          if (decodedSongName) {
+            const songNameInput = document.getElementById('song-name-input');
+            songNameInput.value = decodedSongName;
+            localStorage.setItem('lyricsSubmitterSongName', decodedSongName);
+          }
+          
+          // Clean up URL to remove import parameters
+          const newUrl = window.location.pathname;
+          window.history.replaceState({}, document.title, newUrl);
+        } catch (error) {
+          console.error('Error processing imported text:', error);
+          alert('Error processing imported text. Please try again.');
+        }
+      }
+    }
+    
+    // Function to import text and create sections/lines
+    function importTextToLyrics(text) {
+      // Clear existing sections without adding a default empty section
+      localStorage.removeItem('lyricsSubmitterData');
+      localStorage.removeItem('lyricsSubmitterGenre');
+      document.getElementById('sections').innerHTML = '';
+      sectionCount = 0;
+      document.getElementById('song-name-input').value = '';
+      selectedGenre = '';
+      updateGenreButton();
+      
+      // Split text into lines and filter out completely empty content
+      const lines = text.split(/\r?\n/);
+      let currentSection = null;
+      let hasContent = false;
+      const sectionsDiv = document.getElementById('sections');
+      let pendingSection = false; // Flag to indicate we need a new section for the next lyric line
+      
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        
+        // Empty lines mark the end of the current section and prepare for a new one
+        if (line === '') {
+          currentSection = null;
+          pendingSection = true; // Next lyric line should start a new section
+          continue;
+        }
+        
+        // Check if line is a break indicator (just a dash or multiple dashes)
+        if (/^-+$/.test(line)) {
+          hasContent = true;
+          currentSection = null;
+          pendingSection = false;
+          
+          // Add a break line
+          const breakDiv = document.createElement('div');
+          breakDiv.className = 'break-line';
+          breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
+          sectionsDiv.appendChild(breakDiv);
+          continue;
+        }
+        
+        // Check if line is a section name (starts with # or $ followed by letters/numbers)
+        if (/^[#$][A-Za-z0-9]+$/.test(line)) {
+          hasContent = true;
+          currentSection = addSection(line, true, true);
+          pendingSection = false;
+          continue;
+        }
+        
+        // This is a lyric line - add it to current section
+        hasContent = true;
+        
+        // If we don't have a current section or need a new section, create one with automatic naming
+        if (!currentSection || pendingSection) {
+          currentSection = addSection('', true, true); // Pass empty string to trigger automatic naming
+          pendingSection = false;
+        }
+        
+        // Add the line to the current section
+        addLineToSection(currentSection, line);
+      }
+      
+      // If no content was found, create at least one empty section
+      if (!hasContent) {
+        addSection();
+      }
+      
+      // Save the state and show success message
+      saveState();
+      
+      // Optional: Show a brief success message
+      setTimeout(() => {
+        const firstInput = document.querySelector('.line input[type="text"]');
+        if (firstInput) {
+          firstInput.focus();
+        }
+      }, 100);
+    }
+    
+    // Helper function to add a line to a specific section
+    function addLineToSection(section, text) {
+      const linesDiv = section.querySelector('.lines');
+      const lineDiv = document.createElement('div');
+      lineDiv.className = 'line';
+      lineDiv.innerHTML = `
+        <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް"/>
+        <button class="star-line-btn" title="Star this line">N</button>
+        <button class="move-line-btn" title="Move Line" onclick="cycleMovePosition(this.parentNode)">↕1</button>
+        <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
+      `;
+      linesDiv.appendChild(lineDiv);
+      
+      const lineInput = lineDiv.querySelector('input[type="text"]');
+      const starBtn = lineDiv.querySelector('.star-line-btn');
+      
+      // Check if line starts with * for starred text
+      let starred = false;
+      if (text.startsWith('*')) {
+        starred = true;
+        text = text.slice(1); // Remove the * prefix
+      }
+      
+      // Count existing lines in this section (excluding the one we just added)
+      const existingLines = linesDiv.querySelectorAll('.line');
+      const lineIndex = existingLines.length - 1; // 0-based index of current line
+      
+      // For imported text, apply alternating pattern: first line (index 0) = N, second line (index 1) = Z, etc.
+      // Only apply this if the line wasn't already explicitly starred with *
+      if (!starred) {
+        starred = (lineIndex % 2 === 1); // Odd indices (1, 3, 5...) get Z
+      }
+      
+      // Set the text value (without the * if it was starred)
+      lineInput.value = text;
+      
+      // Set up transliteration and navigation
+      setupThaanaTransliteration(lineInput);
+      setupInputNavigation(lineInput);
+      
+      // Set up star button
+      if (starred) {
+        starBtn.classList.add('active');
+        starBtn.textContent = 'Z';
+      } else {
+        starBtn.textContent = 'N';
+      }
+      
+      // Set up line highlighting
+      setLineHighlight(lineDiv);
+      
+      // Add event listeners
+      lineInput.addEventListener('input', saveState);
+      starBtn.addEventListener('click', function() {
+        starBtn.classList.toggle('active');
+        starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
+        setLineHighlight(lineDiv);
+        saveState();
+      });
+      updateMoveButtons(); // Update move button states
+    }
+    
+    // Handle edit data from songs-download.html
+    function handleEditData() {
+      const editData = JSON.parse(localStorage.getItem('editSongData') || 'null');
+      if (editData) {
+        console.log('Loading edit data:', editData);
+        
+        // Pre-populate form fields
+        document.getElementById('song-name-input').value = editData.name || '';
+        
+        // Set genre if available
+        if (editData.genre) {
+          selectedGenre = editData.genre;
+          localStorage.setItem('lyricsSubmitterGenre', selectedGenre);
+          updateGenreButton();
+          console.log('Set genre to:', selectedGenre);
+        }
+        
+        // Don't set edit mode - treat as new song for CSV system
+        // songs-download.html uses original songs.js data, not CSV data
+        isEditMode = false;
+        currentSongId = null;
+        updateEditModeUI();
+        console.log('Import from songs-download: treating as new song for CSV');
+        
+        // Clear existing sections first
+        document.getElementById('sections').innerHTML = '';
+        sectionCount = 0;
+        
+        // Use parsed lyrics if available, otherwise fall back to simple text parsing
+        if (editData.parsedLyrics && editData.parsedLyrics.length > 0) {
+          reconstructFromParsedLyrics(editData.parsedLyrics);
+        } else if (editData.lyrics) {
+          // Fallback to simple parsing
+          reconstructFromSimpleText(editData.lyrics);
+        }
+        
+        // Clean up edit data
+        localStorage.removeItem('editSongData');
+        
+        // Hide edit indicator since this is a new song
+        const editIndicator = document.getElementById('edit-mode-indicator');
+        if (editIndicator) {
+          editIndicator.style.display = 'none';
+        }
+      }
+    }
+    
+    // Reconstruct form from parsed lyrics structure
+    function reconstructFromParsedLyrics(parsedLyrics) {
+      parsedLyrics.forEach(item => {
+        if (item.type === 'section') {
+          // Add section without initial line since we'll add them manually
+          const section = addSection(item.title, true, true); // skipInitialLine = true
+          
+          // Add lines to the section
+          if (item.lines && item.lines.length > 0) {
+            item.lines.forEach((lineData) => {
+              // Add new line for each line
+              addLine(section);
+              const linesDiv = section.querySelector('.lines');
+              const lineInputs = linesDiv.querySelectorAll('.line input[type="text"]');
+              const lastInput = lineInputs[lineInputs.length - 1];
+              
+              if (lastInput) {
+                lastInput.value = lineData.text;
+                
+                // Set starred state
+                if (lineData.starred) {
+                  const starBtn = lastInput.parentNode.querySelector('.star-line-btn');
+                  starBtn.classList.add('active');
+                  starBtn.textContent = 'Z';
+                  setLineHighlight(lastInput.parentNode);
+                }
+              }
+            });
+          }
+        } else if (item.type === 'break') {
+          // Add break
+          addBreak();
+        }
+      });
+    }
+    
+    // Fallback function for simple text parsing
+    function reconstructFromSimpleText(lyrics) {
+      const lines = lyrics.split('\n').filter(line => line.trim());
+      if (lines.length > 0) {
+        // Add section without initial line
+        const section = addSection('', true, true); // skipInitialLine = true
+        
+        // Add lines manually
+        lines.forEach((line) => {
+          if (line.trim()) {
+            addLine(section);
+            const linesDiv = section.querySelector('.lines');
+            const lineInputs = linesDiv.querySelectorAll('.line input[type="text"]');
+            const lastInput = lineInputs[lineInputs.length - 1];
+            if (lastInput) {
+              lastInput.value = line.trim();
+            }
+          }
+        });
+      }
+    }
+
+    // URL deobfuscation helper
+    function getUrl(key) {
+      const urls = {
+        'c1': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNWdTVmOXgyZi11Mmhha0xfMXBaeV9oYmVweHRuRmY3TVJXVzlMekd1OFNDcV95UWl0aFBETUJWd1dKZmdjeEJYOVVlY09SaTNlVmpSZC9wdWI/b3V0cHV0PWNzdg==',
+        'f3': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTZG5Kb1JkaHp3VWQ3QmpJQnhwaWZ4QTB0aFFWQVpZVVhCMnZGZnJkbU9oamdZZGx3L2Zvcm1SZXNwb25zZQ=='
+      };
+      return atob(urls[key]);
+    }
+
+    // Call initialization functions when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      handleImportedText();
+      initializeForm();
+    });
+  </script>
+</body>
+</html>

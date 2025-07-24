@@ -688,7 +688,7 @@
       const encodedSongName = songName ? encodeURIComponent(songName) : '';
       
       // Build URL to Dhivehi editor with import parameters
-      const dhivehiEditorUrl = `lyrics-edit?import=${encodedLyrics}${encodedSongName ? `&songName=${encodedSongName}` : ''}`;
+      const dhivehiEditorUrl = `lyrics-submit?import=${encodedLyrics}${encodedSongName ? `&songName=${encodedSongName}` : ''}`;
       
       // Open Dhivehi editor in a new tab
       window.open(dhivehiEditorUrl, '_blank');

@@ -329,6 +329,32 @@
     .stats strong {
       color: var(--primary-color);
     }
+
+    .latest-showlist {
+      background: rgba(255, 193, 7, 0.1);
+      border: 2px solid #ffc107;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .latest-showlist-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .latest-showlist-info strong {
+      color: #ffc107;
+    }
+
+    #latest-showlist-name {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
     
     /* Mobile-specific styles */
     @media (max-width: 768px) {
@@ -391,8 +417,21 @@
       <strong>Total Available Songs:</strong> <span id="total-songs">0</span> | 
       <strong>Songs in List:</strong> <span id="list-count">0</span>
     </div>
+
+    <!-- Latest Showlist Display -->
+    <div id="latest-showlist-section" class="latest-showlist" style="display: none;">
+      <div class="latest-showlist-info">
+        <strong>Latest Show List:</strong> <span id="latest-showlist-name"></span>
+        <button class="btn btn-danger" id="remove-showlist-btn" onclick="removeLatestShowlist()">Remove</button>
+      </div>
+    </div>
     
     <div class="input-section">
+      <div class="input-group">
+        <label for="show-name">Show Name:</label>
+        <input type="text" id="show-name" class="search-input" placeholder="Enter show name...">
+      </div>
+      
       <div class="input-group">
         <label for="song-search">Search and Add Songs:</label>
         <input type="text" id="song-search" class="search-input" placeholder="Type song name to search...">
@@ -400,6 +439,7 @@
       </div>
       
       <div class="controls">
+        <button class="btn btn-primary" onclick="submitShowlist()">Submit Show List</button>
         <button class="btn btn-secondary" onclick="clearList()">Clear All</button>
         <button class="btn btn-primary" onclick="copyToClipboard()">Copy to Clipboard</button>
       </div>
@@ -419,19 +459,136 @@
     let touchStartY = 0;
     let touchStartX = 0;
     let isDragging = false;
+    let latestShowlist = null;
     
+    // URL deobfuscation helper
+    function getUrl(key) {
+      const urls = {
+        'c1': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNWdTVmOXgyZi11Mmhha0xfMXBaeV9oYmVweHRuRmY3TVJXVzlMekd1OFNDcV95UWl0aFBETUJWd1dKZmdjeEJYOVVlY09SaTNlVmpSZC9wdWI/b3V0cHV0PWNzdg==',
+        'c2': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlQydTRGdTJmMGJZRl9Ub1BVLWRpZ0QxamJxTnNMN0RPSnBCX2tYbFdUc25YY2dldHN2Y0h1aG5NcXRGLWdDRmlfUG5TaVd6VXdiTjNwNi9wdWI/b3V0cHV0PWNzdg==',
+        'c3': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlFkS2xDRkRjMUlFUVhFZ2prWDFVTHBHTGpXaXRSemFIOFdzYTFmTkdxR2JYa011U2hUTm1URHNrMWZMNkY4STNEMDIyem4ySFVJckN1eC9wdWI/b3V0cHV0PWNzdg==',
+        'f1': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTZjVlWExLQXdnUzNIbm1iUEN3cHNGaUtkVVVWTjl5Z3BlcHJWLXNrRFBYYlJ6bGcvZm9ybVJlc3BvbnNl',
+        'f2': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTZmNxYW50T0x3eGQ0Y2NEOWJfSHRTQ3dHYkVWdHM2eGtJOHdiMWpvZllxUEk4QW1RL2Zvcm1SZXNwb25zZQ=='
+      };
+      return atob(urls[key]);
+    }
+
     // Initialize the page
     document.addEventListener('DOMContentLoaded', function() {
       loadSongs();
       setupEventListeners();
       loadProgress();
+      loadLatestShowlist();
     });
     
-    // Load songs from songs.js
-    function loadSongs() {
-      fetch('/songs.js')
-        .then(response => response.text())
-        .then(scriptContent => {
+    // Load songs from CSV (new method)
+    async function loadSongs() {
+      try {
+        console.log('Fetching CSV from Google Sheets...');
+        const response = await fetch(getUrl('c1'));
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const csvText = await response.text();
+        console.log('CSV text length:', csvText.length);
+        
+        // Parse CSV properly using state machine
+        const rows = [];
+        let currentRow = [];
+        let currentField = '';
+        let inQuotes = false;
+        let i = 0;
+        
+        while (i < csvText.length) {
+          const char = csvText[i];
+          const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+          
+          if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+              // Escaped quote
+              currentField += '"';
+              i += 2;
+            } else {
+              // Toggle quote state
+              inQuotes = !inQuotes;
+              i++;
+            }
+          } else if (char === ',' && !inQuotes) {
+            // End of field
+            currentRow.push(currentField);
+            currentField = '';
+            i++;
+          } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            // End of row
+            if (currentField || currentRow.length > 0) {
+              currentRow.push(currentField);
+              if (currentRow.length > 0) {
+                rows.push(currentRow);
+              }
+              currentRow = [];
+              currentField = '';
+            }
+            // Skip \r\n combinations
+            if (char === '\r' && nextChar === '\n') {
+              i += 2;
+            } else {
+              i++;
+            }
+          } else {
+            currentField += char;
+            i++;
+          }
+        }
+        
+        // Add the last row if it exists
+        if (currentField || currentRow.length > 0) {
+          currentRow.push(currentField);
+          if (currentRow.length > 0) {
+            rows.push(currentRow);
+          }
+        }
+        
+        console.log('Parsed rows:', rows.length);
+        
+        // Process data rows and deduplicate by ID
+        const songMap = new Map();
+        
+        for (let i = 1; i < rows.length; i++) { // Skip header row
+          const columns = rows[i];
+          if (columns.length >= 5) { // Ensure we have all required columns
+            const timestamp = columns[0] ? columns[0].trim() : '';
+            const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
+            const name = columns[2] ? columns[2].trim() : '';
+            const genre = columns[3] ? columns[3].trim() : '';
+            const lyrics = columns[4] ? columns[4].trim() : '';
+            
+            if (!isNaN(id) && name && genre && lyrics) {
+              const song = { id, timestamp, name, genre, lyrics };
+              
+              // Keep only the most recent version of each song (by ID)
+              if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
+                songMap.set(id, song);
+              }
+            }
+          }
+        }
+        
+        const songs = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        availableSongs = songs.map(song => song.name);
+        document.getElementById('total-songs').textContent = availableSongs.length;
+        
+        console.log('Loaded', availableSongs.length, 'songs from CSV');
+        
+      } catch (error) {
+        console.error('Failed to load songs from CSV:', error);
+        
+        // Fallback to songs.js if CSV fails
+        try {
+          const response = await fetch('/songs.js');
+          const scriptContent = await response.text();
+          
           // Replace const with window assignment to make it global
           const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
           eval(modifiedScript);
@@ -439,12 +596,240 @@
           availableSongs = window.songs.map(song => song.name).sort();
           document.getElementById('total-songs').textContent = availableSongs.length;
           
-          console.log('Loaded', availableSongs.length, 'songs');
-        })
-        .catch(error => {
-          console.error('Failed to load songs:', error);
-          alert('Failed to load songs. Please make sure songs.js is accessible.');
+          console.log('Fallback: Loaded', availableSongs.length, 'songs from songs.js');
+        } catch (fallbackError) {
+          console.error('Failed to load songs from both CSV and songs.js:', fallbackError);
+          alert('Failed to load songs. Please check your connection and try again.');
+        }
+      }
+    }
+
+    // Load latest showlist from CSV
+    async function loadLatestShowlist() {
+      try {
+        // First, get the latest showlist
+        const showlistResponse = await fetch(getUrl('c2'));
+        const showlistCsv = await showlistResponse.text();
+        
+        // Parse the showlist CSV
+        const showlistRows = parseCSV(showlistCsv);
+        console.log('Showlist CSV rows:', showlistRows.length);
+        if (showlistRows.length > 0) {
+          console.log('Header row:', showlistRows[0]);
+          if (showlistRows.length > 1) {
+            console.log('First data row:', showlistRows[1]);
+            console.log('Last data row:', showlistRows[showlistRows.length - 1]);
+          }
+        }
+        if (showlistRows.length <= 1) return; // No data beyond headers
+        
+        // Get the latest entry (last row)
+        const latestRow = showlistRows[showlistRows.length - 1];
+        const latestUID = latestRow[1]; // UID is in column 2 (index 1)
+        const latestShowlistData = latestRow[2]; // Showlist is in column 3 (index 2)
+        const latestShowName = latestRow[3]; // Show Name is in column 4 (index 3)
+        
+        console.log('Latest showlist data:', {
+          uid: latestUID,
+          showlistData: latestShowlistData,
+          showName: latestShowName
         });
+        
+        // Check if this showlist is cancelled
+        const cancelResponse = await fetch(getUrl('c3'));
+        const cancelCsv = await cancelResponse.text();
+        
+        // Parse the cancel CSV
+        const cancelRows = parseCSV(cancelCsv);
+        console.log('Cancel CSV rows:', cancelRows.length);
+        if (cancelRows.length > 0) {
+          console.log('Cancel header row:', cancelRows[0]);
+          if (cancelRows.length > 1) {
+            console.log('Cancel first data row:', cancelRows[1]);
+          }
+        }
+        const isCancelled = cancelRows.some(row => 
+          row[1] === latestUID && row[2] && row[2].toLowerCase() === 'yes' // Adjusted column indices
+        );
+        
+        console.log('Is cancelled check:', {
+          latestUID,
+          isCancelled,
+          cancelRows: cancelRows.map(row => ({ uid: row[1], cancelled: row[2] }))
+        });
+        
+        if (!isCancelled && latestShowName) {
+          // Show the latest showlist
+          latestShowlist = {
+            uid: latestUID,
+            name: latestShowName
+          };
+          
+          console.log('Setting latest showlist:', latestShowlist);
+          document.getElementById('latest-showlist-name').textContent = latestShowName;
+          document.getElementById('latest-showlist-section').style.display = 'block';
+        } else {
+          console.log('Not showing showlist - cancelled:', isCancelled, 'showName:', latestShowName);
+        }
+        
+      } catch (error) {
+        console.error('Failed to load latest showlist:', error);
+      }
+    }
+
+    // Parse CSV data
+    function parseCSV(csvText) {
+      const rows = [];
+      let currentRow = [];
+      let currentField = '';
+      let inQuotes = false;
+      let i = 0;
+      
+      while (i < csvText.length) {
+        const char = csvText[i];
+        const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+        
+        if (char === '"') {
+          if (inQuotes && nextChar === '"') {
+            currentField += '"';
+            i += 2;
+          } else {
+            inQuotes = !inQuotes;
+            i++;
+          }
+        } else if (char === ',' && !inQuotes) {
+          currentRow.push(currentField.trim());
+          currentField = '';
+          i++;
+        } else if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (currentField || currentRow.length > 0) {
+            currentRow.push(currentField.trim());
+            if (currentRow.length > 0) {
+              rows.push(currentRow);
+            }
+            currentRow = [];
+            currentField = '';
+          }
+          if (char === '\r' && nextChar === '\n') {
+            i += 2;
+          } else {
+            i++;
+          }
+        } else {
+          currentField += char;
+          i++;
+        }
+      }
+      
+      if (currentField || currentRow.length > 0) {
+        currentRow.push(currentField.trim());
+        if (currentRow.length > 0) {
+          rows.push(currentRow);
+        }
+      }
+      
+      return rows;
+    }
+
+    // Generate unique ID
+    function generateUID() {
+      return 'SL_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Submit showlist to Google Form
+    async function submitShowlist() {
+      const showName = document.getElementById('show-name').value.trim();
+      
+      if (!showName) {
+        alert('Please enter a show name.');
+        return;
+      }
+      
+      if (currentList.length === 0) {
+        alert('Please add at least one song to the list.');
+        return;
+      }
+      
+      const uid = generateUID();
+      const showlistData = currentList.join('\n');
+      
+      try {
+        const formData = new FormData();
+        formData.append('entry.1959879621', uid); // UID field
+        formData.append('entry.958482643', showlistData); // Showlist field
+        formData.append('entry.1573207518', showName); // Show name field
+        
+        await fetch(getUrl('f1'), {
+          method: 'POST',
+          body: formData,
+          mode: 'no-cors'
+        });
+        
+        // Show success message
+        const feedback = document.getElementById('copy-feedback');
+        feedback.textContent = 'Show list submitted successfully!';
+        feedback.style.background = '#28a745';
+        feedback.classList.add('show');
+        setTimeout(() => {
+          feedback.classList.remove('show');
+          feedback.textContent = 'Copied to clipboard!';
+        }, 3000);
+        
+        // Clear the form
+        document.getElementById('show-name').value = '';
+        currentList = [];
+        updateDisplay();
+        saveProgress();
+        
+        // Reload latest showlist after a short delay
+        setTimeout(() => {
+          loadLatestShowlist();
+        }, 2000);
+        
+      } catch (error) {
+        console.error('Error submitting showlist:', error);
+        alert('Error submitting show list. Please try again.');
+      }
+    }
+
+    // Remove latest showlist
+    async function removeLatestShowlist() {
+      if (!latestShowlist) return;
+      
+      const confirmed = confirm(`Are you sure you want to remove the show list "${latestShowlist.name}"?`);
+      
+      if (!confirmed) return;
+      
+      try {
+        const formData = new FormData();
+        formData.append('entry.2066827516', latestShowlist.uid); // UID field
+        formData.append('entry.993370621', 'yes'); // Cancel field
+        
+        await fetch(getUrl('f2'), {
+          method: 'POST',
+          body: formData,
+          mode: 'no-cors'
+        });
+        
+        // Hide the latest showlist section
+        document.getElementById('latest-showlist-section').style.display = 'none';
+        latestShowlist = null;
+        
+        // Show success message
+        const feedback = document.getElementById('copy-feedback');
+        feedback.textContent = 'Show list removed successfully!';
+        feedback.style.background = '#dc3545';
+        feedback.classList.add('show');
+        setTimeout(() => {
+          feedback.classList.remove('show');
+          feedback.textContent = 'Copied to clipboard!';
+          feedback.style.background = '#28a745';
+        }, 3000);
+        
+      } catch (error) {
+        console.error('Error removing showlist:', error);
+        alert('Error removing show list. Please try again.');
+      }
     }
     
     // Setup event listeners

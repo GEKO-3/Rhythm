@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Songs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <!-- Local font definitions -->
+  <style>
+    @font-face {
+      font-family: 'Faruma';
+      src: url('Fonts/Faruma.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+  </style>
+  <!-- Favicon and web app manifest -->
+  <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+  <link rel="manifest" href="favicons/songlist-manifest.webmanifest">
+  
+  <!-- Additional meta tags for better SEO and social sharing -->
+  <meta name="theme-color" content="#f5d000">
+  <meta property="og:title" content="Rhythm Boduberu - Song List">
+  <meta property="og:description" content="Browse our collection of traditional Maldivian Boduberu songs">
+  <meta property="og:image" content="https://rhythmboduberu.com/src/Logo.png">
+  <meta property="og:url" content="https://rhythmboduberu.com/songlist">
+  <meta property="og:type" content="website">
+
+  <!-- Web App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rhythm Songs">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Rhythm Songs">
+  <style>
+    html, body {
+      /* Allow scrolling, but prevent zoom gestures */
+      touch-action: pan-x pan-y;
+      overscroll-behavior: none;
+    }
+    input, textarea, select, button {
+      touch-action: manipulation;
+    }
+    :root {
+      --primary-color: #f5d000;
+      --hover-color: #fced98;
+      --active-color: #E6B800;
+      --text-color: #2b2b2b;
+      --bg-opacity: rgba(31, 31, 31, 0.0);
+      --hover-color2: #3a3a3a;
+      --active-color2: #111111
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    @keyframes slideIn {
+      0% { transform: translateY(10px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    body {
+      /* Use Montserrat for English text */
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background-color: #1f1f1f;
+      background-size: cover;
+      color: var(--primary-color);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .container {
+      text-align: center;
+      position: relative;
+      max-width: 600px;
+      width: 100%; 
+      padding: 10px;
+      background: transparent;
+      transition: transform 0.3s ease;
+      animation: slideIn 0.5s ease-in-out;
+      margin-top: 0;
+      margin-bottom: 40px;
+    }
+    .header-search-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: transparent;
+      padding-top: env(safe-area-inset-top, 0);
+      padding-left: env(safe-area-inset-left, 0);
+      padding-right: env(safe-area-inset-right, 0);
+      padding-bottom: 10px;
+    }
+    
+    .header-search-wrapper::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 20px;
+      background: transparent;
+      pointer-events: none;
+    }
+    
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ff6b6b;
+      color: white;
+      text-align: center;
+      padding: 5px;
+      font-size: 0.9em;
+      z-index: 200;
+      display: none;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    
+    .offline-indicator.show {
+      display: block;
+    }
+    h1 {
+      color: var(--primary-color);
+      margin-bottom: 0.5em;
+      margin-top: 0.5em;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    .search-container {
+      background: transparent;
+      max-width: 600px;
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin: 0 auto;
+      width: 95%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 101;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .filter-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .filter-btn {
+      background: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 1.2em;
+      cursor: pointer;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: background-color 0.3s;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .filter-btn:hover {
+      background: var(--hover-color);
+    }
+    .filter-content {
+      display: none;
+      position: absolute;
+      background: rgba(43,43,43,0.98);
+      border: 1px solid #444;
+      border-radius: 5px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
+      min-width: 200px;
+      min-width: 200px;
+      width: 200px;
+      top: 100%;
+      left: 0;
+      margin-top: 2px;
+    }
+    .filter-content a {
+      color: var(--primary-color);
+      padding: 8px 12px;
+      text-decoration: none;
+      display: block;
+      cursor: pointer;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      border-bottom: 1px solid #333;
+    }
+    .filter-content a:last-child {
+      border-bottom: none;
+    }
+    .filter-content a:hover {
+      background: var(--hover-color);
+      color: var(--text-color);
+    }
+    .filter-dropdown.show .filter-content {
+      display: block;
+    }
+    #search-box {
+      flex: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #444;
+      margin-bottom: 0;
+      font-size: 1em;
+      background: #222;
+      color: var(--primary-color);
+      outline: none;
+      transition: border-color 0.2s;
+      margin-top: 0;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }
+    #search-box:focus {
+      border-color: var(--primary-color);
+    }
+    ul#song-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      margin-top: calc(env(safe-area-inset-top, 0px) + 105px);
+    }
+    ul#song-list li {
+      cursor: pointer;
+      padding: 0.7em 0.5em;
+      border-bottom: 1px solid #1d1d1d;
+      transition: background 0.2s, color 0.2s;
+      color: var(--primary-color);
+      border-radius: 5px;
+      margin-bottom: 5px;
+      font-size: 1.1em;
+      background: rgba(43,43,43,0.7);
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+    }      ul#song-list li:hover {
+        background: var(--hover-color);
+        color: var(--text-color);
+        font-weight: bold;
+      }
+      
+      /* PIN Entry Styles */
+      .pin-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #1f1f1f;
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+      }
+      
+      .pin-container {
+        background: rgba(43,43,43,0.9);
+        padding: 30px;
+        border-radius: 15px;
+        text-align: center;
+        border: 2px solid #444;
+        max-width: 300px;
+        width: 85%;
+      }
+      
+      .pin-title {
+        color: var(--primary-color);
+        font-size: 1.3em;
+        margin-bottom: 25px;
+        font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+        font-weight: 600;
+      }
+      
+      .pin-inputs {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      
+      .pin-digit {
+        width: 50px;
+        height: 50px;
+        padding: 0;
+        font-size: 1.5em;
+        text-align: center;
+        border: 2px solid #444;
+        border-radius: 8px;
+        background: #222;
+        color: var(--primary-color);
+        outline: none;
+        font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+        transition: all 0.3s ease;
+        caret-color: transparent;
+        /* Force numerical keyboard on mobile */
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: textfield;
+      }
+      
+      .pin-digit:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
+        transform: scale(1.05);
+      }
+      
+      .pin-digit.filled {
+        background: rgba(245, 208, 0, 0.1);
+        border-color: var(--primary-color);
+      }
+      
+      .pin-digit.error {
+        border-color: #ff6b6b;
+        animation: shake 0.5s;
+      }
+      
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-3px); }
+        75% { transform: translateX(3px); }
+      }
+      
+      .pin-error {
+        color: #ff6b6b;
+        font-size: 0.85em;
+        margin-top: 5px;
+        min-height: 18px;
+        font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      }
+      
+      .pin-overlay.hidden {
+        display: none;
+      }
+      
+      /* Mobile responsive adjustments */
+      @media (max-width: 400px) {
+        .pin-container {
+          padding: 25px;
+          max-width: 280px;
+        }
+        
+        .pin-digit {
+          width: 45px;
+          height: 45px;
+          font-size: 1.3em;
+        }
+        
+        .pin-inputs {
+          gap: 10px;
+        }
+      }
+    @media (max-width: 700px) {
+      .container {
+        max-width: 95vw;
+        padding: 5px;
+        margin-top: 0;
+      }
+      #search-box {
+        flex: 1;
+      }
+      .search-container {
+        width: 95%;
+        padding: 8px 10px;
+        gap: 8px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .filter-btn {
+        width: 40px;
+        height: 40px;
+      }
+      .filter-content {
+        right: 0;
+        left: auto;
+        min-width: 120px;
+      }
+      .header-search-wrapper {
+        padding-bottom: 8px;
+      }
+      ul#song-list {
+        margin-top: calc(env(safe-area-inset-top, 0px) + 95px);
+      }
+    }
+  </style>
+  <script>
+    // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
+    document.addEventListener('keydown', function(e) {
+      if ((e.ctrlKey || e.metaKey) && (
+        e.key === '+' || e.key === '-' || e.key === '=' || e.key === '0'
+      )) {
+        e.preventDefault();
+      }
+    });
+    document.addEventListener('wheel', function(e) {
+      if (e.ctrlKey) e.preventDefault();
+    }, { passive: false });
+    // Prevent double-tap zoom on mobile
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(e) {
+      const now = (new Date()).getTime();
+      if (now - lastTouchEnd <= 350) {
+        e.preventDefault();
+      }
+      lastTouchEnd = now;
+    }, false);
+    // Prevent pinch-zoom and gesture events on iOS/Safari
+    document.addEventListener('gesturestart', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gesturechange', function(e) {
+      e.preventDefault();
+    });
+    document.addEventListener('gestureend', function(e) {
+      e.preventDefault();
+    });
+
+    // Register service worker for offline functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('Service Worker registered successfully:', registration.scope);
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // New content available, activate it
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                }
+              });
+            });
+          })
+          .catch((error) => {
+            console.log('Service Worker registration failed:', error);
+          });
+        
+        // Listen for messages from service worker
+        navigator.serviceWorker.addEventListener('message', (event) => {
+          if (event.data && event.data.type === 'CACHE_UPDATED') {
+            console.log('Cache updated for files:', event.data.files);
+            // Optionally reload the page or update UI
+          }
+        });
+        
+        // Update cache when online
+        window.addEventListener('online', () => {
+          console.log('Back online - updating cache');
+          updateOfflineStatus();
+          if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({
+              type: 'UPDATE_CACHE',
+              files: ['/songs.js', '/showlist.js', '/songlist.html', '/lyrics.html'] // Use original filename
+            });
+          }
+          
+          // If authenticated and in web app mode, refresh songs data
+          if (pinAuthenticated) {
+            setTimeout(() => {
+              refreshSongsData();
+            }, 1000);
+          }
+        });
+        
+        // Handle offline status
+        window.addEventListener('offline', () => {
+          console.log('Gone offline');
+          updateOfflineStatus();
+        });
+        
+        // Initial offline status check
+        updateOfflineStatus();
+      });
+    }
+    
+    function updateOfflineStatus() {
+      const offlineIndicator = document.getElementById('offline-indicator');
+      if (!navigator.onLine) {
+        offlineIndicator.classList.add('show');
+      } else {
+        offlineIndicator.classList.remove('show');
+      }
+    }
+  </script>
+</head>
+<body>
+  <div class="pin-overlay" id="pin-overlay">
+    <div class="pin-container">
+      <h2 class="pin-title">Enter PIN</h2>
+      <div class="pin-inputs">
+        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-0" maxlength="1" autocomplete="off" />
+        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-1" maxlength="1" autocomplete="off" />
+        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-2" maxlength="1" autocomplete="off" />
+        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-3" maxlength="1" autocomplete="off" />
+      </div>
+      <div class="pin-error" id="pin-error"></div>
+    </div>
+  </div>
+  
+  <div class="offline-indicator" id="offline-indicator">
+    You're offline - Using cached content
+  </div>
+  <div class="container">
+    <div class="header-search-wrapper">
+      <div class="search-container">
+        <input type="text" id="search-box" placeholder="Search songs..." />
+        <div class="filter-dropdown">
+          <button class="filter-btn" id="filter-btn">
+            <img src="src/Filter.png" alt="Filter" style="width: 20px; height: 20px;">
+          </button>
+          <div class="filter-content" id="filter-content">
+            <!-- Content will be generated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul id="song-list"></ul>
+  </div>
+  <script>
+    // ===========================================
+    // PIN CONFIGURATION (Easy to change)
+    // ===========================================
+    const pinAuth = 'ODc2NQ=='; // Change this to update PIN
+    
+    // PIN Security Functions
+    function decodePinConfig(encoded) {
+      try {
+        const decoded = atob(encoded);
+        const reversed = decoded.split('').reverse().join('');
+        return reversed.split('').map(Number);
+      } catch (e) {
+        return [0,0,0,0];
+      }
+    }
+    
+    function validatePinStructure(pin) {
+      // Additional validation layer
+      const checksum = pin.reduce((sum, digit) => sum + digit, 0);
+      // Calculate expected checksum based on actual PIN
+      const expectedChecksum = actualPinConfig.reduce((sum, digit) => sum + digit, 0);
+      return checksum === expectedChecksum;
+    }
+    
+    // Get actual PIN configuration
+    const actualPinConfig = decodePinConfig(pinAuth);
+    
+    // PIN Protection System
+    let pinAuthenticated = false;
+    let pinOverlay, pinDigits, pinError;
+    let attemptCount = 0;
+    const maxAttempts = 5;
+    const lockoutDuration = 60 * 60 * 1000; // 1 hour in milliseconds
+    let lockoutTimer = null;
+    
+    // Session timeout system
+    const sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
+    let sessionTimer = null;
+    let lastActivityTime = Date.now();
+    let isPageVisible = true;
+    
+    // Note: Using sessionStorage instead of localStorage for PIN session
+    // This ensures users must re-enter PIN when browser/app is completely closed
+    
+    // Dynamic script loader to hide from sources
+    let currentGenreFilter = 'all';
+    let songList, searchBox, filterBtn, filterDropdown, filterContent;
+    
+    // Initialize PIN system on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      initializePinSystem();
+      initializeSessionTimeout();
+    });
+    
+    function initializeSessionTimeout() {
+      // Track page visibility
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+          isPageVisible = false;
+          // Start session timeout when page goes out of focus
+          if (pinAuthenticated) {
+            startSessionTimeout();
+          }
+        } else {
+          isPageVisible = true;
+          // Clear session timeout when page comes back into focus
+          clearSessionTimeout();
+          updateLastActivity();
+        }
+      });
+      
+      // Track user activity to reset session timer
+      const activityEvents = ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+      activityEvents.forEach(event => {
+        document.addEventListener(event, updateLastActivity, true);
+      });
+      
+      // For mobile apps, also track window focus/blur
+      window.addEventListener('focus', function() {
+        isPageVisible = true;
+        clearSessionTimeout();
+        updateLastActivity();
+      });
+      
+      window.addEventListener('blur', function() {
+        isPageVisible = false;
+        if (pinAuthenticated) {
+          startSessionTimeout();
+        }
+      });
+    }
+    
+    function updateLastActivity() {
+      lastActivityTime = Date.now();
+      if (pinAuthenticated && !isPageVisible) {
+        // Reset session timeout if user becomes active while page is hidden
+        clearSessionTimeout();
+        startSessionTimeout();
+      }
+    }
+    
+    function startSessionTimeout() {
+      clearSessionTimeout(); // Clear any existing timeout
+      
+      sessionTimer = setTimeout(() => {
+        if (pinAuthenticated && !isPageVisible) {
+          // Session expired - require PIN re-entry
+          expireSession();
+        }
+      }, sessionTimeout);
+    }
+    
+    function clearSessionTimeout() {
+      if (sessionTimer) {
+        clearTimeout(sessionTimer);
+        sessionTimer = null;
+      }
+    }
+    
+    function expireSession() {
+      pinAuthenticated = false;
+      sessionStorage.removeItem('pinSession');
+      
+      // Clear session timeout
+      clearSessionTimeout();
+      
+      // Show PIN overlay again
+      pinOverlay.classList.remove('hidden');
+      clearPinInputs();
+      
+      // Focus on first digit when user returns
+      setTimeout(() => {
+        pinDigits[0].focus();
+        
+        // Force keyboard to open on mobile devices
+        if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+          pinDigits[0].click();
+          setTimeout(() => {
+            pinDigits[0].focus();
+          }, 100);
+        }
+      }, 300);
+      
+      // Show session expired message
+      showPinError('Session expired. Please enter PIN again.');
+      setTimeout(() => {
+        clearPinError();
+      }, 3000);
+    }
+    
+    function initializePinSystem() {
+      pinOverlay = document.getElementById('pin-overlay');
+      pinDigits = [
+        document.getElementById('pin-digit-0'),
+        document.getElementById('pin-digit-1'),
+        document.getElementById('pin-digit-2'),
+        document.getElementById('pin-digit-3')
+      ];
+      pinError = document.getElementById('pin-error');
+      
+      // Check if PIN was previously entered (but still require re-entry)
+      checkPinStatus();
+      
+      // Setup event listeners for each digit input
+      pinDigits.forEach((digit, index) => {
+        digit.addEventListener('input', function(e) {
+          handleDigitInput(e, index);
+        });
+        
+        digit.addEventListener('keydown', function(e) {
+          handleDigitKeydown(e, index);
+        });
+        
+        digit.addEventListener('paste', function(e) {
+          handlePaste(e);
+        });
+        
+        // Mobile focus improvements
+        digit.addEventListener('focus', function() {
+          // Ensure keyboard opens on mobile
+          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            setTimeout(() => {
+              digit.focus();
+              digit.click();
+            }, 50);
+          }
+        });
+        
+        // Additional mobile keyboard trigger
+        digit.addEventListener('touchstart', function(e) {
+          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            setTimeout(() => {
+              digit.focus();
+            }, 50);
+          }
+        });
+      });
+      
+      // Auto-focus first digit with delay for mobile
+      setTimeout(() => {
+        if (pinOverlay && !pinOverlay.classList.contains('hidden')) {
+          pinDigits[0].focus();
+          
+          // Force keyboard to open on mobile devices
+          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            // Multiple attempts to ensure keyboard opens
+            pinDigits[0].click();
+            setTimeout(() => {
+              pinDigits[0].focus();
+              pinDigits[0].click();
+            }, 100);
+            setTimeout(() => {
+              pinDigits[0].focus();
+            }, 200);
+          }
+        }
+      }, 500); // Increased delay to ensure DOM is ready
+    }
+    
+    function handleDigitInput(e, index) {
+      // Check if locked out
+      if (e.target.disabled) return;
+      
+      const value = e.target.value;
+      
+      // Only allow single digit numbers
+      if (!/^\d$/.test(value)) {
+        e.target.value = '';
+        return;
+      }
+      
+      // Clear any previous errors
+      clearPinError();
+      
+      // Mark as filled
+      e.target.classList.add('filled');
+      
+      // Move to next digit
+      if (index < 3) {
+        pinDigits[index + 1].focus();
+      } else {
+        // All digits filled, verify PIN
+        setTimeout(() => verifyPin(), 100);
+      }
+    }
+    
+    function handleDigitKeydown(e, index) {
+      // Check if locked out
+      if (e.target.disabled) return;
+      
+      // Handle backspace
+      if (e.key === 'Backspace') {
+        if (e.target.value === '' && index > 0) {
+          // Move to previous digit if current is empty
+          pinDigits[index - 1].focus();
+          pinDigits[index - 1].value = '';
+          pinDigits[index - 1].classList.remove('filled');
+        } else {
+          // Clear current digit
+          e.target.value = '';
+          e.target.classList.remove('filled');
+        }
+      }
+      
+      // Handle Enter key
+      if (e.key === 'Enter') {
+        verifyPin();
+      }
+      
+      // Handle arrow keys
+      if (e.key === 'ArrowLeft' && index > 0) {
+        pinDigits[index - 1].focus();
+      }
+      if (e.key === 'ArrowRight' && index < 3) {
+        pinDigits[index + 1].focus();
+      }
+    }
+    
+    function handlePaste(e) {
+      e.preventDefault();
+      const pasteData = e.clipboardData.getData('text');
+      
+      // Check if pasted data is 4 digits
+      if (/^\d{4}$/.test(pasteData)) {
+        const digits = pasteData.split('');
+        pinDigits.forEach((digit, index) => {
+          digit.value = digits[index];
+          digit.classList.add('filled');
+        });
+        setTimeout(() => verifyPin(), 100);
+      }
+    }
+    
+    function checkPinStatus() {
+      // Check if currently locked out
+      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
+      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
+        startLockoutTimer(parseInt(lockoutEnd));
+        return;
+      }
+      
+      // Clear any expired lockout
+      if (lockoutEnd && Date.now() >= parseInt(lockoutEnd)) {
+        localStorage.removeItem('pinLockoutEnd');
+        localStorage.removeItem('pinAttemptCount');
+        attemptCount = 0;
+      }
+      
+      // Restore attempt count if not locked out
+      const savedAttempts = localStorage.getItem('pinAttemptCount');
+      if (savedAttempts) {
+        attemptCount = parseInt(savedAttempts);
+      }
+      
+      // Check for existing valid session 
+      const sessionData = sessionStorage.getItem('pinSession');
+      if (sessionData) {
+        try {
+          const session = JSON.parse(sessionData);
+          const sessionAge = Date.now() - session.timestamp;
+          
+          // Session is valid if authenticated and less than 3 minutes old (with 10 second buffer for navigation)
+          if (session.authenticated && sessionAge < (sessionTimeout + 10000)) {
+            // Valid session found - skip PIN entry and refresh session timestamp
+            pinAuthenticated = true;
+            // Refresh session timestamp to extend it
+            const refreshedSession = {
+              timestamp: Date.now(),
+              authenticated: true,
+              sessionType: 'songlist'
+            };
+            sessionStorage.setItem('pinSession', JSON.stringify(refreshedSession));
+            updateLastActivity();
+            hidePinOverlay();
+            loadSongsData();
+            return;
+          } else {
+            // Session expired, remove it
+            sessionStorage.removeItem('pinSession');
+          }
+        } catch (e) {
+          // Invalid session data, remove it
+          sessionStorage.removeItem('pinSession');
+        }
+      }
+      
+      // No valid session - show PIN overlay
+      pinOverlay.classList.remove('hidden');
+      
+      // Ensure keyboard opens when PIN overlay is shown
+      setTimeout(() => {
+        if (pinDigits[0]) {
+          pinDigits[0].focus();
+          
+          // Force keyboard to open on mobile devices
+          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            pinDigits[0].click();
+            setTimeout(() => {
+              pinDigits[0].focus();
+            }, 100);
+          }
+        }
+      }, 300);
+    }
+    
+    function startLockout() {
+      const lockoutEnd = Date.now() + lockoutDuration;
+      localStorage.setItem('pinLockoutEnd', lockoutEnd.toString());
+      localStorage.setItem('pinAttemptCount', attemptCount.toString());
+      
+      // Disable all inputs
+      pinDigits.forEach(digit => digit.disabled = true);
+      
+      startLockoutTimer(lockoutEnd);
+    }
+    
+    function startLockoutTimer(lockoutEnd) {
+      function updateLockoutDisplay() {
+        const now = Date.now();
+        const remaining = lockoutEnd - now;
+        
+        if (remaining <= 0) {
+          // Lockout expired
+          clearInterval(lockoutTimer);
+          localStorage.removeItem('pinLockoutEnd');
+          localStorage.removeItem('pinAttemptCount');
+          attemptCount = 0;
+          
+          // Re-enable inputs
+          pinDigits.forEach(digit => digit.disabled = false);
+          clearPinInputs();
+          pinError.textContent = 'Lockout expired. You may try again.';
+          
+          setTimeout(() => {
+            clearPinError();
+            pinDigits[0].focus();
+            
+            // Force keyboard to open on mobile devices
+            if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+              pinDigits[0].click();
+              setTimeout(() => {
+                pinDigits[0].focus();
+              }, 100);
+            }
+          }, 2000);
+          
+          return;
+        }
+        
+        // Calculate time remaining
+        const minutes = Math.floor(remaining / (1000 * 60));
+        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
+        
+        showPinError(`Locked out. Try again in ${minutes}m ${seconds}s`);
+      }
+      
+      // Update immediately and then every second
+      updateLockoutDisplay();
+      lockoutTimer = setInterval(updateLockoutDisplay, 1000);
+    }
+    
+    function verifyPin() {
+      const enteredPin = pinDigits.map(digit => digit.value).join('');
+      
+      if (enteredPin.length !== 4) {
+        showPinError('Please enter all 4 digits');
+        return;
+      }
+      
+      // Check if currently locked out
+      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
+      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
+        showPinError('Account is locked. Please wait.');
+        return;
+      }
+      
+      // Convert entered PIN to array for comparison
+      const enteredPinArray = enteredPin.split('').map(Number);
+      
+      // Multi-layer validation
+      const basicMatch = enteredPinArray.every((digit, index) => 
+        digit === actualPinConfig[index]
+      );
+      
+      const structureValid = validatePinStructure(enteredPinArray);
+      
+      if (basicMatch && structureValid) {
+        // Successful authentication
+        pinAuthenticated = true;
+        // Store session with timestamp and songlist type for cross-page access
+        const sessionData = {
+          timestamp: Date.now(),
+          authenticated: true,
+          sessionType: 'songlist'
+        };
+        sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
+        
+        // Clear lockout data on success
+        localStorage.removeItem('pinLockoutEnd');
+        localStorage.removeItem('pinAttemptCount');
+        attemptCount = 0;
+        
+        if (lockoutTimer) {
+          clearInterval(lockoutTimer);
+          lockoutTimer = null;
+        }
+        
+        // Update activity time and start session monitoring
+        updateLastActivity();
+        
+        hidePinOverlay();
+        loadSongsData();
+      } else {
+        // Failed authentication
+        attemptCount++;
+        localStorage.setItem('pinAttemptCount', attemptCount.toString());
+        
+        if (attemptCount >= maxAttempts) {
+          // Start lockout
+          startLockout();
+        } else {
+          // Show remaining attempts
+          const remainingAttempts = maxAttempts - attemptCount;
+          showPinError(`Invalid PIN. ${remainingAttempts} attempts remaining.`);
+          clearPinInputs();
+          setTimeout(() => {
+            pinDigits[0].focus();
+            
+            // Force keyboard to open on mobile devices
+            if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+              pinDigits[0].click();
+              setTimeout(() => {
+                pinDigits[0].focus();
+              }, 100);
+            }
+          }, 500);
+        }
+      }
+    }
+    
+    function showPinError(message) {
+      pinError.textContent = message;
+      pinDigits.forEach(digit => {
+        digit.classList.add('error');
+      });
+      setTimeout(() => {
+        pinDigits.forEach(digit => {
+          digit.classList.remove('error');
+        });
+      }, 500);
+    }
+    
+    function clearPinError() {
+      pinError.textContent = '';
+      pinDigits.forEach(digit => {
+        digit.classList.remove('error');
+      });
+    }
+    
+    function clearPinInputs() {
+      pinDigits.forEach(digit => {
+        digit.value = '';
+        digit.classList.remove('filled');
+      });
+    }
+    
+    function hidePinOverlay() {
+      pinOverlay.classList.add('hidden');
+    }
+    
+    function loadSongsData() {
+      // Only load songs after PIN is verified
+      if (!pinAuthenticated) {
+        console.log('PIN not authenticated - blocking song data load');
+        return;
+      }
+      
+      // Check if running as web app and force cache refresh
+      const isWebApp = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      const cacheParam = isWebApp ? `?t=${Date.now()}` : '';
+      
+      // Load songs.js first, then showlist.js with cache busting for web apps
+      fetch(`/songs.js${cacheParam}`, {
+        cache: isWebApp ? 'no-cache' : 'default'
+      })
+        .then(response => response.text())
+        .then(scriptContent => {
+          // Replace const with window assignment to make it global
+          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+          eval(modifiedScript);
+          
+          // Now load showlist.js
+          return fetch(`/showlist.js${cacheParam}`, {
+            cache: isWebApp ? 'no-cache' : 'default'
+          });
+        })
+        .then(response => response.text())
+        .then(showlistContent => {
+          // Replace const with window assignment to make it global
+          const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
+          eval(modifiedShowlist);
+          
+          // Initialize after both files are loaded
+          initializeSongList();
+        })
+        .catch(error => {
+          console.error('Failed to load songs data:', error);
+          // Fallback to cached version if network fails
+          if (isWebApp) {
+            console.log('Retrying with cached version...');
+            fetch('/songs.js')
+              .then(response => response.text())
+              .then(scriptContent => {
+                const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+                eval(modifiedScript);
+                return fetch('/showlist.js');
+              })
+              .then(response => response.text())
+              .then(showlistContent => {
+                const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
+                eval(modifiedShowlist);
+                initializeSongList();
+              })
+              .catch(fallbackError => {
+                console.error('Failed to load cached songs data:', fallbackError);
+              });
+          }
+        });
+    }
+    
+    function refreshSongsData() {
+      // Force refresh songs data - useful for web app mode
+      if (!pinAuthenticated) return;
+      
+      const isWebApp = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      const cacheParam = `?refresh=${Date.now()}`;
+      
+      console.log('Refreshing songs data...');
+      
+      fetch(`/songs.js${cacheParam}`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      })
+        .then(response => response.text())
+        .then(scriptContent => {
+          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+          eval(modifiedScript);
+          
+          return fetch(`/showlist.js${cacheParam}`, {
+            cache: 'no-cache',
+            headers: {
+              'Cache-Control': 'no-cache',
+              'Pragma': 'no-cache'
+            }
+          });
+        })
+        .then(response => response.text())
+        .then(showlistContent => {
+          const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
+          eval(modifiedShowlist);
+          
+          // Update the UI with fresh data
+          updateFilterDropdown();
+          renderList(searchBox.value, currentGenreFilter);
+          
+          console.log('Songs data refreshed successfully');
+        })
+        .catch(error => {
+          console.error('Failed to refresh songs data:', error);
+        });
+    }
+    
+    // Remove the immediate execution - now controlled by PIN
+    // (function(){
+    //   // Load script via fetch to hide from sources
+    //   fetch('/songs.js') // Use original filename for proper caching
+    //     .then(response => response.text())
+    //     .then(scriptContent => {
+    //       // Replace const with window assignment to make it global
+    //       const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
+    //       eval(modifiedScript);
+    //       // Initialize after songs.js is loaded
+    //       initializeSongList();
+    //     })
+    //     .catch(error => {
+    //       console.error('Failed to load songs data:', error);
+    //     });
+    // })();
+    
+    function initializeSongList() {
+      songList = document.getElementById('song-list');
+      searchBox = document.getElementById('search-box');
+      filterBtn = document.getElementById('filter-btn');
+      filterDropdown = document.querySelector('.filter-dropdown');
+      filterContent = document.getElementById('filter-content');
+      
+      // Restore saved filter state
+      const savedFilter = localStorage.getItem('songListFilter');
+      if (savedFilter) {
+        currentGenreFilter = savedFilter;
+      }
+      
+      updateFilterDropdown();
+      renderList();
+      
+      // Set up periodic refresh for web app mode
+      const isWebApp = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+      if (isWebApp) {
+        // Refresh songs data every 5 minutes in web app mode
+        setInterval(() => {
+          if (pinAuthenticated && navigator.onLine) {
+            refreshSongsData();
+          }
+        }, 5 * 60 * 1000); // 5 minutes
+      }
+      
+      // Toggle dropdown
+      filterBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        filterDropdown.classList.toggle('show');
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function() {
+        filterDropdown.classList.remove('show');
+      });
+
+      searchBox.addEventListener('input', e => {
+        renderList(e.target.value, currentGenreFilter);
+      });
+      
+      // Restore scroll position when page loads
+      window.addEventListener('load', function() {
+        const savedScrollPosition = localStorage.getItem('songListScrollPosition');
+        if (savedScrollPosition !== null) {
+          // Use setTimeout to ensure content is fully rendered before scrolling
+          setTimeout(() => {
+            window.scrollTo(0, parseInt(savedScrollPosition));
+            // Clear the stored position after restoring it
+            localStorage.removeItem('songListScrollPosition');
+          }, 100);
+        }
+      });
+    }
+
+    function updateFilterDropdown() {
+      // Count songs by genre
+      const genreCounts = {
+        'Baburu': 0,
+        'Kaasi': 0,
+        'Nala': 0,
+        'Taki': 0,
+        'Thinberu': 0,
+        'Zamaanee': 0
+      };
+      
+      let totalSongs = 0;
+      let showCount = 0;
+      
+      window.songs.forEach(song => {
+        if (song.genre && genreCounts.hasOwnProperty(song.genre)) {
+          genreCounts[song.genre]++;
+        }
+        totalSongs++;
+      });
+      
+      // Count songs in showlist that exist in songs
+      if (window.showList && Array.isArray(window.showList) && window.showList.length > 0) {
+        showCount = window.showList.filter(showSongName => 
+          window.songs.some(song => song.name.toLowerCase() === showSongName.toLowerCase())
+        ).length;
+      }
+      
+      // Build dropdown content
+      let dropdownContent = `<a onclick="setFilter('all')">All (${totalSongs})</a>`;
+      
+      // Add SHOW option only if showlist has items
+      if (showCount > 0) {
+        dropdownContent += `<a onclick="setFilter('SHOW')">SHOW (${showCount})</a>`;
+      }
+      
+      dropdownContent += `
+        <a onclick="setFilter('Baburu')">Baburu (${genreCounts.Baburu})</a>
+        <a onclick="setFilter('Kaasi')">Kaasi (${genreCounts.Kaasi})</a>
+        <a onclick="setFilter('Nala')">Nala (${genreCounts.Nala})</a>
+        <a onclick="setFilter('Taki')">Taki (${genreCounts.Taki})</a>
+        <a onclick="setFilter('Thinberu')">Thinberu (${genreCounts.Thinberu})</a>
+        <a onclick="setFilter('Zamaanee')">Zamaanee (${genreCounts.Zamaanee})</a>
+      `;
+      
+      // Update dropdown content
+      filterContent.innerHTML = dropdownContent;
+    }
+
+    function renderList(searchFilter = '', genreFilter = 'all') {
+      songList.innerHTML = '';
+      
+      let filteredSongs;
+      
+      if (genreFilter === 'SHOW') {
+        // For SHOW filter, use the order from showlist
+        if (window.showList && Array.isArray(window.showList) && window.showList.length > 0) {
+          filteredSongs = [];
+          
+          // Add songs in the order specified in showlist
+          window.showList.forEach(showSongName => {
+            const song = window.songs.find(s => s.name.toLowerCase() === showSongName.toLowerCase());
+            if (song) {
+              // Apply search filter if provided
+              if (searchFilter === '' || song.name.toLowerCase().includes(searchFilter.toLowerCase())) {
+                filteredSongs.push(song);
+              }
+            }
+          });
+        } else {
+          filteredSongs = [];
+        }
+      } else {
+        // For other filters, use normal filtering and sorting
+        filteredSongs = window.songs
+          .filter(song => {
+            const matchesSearch = song.name.toLowerCase().includes(searchFilter.toLowerCase());
+            const matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
+            return matchesSearch && matchesGenre;
+          })
+          .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
+      }
+      
+      // Render the filtered songs
+      filteredSongs.forEach(song => {
+        const li = document.createElement('li');
+        li.textContent = song.name;
+        
+        // Check if English lyrics are available
+        if (!song.englishLyrics || song.englishLyrics.trim() === '') {
+              li.style.color = '#f5d467';
+              li.addEventListener('mouseenter', () => {
+                li.style.color = 'black';
+              });
+              li.addEventListener('mouseleave', () => {
+                li.style.color = '#f5d467';
+              });
+              }
+        
+        li.onclick = () => {
+          // Save current scroll position before navigating
+          localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
+          localStorage.setItem('selectedSongId', song.id);
+          // Refresh session before navigating
+          if (pinAuthenticated) {
+            const sessionData = {
+              timestamp: Date.now(),
+              authenticated: true,
+              sessionType: 'songlist'
+            };
+            sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
+          }
+          window.location.href = 'lyrics';
+        };
+        songList.appendChild(li);
+      });
+    }
+
+    // Global functions for onclick handlers
+    function setFilter(genre) {
+      currentGenreFilter = genre;
+      // Save the filter state to localStorage
+      localStorage.setItem('songListFilter', genre);
+      // Keep the filter icon, don't change button text
+      document.querySelector('.filter-dropdown').classList.remove('show');
+      renderList(document.getElementById('search-box').value, currentGenreFilter);
+    }
+  </script>
+</body>
+</html>
