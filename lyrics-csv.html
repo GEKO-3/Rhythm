@@ -695,14 +695,6 @@
     // Note: Using sessionStorage instead of localStorage for PIN session
     // This ensures users must re-enter PIN when browser/app is completely closed
     
-    // URL deobfuscation helper
-    function getUrl(key) {
-      const urls = {
-        'c1': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNWdTVmOXgyZi11Mmhha0xfMXBaeV9oYmVweHRuRmY3TVJXVzlMekd1OFNDcV95UWl0aFBETUJWd1dKZmdjeEJYOVVlY09SaTNlVmpSZC9wdWI/b3V0cHV0PWNzdg=='
-      };
-      return atob(urls[key]);
-    }
-    
     // Initialize PIN system on page load
     document.addEventListener('DOMContentLoaded', function() {
       initializePinSystem();
@@ -1102,7 +1094,7 @@
     async function getSongsFromCSV() {
       try {
         console.log('Fetching CSV from Google Sheets...');
-        const response = await fetch(getUrl('c1'));
+        const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv');
         const csvText = await response.text();
         console.log('CSV text length:', csvText.length);
         

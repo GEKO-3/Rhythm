@@ -636,20 +636,10 @@
         const calledBackCountEl = document.getElementById('called-back-count');
         const pendingCallbackCountEl = document.getElementById('pending-callback-count');
 
-        // URL deobfuscation helper
-        function getUrl(key) {
-            const urls = {
-                'c6': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlJ4VWxNS0k5RmRxZlRIakQzeVREaXV3bGhId3pyZm9WRUtYc0EwWmZUcFFMR25fU0d2TTJ1SnV6NlVSQTNfR1hSRkJ2b2Zqa2EtNGZKRi9wdWI/b3V0cHV0PWNzdg==',
-                'c7': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNvckVBaHg4TG1MRDFtOG1LREt1Wk1ZV2xFQ0EyNFFxRll0N2FfczVCMlRheFIxTjlYYkhIRXVjS1VpVVlDTHBWRjBYVktsMTRMWWE2bC9wdWI/b3V0cHV0PWNzdg==',
-                'f6': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTY29qRVZiaDZKTEllcHd3UXhKdElBQjdCbUlUUHAtdnA2UERZN0pGUzUxWnJxckZnL2Zvcm1SZXNwb25zZQ=='
-            };
-            return atob(urls[key]);
-        }
-
         // CSV URLs
-        const CSV_URL = getUrl('c6');
-        const STATUS_CSV_URL = getUrl('c7');
-        const FORM_URL = getUrl('f6');
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRxUlMKI9FdqfTHjD3yTDiuwlhHwzrfoVEKXsA0ZfTpQLGn_SGvM2uJuz6URA3_GXRFBvofjka-4fJF/pub?output=csv';
+        const STATUS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSorEAhx8LmLD1m8mKDKuZMYWlECA24QqFYt7a_s5B2TaxR1N9XbHHEucKUiUYCLpVF0XVKl14LYa6l/pub?output=csv';
+        const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScojEVbh6JLIepwwQxJtIAB7BmITPp-vp6PDY7JFS51ZrqrFg/formResponse';
 
         // Store previously loaded sponsors and callback data
         let previousSponsors = [];

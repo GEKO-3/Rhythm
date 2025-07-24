@@ -147,15 +147,6 @@
     <script src="songs.js"></script>
     
     <script>
-        // URL deobfuscation helper
-        function getUrl(key) {
-            const urls = {
-                'c1': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNWdTVmOXgyZi11Mmhha0xfMXBaeV9oYmVweHRuRmY3TVJXVzlMekd1OFNDcV95UWl0aFBETUJWd1dKZmdjeEJYOVVlY09SaTNlVmpSZC9wdWI/b3V0cHV0PWNzdg==',
-                'f3': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTZG5Kb1JkaHp3VWQ3QmpJQnhwaWZ4QTB0aFFWQVpZVVhCMnZGZnJkbU9oamdZZGx3L2Zvcm1SZXNwb25zZQ=='
-            };
-            return atob(urls[key]);
-        }
-
         let submissionState = {
             isRunning: false,
             isPaused: false,
@@ -183,7 +174,7 @@
         async function getNextAvailableId() {
             try {
                 log('Fetching CSV to determine next available ID...');
-                const response = await fetch(getUrl('c1'));
+                const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv');
                 const csvText = await response.text();
                 
                 // Parse CSV to find the highest ID
@@ -279,7 +270,7 @@
                 formData.append('entry.269641100', song.lyrics.trim()); // Dhivehi lyrics
 
                 // Submit to Google Form
-                const response = await fetch(getUrl('f3'), {
+                const response = await fetch('https://docs.google.com/forms/d/e/1FAIpQLSdnJoRdhzwUd7BjIBxpifxA0thQVAZYUXB2vFfrdmOhjgYdlw/formResponse', {
                     method: 'POST',
                     body: formData,
                     mode: 'no-cors' // Required for Google Forms

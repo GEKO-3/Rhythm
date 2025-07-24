@@ -648,20 +648,10 @@
         const inAreaCountEl = document.getElementById('in-area-count');
         const outAreaCountEl = document.getElementById('out-area-count');
 
-        // URL deobfuscation helper
-        function getUrl(key) {
-            const urls = {
-                'c4': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlFnM0phOHZGXzU2Zks1VGNpOE5kcFBxemlKOS1sR1BhUjFLbW5aTjJ6b0JDeXIwWVVjWkZIakdsYnNpRzdxbXJKZHNVRFJXSzFRdXQ5Ri9wdWI/Z2lkPTIwNDA5MDE5MTAmc2luZ2xlPXRydWUmb3V0cHV0PWNzdg==',
-                'c5': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlJZZ2hWUUxwelNhdm5FdktSV0tZYnFhZE9EVjF5bDcxUnFNWXNSbERHaUpZcWpXaDM5OEo3LWNnbGpMWW9qMXlMQUxQa0tEZmtzZFBlQy9wdWI/b3V0cHV0PWNzdg==',
-                'f4': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTZmVMTkJ2TDhLZThTUFZSNmhuaWhscnFvWExMZFc0VElCNS1iVVBsaXVUVGFQOUZRL2Zvcm1SZXNwb25zZQ=='
-            };
-            return atob(urls[key]);
-        }
-
         // CSV URLs
-        const CSV_URL = getUrl('c4');
-        const STATUS_CSV_URL = getUrl('c5');
-        const FORM_URL = getUrl('f4');
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQg3Ja8vF_56fK5Tci8NdpPqziJ9-lGPaR1KmnZN2zoBCyr0YUcZFHjGlbsiG7qmrJdsUDRWK1Qut9F/pub?gid=2040901910&single=true&output=csv';
+        const STATUS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRYghVQLpzSavnEvKRWKYbqadODV1yl71RqMYsRlDGiJYqjWh398J7-cgljLYoj1yLALPkKDfksdPeC/pub?output=csv';
+        const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfeLNBvL8Ke8SPVR6hnihlrqoXLLdW4TIB5-bUPliuTTaP9FQ/formResponse';
 
         // Store previously loaded applications and status data
         let previousApplications = [];

@@ -482,7 +482,7 @@ const entryFields = [
         
         <div class="warning">
             🔍 <strong>Your Google Form URL:</strong><br>
-            <code id="viewform-url"></code>
+            <code>https://docs.google.com/forms/d/e/1FAIpQLScWjYnitFJZl3Yi-e9raSASgAXzla8Gog6_QU0IQrfZ8ZNLTQ/viewform</code>
             <br><br>
             <strong>To edit:</strong> Replace "viewform" with "edit" in the URL
         </div>
@@ -494,16 +494,6 @@ const entryFields = [
     </div>
 
     <script>
-        // URL deobfuscation helper
-        function getUrl(key) {
-            const urls = {
-                'f8': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTY1dqWW5pdEZKWmwzWWktZTlyYVNBU2dBWHpsYThHb2c2X1FVMElRcmZaOFpOTFRR',
-                'f9': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTY1dqWW5pdEZKWmwzWWktZTlyYVNBU2dBWHpsYThHb2c2X1FVMElRcmZaOFpOTFRRL2VkaXQ=',
-                'f10': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vZm9ybXMvZC9lLzFGQUlwUUxTY1dqWW5pdEZKWmwzWWktZTlyYVNBU2dBWHpsYThHb2c2X1FVMElRcmZaOFpOTFRRL3ZpZXdmb3Jt'
-            };
-            return atob(urls[key]);
-        }
-
         function copyScript() {
             const script = document.getElementById('consoleScript').textContent;
             navigator.clipboard.writeText(script).then(() => {
@@ -527,15 +517,14 @@ const entryFields = [
         }
         
         function openFormEdit() {
-            const editUrl = getUrl('f9');
+            const editUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScWjYnitFJZl3Yi-e9raSASgAXzla8Gog6_QU0IQrfZ8ZNLTQ/edit';
             window.open(editUrl, '_blank');
         }
         
         // Auto-focus on form URL input
         document.addEventListener('DOMContentLoaded', function() {
             const formUrl = document.getElementById('formUrl');
-            formUrl.value = getUrl('f9');
-            document.getElementById('viewform-url').textContent = getUrl('f10');
+            formUrl.value = 'https://docs.google.com/forms/d/e/1FAIpQLScWjYnitFJZl3Yi-e9raSASgAXzla8Gog6_QU0IQrfZ8ZNLTQ/edit';
         });
     </script>
 </body>

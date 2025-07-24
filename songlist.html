@@ -543,16 +543,6 @@
     // Get actual PIN configuration
     const actualPinConfig = decodePinConfig(pinAuth);
     
-    // URL deobfuscation helper
-    function getUrl(key) {
-      const urls = {
-        'c1': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlNWdTVmOXgyZi11Mmhha0xfMXBaeV9oYmVweHRuRmY3TVJXVzlMekd1OFNDcV95UWl0aFBETUJWd1dKZmdjeEJYOVVlY09SaTNlVmpSZC9wdWI/b3V0cHV0PWNzdg==',
-        'c2': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlQydTRGdTJmMGJZRl9Ub1BVLWRpZ0QxamJxTnNMN0RPSnBCX2tYbFdUc25YY2dldHN2Y0h1aG5NcXRGLWdDRmlfUG5TaVd6VXdiTjNwNi9wdWI/b3V0cHV0PWNzdg==',
-        'c3': 'aHR0cHM6Ly9kb2NzLmdvb2dsZS5jb20vc3ByZWFkc2hlZXRzL2QvZS8yUEFDWC0xdlFkS2xDRkRjMUlFUVhFZ2prWDFVTHBHTGpXaXRSemFIOFdzYTFmTkdxR2JYa011U2hUTm1URHNrMWZMNkY4STNEMDIyem4ySFVJckN1eC9wdWI/b3V0cHV0PWNzdg=='
-      };
-      return atob(urls[key]);
-    }
-    
     // PIN Protection System
     let pinAuthenticated = false;
     let pinOverlay, pinDigits, pinError;
@@ -966,7 +956,7 @@
     async function getSongsFromCSV() {
       try {
         console.log('Fetching CSV from Google Sheets...');
-        const response = await fetch(getUrl('c1'));
+        const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv');
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -1168,7 +1158,7 @@
     async function loadLatestShowlist() {
       try {
         // First, get the latest showlist
-        const showlistResponse = await fetch(getUrl('c2'));
+        const showlistResponse = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vT2u4Fu2f0bYF_ToPU-digD1jbqNsL7DOJpB_kXlWTsnXcgetsvcHuhnMqtF-gCFi_PnSiWzUwbN3p6/pub?output=csv');
         const showlistCsv = await showlistResponse.text();
         
         // Parse the showlist CSV
@@ -1185,7 +1175,7 @@
         const latestShowName = latestRow[3]; // Show Name is in column 4 (index 3)
         
         // Check if this showlist is cancelled
-        const cancelResponse = await fetch(getUrl('c3'));
+        const cancelResponse = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQdKlCFDc1IEQXEgjkX1ULpGLjWitRzaH8Wsa1fNGqGbXkMuShTNmTDsk1fL6F8I3D022zn2HUIrCux/pub?output=csv');
         const cancelCsv = await cancelResponse.text();
         
         // Parse the cancel CSV
