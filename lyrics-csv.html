@@ -73,10 +73,15 @@
       padding: 20px;
       background: var(--bg-opacity);
       border-radius: 10px;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, opacity 0.3s ease;
       animation: slideIn 0.5s ease-in-out;
       margin-top: 40px;
       margin-bottom: 40px;
+      opacity: 0;
+    }
+    
+    .container.ready {
+      opacity: 1;
     }
     
     .offline-indicator {
@@ -245,6 +250,12 @@
       -webkit-user-select: none;
       -ms-user-select: none;
       -moz-user-select: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    
+    .lyrics-template.ready {
+      opacity: 1;
     }
     .lyrics-template * {
       user-select: none;
@@ -278,7 +289,12 @@
       touch-action: none;
       pointer-events: auto;
       will-change: transform;
-      transition: left 0.3s ease, right 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease;
+      transition: left 0.3s ease, right 0.3s ease, border-radius 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+      opacity: 0;
+    }
+    
+    .section-nav-bar.ready {
+      opacity: 1;
     }
     .section-nav-bar.english {
       left: auto;
@@ -558,6 +574,124 @@
         gap: 8px;
       }
     }
+    
+    /* Loading Screen Styles */
+    @keyframes spin-and-scale {
+      from { transform: rotate(0deg) scale(1); }
+      to { transform: rotate(360deg) scale(1); }
+    }
+
+    @keyframes spin-and-scale-smooth {
+      0% { transform: rotate(0deg); width: 80px; height: 80px; }
+      25% { transform: rotate(90deg); width: 200px; height: 200px; }
+      50% { transform: rotate(180deg); width: 800px; height: 800px; }
+      75% { transform: rotate(270deg); width: 2400px; height: 2400px; }
+      100% { transform: rotate(360deg); width: 4000px; height: 4000px; }
+    }
+
+    @keyframes slideLeft {
+      0% { transform: translateX(0) translateZ(0); }
+      100% { transform: translateX(-100vw) translateZ(0); }
+    }
+
+    @keyframes slideRight {
+      0% { transform: translateX(-100vw) translateZ(0); }
+      100% { transform: translateX(0) translateZ(0); }
+    }
+
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #2b2b2b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 0.6s ease-out;
+    }
+
+    .loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      animation: spin-and-scale 3s linear infinite;
+      transition: none;
+      position: relative;
+      z-index: 2;
+    }
+
+    .loading-logo.fade-out {
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+    }
+
+    .loading-screen.fade-out .loading-logo {
+      animation: spin-and-scale-smooth 1.5s ease-out infinite;
+    }
+
+    .loading-progress {
+      position: absolute;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--primary-color);
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      font-size: 1em;
+      font-weight: 500;
+      text-align: center;
+      z-index: 3;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-progress.fade-out {
+      opacity: 0;
+    }
+
+    .pattern-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+      opacity: 0.25;
+      transition: opacity 0.6s ease-out;
+      will-change: opacity;
+      transform: translateZ(0);
+    }
+
+    .pattern-container.fade-out {
+      opacity: 0;
+    }
+
+    .pattern-line {
+      position: absolute;
+      height: 40px;
+      width: 300vw;
+      background-image: url('src/repeatp.svg');
+      background-repeat: repeat-x;
+      background-size: auto 40px;
+      left: -100vw;
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    .pattern-line:nth-child(odd) {
+      animation: slideLeft 10s linear infinite;
+    }
+
+    .pattern-line:nth-child(even) {
+      animation: slideRight 10s linear infinite;
+    }
   </style>
   <script>
     // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
@@ -606,9 +740,122 @@
         offlineIndicator.classList.remove('show');
       }
     }
+
+    // Loading screen functionality
+    function initializeLoadingScreen() {
+      const loadingScreen = document.getElementById('loading-screen');
+      const patternContainer = document.getElementById('pattern-container');
+      
+      if (!loadingScreen || !patternContainer) return;
+      
+      // Generate animated pattern lines - Optimized
+      function generatePatternLines() {
+        // Calculate how many lines needed to fill the screen (optimized for performance)
+        const viewportHeight = window.innerHeight;
+        const lineHeight = 40;
+        const numberOfLines = Math.ceil(viewportHeight / lineHeight) + 1;
+        
+        // Clear any existing lines
+        patternContainer.innerHTML = '';
+        
+        // Create pattern lines with performance optimizations
+        for (let i = 0; i < numberOfLines; i++) {
+          const line = document.createElement('div');
+          line.className = 'pattern-line';
+          line.style.top = (i * lineHeight) + 'px';
+          // Add performance optimizations
+          line.style.willChange = 'transform';
+          line.style.transform = 'translateZ(0)';
+          patternContainer.appendChild(line);
+        }
+        
+        console.log('Generated', numberOfLines, 'optimized pattern lines');
+      }
+      
+      // Generate pattern lines immediately
+      generatePatternLines();
+      
+      // Regenerate lines on resize
+      window.addEventListener('resize', generatePatternLines);
+      
+      return { loadingScreen, patternContainer };
+    }
+
+    // Update loading progress text
+    function updateLoadingProgress(text) {
+      const loadingProgress = document.getElementById('loading-progress');
+      if (loadingProgress) {
+        loadingProgress.textContent = text;
+      }
+    }
+
+    // Hide loading screen function
+    function hideLoadingScreen() {
+      const loadingScreen = document.getElementById('loading-screen');
+      const patternContainer = document.getElementById('pattern-container');
+      const loadingProgress = document.getElementById('loading-progress');
+      
+      if (!loadingScreen) return;
+      
+      // Start enlarging animation
+      function startEnlarging() {
+        const loadingLogo = loadingScreen.querySelector('.loading-logo');
+        if (loadingLogo) {
+          // Trigger the enlarging animation by adding fade-out class to screen
+          loadingScreen.classList.add('fade-out');
+          // But remove the opacity transition temporarily to only get the animation
+          loadingScreen.style.transition = 'none';
+          loadingScreen.style.opacity = '1';
+        }
+      }
+      
+      // Start the fade-out process
+      startEnlarging();
+      
+      setTimeout(function() {
+        // Restore the transition and start actual fade-out
+        loadingScreen.style.transition = 'opacity 0.6s ease-out';
+        
+        // First fade out the logo
+        const loadingLogo = loadingScreen.querySelector('.loading-logo');
+        if (loadingLogo) {
+          loadingLogo.classList.add('fade-out');
+        }
+        
+        // Fade out the progress text
+        if (loadingProgress) {
+          loadingProgress.classList.add('fade-out');
+        }
+        
+        // Fade out the pattern container along with the logo
+        if (patternContainer) {
+          patternContainer.classList.add('fade-out');
+        }
+        
+        // Then fade out the background 200ms later
+        setTimeout(function() {
+          loadingScreen.style.opacity = '0';
+        }, 200);
+        
+        // Remove loading screen from DOM after fade out completes
+        setTimeout(function() {
+          loadingScreen.remove();
+        }, 1000);
+      }, 200);
+    }
   </script>
 </head>
 <body>
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loading-screen">
+    <!-- Animated Pattern Background -->
+    <div class="pattern-container" id="pattern-container">
+      <!-- Pattern lines will be generated by JavaScript -->
+    </div>
+    <img src="src/Logo_1.svg" alt="Rhythm Boduberu Loading" class="loading-logo">
+    <div class="loading-progress" id="loading-progress">Loading...</div>
+  </div>
+
   <div class="pin-overlay" id="pin-overlay">
     <div class="pin-container">
       <h2 class="pin-title">Enter PIN</h2>
@@ -697,6 +944,11 @@
     
     // Initialize PIN system on page load
     document.addEventListener('DOMContentLoaded', function() {
+      // Initialize loading screen first
+      initializeLoadingScreen();
+      updateLoadingProgress('Initializing...');
+      
+      // Initialize PIN system and session timeout
       initializePinSystem();
       initializeSessionTimeout();
     });
@@ -898,6 +1150,7 @@
           
           if (session.authenticated && sessionAge < sessionTimeout) {
             // Valid session exists
+            updateLoadingProgress('Session found, loading songs...');
             pinAuthenticated = true;
             hidePinOverlay();
             loadSongsData();
@@ -911,6 +1164,7 @@
       }
       
       // No valid session - show PIN overlay
+      updateLoadingProgress('Please enter PIN');
       pinOverlay.classList.remove('hidden');
       
       // Ensure keyboard opens when PIN overlay is shown
@@ -1053,6 +1307,7 @@
     
     function hidePinOverlay() {
       pinOverlay.classList.add('hidden');
+      // Don't hide loading screen here - let it persist until lyrics are fully rendered
     }
     
     // CSV Data Loading Functions
@@ -1093,10 +1348,13 @@
 
     async function getSongsFromCSV() {
       try {
+        updateLoadingProgress('Fetching song data...');
         console.log('Fetching CSV from Google Sheets...');
         const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv');
         const csvText = await response.text();
         console.log('CSV text length:', csvText.length);
+        
+        updateLoadingProgress('Processing song data...');
         
         // Parse CSV properly using state machine
         const rows = [];
@@ -1181,9 +1439,11 @@
         
         const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
         console.log('Final songs array:', result.length, 'songs');
+        updateLoadingProgress('Songs loaded successfully!');
         return result;
       } catch (error) {
         console.error('Error fetching CSV:', error);
+        updateLoadingProgress('Error loading songs');
         return [];
       }
     }
@@ -1195,14 +1455,18 @@
         return;
       }
       
+      updateLoadingProgress('Preparing to load songs...');
+      
       // Load CSV data
       getSongsFromCSV()
         .then(csvSongs => {
           window.songs = csvSongs;
+          updateLoadingProgress('Initializing lyrics...');
           initializeLyrics();
         })
         .catch(error => {
           console.error('Failed to load songs data:', error);
+          updateLoadingProgress('Failed to load songs');
           window.songs = [];
           initializeLyrics();
         });
@@ -1338,7 +1602,7 @@
       });
     }
 
-    function createSectionOverlays(orderedSections) {
+    function createSectionOverlays(orderedSections, callback) {
       // Remove existing overlays
       document.querySelectorAll('.section-name-overlay').forEach(overlay => overlay.remove());
       
@@ -1355,6 +1619,23 @@
           sectionElement.appendChild(overlay);
         }
       });
+      
+      // Call callback if provided to signal completion
+      if (callback) {
+        setTimeout(() => {
+          // Show all UI elements
+          const container = document.querySelector('.container');
+          const lyricsTemplate = document.getElementById('lyrics-template');
+          const sectionNavBar = document.getElementById('section-nav-bar');
+          
+          if (container) container.classList.add('ready');
+          if (lyricsTemplate) lyricsTemplate.classList.add('ready');
+          if (sectionNavBar) sectionNavBar.classList.add('ready');
+          
+          // Wait a bit for the fade-in transition, then hide loading screen
+          setTimeout(callback, 300);
+        }, 50);
+      }
     }
     
     // Generate English lyrics using reverse transliteration
@@ -1491,6 +1772,7 @@
       }, 100);
       
       // Initially show Dhivehi lyrics
+      updateLoadingProgress('Rendering sections...');
       const { html, orderedSections } = parseSections(song.lyrics);
       songLyrics.innerHTML = html;
       lyricsTemplate.style.display = 'block';
@@ -1498,12 +1780,30 @@
       // Setup navigation
       renderSectionButtons(orderedSections);
       
-      // Create section overlays
-      setTimeout(() => createSectionOverlays(orderedSections), 100);
+      // Create section overlays and hide loading screen after everything is ready
+      setTimeout(() => {
+        updateLoadingProgress('Finalizing...');
+        createSectionOverlays(orderedSections, () => {
+          // Hide loading screen after section overlays are created
+          hideLoadingScreen();
+        });
+      }, 100);
     } else {
       songTitle.textContent = 'Song not found';
       songLyrics.innerHTML = 'The selected song could not be found.';
       lyricsTemplate.style.display = 'block';
+      
+      // Show UI elements even for error case
+      setTimeout(() => {
+        const container = document.querySelector('.container');
+        const lyricsTemplate = document.getElementById('lyrics-template');
+        
+        if (container) container.classList.add('ready');
+        if (lyricsTemplate) lyricsTemplate.classList.add('ready');
+        
+        // Hide loading screen after showing error
+        setTimeout(() => hideLoadingScreen(), 300);
+      }, 100);
     }
     } // Close initializeLyrics function
     
