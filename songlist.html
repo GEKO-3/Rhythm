@@ -22,10 +22,6 @@
       font-style: normal;
     }
   </style>
-  
-  <!-- Preload critical resources -->
-  <link rel="preload" href="Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="src/Filter.png" as="image">
   <!-- Favicon and web app manifest -->
   <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
   <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
@@ -65,45 +61,28 @@
       --text-color: #2b2b2b;
       --bg-opacity: rgba(31, 31, 31, 0.0);
       --hover-color2: #3a3a3a;
-      --active-color2: #111111;
-      --border-color: #444;
-      --background-dark: #1f1f1f;
-      --card-background: rgba(43,43,43,0.7);
-      --error-color: #ff6b6b;
-      --success-color: #28a745;
+      --active-color2: #111111
     }
-    
-    * {
-      box-sizing: border-box;
-    }
-    
     @keyframes fadeIn {
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
-    
     @keyframes slideIn {
       0% { transform: translateY(10px); opacity: 0; }
       100% { transform: translateY(0); opacity: 1; }
     }
-    
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-3px); }
-      75% { transform: translateX(3px); }
-    }
     body {
+      /* Use Montserrat for English text */
       font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
       margin: 0;
-      background-color: var(--background-dark);
+      background-color: #1f1f1f;
       background-size: cover;
       color: var(--primary-color);
       animation: fadeIn 0.5s ease-in-out;
-      will-change: scroll-position;
     }
     .container {
       text-align: center;
@@ -192,8 +171,8 @@
       padding: 10px;
       font-size: 1.2em;
       cursor: pointer;
-      font-family: inherit;
-      transition: background-color 0.3s ease, transform 0.2s ease;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      transition: background-color 0.3s;
       width: 40px;
       height: 40px;
       display: flex;
@@ -201,112 +180,85 @@
       justify-content: center;
       flex-shrink: 0;
     }
-    
     .filter-btn:hover {
       background: var(--hover-color);
-      transform: scale(1.05);
-    }
-    
-    .filter-btn:active {
-      transform: scale(0.95);
     }
     .filter-content {
       display: none;
       position: absolute;
-      background: var(--card-background);
-      backdrop-filter: blur(10px);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-      z-index: 1000;
+      background: rgba(43,43,43,0.98);
+      border: 1px solid #444;
+      border-radius: 5px;
+      box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+      z-index: 1;
       min-width: 200px;
+      min-width: 200px;
+      width: 200px;
       top: 100%;
       left: 0;
-      margin-top: 5px;
-      overflow: hidden;
+      margin-top: 2px;
     }
-    
     .filter-content a {
       color: var(--primary-color);
-      padding: 12px 16px;
+      padding: 8px 12px;
       text-decoration: none;
       display: block;
       cursor: pointer;
-      font-family: inherit;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      transition: all 0.3s ease;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      border-bottom: 1px solid #333;
     }
-    
     .filter-content a:last-child {
       border-bottom: none;
     }
-    
     .filter-content a:hover {
       background: var(--hover-color);
       color: var(--text-color);
-      transform: translateX(4px);
     }
     .show {
       display: block;
     }
     #search-box {
       flex: 1;
-      padding: 10px 15px;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #444;
       margin-bottom: 0;
       font-size: 1em;
       background: #222;
       color: var(--primary-color);
       outline: none;
-      transition: all 0.3s ease;
+      transition: border-color 0.2s;
       margin-top: 0;
-      font-family: inherit;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
     }
-    
     #search-box::placeholder {
       color: #999;
-      opacity: 0.7;
     }
-    
     #search-box:focus {
       border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
-      background: #2a2a2a;
     }
     ul#song-list {
       list-style: none;
       padding: 0;
       margin: 0;
       margin-top: calc(env(safe-area-inset-top, 0px) + 105px);
-      contain: layout style;
     }
-    
     ul#song-list li {
       cursor: pointer;
       padding: 0.7em 0.5em;
       border-bottom: 1px solid #1d1d1d;
-      transition: all 0.2s ease;
+      transition: background 0.2s, color 0.2s;
       color: var(--primary-color);
       border-radius: 5px;
       margin-bottom: 5px;
       font-size: 1.1em;
-      background: var(--card-background);
-      font-family: inherit;
-      will-change: transform, background-color;
-      transform: translateZ(0); /* Force GPU acceleration */
+      background: rgba(43,43,43,0.7);
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
     }
-    
     ul#song-list li:hover {
       background: var(--hover-color);
       color: var(--text-color);
-      font-weight: 600;
-      transform: translateY(-1px) translateZ(0);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    
-    ul#song-list li:active {
-      transform: translateY(0) translateZ(0);
+      font-weight: bold;
     }
     
     @media (max-width: 700px) {
@@ -343,32 +295,29 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: var(--background-dark);
+      background: #1f1f1f;
       z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
-      backdrop-filter: blur(5px);
     }
     
     .pin-container {
-      background: var(--card-background);
-      backdrop-filter: blur(20px);
+      background: rgba(43,43,43,0.9);
       padding: 30px;
       border-radius: 15px;
       text-align: center;
-      border: 2px solid var(--border-color);
+      border: 2px solid #444;
       max-width: 300px;
       width: 85%;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
     }
     
     .pin-title {
       color: var(--primary-color);
       font-size: 1.3em;
       margin-bottom: 25px;
-      font-family: inherit;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
       font-weight: 600;
     }
     
@@ -385,14 +334,15 @@
       padding: 0;
       font-size: 1.5em;
       text-align: center;
-      border: 2px solid var(--border-color);
+      border: 2px solid #444;
       border-radius: 8px;
       background: #222;
       color: var(--primary-color);
       outline: none;
-      font-family: inherit;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
       transition: all 0.3s ease;
       caret-color: transparent;
+      /* Force numerical keyboard on mobile */
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: textfield;
@@ -402,7 +352,6 @@
       border-color: var(--primary-color);
       box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
       transform: scale(1.05);
-      background: #2a2a2a;
     }
     
     .pin-digit.filled {
@@ -411,17 +360,22 @@
     }
     
     .pin-digit.error {
-      border-color: var(--error-color);
-      animation: shake 0.5s ease-in-out;
+      border-color: #ff6b6b;
+      animation: shake 0.5s;
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
     }
     
     .pin-error {
-      color: var(--error-color);
+      color: #ff6b6b;
       font-size: 0.85em;
       margin-top: 5px;
       min-height: 18px;
-      font-family: inherit;
-      font-weight: 500;
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
     }
     
     .pin-overlay.hidden {
@@ -447,33 +401,6 @@
     }
   </style>
   <script>
-    // Debounce utility for performance optimization
-    function debounce(func, wait) {
-      let timeout;
-      return function executedFunction(...args) {
-        const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-        };
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-      };
-    }
-
-    // Throttle utility for scroll events
-    function throttle(func, limit) {
-      let inThrottle;
-      return function() {
-        const args = arguments;
-        const context = this;
-        if (!inThrottle) {
-          func.apply(context, args);
-          inThrottle = true;
-          setTimeout(() => inThrottle = false, limit);
-        }
-      }
-    }
-
     // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
     document.addEventListener('keydown', function(e) {
       if ((e.ctrlKey || e.metaKey) && (
@@ -535,19 +462,18 @@
       });
     }
     
-    // Optimized online/offline event handlers
-    const updateOfflineStatus = throttle(() => {
+    // Listen for online/offline events
+    window.addEventListener('online', updateOfflineStatus);
+    window.addEventListener('offline', updateOfflineStatus);
+    
+    function updateOfflineStatus() {
       const offlineIndicator = document.getElementById('offline-indicator');
       if (!navigator.onLine) {
         offlineIndicator.classList.add('show');
       } else {
         offlineIndicator.classList.remove('show');
       }
-    }, 1000);
-    
-    // Listen for online/offline events
-    window.addEventListener('online', updateOfflineStatus);
-    window.addEventListener('offline', updateOfflineStatus);
+    }
   </script>
 </head>
 <body>
@@ -1037,7 +963,6 @@
       return result;
     }
 
-    // Optimized CSV parsing with better memory management
     async function getSongsFromCSV() {
       try {
         console.log('Fetching CSV from Google Sheets...');
@@ -1052,130 +977,191 @@
         
         // Cache the CSV data for offline use
         if ('caches' in window) {
-          try {
-            const cache = await caches.open('rhythm-csv-data');
-            const csvResponse = new Response(csvText, {
-              headers: { 'Content-Type': 'text/csv' }
-            });
-            await cache.put('csv-songs-data', csvResponse);
-            console.log('CSV data cached for offline use');
-          } catch (cacheError) {
-            console.warn('Failed to cache CSV data:', cacheError);
-          }
+          const cache = await caches.open('rhythm-csv-data');
+          const csvResponse = new Response(csvText, {
+            headers: { 'Content-Type': 'text/csv' }
+          });
+          await cache.put('csv-songs-data', csvResponse);
+          console.log('CSV data cached for offline use');
         }
         
-        // Optimized CSV parsing with streaming approach for large files
-        return parseCSVOptimized(csvText);
+        // Parse CSV properly using state machine
+        const rows = [];
+        let currentRow = [];
+        let currentField = '';
+        let inQuotes = false;
+        let i = 0;
         
-      } catch (error) {
-        console.error('Error fetching CSV:', error);
-        return await loadFromCache();
-      }
-    }
-
-    // Optimized CSV parser with better performance
-    function parseCSVOptimized(csvText) {
-      const rows = [];
-      const songMap = new Map();
-      let currentRow = [];
-      let currentField = '';
-      let inQuotes = false;
-      let rowCount = 0;
-      
-      // Process in chunks to avoid blocking the main thread
-      const processChunk = (startIndex, endIndex) => {
-        for (let i = startIndex; i < endIndex && i < csvText.length; i++) {
+        while (i < csvText.length) {
           const char = csvText[i];
           const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
           
           if (char === '"') {
             if (inQuotes && nextChar === '"') {
+              // Escaped quote
               currentField += '"';
-              i++; // Skip next quote
+              i += 2;
             } else {
+              // Toggle quote state
               inQuotes = !inQuotes;
+              i++;
             }
           } else if (char === ',' && !inQuotes) {
+            // End of field
             currentRow.push(currentField);
             currentField = '';
+            i++;
           } else if ((char === '\n' || char === '\r') && !inQuotes) {
+            // End of row
             if (currentField || currentRow.length > 0) {
               currentRow.push(currentField);
               if (currentRow.length > 0) {
-                rows.push([...currentRow]); // Create copy to avoid reference issues
+                rows.push(currentRow);
               }
-              currentRow.length = 0; // Clear array efficiently
+              currentRow = [];
               currentField = '';
-              rowCount++;
             }
             // Skip \r\n combinations
             if (char === '\r' && nextChar === '\n') {
-              i++; // Skip \n
+              i += 2;
+            } else {
+              i++;
             }
           } else {
             currentField += char;
+            i++;
           }
         }
-      };
-      
-      // Process the entire text (for small files, chunking isn't necessary)
-      processChunk(0, csvText.length);
-      
-      // Add the last row if it exists
-      if (currentField || currentRow.length > 0) {
-        currentRow.push(currentField);
-        if (currentRow.length > 0) {
-          rows.push(currentRow);
+        
+        // Add the last row if it exists
+        if (currentField || currentRow.length > 0) {
+          currentRow.push(currentField);
+          if (currentRow.length > 0) {
+            rows.push(currentRow);
+          }
         }
-      }
-      
-      console.log('Parsed rows:', rows.length);
-      
-      // Process data rows with deduplication
-      for (let i = 1; i < rows.length; i++) { // Skip header row
-        const columns = rows[i];
-        if (columns.length >= 5) { // Ensure we have all required columns
-          const timestamp = columns[0]?.trim() || '';
-          const id = parseInt(columns[1]?.trim() || '0', 10);
-          const name = columns[2]?.trim() || '';
-          const genre = columns[3]?.trim() || '';
-          const lyrics = columns[4]?.trim() || '';
-          
-          if (!isNaN(id) && name && genre && lyrics) {
-            const song = { id, timestamp, name, genre, lyrics };
+        
+        console.log('Parsed rows:', rows.length);
+        
+        // Process data rows and deduplicate by ID
+        const songMap = new Map();
+        
+        for (let i = 1; i < rows.length; i++) { // Skip header row
+          const columns = rows[i];
+          if (columns.length >= 5) { // Ensure we have all required columns
+            const timestamp = columns[0] ? columns[0].trim() : '';
+            const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
+            const name = columns[2] ? columns[2].trim() : '';
+            const genre = columns[3] ? columns[3].trim() : '';
+            const lyrics = columns[4] ? columns[4].trim() : '';
             
-            // Keep only the most recent version of each song (by ID)
-            const existing = songMap.get(id);
-            if (!existing || new Date(timestamp) > new Date(existing.timestamp)) {
-              songMap.set(id, song);
+            if (!isNaN(id) && name && genre && lyrics) {
+              const song = { id, timestamp, name, genre, lyrics };
+              
+              // Keep only the most recent version of each song (by ID)
+              if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
+                songMap.set(id, song);
+              }
             }
           }
         }
-      }
-      
-      const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-      console.log('Final songs array:', result.length, 'songs');
-      return result;
-    }
-
-    // Optimized cache loading
-    async function loadFromCache() {
-      if (!('caches' in window)) return [];
-      
-      try {
-        const cache = await caches.open('rhythm-csv-data');
-        const cachedResponse = await cache.match('csv-songs-data');
         
-        if (cachedResponse) {
-          console.log('Loading CSV data from cache (offline mode)');
-          const csvText = await cachedResponse.text();
-          return parseCSVOptimized(csvText);
+        const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+        console.log('Final songs array:', result.length, 'songs');
+        return result;
+      } catch (error) {
+        console.error('Error fetching CSV:', error);
+        
+        // Try to load from cache if offline
+        if ('caches' in window) {
+          try {
+            const cache = await caches.open('rhythm-csv-data');
+            const cachedResponse = await cache.match('csv-songs-data');
+            
+            if (cachedResponse) {
+              console.log('Loading CSV data from cache (offline mode)');
+              const csvText = await cachedResponse.text();
+              
+              // Reuse the same parsing logic
+              const rows = [];
+              let currentRow = [];
+              let currentField = '';
+              let inQuotes = false;
+              let i = 0;
+              
+              while (i < csvText.length) {
+                const char = csvText[i];
+                const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+                
+                if (char === '"') {
+                  if (inQuotes && nextChar === '"') {
+                    currentField += '"';
+                    i += 2;
+                  } else {
+                    inQuotes = !inQuotes;
+                    i++;
+                  }
+                } else if (char === ',' && !inQuotes) {
+                  currentRow.push(currentField);
+                  currentField = '';
+                  i++;
+                } else if ((char === '\n' || char === '\r') && !inQuotes) {
+                  if (currentField || currentRow.length > 0) {
+                    currentRow.push(currentField);
+                    if (currentRow.length > 0) {
+                      rows.push(currentRow);
+                    }
+                    currentRow = [];
+                    currentField = '';
+                  }
+                  if (char === '\r' && nextChar === '\n') {
+                    i += 2;
+                  } else {
+                    i++;
+                  }
+                } else {
+                  currentField += char;
+                  i++;
+                }
+              }
+              
+              if (currentField || currentRow.length > 0) {
+                currentRow.push(currentField);
+                if (currentRow.length > 0) {
+                  rows.push(currentRow);
+                }
+              }
+              
+              const songMap = new Map();
+              for (let i = 1; i < rows.length; i++) {
+                const columns = rows[i];
+                if (columns.length >= 5) {
+                  const timestamp = columns[0] ? columns[0].trim() : '';
+                  const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
+                  const name = columns[2] ? columns[2].trim() : '';
+                  const genre = columns[3] ? columns[3].trim() : '';
+                  const lyrics = columns[4] ? columns[4].trim() : '';
+                  
+                  if (!isNaN(id) && name && genre && lyrics) {
+                    const song = { id, timestamp, name, genre, lyrics };
+                    if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
+                      songMap.set(id, song);
+                    }
+                  }
+                }
+              }
+              
+              const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+              console.log('Loaded', result.length, 'songs from cache');
+              return result;
+            }
+          } catch (cacheError) {
+            console.error('Error loading from cache:', cacheError);
+          }
         }
-      } catch (cacheError) {
-        console.error('Error loading from cache:', cacheError);
+        
+        return [];
       }
-      
-      return [];
     }
 
     // Load latest showlist from CSV
@@ -1293,32 +1279,21 @@
         return;
       }
       
-      // Show loading state
-      showLoadingState();
-      
-      // Load CSV data and showlist in parallel with timeout
-      const loadTimeout = setTimeout(() => {
-        console.warn('Loading timeout - proceeding with cached data');
-      }, 10000); // 10 second timeout
-      
+      // Load CSV data and showlist in parallel
       Promise.all([
         getSongsFromCSV(),
         loadLatestShowlist()
       ])
         .then(([csvSongs]) => {
-          clearTimeout(loadTimeout);
           songs = csvSongs;
           window.songs = songs; // Make global for compatibility
-          hideLoadingState();
           initializeSongList();
         })
         .catch(error => {
-          clearTimeout(loadTimeout);
           console.error('Failed to load songs data:', error);
           songs = [];
           window.songs = songs;
           window.currentShowList = [];
-          hideLoadingState();
           initializeSongList();
         });
     }
@@ -1352,13 +1327,13 @@
         e.stopPropagation();
       });
       
-      // Search functionality with optimized debouncing
-      const debouncedSearch = debounce((searchValue) => {
-        renderList(searchValue, currentGenreFilter);
-      }, 250);
-      
+      // Search functionality with debouncing
+      let searchTimeout;
       searchBox.addEventListener('input', function(e) {
-        debouncedSearch(e.target.value);
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          renderList(e.target.value, currentGenreFilter);
+        }, 300);
       });
       
       // Focus search box when typing (unless in an input)
@@ -1373,30 +1348,24 @@
       renderList('', currentGenreFilter);
       
       // Restore scroll position if returning from lyrics page
-      restoreScrollPosition();
+      const savedScrollPosition = localStorage.getItem('songListScrollPosition');
+      if (savedScrollPosition) {
+        setTimeout(() => {
+          window.scrollTo(0, parseInt(savedScrollPosition));
+          localStorage.removeItem('songListScrollPosition');
+        }, 100);
+      }
     }
     
-    // Optimized genre counting with caching
     function updateFilterDropdown() {
       if (!songs || songs.length === 0) {
         filterContent.innerHTML = '<a onclick="setFilter(\'all\')">All (0)</a>';
         return;
       }
       
-      // Use cached counts if songs haven't changed
-      if (updateFilterDropdown.cachedSongs === songs) {
-        return;
-      }
-      
-      // Count songs by genre efficiently
-      const genreCounts = songs.reduce((counts, song) => {
-        counts.all++;
-        if (counts.hasOwnProperty(song.genre)) {
-          counts[song.genre]++;
-        }
-        return counts;
-      }, {
-        all: 0,
+      // Count songs by genre
+      const genreCounts = {
+        all: songs.length,
         Baburu: 0,
         Kaasi: 0,
         Nala: 0,
@@ -1404,6 +1373,12 @@
         Thinberu: 0,
         Zamaanee: 0,
         showlist: 0
+      };
+      
+      songs.forEach(song => {
+        if (genreCounts.hasOwnProperty(song.genre)) {
+          genreCounts[song.genre]++;
+        }
       });
 
       // Count showlist songs
@@ -1411,149 +1386,107 @@
         genreCounts.showlist = window.currentShowList.length;
       }
       
-      // Build dropdown content using template literals for better performance
-      const dropdownItems = [
-        `<a onclick="setFilter('all')">All (${genreCounts.all})</a>`
-      ];
+      // Build dropdown content - only include showlist if there's an active showlist
+      let dropdownContent = `
+        <a onclick="setFilter('all')">All (${genreCounts.all})</a>`;
       
       // Only add showlist option if there's an active showlist
       if (window.currentShowList && window.currentShowList.length > 0) {
-        dropdownItems.push(`<a onclick="setFilter('showlist')">Show List (${genreCounts.showlist})</a>`);
+        dropdownContent += `
+        <a onclick="setFilter('showlist')">Show List (${genreCounts.showlist})</a>`;
       }
       
-      // Add genre filters
-      ['Baburu', 'Kaasi', 'Nala', 'Taki', 'Thinberu', 'Zamaanee'].forEach(genre => {
-        dropdownItems.push(`<a onclick="setFilter('${genre}')">${genre} (${genreCounts[genre]})</a>`);
-      });
+      dropdownContent += `
+        <a onclick="setFilter('Baburu')">Baburu (${genreCounts.Baburu})</a>
+        <a onclick="setFilter('Kaasi')">Kaasi (${genreCounts.Kaasi})</a>
+        <a onclick="setFilter('Nala')">Nala (${genreCounts.Nala})</a>
+        <a onclick="setFilter('Taki')">Taki (${genreCounts.Taki})</a>
+        <a onclick="setFilter('Thinberu')">Thinberu (${genreCounts.Thinberu})</a>
+        <a onclick="setFilter('Zamaanee')">Zamaanee (${genreCounts.Zamaanee})</a>
+      `;
       
-      // Update dropdown content in one operation
-      filterContent.innerHTML = dropdownItems.join('');
-      
-      // Cache the results
-      updateFilterDropdown.cachedSongs = songs;
+      // Update dropdown content
+      filterContent.innerHTML = dropdownContent;
     }
 
-    // Optimized list rendering with virtual scrolling considerations
     function renderList(searchFilter = '', genreFilter = 'all') {
-      const startTime = performance.now();
+      songList.innerHTML = '';
       
       if (!songs || songs.length === 0) {
-        songList.innerHTML = '<li style="color: #999; cursor: default;">No songs available</li>';
+        const li = document.createElement('li');
+        li.textContent = 'No songs available';
+        li.style.color = '#999';
+        li.style.cursor = 'default';
+        songList.appendChild(li);
         return;
       }
       
-      // Pre-compile search regex for better performance
-      const searchRegex = searchFilter ? new RegExp(searchFilter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') : null;
+      // Filter songs
+      const filteredSongs = songs
+        .filter(song => {
+          const matchesSearch = song.name.toLowerCase().includes(searchFilter.toLowerCase());
+          let matchesGenre;
+          
+          if (genreFilter === 'showlist') {
+            // Show only songs that are in the current show list
+            matchesGenre = window.currentShowList && window.currentShowList.includes(song.name);
+          } else {
+            matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
+          }
+          
+          return matchesSearch && matchesGenre;
+        })
+        .sort((a, b) => a.name.localeCompare(b.name)); // Sort alphabetically
       
-      // Create showlist lookup set for O(1) lookups
-      const showlistSet = genreFilter === 'showlist' && window.currentShowList 
-        ? new Set(window.currentShowList) 
-        : null;
-      
-      // Filter songs efficiently
-      const filteredSongs = songs.filter(song => {
-        const matchesSearch = !searchRegex || searchRegex.test(song.name);
+      // Render the filtered songs
+      filteredSongs.forEach(song => {
+        const li = document.createElement('li');
+        li.textContent = song.name;
         
-        let matchesGenre;
-        if (genreFilter === 'showlist') {
-          matchesGenre = showlistSet && showlistSet.has(song.name);
-        } else {
-          matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
-        }
+        // Note: All songs will be yellow since CSV doesn't have English lyrics
+        li.style.color = '#f5d467';
+        li.addEventListener('mouseenter', () => {
+          li.style.color = 'black';
+        });
+        li.addEventListener('mouseleave', () => {
+          li.style.color = '#f5d467';
+        });
         
-        return matchesSearch && matchesGenre;
+        li.onclick = () => {
+          // Save current scroll position before navigating
+          localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
+          localStorage.setItem('selectedSongId', song.id);
+          // Refresh session before navigating
+          if (pinAuthenticated) {
+            const sessionData = {
+              timestamp: Date.now(),
+              authenticated: true,
+              sessionType: 'songlist'
+            };
+            sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
+          }
+          window.location.href = 'lyrics-csv';
+        };
+        songList.appendChild(li);
       });
-      
-      // Use DocumentFragment for better performance
-      const fragment = document.createDocumentFragment();
       
       if (filteredSongs.length === 0) {
         const li = document.createElement('li');
         li.textContent = 'No songs match your search';
-        li.style.cssText = 'color: #999; cursor: default;';
-        fragment.appendChild(li);
-      } else {
-        // Create elements efficiently
-        filteredSongs.forEach(song => {
-          const li = document.createElement('li');
-          li.textContent = song.name;
-          li.style.color = '#f5d467';
-          
-          // Use event delegation for better performance
-          li.dataset.songId = song.id;
-          
-          fragment.appendChild(li);
-        });
+        li.style.color = '#999';
+        li.style.cursor = 'default';
+        songList.appendChild(li);
       }
-      
-      // Single DOM update
-      songList.innerHTML = '';
-      songList.appendChild(fragment);
-      
-      console.log(`Rendered ${filteredSongs.length} songs in ${performance.now() - startTime}ms`);
     }
-    
-    // Event delegation for song clicks
-    document.addEventListener('click', function(e) {
-      if (e.target.matches('#song-list li[data-song-id]')) {
-        const songId = e.target.dataset.songId;
-        
-        // Save current scroll position before navigating
-        localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
-        localStorage.setItem('selectedSongId', songId);
-        
-        // Refresh session before navigating
-        if (pinAuthenticated) {
-          const sessionData = {
-            timestamp: Date.now(),
-            authenticated: true,
-            sessionType: 'songlist'
-          };
-          sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
-        }
-        
-        window.location.href = 'lyrics-csv';
-      }
-    });
 
-    // Global functions for onclick handlers (optimized)
+    // Global functions for onclick handlers
     function setFilter(genre) {
-      if (currentGenreFilter === genre) return; // Avoid unnecessary re-renders
-      
       currentGenreFilter = genre;
+      // Save the filter state to localStorage
       localStorage.setItem('songListFilter', genre);
-      
-      // Close dropdown with animation
-      const filterContent = document.getElementById('filter-content');
-      filterContent.classList.remove('show');
-      
-      // Update list
+      // Keep the filter icon, don't change button text
+      document.getElementById('filter-content').classList.remove('show');
       renderList(document.getElementById('search-box').value, currentGenreFilter);
-    }
-    
-    // Add loading state management
-    function showLoadingState() {
-      const songList = document.getElementById('song-list');
-      songList.innerHTML = '<li style="color: #999; cursor: default; text-align: center;">Loading songs...</li>';
-    }
-    
-    function hideLoadingState() {
-      // Loading state will be replaced by actual content in renderList
-    }
-    
-    // Optimize scroll restoration
-    function restoreScrollPosition() {
-      const savedScrollPosition = localStorage.getItem('songListScrollPosition');
-      if (savedScrollPosition) {
-        // Use requestAnimationFrame for smoother scrolling
-        requestAnimationFrame(() => {
-          window.scrollTo({
-            top: parseInt(savedScrollPosition),
-            behavior: 'auto' // Instant for better UX on return
-          });
-          localStorage.removeItem('songListScrollPosition');
-        });
-      }
     }
   </script>
 </body>
