@@ -964,7 +964,7 @@
               if (session.authenticated && sessionAge < (CONFIG.SESSION_TIMEOUT * 3)) {
                 STATE.pinAuthenticated = true;
                 this.hidePinOverlay();
-                DataManager.loadSongsData();
+                App.loadData(); // Use App.loadData instead of DataManager.loadSongsData
                 SessionManager.refreshSession(); // Refresh instead of starting timeout
                 return;
               }
@@ -2111,19 +2111,35 @@
               return;
             }
 
+            // Wait for shared services to be available
+            LoadingScreen.show('Initializing services...');
+            await this.waitForServices();
+
             // Try shared data service first
             if (window.RhythmData) {
               console.log('Using shared data service');
               LoadingScreen.show('Loading songs...');
               
-              // Use fast cached data for navigation
-              await window.RhythmData.loadSongsData(false, false); // Don't skip loading events for initial load
-              const songs = await window.RhythmData.getAllSongs();
-              STATE.songs = songs;
-              
-              UI.renderSongs(STATE.songs);
-              UI.showUI();
-              LoadingScreen.hide();
+              try {
+                // Use fast cached data for navigation
+                await window.RhythmData.loadSongsData(false, false); // Don't skip loading events for initial load
+                const songs = await window.RhythmData.getAllSongs();
+                STATE.songs = songs;
+                window.songs = songs; // Global compatibility
+                
+                console.log('Songs loaded:', songs.length);
+                LoadingScreen.show('Songs loaded successfully!');
+                
+                // Small delay to show success message
+                setTimeout(() => {
+                  LoadingScreen.hide();
+                  UI.initializeSongList();
+                }, 800);
+              } catch (dataError) {
+                console.error('Shared data service failed, falling back to DataManager:', dataError);
+                // Fallback to DataManager
+                DataManager.loadSongsData();
+              }
             } else {
               // Use DataManager which handles its own loading flow
               console.log('Using DataManager - it will handle the complete loading flow');
@@ -2133,7 +2149,7 @@
           } catch (error) {
             console.error('Failed to load songs:', error);
             LoadingScreen.updateProgress('Failed to load songs');
-            LoadingScreen.hide();
+            setTimeout(() => LoadingScreen.hide(), 2000);
           }
         },
 
