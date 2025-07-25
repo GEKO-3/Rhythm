@@ -833,6 +833,7 @@
         </div>
     </div>
 
+    <script src="config.js" async defer></script>
     <script>
         // Check if form was already submitted on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -916,6 +917,12 @@
 
         // Function to submit to Google Form using hidden iframe
         function submitToGoogleForm(email, name, birthday, contact, location) {
+            // Wait for config to load
+            if (!window.RhythmConfig) {
+                setTimeout(() => submitToGoogleForm(email, name, birthday, contact, location), 100);
+                return;
+            }
+            
             // Create hidden iframe
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
@@ -924,18 +931,19 @@
 
             // Create form
             const hiddenForm = document.createElement('form');
-            hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLScbp5A6HXsVo5_8CJUHvZBtb_jANny1k8K6_YPkToQv4NP8rg/formResponse';
+            hiddenForm.action = window.RhythmConfig.applicationForm;
             hiddenForm.method = 'POST';
             hiddenForm.target = 'hidden_iframe';
             hiddenForm.style.display = 'none';
 
             // Add form fields with correct entry names based on Google Form structure
+            const entries = window.RhythmConfig.applicationEntries;
             const fields = [
-                { name: 'entry.1003573213', value: email },        // Email
-                { name: 'entry.737939001', value: name },          // Full Name  
-                { name: 'entry.1810732969', value: birthday },     // Date of Birth
-                { name: 'entry.527795664', value: contact },       // Contact Number
-                { name: 'entry.2890343', value: location }         // Location (Yes/No question)
+                { name: entries.email, value: email },
+                { name: entries.name, value: name },
+                { name: entries.birthday, value: birthday },
+                { name: entries.contact, value: contact },
+                { name: entries.location, value: location }
             ];
 
             fields.forEach(field => {

@@ -224,7 +224,7 @@
       z-index: 1000;
       min-width: 200px;
       top: 100%;
-      left: 0;
+      right: 0;
       margin-top: 2px;
       backdrop-filter: blur(10px);
     }
@@ -247,6 +247,12 @@
     .filter-content a:hover {
       background: var(--hover-color);
       color: var(--text-color);
+    }
+
+    .filter-content a.active {
+      background: var(--primary-color);
+      color: var(--text-color);
+      font-weight: 600;
     }
 
     .filter-content.show {
@@ -561,6 +567,13 @@
         padding: 10px 12px;
         font-size: 1em;
       }
+      
+      .filter-content {
+        right: 0;
+        left: auto;
+        min-width: 180px;
+        max-width: calc(100vw - 20px);
+      }
     }
     
     @media (max-width: 400px) {
@@ -732,6 +745,7 @@
     </div>
     <ul id="song-list"></ul>
   </div>
+  <script src="lyrics-showlist-config.js"></script>
   <script>
     // Optimized Application Module
     const RhythmSongList = (function() {
@@ -745,9 +759,9 @@
         SESSION_TIMEOUT: 3 * 60 * 1000, // 3 minutes
         SEARCH_DEBOUNCE: 300,
         CSV_ENDPOINTS: {
-          songs: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv',
-          showlist: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT2u4Fu2f0bYF_ToPU-digD1jbqNsL7DOJpB_kXlWTsnXcgetsvcHuhnMqtF-gCFi_PnSiWzUwbN3p6/pub?output=csv',
-          cancel: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQdKlCFDc1IEQXEgjkX1ULpGLjWitRzaH8Wsa1fNGqGbXkMuShTNmTDsk1fL6F8I3D022zn2HUIrCux/pub?output=csv'
+          get songs() { return window.RhythmLyricsShowConfig?.lyricsSheet || 'fallback_url'; },
+          get showlist() { return window.RhythmLyricsShowConfig?.showListSheet || 'fallback_url'; },
+          get cancel() { return window.RhythmLyricsShowConfig?.cancelSheet || 'fallback_url'; }
         }
       };
 
@@ -1495,6 +1509,13 @@
           this.updateFilterDropdown();
           this.renderList('', STATE.currentGenreFilter);
           
+          // Set initial filter button state
+          const filterBtn = ELEMENTS.filterBtn;
+          if (STATE.currentGenreFilter !== 'all') {
+            filterBtn.style.background = 'var(--active-color)';
+            filterBtn.style.transform = 'scale(1.05)';
+          }
+          
           // Restore scroll position if returning from lyrics page
           const savedScrollPosition = localStorage.getItem('songListScrollPosition');
           if (savedScrollPosition) {
@@ -1507,7 +1528,7 @@
 
         updateFilterDropdown() {
           if (!STATE.songs || STATE.songs.length === 0) {
-            ELEMENTS.filterContent.innerHTML = '<a onclick="App.setFilter(\'all\')">All (0)</a>';
+            ELEMENTS.filterContent.innerHTML = '<a data-filter="all">All (0)</a>';
             return;
           }
           
@@ -1534,24 +1555,34 @@
             genreCounts.showlist = STATE.currentShowList.length;
           }
           
-          // Build dropdown content
-          let dropdownContent = `<a onclick="App.setFilter('all')">All (${genreCounts.all})</a>`;
+          // Build dropdown content with data attributes
+          let dropdownContent = `<a data-filter="all" ${STATE.currentGenreFilter === 'all' ? 'class="active"' : ''}>All (${genreCounts.all})</a>`;
           
           // Only add showlist option if there's an active showlist
           if (STATE.currentShowList && STATE.currentShowList.length > 0) {
-            dropdownContent += `<a onclick="App.setFilter('showlist')">Show List (${genreCounts.showlist})</a>`;
+            dropdownContent += `<a data-filter="showlist" ${STATE.currentGenreFilter === 'showlist' ? 'class="active"' : ''}>Show List (${genreCounts.showlist})</a>`;
           }
           
           dropdownContent += `
-            <a onclick="App.setFilter('Baburu')">Baburu (${genreCounts.Baburu})</a>
-            <a onclick="App.setFilter('Kaasi')">Kaasi (${genreCounts.Kaasi})</a>
-            <a onclick="App.setFilter('Nala')">Nala (${genreCounts.Nala})</a>
-            <a onclick="App.setFilter('Taki')">Taki (${genreCounts.Taki})</a>
-            <a onclick="App.setFilter('Thinberu')">Thinberu (${genreCounts.Thinberu})</a>
-            <a onclick="App.setFilter('Zamaanee')">Zamaanee (${genreCounts.Zamaanee})</a>
+            <a data-filter="Baburu" ${STATE.currentGenreFilter === 'Baburu' ? 'class="active"' : ''}>Baburu (${genreCounts.Baburu})</a>
+            <a data-filter="Kaasi" ${STATE.currentGenreFilter === 'Kaasi' ? 'class="active"' : ''}>Kaasi (${genreCounts.Kaasi})</a>
+            <a data-filter="Nala" ${STATE.currentGenreFilter === 'Nala' ? 'class="active"' : ''}>Nala (${genreCounts.Nala})</a>
+            <a data-filter="Taki" ${STATE.currentGenreFilter === 'Taki' ? 'class="active"' : ''}>Taki (${genreCounts.Taki})</a>
+            <a data-filter="Thinberu" ${STATE.currentGenreFilter === 'Thinberu' ? 'class="active"' : ''}>Thinberu (${genreCounts.Thinberu})</a>
+            <a data-filter="Zamaanee" ${STATE.currentGenreFilter === 'Zamaanee' ? 'class="active"' : ''}>Zamaanee (${genreCounts.Zamaanee})</a>
           `;
           
           ELEMENTS.filterContent.innerHTML = dropdownContent;
+          
+          // Add click event listeners to filter options
+          ELEMENTS.filterContent.querySelectorAll('a[data-filter]').forEach(link => {
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const filter = e.target.getAttribute('data-filter');
+              this.setFilter(filter);
+            });
+          });
         },
 
         renderList(searchFilter = '', genreFilter = 'all') {
@@ -1631,6 +1662,24 @@
           li.style.color = color;
           li.style.cursor = 'default';
           ELEMENTS.songList.appendChild(li);
+        },
+
+        setFilter(genre) {
+          STATE.currentGenreFilter = genre;
+          localStorage.setItem('songListFilter', genre);
+          ELEMENTS.filterContent.classList.remove('show');
+          this.updateFilterDropdown(); // Update the dropdown to show active state
+          this.renderList(ELEMENTS.searchBox.value, STATE.currentGenreFilter);
+          
+          // Update filter button to show active state
+          const filterBtn = ELEMENTS.filterBtn;
+          if (genre !== 'all') {
+            filterBtn.style.background = 'var(--active-color)';
+            filterBtn.style.transform = 'scale(1.05)';
+          } else {
+            filterBtn.style.background = 'var(--primary-color)';
+            filterBtn.style.transform = 'scale(1)';
+          }
         }
       };
 
@@ -1647,10 +1696,7 @@
         },
 
         setFilter(genre) {
-          STATE.currentGenreFilter = genre;
-          localStorage.setItem('songListFilter', genre);
-          ELEMENTS.filterContent.classList.remove('show');
-          UI.renderList(ELEMENTS.searchBox.value, STATE.currentGenreFilter);
+          UI.setFilter(genre);
         }
       };
 

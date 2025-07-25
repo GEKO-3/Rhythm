@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URL Verification Test</title>
+</head>
+<body>
+    <h1>Configuration URL Verification</h1>
+    <div id="results"></div>
+
+    <script src="config.js"></script>
+    <script src="lyrics-showlist-config.js"></script>
+    <script>
+        async function verifyUrls() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<h2>Testing URLs...</h2>';
+
+            // Test config.js URLs
+            const config = window.RhythmConfig;
+            const lyricsConfig = window.RhythmLyricsShowConfig;
+
+            const tests = [
+                { name: 'Application Form', url: config.applicationForm, type: 'form' },
+                { name: 'Applications Sheet', url: config.applicationsSheet, type: 'csv' },
+                { name: 'Applications Status Sheet', url: config.applicationsStatusSheet, type: 'csv' },
+                { name: 'Applications Status Form', url: config.applicationsStatusForm, type: 'form' },
+                { name: 'Sponsor Callback Sheet', url: config.sponsorCallbackSheet, type: 'csv' },
+                { name: 'Sponsor Callback Status Sheet', url: config.sponsorCallbackStatusSheet, type: 'csv' },
+                { name: 'Sponsor Callback Form', url: config.sponsorCallbackForm, type: 'form' },
+                { name: 'Sponsor Proposal Form', url: config.sponsorProposalForm, type: 'form' },
+                
+                { name: 'Lyrics Sheet', url: lyricsConfig.lyricsSheet, type: 'csv' },
+                { name: 'Lyrics Submit Form', url: lyricsConfig.lyricsSubmitForm, type: 'form' },
+                { name: 'Bulk Submit Sheet', url: lyricsConfig.bulkSubmitSheet, type: 'csv' },
+                { name: 'Showlist Sheet', url: lyricsConfig.showlistSheet, type: 'csv' },
+                { name: 'Show List Generator Form', url: lyricsConfig.showListGeneratorForm, type: 'form' },
+                { name: 'Songs Download Form', url: lyricsConfig.songsDownloadForm, type: 'form' }
+            ];
+
+            let html = '<table border="1"><tr><th>Name</th><th>Type</th><th>URL</th><th>Status</th></tr>';
+
+            for (const test of tests) {
+                try {
+                    if (test.type === 'csv') {
+                        // Test CSV by fetching
+                        const response = await fetch(test.url);
+                        const status = response.ok ? 'OK ✅' : `Error ${response.status} ❌`;
+                        html += `<tr><td>${test.name}</td><td>${test.type}</td><td>${test.url.substring(0, 50)}...</td><td>${status}</td></tr>`;
+                    } else {
+                        // For forms, just check if URL is valid format
+                        const isValid = test.url && test.url.includes('docs.google.com/forms') && test.url.includes('formResponse');
+                        const status = isValid ? 'Valid Format ✅' : 'Invalid Format ❌';
+                        html += `<tr><td>${test.name}</td><td>${test.type}</td><td>${test.url.substring(0, 50)}...</td><td>${status}</td></tr>`;
+                    }
+                } catch (error) {
+                    html += `<tr><td>${test.name}</td><td>${test.type}</td><td>${test.url.substring(0, 50)}...</td><td>Error: ${error.message} ❌</td></tr>`;
+                }
+            }
+
+            html += '</table>';
+            results.innerHTML = html;
+        }
+
+        window.onload = verifyUrls;
+    </script>
+</body>
+</html>

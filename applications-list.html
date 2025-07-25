@@ -635,6 +635,7 @@
         </div>
     </main>
 
+    <script src="config.js" async defer></script>
     <script>
         // DOM elements
         const loadingContainer = document.getElementById('loading-container');
@@ -649,9 +650,9 @@
         const outAreaCountEl = document.getElementById('out-area-count');
 
         // CSV URLs
-        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQg3Ja8vF_56fK5Tci8NdpPqziJ9-lGPaR1KmnZN2zoBCyr0YUcZFHjGlbsiG7qmrJdsUDRWK1Qut9F/pub?gid=2040901910&single=true&output=csv';
-        const STATUS_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRYghVQLpzSavnEvKRWKYbqadODV1yl71RqMYsRlDGiJYqjWh398J7-cgljLYoj1yLALPkKDfksdPeC/pub?output=csv';
-        const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfeLNBvL8Ke8SPVR6hnihlrqoXLLdW4TIB5-bUPliuTTaP9FQ/formResponse';
+        const CSV_URL = () => window.RhythmConfig?.applicationsSheet || '';
+        const STATUS_CSV_URL = () => window.RhythmConfig?.applicationsStatusSheet || '';
+        const FORM_URL = () => window.RhythmConfig?.applicationsStatusForm || '';
 
         // Store previously loaded applications and status data
         let previousApplications = [];
@@ -713,7 +714,7 @@
                 
                 // Use the same approach as fetchApplicationsData
                 const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const targetUrl = STATUS_CSV_URL;
+                const targetUrl = STATUS_CSV_URL();
                 
                 let response;
                 try {
@@ -777,7 +778,7 @@
                 // Try alternative method using a different CORS proxy (same as applications)
                 try {
                     console.log('Trying alternative CORS proxy for status data...');
-                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(STATUS_CSV_URL)}`);
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(STATUS_CSV_URL())}`);
                     const data = await response.json();
                     
                     if (data.contents) {
@@ -814,11 +815,12 @@
                 
                 // Create form data
                 const formData = new FormData();
-                formData.append('entry.1518732664', uid); // UID field
-                formData.append('entry.582339623', status); // Status field
+                const entries = window.RhythmConfig.applicationsStatusEntries;
+                formData.append(entries.uid, uid); // UID field
+                formData.append(entries.status, status); // Status field
                 
                 // Try direct fetch first
-                const response = await fetch(FORM_URL, {
+                const response = await fetch(FORM_URL(), {
                     method: 'POST',
                     mode: 'no-cors', // This is important for Google Forms
                     body: formData
@@ -848,20 +850,21 @@
                     // Create form
                     const form = document.createElement('form');
                     form.method = 'POST';
-                    form.action = FORM_URL;
+                    form.action = FORM_URL();
                     form.target = 'hidden_iframe';
                     
                     // Add UID field
                     const uidInput = document.createElement('input');
                     uidInput.type = 'hidden';
-                    uidInput.name = 'entry.1518732664';
+                    const entries = window.RhythmConfig.applicationsStatusEntries;
+                    uidInput.name = entries.uid;
                     uidInput.value = uid;
                     form.appendChild(uidInput);
                     
                     // Add Status field
                     const statusInput = document.createElement('input');
                     statusInput.type = 'hidden';
-                    statusInput.name = 'entry.582339623';
+                    statusInput.name = entries.status;
                     statusInput.value = status;
                     form.appendChild(statusInput);
                     
@@ -1414,7 +1417,7 @@
                 
                 // Try alternative method using a different CORS proxy
                 try {
-                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(CSV_URL)}`);
+                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(CSV_URL())}`);
                     const data = await response.json();
                     
                     if (data.contents) {

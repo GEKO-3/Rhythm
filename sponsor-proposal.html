@@ -1402,6 +1402,7 @@
         </div>
     </div>
 
+    <script src="config.js"></script>
     <script>
         // Info Modal Data
         const infoData = {
@@ -1625,17 +1626,18 @@
 
             // Create form
             const hiddenForm = document.createElement('form');
-            hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLScWjYnitFJZl3Yi-e9raSASgAXzla8Gog6_QU0IQrfZ8ZNLTQ/formResponse';
+            hiddenForm.action = window.RhythmConfig.sponsorProposalForm;
             hiddenForm.method = 'POST';
             hiddenForm.target = 'hidden_iframe';
             hiddenForm.style.display = 'none';
 
             // Add form fields with correct entry names based on Google Form structure
+            const entries = window.RhythmConfig.sponsorProposalEntries;
             const fields = [
-                { name: 'entry.1365406747', value: name },         // Full Name
-                { name: 'entry.1804991125', value: phone },        // Phone Number  
-                { name: 'entry.578437853', value: company },      // Company/Organization
-                { name: 'entry.940936853', value: interest }      // Sponsorship Interest
+                { name: entries.name, value: name },         // Full Name
+                { name: entries.phone, value: phone },        // Phone Number  
+                { name: entries.company, value: company },      // Company/Organization
+                { name: entries.interest, value: interest }      // Sponsorship Interest
             ];
 
             fields.forEach(field => {

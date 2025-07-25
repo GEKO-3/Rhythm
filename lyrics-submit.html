@@ -472,6 +472,8 @@
       <button onclick="resetTool()">Reset</button>
     </div>
   </div>
+  <script src="config.js"></script>
+  <script src="lyrics-showlist-config.js"></script>
   <script>
     // Global variables
     let sectionCount = 0;
@@ -685,7 +687,19 @@
     async function getSongsFromCSV() {
       try {
         console.log('Fetching CSV from Google Sheets...');
-        const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv');
+        
+        // Wait for config to load
+        if (!window.RhythmLyricsShowConfig) {
+          await new Promise(resolve => {
+            const check = () => {
+              if (window.RhythmLyricsShowConfig) resolve();
+              else setTimeout(check, 50);
+            };
+            check();
+          });
+        }
+        
+        const response = await fetch(window.RhythmLyricsShowConfig.lyricsSheet);
         const csvText = await response.text();
         console.log('CSV text length:', csvText.length);
         console.log('First 500 chars:', csvText.substring(0, 500));
@@ -807,8 +821,20 @@
     async function getNextId() {
       try {
         console.log('Getting next ID - fetching fresh CSV data...');
+        
+        // Wait for config to load
+        if (!window.RhythmConfig) {
+          await new Promise(resolve => {
+            const check = () => {
+              if (window.RhythmConfig) resolve();
+              else setTimeout(check, 50);
+            };
+            check();
+          });
+        }
+        
         // Always fetch fresh data to ensure we get the most current highest ID
-        const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv');
+        const response = await fetch(window.RhythmLyricsShowConfig.lyricsSheet);
         const csvText = await response.text();
         
         // Parse CSV to find the highest ID
@@ -916,6 +942,13 @@
 
     // Function to submit to Google Form
     async function submitToForm() {
+      // Wait for config to load
+      if (!window.RhythmConfig) {
+        showNotification('Loading configuration...', 'info');
+        setTimeout(submitToForm, 100);
+        return;
+      }
+      
       const songName = document.getElementById('song-name-input').value.trim();
       const container = document.getElementById('sections');
       const children = Array.from(container.children);
@@ -1000,10 +1033,11 @@
 
       // Create form data
       const formData = new FormData();
-      formData.append('entry.1997798105', songId.toString()); // ID
-      formData.append('entry.543765933', songName); // Name
-      formData.append('entry.320041437', selectedGenre); // Genre
-      formData.append('entry.269641100', lyrics.trim()); // Dhivehi lyrics
+      const entries = window.RhythmLyricsShowConfig.lyricsEntries;
+      formData.append(entries.id, songId.toString()); // ID
+      formData.append(entries.name, songName); // Name
+      formData.append(entries.genre, selectedGenre); // Genre
+      formData.append(entries.lyrics, lyrics.trim()); // Dhivehi lyrics
 
       console.log('Form data being submitted:', {
         id: songId.toString(),
@@ -1014,7 +1048,7 @@
 
       try {
         // Submit to Google Form
-        const response = await fetch('https://docs.google.com/forms/d/e/1FAIpQLSdnJoRdhzwUd7BjIBxpifxA0thQVAZYUXB2vFfrdmOhjgYdlw/formResponse', {
+        const response = await fetch(window.RhythmLyricsShowConfig.lyricsForm, {
           method: 'POST',
           body: formData,
           mode: 'no-cors' // Required for Google Forms

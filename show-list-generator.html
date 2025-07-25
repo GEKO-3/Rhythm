@@ -452,6 +452,7 @@
   
   <div class="copy-feedback" id="copy-feedback">Copied to clipboard!</div>
   
+  <script src="lyrics-showlist-config.js"></script>
   <script>
     let availableSongs = [];
     let currentList = [];
@@ -473,7 +474,7 @@
     async function loadSongs() {
       try {
         console.log('Fetching CSV from Google Sheets...');
-        const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSVu5f9x2f-u2hakL_1pZy_hbepxtnFf7MRWW9LzGu8SCq_yQithPDMBVwWJfgcxRX9UecORi3eVjRd/pub?output=csv');
+        const response = await fetch(window.RhythmLyricsShowConfig.lyricsSheet);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -596,7 +597,7 @@
     async function loadLatestShowlist() {
       try {
         // First, get the latest showlist
-        const showlistResponse = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vT2u4Fu2f0bYF_ToPU-digD1jbqNsL7DOJpB_kXlWTsnXcgetsvcHuhnMqtF-gCFi_PnSiWzUwbN3p6/pub?output=csv');
+        const showlistResponse = await fetch(window.RhythmLyricsShowConfig.showListSheet);
         const showlistCsv = await showlistResponse.text();
         
         // Parse the showlist CSV
@@ -624,7 +625,7 @@
         });
         
         // Check if this showlist is cancelled
-        const cancelResponse = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vQdKlCFDc1IEQXEgjkX1ULpGLjWitRzaH8Wsa1fNGqGbXkMuShTNmTDsk1fL6F8I3D022zn2HUIrCux/pub?output=csv');
+        const cancelResponse = await fetch(window.RhythmLyricsShowConfig.cancelSheet);
         const cancelCsv = await cancelResponse.text();
         
         // Parse the cancel CSV
@@ -743,11 +744,12 @@
       
       try {
         const formData = new FormData();
-        formData.append('entry.1959879621', uid); // UID field
-        formData.append('entry.958482643', showlistData); // Showlist field
-        formData.append('entry.1573207518', showName); // Show name field
+        const entries = window.RhythmLyricsShowConfig.showListEntries;
+        formData.append(entries.uid, uid); // UID field
+        formData.append(entries.data, showlistData); // Showlist field
+        formData.append(entries.name, showName); // Show name field
         
-        await fetch('https://docs.google.com/forms/d/e/1FAIpQLSf5eXLKAwgS3HnmbPCwpsFiNKdUUVN9ygpeprV-skDPXbRzlg/formResponse', {
+        await fetch(window.RhythmLyricsShowConfig.showListForm, {
           method: 'POST',
           body: formData,
           mode: 'no-cors'
@@ -790,10 +792,11 @@
       
       try {
         const formData = new FormData();
-        formData.append('entry.2066827516', latestShowlist.uid); // UID field
-        formData.append('entry.993370621', 'yes'); // Cancel field
+        const entries = window.RhythmLyricsShowConfig.cancelEntries;
+        formData.append(entries.uid, latestShowlist.uid); // UID field
+        formData.append(entries.status, 'yes'); // Cancel field
         
-        await fetch('https://docs.google.com/forms/d/e/1FAIpQLSfcqantOLwxd4ccD9b_HtSCwGbEVts6xkI8wb1jofYqPI8AmQ/formResponse', {
+        await fetch(window.RhythmLyricsShowConfig.cancelForm, {
           method: 'POST',
           body: formData,
           mode: 'no-cors'

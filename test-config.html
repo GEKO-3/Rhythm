@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Configuration</title>
+</head>
+<body>
+    <h1>Configuration Test</h1>
+    <div id="results"></div>
+    
+    <script src="lyrics-showlist-config.js"></script>
+    <script>
+        async function testConfig() {
+            const results = document.getElementById('results');
+            
+            // Wait for config to load
+            if (!window.RhythmLyricsShowConfig) {
+                await new Promise(resolve => {
+                    const check = () => {
+                        if (window.RhythmLyricsShowConfig) resolve();
+                        else setTimeout(check, 50);
+                    };
+                    check();
+                });
+            }
+            
+            console.log('Configuration loaded:', window.RhythmLyricsShowConfig);
+            
+            try {
+                const lyricsSheet = window.RhythmLyricsShowConfig.lyricsSheet;
+                console.log('Lyrics sheet URL:', lyricsSheet);
+                results.innerHTML += `<p><strong>Lyrics Sheet URL:</strong> ${lyricsSheet}</p>`;
+                
+                const lyricsForm = window.RhythmLyricsShowConfig.lyricsForm;
+                console.log('Lyrics form URL:', lyricsForm);
+                results.innerHTML += `<p><strong>Lyrics Form URL:</strong> ${lyricsForm}</p>`;
+                
+                const entries = window.RhythmLyricsShowConfig.lyricsEntries;
+                console.log('Lyrics entries:', entries);
+                results.innerHTML += `<p><strong>Lyrics Entries:</strong> ${JSON.stringify(entries)}</p>`;
+                
+                // Test CSV fetch
+                console.log('Testing CSV fetch...');
+                const response = await fetch(lyricsSheet);
+                const csvText = await response.text();
+                console.log('CSV fetch successful, length:', csvText.length);
+                results.innerHTML += `<p><strong>CSV Fetch:</strong> Success! Length: ${csvText.length}</p>`;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                results.innerHTML += `<p><strong>Error:</strong> ${error.message}</p>`;
+            }
+        }
+        
+        testConfig();
+    </script>
+</body>
+</html>
