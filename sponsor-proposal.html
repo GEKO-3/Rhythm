@@ -1402,7 +1402,7 @@
         </div>
     </div>
 
-    <script src="config.js"></script>
+    <script src="config.js" async defer></script>
     <script>
         // Info Modal Data
         const infoData = {
@@ -1618,6 +1618,16 @@
         
         // Function to submit to Google Form using hidden iframe
         function submitToGoogleForm(name, phone, company, interest, submitBtn, originalText) {
+            // Wait for config to load
+            if (!window.RhythmConfig) {
+                console.log('Config not loaded yet, retrying...');
+                setTimeout(() => submitToGoogleForm(name, phone, company, interest, submitBtn, originalText), 100);
+                return;
+            }
+            
+            console.log('Config loaded, submitting form...');
+            console.log('Form URL:', window.RhythmConfig.sponsorProposalForm);
+            
             // Create hidden iframe
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
@@ -1680,6 +1690,14 @@
 
             // Listen for iframe load (indicates submission completion)
             iframe.addEventListener('load', handleSubmission);
+            
+            // Add error handling
+            iframe.addEventListener('error', (error) => {
+                console.error('Form submission error:', error);
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                alert('There was an error submitting the form. Please try again.');
+            });
 
             // Fallback timeout
             setTimeout(() => {
@@ -1690,7 +1708,15 @@
             }, 5000);
 
             // Submit the form
-            hiddenForm.submit();
+            try {
+                console.log('Submitting form to:', hiddenForm.action);
+                hiddenForm.submit();
+            } catch (error) {
+                console.error('Form submission failed:', error);
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+                alert('There was an error submitting the form. Please check your internet connection and try again.');
+            }
         }
         
         // Smooth scrolling for better UX

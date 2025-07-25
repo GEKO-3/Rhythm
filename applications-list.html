@@ -361,6 +361,24 @@
             color: #ffaa00;
         }
 
+        .approval-button.pending-audition {
+            background: rgba(138, 43, 226, 0.1);
+            border-color: #8a2be2;
+            color: #8a2be2;
+        }
+
+        .approval-button.pending-exco-approval {
+            background: rgba(30, 144, 255, 0.1);
+            border-color: #1e90ff;
+            color: #1e90ff;
+        }
+
+        .approval-button.called-back {
+            background: rgba(0, 191, 255, 0.1);
+            border-color: #00bfff;
+            color: #00bfff;
+        }
+
         .approval-dropdown {
             position: absolute;
             bottom: 100%;
@@ -400,6 +418,18 @@
 
         .approval-option.reject {
             color: var(--error-color);
+        }
+
+        .approval-option.pending-audition {
+            color: #8a2be2;
+        }
+
+        .approval-option.pending-exco {
+            color: #1e90ff;
+        }
+
+        .approval-option.called-back {
+            color: #00bfff;
         }
 
         .approval-option:first-child {
@@ -478,7 +508,147 @@
             margin-top: 5px;
         }
 
-        /* Empty State */
+        /* Filter System */
+        .filter-container {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .filter-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .filter-dropdown-container {
+            position: relative;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .filter-dropdown-button {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(245, 208, 0, 0.1);
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .filter-dropdown-button:hover {
+            background: rgba(245, 208, 0, 0.2);
+            border-color: rgba(245, 208, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .filter-dropdown-button .selected-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-dropdown-button .dropdown-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .filter-dropdown-button.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .filter-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            margin-top: 5px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .filter-dropdown-menu.show {
+            display: block;
+        }
+
+        .filter-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+
+        .filter-option:hover {
+            background: rgba(245, 208, 0, 0.1);
+        }
+
+        .filter-option.active {
+            background: rgba(245, 208, 0, 0.2);
+            color: var(--primary-color);
+        }
+
+        .filter-option.all {
+            color: var(--primary-color);
+        }
+
+        .filter-option.approved {
+            color: var(--success-color);
+        }
+
+        .filter-option.rejected {
+            color: var(--error-color);
+        }
+
+        .filter-option.pending {
+            color: #ffaa00;
+        }
+
+        .filter-option.pending-audition {
+            color: #8a2be2;
+        }
+
+        .filter-option.pending-exco-approval {
+            color: #1e90ff;
+        }
+
+        .filter-option.called-back {
+            color: #00bfff;
+        }
+
+        .filter-results {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: #cccccc;
+        }
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -540,6 +710,20 @@
             .approval-dropdown {
                 font-size: 0.9rem;
             }
+
+            .filter-dropdown-container {
+                max-width: 250px;
+            }
+
+            .filter-dropdown-button {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+
+            .filter-option {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -571,6 +755,20 @@
             .approval-option {
                 padding: 10px 14px;
                 font-size: 0.85rem;
+            }
+
+            .filter-dropdown-container {
+                max-width: 200px;
+            }
+
+            .filter-dropdown-button {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+
+            .filter-option {
+                font-size: 0.85rem;
+                padding: 8px 12px;
             }
         }
     </style>
@@ -624,6 +822,46 @@
             </div>
         </div>
 
+        <!-- Filter System -->
+        <div id="filter-container" class="filter-container" style="display: none;">
+            <div class="filter-title">Filter by Status</div>
+            <div class="filter-dropdown-container">
+                <button class="filter-dropdown-button" id="filter-dropdown-button">
+                    <div class="selected-filter">
+                        <span class="filter-icon">📋</span>
+                        <span class="filter-text">All Applications</span>
+                    </div>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="filter-dropdown-menu" id="filter-dropdown-menu">
+                    <div class="filter-option all active" data-filter="all">
+                        <span>📋</span> All Applications
+                    </div>
+                    <div class="filter-option pending" data-filter="pending">
+                        <span>⏳</span> Pending Review
+                    </div>
+                    <div class="filter-option pending-audition" data-filter="pending audition">
+                        <span>🎵</span> Pending Audition
+                    </div>
+                    <div class="filter-option pending-exco-approval" data-filter="pending exco approval">
+                        <span>📋</span> Pending Exco Approval
+                    </div>
+                    <div class="filter-option called-back" data-filter="called back">
+                        <span>📞</span> Called Back
+                    </div>
+                    <div class="filter-option approved" data-filter="approved">
+                        <span>✅</span> Approved
+                    </div>
+                    <div class="filter-option rejected" data-filter="rejected">
+                        <span>❌</span> Rejected
+                    </div>
+                </div>
+            </div>
+            <div class="filter-results" id="filter-results">
+                Showing all applications
+            </div>
+        </div>
+
         <!-- Applications Grid -->
         <div id="applications-grid" class="applications-grid" style="display: none;"></div>
 
@@ -641,13 +879,20 @@
         const loadingContainer = document.getElementById('loading-container');
         const errorContainer = document.getElementById('error-container');
         const statsContainer = document.getElementById('stats-container');
+        const filterContainer = document.getElementById('filter-container');
         const applicationsGrid = document.getElementById('applications-grid');
         const emptyState = document.getElementById('empty-state');
+        const filterResults = document.getElementById('filter-results');
 
         // Statistics elements
         const totalApplicationsEl = document.getElementById('total-applications');
         const inAreaCountEl = document.getElementById('in-area-count');
         const outAreaCountEl = document.getElementById('out-area-count');
+
+        // Filter state
+        let currentFilter = 'all';
+        let allApplications = [];
+        let filteredApplications = [];
 
         // CSV URLs using getter functions for delayed access
         const CSV_URL = () => window.RhythmConfig?.applicationsSheet || '';
@@ -1050,6 +1295,7 @@
             
             // Get current approval status
             const currentStatus = statusData.get(appId) || 'pending';
+            const cssStatus = currentStatus.replace(/\s+/g, '-').toLowerCase();
             
             // Format phone number for display and calling
             const phoneForCall = formatPhoneForCall(contactNumber);
@@ -1067,7 +1313,7 @@
                 <div class="email">${email || 'No email provided'}</div>
                 <div class="location-status">${locationText}</div>
                 <div class="approval-system" style="position: relative;">
-                    <button class="approval-button ${currentStatus}" data-uid="${appId}">
+                    <button class="approval-button ${cssStatus}" data-uid="${appId}">
                         <span class="status-icon">${getStatusIcon(currentStatus)}</span>
                         <span class="status-text">${getStatusText(currentStatus)}</span>
                     </button>
@@ -1077,6 +1323,15 @@
                         </div>
                         <div class="approval-option reject" data-status="rejected">
                             <span>❌</span> Reject
+                        </div>
+                        <div class="approval-option pending-audition" data-status="pending audition">
+                            <span>🎵</span> Pending Audition
+                        </div>
+                        <div class="approval-option pending-exco" data-status="pending exco approval">
+                            <span>📋</span> Pending Exco Approval
+                        </div>
+                        <div class="approval-option called-back" data-status="called back">
+                            <span>📞</span> Called Back
                         </div>
                     </div>
                 </div>
@@ -1114,6 +1369,9 @@
             switch (status) {
                 case 'approved': return '✅';
                 case 'rejected': return '❌';
+                case 'pending audition': return '🎵';
+                case 'pending exco approval': return '📋';
+                case 'called back': return '📞';
                 case 'pending':
                 default: return '⏳';
             }
@@ -1124,6 +1382,9 @@
             switch (status) {
                 case 'approved': return 'Approved';
                 case 'rejected': return 'Rejected';
+                case 'pending audition': return 'Pending Audition';
+                case 'pending exco approval': return 'Pending Exco Approval';
+                case 'called back': return 'Called Back';
                 case 'pending':
                 default: return 'Pending Review';
             }
@@ -1141,18 +1402,134 @@
                 if (uid && button) {
                     // Get the current status from our status data
                     const currentStatus = statusData.get(uid) || 'pending';
+                    const cssStatus = currentStatus.replace(/\s+/g, '-').toLowerCase();
                     
                     // Update button appearance
-                    button.className = `approval-button ${currentStatus}`;
+                    button.className = `approval-button ${cssStatus}`;
                     button.querySelector('.status-icon').textContent = getStatusIcon(currentStatus);
                     button.querySelector('.status-text').textContent = getStatusText(currentStatus);
                     
                     console.log(`Updated button for UID ${uid} to status: ${currentStatus}`);
                 }
             });
+            
+            // Re-apply filter after updating buttons
+            if (allApplications.length > 0) {
+                applyFilter();
+            }
         }
 
-        // Function to setup approval system for a tile
+        // Function to setup filter system
+        function setupFilterSystem() {
+            const dropdownButton = document.getElementById('filter-dropdown-button');
+            const dropdownMenu = document.getElementById('filter-dropdown-menu');
+            const filterOptions = document.querySelectorAll('.filter-option');
+            
+            // Toggle dropdown on button click
+            dropdownButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+                dropdownButton.classList.toggle('open');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.filter-dropdown-container')) {
+                    dropdownMenu.classList.remove('show');
+                    dropdownButton.classList.remove('open');
+                }
+            });
+            
+            // Handle filter option selection
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Remove active class from all options
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to selected option
+                    this.classList.add('active');
+                    
+                    // Update dropdown button text and icon
+                    const icon = this.querySelector('span').textContent;
+                    const text = this.textContent.trim().substring(2); // Remove emoji
+                    dropdownButton.querySelector('.filter-icon').textContent = icon;
+                    dropdownButton.querySelector('.filter-text').textContent = text;
+                    
+                    // Update current filter
+                    currentFilter = this.dataset.filter;
+                    
+                    // Close dropdown
+                    dropdownMenu.classList.remove('show');
+                    dropdownButton.classList.remove('open');
+                    
+                    // Apply filter
+                    applyFilter();
+                });
+            });
+        }
+
+        // Function to apply filter
+        function applyFilter() {
+            if (currentFilter === 'all') {
+                filteredApplications = [...allApplications];
+            } else {
+                filteredApplications = allApplications.filter(app => {
+                    const appId = generateApplicationId(app);
+                    const appStatus = statusData.get(appId) || 'pending';
+                    return appStatus.toLowerCase() === currentFilter.toLowerCase();
+                });
+            }
+            
+            // Update filter results text
+            updateFilterResults();
+            
+            // Re-render the applications grid with filtered data
+            renderApplicationsGrid(filteredApplications);
+        }
+
+        // Function to update filter results text
+        function updateFilterResults() {
+            const totalCount = filteredApplications.length;
+            const allCount = allApplications.length;
+            
+            if (currentFilter === 'all') {
+                filterResults.textContent = `Showing all ${totalCount} applications`;
+            } else {
+                const statusText = getStatusText(currentFilter);
+                filterResults.textContent = `Showing ${totalCount} of ${allCount} applications with status: ${statusText}`;
+            }
+        }
+
+        // Function to render applications grid (separated from display logic)
+        function renderApplicationsGrid(applications) {
+            // Clear existing tiles
+            applicationsGrid.innerHTML = '';
+            
+            if (applications.length === 0) {
+                applicationsGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                emptyState.querySelector('.empty-title').textContent = currentFilter === 'all' ? 'No Applications Yet' : 'No Applications Found';
+                emptyState.querySelector('.empty-message').textContent = currentFilter === 'all' ? 'No member applications have been submitted yet.' : `No applications found with the selected filter.`;
+                return;
+            }
+            
+            // Hide empty state and show grid
+            emptyState.style.display = 'none';
+            applicationsGrid.style.display = 'grid';
+            
+            // Create tiles for each application
+            applications.forEach((application, index) => {
+                const tile = createApplicationTile(application, application.isNew);
+                applicationsGrid.appendChild(tile);
+                
+                // Debug log to check if NEW tag should be shown
+                if (application.isNew) {
+                    console.log(`Application ${index} marked as NEW:`, application['Full Name']);
+                }
+            });
+        }
         function setupApprovalSystem(tile, uid) {
             const button = tile.querySelector('.approval-button');
             const dropdown = tile.querySelector('.approval-dropdown');
@@ -1179,8 +1556,11 @@
                     const statusIcon = this.querySelector('span').textContent;
                     const statusText = this.textContent.trim().substring(2); // Remove emoji
                     
+                    // Convert status for CSS class (replace spaces with hyphens)
+                    const cssStatus = newStatus.replace(/\s+/g, '-').toLowerCase();
+                    
                     // Update button appearance
-                    button.className = `approval-button ${newStatus}`;
+                    button.className = `approval-button ${cssStatus}`;
                     button.querySelector('.status-icon').textContent = statusIcon;
                     button.querySelector('.status-text').textContent = statusText;
                     
@@ -1204,6 +1584,10 @@
                                 const updatedStatusMap = await fetchStatusData();
                                 statusData = updatedStatusMap;
                                 updateApprovalButtons(); // Update all buttons with new status
+                                
+                                // Re-apply current filter to update the display
+                                applyFilter();
+                                
                                 console.log('Status data refreshed automatically');
                             } catch (error) {
                                 console.error('Auto-refresh of status data failed:', error);
@@ -1214,7 +1598,8 @@
                         // Revert on failure
                         alert('Failed to update status. Please try again.');
                         const previousStatus = statusData.get(uid) || 'pending';
-                        button.className = `approval-button ${previousStatus}`;
+                        const previousCssStatus = previousStatus.replace(/\s+/g, '-').toLowerCase();
+                        button.className = `approval-button ${previousCssStatus}`;
                         button.querySelector('.status-icon').textContent = getStatusIcon(previousStatus);
                         button.querySelector('.status-text').textContent = getStatusText(previousStatus);
                     }
@@ -1328,25 +1713,24 @@
             // Sort again after identifying new applications to prioritize NEW items
             const finalSortedApplications = sortApplicationsByTimestamp(applicationsWithNewFlag);
             
-            // Update statistics
+            // Store all applications for filtering
+            allApplications = [...finalSortedApplications];
+            
+            // Update statistics (always show stats for all applications)
             updateStatistics(finalSortedApplications);
             statsContainer.style.display = 'block';
             
-            // Clear existing tiles
-            applicationsGrid.innerHTML = '';
+            // Show filter container
+            filterContainer.style.display = 'block';
             
-            // Create tiles for each application
-            finalSortedApplications.forEach((application, index) => {
-                const tile = createApplicationTile(application, application.isNew);
-                applicationsGrid.appendChild(tile);
-                
-                // Debug log to check if NEW tag should be shown
-                if (application.isNew) {
-                    console.log(`Application ${index} marked as NEW:`, application['Full Name']);
-                }
-            });
+            // Setup filter system if not already setup
+            if (!document.getElementById('filter-dropdown-button').hasAttribute('data-setup')) {
+                setupFilterSystem();
+                document.getElementById('filter-dropdown-button').setAttribute('data-setup', 'true');
+            }
             
-            applicationsGrid.style.display = 'grid';
+            // Apply current filter
+            applyFilter();
             
             // Store current applications for next comparison
             previousApplications = [...finalSortedApplications];
