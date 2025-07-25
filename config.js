@@ -69,8 +69,8 @@
             return {
                 name: _0x2c4f(_0x4a5b[16]),
                 phone: _0x2c4f(_0x4a5b[17]),
-                company: _0x2c4f(_0x4a5b[18]),
-                interest: _0x2c4f(_0x4a5b[19])
+                company: _0x2c4f(_0x4a5b[19]),
+                interest: _0x2c4f(_0x4a5b[18])
             };
         }
     };

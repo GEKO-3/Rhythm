@@ -880,6 +880,7 @@
             
             const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
             console.log('CSV headers:', headers);
+            console.log('Available headers for mapping:', headers.join(', '));
             
             const data = [];
             for (let i = 1; i < lines.length; i++) {
@@ -958,11 +959,20 @@
             
             // Map CSV headers to expected fields (adjust based on actual CSV structure)
             const timestamp = sponsor['Timestamp'] || sponsor['timestamp'] || '';
-            const name = sponsor['Name'] || sponsor['Full Name'] || sponsor['Sponsor Name'] || '';
-            const companyName = sponsor['Company Name'] || sponsor['Organization'] || sponsor['Business'] || '';
-            const contactNumber = sponsor['Contact Number'] || sponsor['Phone'] || sponsor['Contact'] || '';
-            const email = sponsor['Email'] || sponsor['Email Address'] || '';
+            const name = sponsor['Full Name'] || sponsor['Name'] || sponsor['Sponsor Name'] || sponsor['Your Name'] || sponsor['Contact Person'] || '';
+            const companyName = sponsor['Company/Organisation'] || sponsor['Company/Organization'] || sponsor['Company Name'] || sponsor['Business Name'] || sponsor['Organization'] || sponsor['Business'] || sponsor['Company'] || sponsor['Organization Name'] || sponsor['Business/Organization Name'] || '';
+            const contactNumber = sponsor['Phone Number'] || sponsor['Contact Number'] || sponsor['Phone'] || sponsor['Contact'] || sponsor['Mobile Number'] || sponsor['Telephone'] || '';
+            const email = sponsor['Email'] || sponsor['Email Address'] || sponsor['E-mail'] || '';
+            const sponsorshipInterest = sponsor['Sponsorship Interest'] || sponsor['Interest'] || sponsor['Sponsor Interest'] || sponsor['Type of Sponsorship'] || sponsor['Sponsorship Type Interest'] || sponsor['What type of sponsorship are you interested in?'] || '';
             const sponsorshipType = sponsor['Sponsorship Type'] || sponsor['Type'] || sponsor['Category'] || '';
+            
+            // Debug logging to see what values we're getting
+            console.log('Sponsor data mapping for:', sponsor);
+            console.log('- name:', name);
+            console.log('- companyName:', companyName);
+            console.log('- email:', email);
+            console.log('- sponsorshipInterest:', sponsorshipInterest);
+            console.log('Available keys in sponsor object:', Object.keys(sponsor));
             
             // Get current callback status
             const hasBeenCalled = callbackData.has(sponsorId);
@@ -981,7 +991,7 @@
                     '<div class="contact-number">📞 Not provided</div>'
                 }
                 <div class="email">${email || 'No email provided'}</div>
-                ${sponsorshipType ? `<div class="sponsorship-type">Type: ${sponsorshipType}</div>` : ''}
+                ${sponsorshipInterest ? `<div class="sponsorship-type">Interest: ${sponsorshipInterest}</div>` : ''}
                 <div class="callback-system" style="position: relative;">
                     <button class="callback-button ${hasBeenCalled ? 'called' : 'pending'}" data-uid="${sponsorId}">
                         <span class="status-icon">${hasBeenCalled ? '✅' : '📞'}</span>
