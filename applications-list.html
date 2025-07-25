@@ -125,6 +125,47 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
+        .header-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pending-indicator {
+            background: rgba(245, 208, 0, 0.1);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            color: #f5d000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse-glow 2s infinite;
+        }
+
+        .pending-icon {
+            font-size: 1rem;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(245, 208, 0, 0.4);
+                background: rgba(245, 208, 0, 0.1);
+            }
+            50% { 
+                box-shadow: 0 0 0 4px rgba(245, 208, 0, 0.1);
+                background: rgba(245, 208, 0, 0.2);
+            }
+        }
+
         .header p {
             font-size: 1.1rem;
             color: #cccccc;
@@ -232,6 +273,12 @@
             margin-top: 20px;
         }
 
+        /* Compact mode grid adjustments */
+        .applications-grid:has(.application-tile.compact) {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
         .application-tile {
             background: rgba(42, 42, 42, 0.8);
             backdrop-filter: blur(15px);
@@ -241,6 +288,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: visible;
+            cursor: pointer;
         }
 
         .application-tile:hover {
@@ -249,14 +297,108 @@
             border-color: rgba(245, 208, 0, 0.4);
         }
 
-        .application-tile::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-color), #ffed4e);
+        /* Compact mode styles */
+        .application-tile.compact {
+            padding: 15px 20px;
+            min-height: auto;
+        }
+
+        .application-tile.compact .applications-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .tile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .application-tile.compact .tile-header {
+            margin-bottom: 0;
+        }
+
+        .compact-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .compact-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .compact-status.pending {
+            background: rgba(255, 170, 0, 0.1);
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .compact-status.approved {
+            background: rgba(68, 255, 68, 0.1);
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .compact-status.rejected {
+            background: rgba(255, 68, 68, 0.1);
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        .compact-status.pending-audition {
+            background: rgba(138, 43, 226, 0.1);
+            border-color: #8a2be2;
+            color: #8a2be2;
+        }
+
+        .compact-status.pending-exco-approval {
+            background: rgba(30, 144, 255, 0.1);
+            border-color: #1e90ff;
+            color: #1e90ff;
+        }
+
+        .compact-status.called-back {
+            background: rgba(0, 191, 255, 0.1);
+            border-color: #00bfff;
+            color: #00bfff;
+        }
+
+        .expand-indicator {
+            margin-left: 10px;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .application-tile.expanded .expand-indicator {
+            transform: rotate(180deg);
+        }
+
+        .tile-details {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .application-tile.expanded .tile-details {
+            max-height: 1000px;
+            opacity: 1;
+            margin-top: 15px;
         }
 
         .timestamp {
@@ -273,6 +415,23 @@
             color: var(--primary-color);
             margin-bottom: 12px;
             line-height: 1.2;
+        }
+
+        /* Compact mode name styling */
+        .application-tile.compact .full-name {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        /* Expanded mode - hide compact status and make name larger */
+        .application-tile.expanded .compact-status {
+            display: none;
+        }
+
+        .application-tile.expanded .full-name {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
         }
 
         .date-of-birth {
@@ -379,6 +538,42 @@
             color: #00bfff;
         }
 
+        /* Pending update indicator */
+        .approval-button.updating {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .approval-button.updating::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(245, 208, 0, 0.3), 
+                transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .approval-button.pending-sync {
+            border-color: #f5d000;
+            box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2); }
+            50% { box-shadow: 0 0 0 4px rgba(245, 208, 0, 0.4); }
+        }
+
         .approval-dropdown {
             position: absolute;
             bottom: 100%;
@@ -472,40 +667,129 @@
             background: rgba(42, 42, 42, 0.8);
             backdrop-filter: blur(15px);
             border-radius: 15px;
-            padding: 25px;
+            padding: 20px;
             border: 1px solid rgba(245, 208, 0, 0.2);
-            margin-bottom: 30px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
         .stats-title {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 700;
             color: var(--primary-color);
             margin-bottom: 15px;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+        .stats-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
         }
 
         .stat-item {
             text-align: center;
+            min-width: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid rgba(245, 208, 0, 0.1);
         }
 
         .stat-number {
-            font-size: 2rem;
+            font-size: 1.4rem;
             font-weight: 800;
             color: var(--primary-color);
             display: block;
+            line-height: 1;
         }
 
         .stat-label {
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             color: #cccccc;
-            margin-top: 5px;
+            margin-top: 4px;
+            line-height: 1.2;
+        }
+
+        /* Mobile optimizations - List style */
+        @media (max-width: 768px) {
+            .stats-container {
+                padding: 15px;
+                margin-bottom: 20px;
+                text-align: left;
+            }
+            
+            .stats-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            
+            .stats-list {
+                flex-direction: column;
+                gap: 0;
+                align-items: stretch;
+            }
+            
+            .stat-item {
+                min-width: unset;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.03);
+                border-radius: 6px;
+                padding: 12px 15px;
+                border: none;
+                border-bottom: 1px solid rgba(245, 208, 0, 0.1);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+                margin-bottom: 1px;
+            }
+            
+            .stat-item:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+            }
+            
+            .stat-number {
+                font-size: 1.3rem;
+                order: 2;
+                margin-left: auto;
+            }
+            
+            .stat-label {
+                font-size: 0.85rem;
+                margin-top: 0;
+                order: 1;
+                color: #e0e0e0;
+                font-weight: 500;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                padding: 12px;
+                border-radius: 12px;
+            }
+            
+            .stats-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .stat-item {
+                padding: 10px 12px;
+                border-radius: 4px;
+            }
+            
+            .stat-number {
+                font-size: 1.2rem;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+            }
         }
 
         /* Filter System */
@@ -643,12 +927,6 @@
             color: #00bfff;
         }
 
-        .filter-results {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: #cccccc;
-        }
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -679,15 +957,33 @@
             
             .applications-grid {
                 grid-template-columns: 1fr;
-                gap: 20px;
+                gap: 15px;
             }
             
             .application-tile {
-                padding: 20px;
+                padding: 15px;
+            }
+            
+            .application-tile.compact {
+                padding: 12px 15px;
             }
             
             .full-name {
-                font-size: 1.4rem;
+                font-size: 1.3rem;
+            }
+            
+            .application-tile.compact .full-name {
+                font-size: 1rem;
+                margin-bottom: 5px;
+            }
+            
+            .compact-status {
+                font-size: 0.7rem !important;
+                padding: 3px 6px !important;
+            }
+            
+            .expand-indicator {
+                font-size: 0.8rem;
             }
             
             .back-link {
@@ -712,7 +1008,8 @@
             }
 
             .filter-dropdown-container {
-                max-width: 250px;
+                max-width: 90%;
+                width: 90%;
             }
 
             .filter-dropdown-button {
@@ -740,7 +1037,28 @@
             }
             
             .application-tile {
-                padding: 15px;
+                padding: 12px;
+            }
+            
+            .application-tile.compact {
+                padding: 10px 12px;
+            }
+            
+            .applications-grid {
+                gap: 10px;
+            }
+            
+            .full-name {
+                font-size: 1.2rem;
+            }
+            
+            .application-tile.compact .full-name {
+                font-size: 0.95rem;
+            }
+            
+            .compact-status {
+                font-size: 0.65rem !important;
+                padding: 2px 5px !important;
             }
 
             .stats-grid {
@@ -758,12 +1076,13 @@
             }
 
             .filter-dropdown-container {
-                max-width: 200px;
+                max-width: 100%;
+                width: 100%;
             }
 
             .filter-dropdown-button {
-                font-size: 0.85rem;
-                padding: 8px 12px;
+                font-size: 0.9rem;
+                padding: 10px 14px;
             }
 
             .filter-option {
@@ -785,7 +1104,13 @@
     <!-- Header -->
     <header class="header">
         <img src="src/Logo_1.svg" alt="Rhythm Boduberu" class="logo">
-        <h1>Member Applications</h1>
+        <div class="header-title">
+            <h1>Member Applications</h1>
+            <div id="pending-indicator" class="pending-indicator" style="display: none;">
+                <span class="pending-icon">⏳</span>
+                <span id="pending-count">0</span> updates pending
+            </div>
+        </div>
         <p>View all submitted member applications for Rhythm Boduberu</p>
     </header>
 
@@ -806,18 +1131,30 @@
         <!-- Statistics -->
         <div id="stats-container" class="stats-container" style="display: none;">
             <div class="stats-title">Application Statistics</div>
-            <div class="stats-grid">
+            <div class="stats-list">
                 <div class="stat-item">
                     <span class="stat-number" id="total-applications">0</span>
                     <div class="stat-label">Total Applications</div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number" id="in-area-count">0</span>
-                    <div class="stat-label">In Gan/Fonadhoo</div>
+                    <span class="stat-number" id="pending-audition-count">0</span>
+                    <div class="stat-label">Pending Audition</div>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number" id="out-area-count">0</span>
-                    <div class="stat-label">Outside Area</div>
+                    <span class="stat-number" id="called-back-count">0</span>
+                    <div class="stat-label">Called Back</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="pending-exco-count">0</span>
+                    <div class="stat-label">Pending Exco Approval</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="approved-count">0</span>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="in-area-count">0</span>
+                    <div class="stat-label">In Gan/Fonadhoo</div>
                 </div>
             </div>
         </div>
@@ -857,9 +1194,6 @@
                     </div>
                 </div>
             </div>
-            <div class="filter-results" id="filter-results">
-                Showing all applications
-            </div>
         </div>
 
         <!-- Applications Grid -->
@@ -882,12 +1216,14 @@
         const filterContainer = document.getElementById('filter-container');
         const applicationsGrid = document.getElementById('applications-grid');
         const emptyState = document.getElementById('empty-state');
-        const filterResults = document.getElementById('filter-results');
 
         // Statistics elements
         const totalApplicationsEl = document.getElementById('total-applications');
+        const pendingAuditionCountEl = document.getElementById('pending-audition-count');
+        const calledBackCountEl = document.getElementById('called-back-count');
+        const pendingExcoCountEl = document.getElementById('pending-exco-count');
+        const approvedCountEl = document.getElementById('approved-count');
         const inAreaCountEl = document.getElementById('in-area-count');
-        const outAreaCountEl = document.getElementById('out-area-count');
 
         // Filter state
         let currentFilter = 'all';
@@ -903,6 +1239,12 @@
         let previousApplications = [];
         let statusData = new Map(); // Map of UID -> status
         let initialLoad = true;
+        
+        // Status update tracking
+        let pendingStatusUpdates = new Map(); // Map of UID -> {status, timestamp}
+        let isPollingForUpdates = false;
+        let statusPollingInterval = null;
+        let lastUpdateTimestamp = 0;
         
         // Function to get seen applications from localStorage
         function getSeenApplications() {
@@ -1075,6 +1417,19 @@
                 
                 console.log(`Attempting to submit: UID=${uid}, Status=${status}`);
                 
+                // Record this pending update with timestamp
+                const updateTimestamp = Date.now();
+                pendingStatusUpdates.set(uid, {
+                    status: status.toLowerCase(),
+                    timestamp: updateTimestamp
+                });
+                lastUpdateTimestamp = updateTimestamp;
+                
+                console.log(`Recorded pending update: UID=${uid}, Status=${status}, Timestamp=${updateTimestamp}`);
+                
+                // Show visual feedback for pending update
+                showPendingUpdate(uid);
+                
                 // Create form data
                 const formData = new FormData();
                 const entries = window.RhythmConfig.applicationsStatusEntries;
@@ -1090,10 +1445,13 @@
                 
                 console.log(`Form submission response status: ${response.status || 'no-cors'}`);
                 
-                // Update local status data immediately
+                // Update local status data immediately for UI responsiveness
                 statusData.set(uid, status.toLowerCase());
                 
-                console.log(`Status ${status} submitted for UID ${uid}`);
+                // Start polling for updates to confirm the change
+                startStatusPolling();
+                
+                console.log(`Status ${status} submitted for UID ${uid}, polling started`);
                 return true;
                 
             } catch (error) {
@@ -1149,12 +1507,238 @@
                     // Update local status data
                     statusData.set(uid, status.toLowerCase());
                     
-                    console.log(`Fallback method: Status ${status} submitted for UID ${uid}`);
+                    // Start polling for updates
+                    startStatusPolling();
+                    
+                    console.log(`Fallback method: Status ${status} submitted for UID ${uid}, polling started`);
                     return true;
                     
                 } catch (fallbackError) {
                     console.error('Fallback submission also failed:', fallbackError);
+                    
+                    // Remove the pending update since submission failed
+                    pendingStatusUpdates.delete(uid);
                     return false;
+                }
+            }
+        }
+
+        // Function to start status polling
+        function startStatusPolling() {
+            if (isPollingForUpdates) {
+                console.log('Status polling already active');
+                return;
+            }
+            
+            if (pendingStatusUpdates.size === 0) {
+                console.log('No pending updates to poll for');
+                return;
+            }
+            
+            console.log(`Starting status polling for ${pendingStatusUpdates.size} pending updates`);
+            isPollingForUpdates = true;
+            
+            // Clear any existing interval
+            if (statusPollingInterval) {
+                clearInterval(statusPollingInterval);
+            }
+            
+            // Start polling every 5 seconds
+            statusPollingInterval = setInterval(async () => {
+                await checkForStatusUpdates();
+            }, 5000);
+            
+            // Also check immediately
+            setTimeout(checkForStatusUpdates, 1000);
+        }
+
+        // Function to stop status polling
+        function stopStatusPolling() {
+            console.log('Stopping status polling');
+            isPollingForUpdates = false;
+            
+            if (statusPollingInterval) {
+                clearInterval(statusPollingInterval);
+                statusPollingInterval = null;
+            }
+        }
+
+        // Function to check for status updates in CSV
+        async function checkForStatusUpdates() {
+            try {
+                if (pendingStatusUpdates.size === 0) {
+                    console.log('No pending updates, stopping polling');
+                    stopStatusPolling();
+                    return;
+                }
+                
+                console.log(`Polling for ${pendingStatusUpdates.size} pending status updates...`);
+                console.log('Pending updates:', Array.from(pendingStatusUpdates.entries()));
+                
+                // Fetch the latest status data
+                const latestStatusData = await fetchStatusData();
+                
+                // Check which pending updates have been reflected
+                const confirmedUpdates = [];
+                const stillPendingUpdates = new Map();
+                
+                for (const [uid, pendingUpdate] of pendingStatusUpdates.entries()) {
+                    const csvStatus = latestStatusData.get(uid);
+                    console.log(`Checking UID ${uid}: pending="${pendingUpdate.status}", CSV="${csvStatus}"`);
+                    
+                    if (csvStatus && csvStatus.toLowerCase() === pendingUpdate.status.toLowerCase()) {
+                        console.log(`✓ Update confirmed for UID ${uid}: ${pendingUpdate.status}`);
+                        confirmedUpdates.push(uid);
+                        
+                        // Update our local status data with the confirmed data
+                        statusData.set(uid, csvStatus);
+                    } else {
+                        console.log(`⏳ Update still pending for UID ${uid}: expected "${pendingUpdate.status}", got "${csvStatus || 'not found'}"`);
+                        stillPendingUpdates.set(uid, pendingUpdate);
+                    }
+                }
+                
+                // Remove confirmed updates from pending list
+                confirmedUpdates.forEach(uid => {
+                    pendingStatusUpdates.delete(uid);
+                    hidePendingUpdate(uid); // Hide visual indicator
+                });
+                
+                // Update the UI if any updates were confirmed
+                if (confirmedUpdates.length > 0) {
+                    console.log(`${confirmedUpdates.length} status updates confirmed, updating UI`);
+                    updateApprovalButtons();
+                    updateFilterCounts();
+                }
+                
+                // Update visual indicators for remaining pending updates
+                updatePendingVisuals();
+                
+                // If all updates are confirmed, stop polling
+                if (pendingStatusUpdates.size === 0) {
+                    console.log('All pending updates confirmed, stopping polling');
+                    stopStatusPolling();
+                } else {
+                    console.log(`${pendingStatusUpdates.size} updates still pending, continuing to poll`);
+                    
+                    // Optional: Add timeout to prevent infinite polling
+                    const oldestPendingUpdate = Math.min(...Array.from(pendingStatusUpdates.values()).map(u => u.timestamp));
+                    const timeSinceOldest = Date.now() - oldestPendingUpdate;
+                    
+                    // Stop polling after 2 minutes if updates aren't reflected
+                    if (timeSinceOldest > 120000) {
+                        console.warn('Stopping polling after 2 minutes - some updates may not have been processed');
+                        pendingStatusUpdates.clear();
+                        stopStatusPolling();
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error during status polling:', error);
+                // Continue polling despite errors, but with a counter
+                const pollingAttempts = (window.statusPollingAttempts || 0) + 1;
+                window.statusPollingAttempts = pollingAttempts;
+                
+                // Stop polling after 10 failed attempts
+                if (pollingAttempts >= 10) {
+                    console.error('Too many polling failures, stopping');
+                    pendingStatusUpdates.clear();
+                    stopStatusPolling();
+                    window.statusPollingAttempts = 0;
+                }
+            }
+        }
+
+        // Function to update filter counts based on current status data
+        function updateFilterCounts() {
+            if (allApplications.length === 0) return;
+            
+            // Count applications by status
+            const statusCounts = {
+                all: allApplications.length,
+                pending: 0,
+                'pending audition': 0,
+                'pending exco approval': 0,
+                'called back': 0,
+                approved: 0,
+                rejected: 0
+            };
+            
+            allApplications.forEach(app => {
+                const appId = generateApplicationId(app);
+                const status = statusData.get(appId) || 'pending';
+                if (statusCounts.hasOwnProperty(status)) {
+                    statusCounts[status]++;
+                } else {
+                    statusCounts.pending++; // Default to pending for unknown statuses
+                }
+            });
+            
+            console.log('Updated status counts:', statusCounts);
+            
+            // Update filter options with counts (optional visual enhancement)
+            const filterOptions = document.querySelectorAll('.filter-option');
+            filterOptions.forEach(option => {
+                const filterType = option.dataset.filter;
+                if (statusCounts.hasOwnProperty(filterType)) {
+                    const currentText = option.textContent.split('(')[0].trim(); // Remove existing count
+                    const count = statusCounts[filterType];
+                    option.innerHTML = option.innerHTML.split('(')[0] + (filterType !== 'all' ? ` (${count})` : '');
+                }
+            });
+        }
+
+        // Function to show pending update visual feedback
+        function showPendingUpdate(uid) {
+            const tile = document.querySelector(`[data-uid="${uid}"]`);
+            if (tile) {
+                const button = tile.querySelector('.approval-button');
+                if (button) {
+                    button.classList.add('pending-sync');
+                }
+            }
+        }
+
+        // Function to hide pending update visual feedback
+        function hidePendingUpdate(uid) {
+            const tile = document.querySelector(`[data-uid="${uid}"]`);
+            if (tile) {
+                const button = tile.querySelector('.approval-button');
+                if (button) {
+                    button.classList.remove('pending-sync', 'updating');
+                }
+            }
+        }
+
+        // Function to show all pending updates
+        function updatePendingVisuals() {
+            // Hide all pending indicators first
+            document.querySelectorAll('.approval-button.pending-sync').forEach(button => {
+                button.classList.remove('pending-sync');
+            });
+
+            // Show indicators for currently pending updates
+            pendingStatusUpdates.forEach((data, uid) => {
+                showPendingUpdate(uid);
+            });
+
+            // Update the header pending indicator
+            updatePendingIndicator();
+        }
+
+        // Function to update the header pending indicator
+        function updatePendingIndicator() {
+            const pendingIndicator = document.getElementById('pending-indicator');
+            const pendingCount = document.getElementById('pending-count');
+            
+            if (pendingIndicator && pendingCount) {
+                const count = pendingStatusUpdates.size;
+                
+                if (count > 0) {
+                    pendingCount.textContent = count;
+                    pendingIndicator.style.display = 'flex';
+                } else {
+                    pendingIndicator.style.display = 'none';
                 }
             }
         }
@@ -1275,13 +1859,14 @@
         // Function to create application tile
         function createApplicationTile(application, isNew = false) {
             const tile = document.createElement('div');
-            tile.className = 'application-tile';
+            tile.className = 'application-tile compact'; // Start in compact mode
             
             // Store application ID for click handling
             const appId = generateApplicationId(application);
             tile.dataset.applicationId = appId;
+            tile.dataset.uid = appId; // For status updates
             
-            // Map CSV headers to expected fields (adjust based on actual CSV structure)
+            // Map CSV headers to expected fields
             const timestamp = application['Timestamp'] || application['timestamp'] || '';
             const fullName = application['Full Name'] || application['Full name'] || application['Name'] || '';
             const dateOfBirth = application['Date of Birth'] || application['Birthday'] || application['DOB'] || '';
@@ -1303,62 +1888,89 @@
             
             tile.innerHTML = `
                 ${isNew ? '<div class="new-tag">NEW</div>' : ''}
-                <div class="timestamp">${formatTimestamp(timestamp)}</div>
-                <div class="full-name">${fullName || 'Name not provided'}</div>
-                <div class="date-of-birth">Born: ${formatDate(dateOfBirth)}</div>
-                ${contactNumber ? 
-                    `<a href="tel:${phoneForCall}" class="contact-number">📞 ${phoneDisplay}</a>` : 
-                    '<div class="contact-number">📞 Not provided</div>'
-                }
-                <div class="email">${email || 'No email provided'}</div>
-                <div class="location-status">${locationText}</div>
-                <div class="approval-system" style="position: relative;">
-                    <button class="approval-button ${cssStatus}" data-uid="${appId}">
-                        <span class="status-icon">${getStatusIcon(currentStatus)}</span>
-                        <span class="status-text">${getStatusText(currentStatus)}</span>
-                    </button>
-                    <div class="approval-dropdown">
-                        <div class="approval-option approve" data-status="approved">
-                            <span>✅</span> Approve
+                
+                <!-- Tile Header (always visible) -->
+                <div class="tile-header">
+                    <div class="compact-info">
+                        <div class="full-name">${fullName || 'Name not provided'}</div>
+                        <div class="compact-status ${cssStatus}">
+                            <span class="status-icon">${getStatusIcon(currentStatus)}</span>
+                            <span class="status-text">${getStatusText(currentStatus)}</span>
                         </div>
-                        <div class="approval-option reject" data-status="rejected">
-                            <span>❌</span> Reject
-                        </div>
-                        <div class="approval-option pending-audition" data-status="pending audition">
-                            <span>🎵</span> Pending Audition
-                        </div>
-                        <div class="approval-option pending-exco" data-status="pending exco approval">
-                            <span>📋</span> Pending Exco Approval
-                        </div>
-                        <div class="approval-option called-back" data-status="called back">
-                            <span>📞</span> Called Back
+                    </div>
+                    <div class="expand-indicator">▼</div>
+                </div>
+                
+                <!-- Tile Details (expandable) -->
+                <div class="tile-details">
+                    <div class="timestamp">${formatTimestamp(timestamp)}</div>
+                    <div class="date-of-birth">Born: ${formatDate(dateOfBirth)}</div>
+                    ${contactNumber ? 
+                        `<a href="tel:${phoneForCall}" class="contact-number">📞 ${phoneDisplay}</a>` : 
+                        '<div class="contact-number">📞 Not provided</div>'
+                    }
+                    <div class="email">${email || 'No email provided'}</div>
+                    <div class="location-status">${locationText}</div>
+                    <div class="approval-system" style="position: relative;">
+                        <button class="approval-button ${cssStatus}" data-uid="${appId}">
+                            <span class="status-icon">${getStatusIcon(currentStatus)}</span>
+                            <span class="status-text">${getStatusText(currentStatus)}</span>
+                        </button>
+                        <div class="approval-dropdown">
+                            <div class="approval-option approve" data-status="approved">
+                                <span>✅</span> Approve
+                            </div>
+                            <div class="approval-option reject" data-status="rejected">
+                                <span>❌</span> Reject
+                            </div>
+                            <div class="approval-option pending-audition" data-status="pending audition">
+                                <span>🎵</span> Pending Audition
+                            </div>
+                            <div class="approval-option pending-exco" data-status="pending exco approval">
+                                <span>📋</span> Pending Exco Approval
+                            </div>
+                            <div class="approval-option called-back" data-status="called back">
+                                <span>📞</span> Called Back
+                            </div>
                         </div>
                     </div>
                 </div>
             `;
             
-            // Add click handler to mark as seen and remove NEW tag
-            tile.addEventListener('click', function(e) {
-                // Don't trigger if clicking on phone link, approval button, or dropdown
-                if (e.target.tagName === 'A' && e.target.href.startsWith('tel:')) {
-                    return;
-                }
-                if (e.target.closest('.approval-system')) {
+            // Add click handler for expand/collapse
+            const tileHeader = tile.querySelector('.tile-header');
+            tileHeader.addEventListener('click', function(e) {
+                // Don't expand if clicking on status in compact mode
+                if (e.target.closest('.compact-status')) {
                     return;
                 }
                 
-                // Mark as seen
-                markApplicationAsSeen(appId);
+                // Toggle expanded state
+                tile.classList.toggle('expanded');
+                tile.classList.toggle('compact');
                 
-                // Remove NEW tag if present
-                const newTag = tile.querySelector('.new-tag');
-                if (newTag) {
-                    newTag.style.animation = 'fadeOut 0.3s ease-out forwards';
-                    setTimeout(() => newTag.remove(), 300);
+                // Mark as seen when expanded
+                if (tile.classList.contains('expanded')) {
+                    markApplicationAsSeen(appId);
+                    
+                    // Remove NEW tag if present
+                    const newTag = tile.querySelector('.new-tag');
+                    if (newTag) {
+                        newTag.style.animation = 'fadeOut 0.3s ease-out forwards';
+                        setTimeout(() => newTag.remove(), 300);
+                    }
                 }
             });
             
-            // Set up approval system event listeners
+            // Prevent phone link clicks from toggling tile
+            const phoneLink = tile.querySelector('.contact-number');
+            if (phoneLink && phoneLink.tagName === 'A') {
+                phoneLink.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+            
+            // Set up approval system event listeners (only for expanded mode)
             setupApprovalSystem(tile, appId);
             
             return tile;
@@ -1482,24 +2094,8 @@
                 });
             }
             
-            // Update filter results text
-            updateFilterResults();
-            
             // Re-render the applications grid with filtered data
             renderApplicationsGrid(filteredApplications);
-        }
-
-        // Function to update filter results text
-        function updateFilterResults() {
-            const totalCount = filteredApplications.length;
-            const allCount = allApplications.length;
-            
-            if (currentFilter === 'all') {
-                filterResults.textContent = `Showing all ${totalCount} applications`;
-            } else {
-                const statusText = getStatusText(currentFilter);
-                filterResults.textContent = `Showing ${totalCount} of ${allCount} applications with status: ${statusText}`;
-            }
         }
 
         // Function to render applications grid (separated from display logic)
@@ -1535,9 +2131,14 @@
             const dropdown = tile.querySelector('.approval-dropdown');
             const options = tile.querySelectorAll('.approval-option');
             
-            // Toggle dropdown on button click
+            // Toggle dropdown on button click (only in expanded mode)
             button.addEventListener('click', function(e) {
                 e.stopPropagation();
+                
+                // Only allow interaction when tile is expanded
+                if (!tile.classList.contains('expanded')) {
+                    return;
+                }
                 
                 // Close all other dropdowns
                 document.querySelectorAll('.approval-dropdown.show').forEach(dd => {
@@ -1559,15 +2160,25 @@
                     // Convert status for CSS class (replace spaces with hyphens)
                     const cssStatus = newStatus.replace(/\s+/g, '-').toLowerCase();
                     
-                    // Update button appearance
-                    button.className = `approval-button ${cssStatus}`;
-                    button.querySelector('.status-icon').textContent = statusIcon;
-                    button.querySelector('.status-text').textContent = statusText;
+                    // Show loading state on button
+                    const originalButtonContent = button.innerHTML;
+                    button.innerHTML = '<span class="status-icon">⏳</span><span class="status-text">Updating...</span>';
+                    button.disabled = true;
+                    button.style.opacity = '0.7';
+                    
+                    // Update button appearance immediately for responsiveness
+                    setTimeout(() => {
+                        button.className = `approval-button ${cssStatus}`;
+                        button.querySelector('.status-icon').textContent = statusIcon;
+                        button.querySelector('.status-text').textContent = statusText;
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                    }, 500);
                     
                     // Hide dropdown
                     dropdown.classList.remove('show');
                     
-                    // Submit to Google Form
+                    // Submit to Google Form (this will start polling automatically)
                     const success = await submitStatusToForm(uid, newStatus);
                     
                     if (success) {
@@ -1577,31 +2188,21 @@
                             button.style.transform = 'scale(1)';
                         }, 150);
                         
-                        // Automatically refresh status data after a delay to get updated status from Google Sheets
-                        setTimeout(async () => {
-                            console.log('Auto-refreshing status data after form submission...');
-                            try {
-                                const updatedStatusMap = await fetchStatusData();
-                                statusData = updatedStatusMap;
-                                updateApprovalButtons(); // Update all buttons with new status
-                                
-                                // Re-apply current filter to update the display
-                                applyFilter();
-                                
-                                console.log('Status data refreshed automatically');
-                            } catch (error) {
-                                console.error('Auto-refresh of status data failed:', error);
-                            }
-                        }, 5000); // Wait 5 seconds for Google Sheets to process
+                        console.log(`Status update submitted for UID ${uid}: ${newStatus}`);
+                        console.log('Polling system will verify the update in the CSV');
                         
+                        // Update filter counts immediately
+                        updateFilterCounts();
+                        
+                        // Re-apply current filter to update the display
+                        applyFilter();
                     } else {
-                        // Revert on failure
+                        // Revert button if submission failed
+                        button.innerHTML = originalButtonContent;
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                        
                         alert('Failed to update status. Please try again.');
-                        const previousStatus = statusData.get(uid) || 'pending';
-                        const previousCssStatus = previousStatus.replace(/\s+/g, '-').toLowerCase();
-                        button.className = `approval-button ${previousCssStatus}`;
-                        button.querySelector('.status-icon').textContent = getStatusIcon(previousStatus);
-                        button.querySelector('.status-text').textContent = getStatusText(previousStatus);
                     }
                 });
             });
@@ -1621,7 +2222,34 @@
                 if (a.isNew && !b.isNew) return -1;
                 if (!a.isNew && b.isNew) return 1;
                 
-                // Then sort by timestamp (newest first)
+                // Second, sort by status priority (pending review first, rejected last)
+                const appIdA = generateApplicationId(a);
+                const appIdB = generateApplicationId(b);
+                const statusA = (statusData.get(appIdA) || 'pending').toLowerCase();
+                const statusB = (statusData.get(appIdB) || 'pending').toLowerCase();
+                
+                // Define status priority (lower number = higher priority)
+                const getStatusPriority = (status) => {
+                    switch (status) {
+                        case 'pending': return 1; // Highest priority (top)
+                        case 'pending audition': return 2;
+                        case 'called back': return 3;
+                        case 'pending exco approval': return 4;
+                        case 'approved': return 5;
+                        case 'rejected': return 6; // Lowest priority (bottom)
+                        default: return 1; // Default to pending priority
+                    }
+                };
+                
+                const priorityA = getStatusPriority(statusA);
+                const priorityB = getStatusPriority(statusB);
+                
+                // Sort by status priority first
+                if (priorityA !== priorityB) {
+                    return priorityA - priorityB;
+                }
+                
+                // Then sort by timestamp (newest first) within the same status
                 const timestampA = a['Timestamp'] || a['timestamp'] || '';
                 const timestampB = b['Timestamp'] || b['timestamp'] || '';
                 
@@ -1648,14 +2276,14 @@
             const seenApps = getSeenApplications();
             
             if (initialLoad || previousApplications.length === 0) {
-                // First load - check against seen applications in localStorage
-                const newApps = currentApplications.map(app => ({
+                // First load - don't mark any applications as new since we have no previous state to compare against
+                const appsWithoutNewFlag = currentApplications.map(app => ({
                     ...app,
-                    isNew: !seenApps.has(generateApplicationId(app))
+                    isNew: false  // No applications are "new" on first load
                 }));
                 
                 initialLoad = false;
-                return newApps;
+                return appsWithoutNewFlag;
             }
             
             const previousIds = new Set(previousApplications.map(generateApplicationId));
@@ -1680,18 +2308,94 @@
             return appsWithNewFlag;
         }
 
+        // Function to check if an application should be hidden (rejected and older than 2 days)
+        function shouldHideApplication(application) {
+            const appId = generateApplicationId(application);
+            const appStatus = statusData.get(appId) || 'pending';
+            
+            // Only hide if status is rejected
+            if (appStatus.toLowerCase() !== 'rejected') {
+                return false;
+            }
+            
+            // Check if application is older than 2 days
+            const timestamp = application['Timestamp'] || application['timestamp'] || '';
+            if (!timestamp) {
+                return false; // Don't hide if no timestamp
+            }
+            
+            try {
+                const applicationDate = new Date(timestamp);
+                if (isNaN(applicationDate.getTime())) {
+                    return false; // Don't hide if invalid date
+                }
+                
+                const now = new Date();
+                const twoDaysAgo = new Date(now.getTime() - (2 * 24 * 60 * 60 * 1000)); // 2 days in milliseconds
+                
+                return applicationDate < twoDaysAgo;
+            } catch (e) {
+                console.error('Error checking application age:', e);
+                return false; // Don't hide if error parsing date
+            }
+        }
+
+        // Function to filter out old rejected applications
+        function filterValidApplications(applications) {
+            const filteredApps = applications.filter(app => !shouldHideApplication(app));
+            const hiddenCount = applications.length - filteredApps.length;
+            
+            if (hiddenCount > 0) {
+                console.log(`Filtered out ${hiddenCount} old rejected applications (older than 2 days)`);
+            }
+            
+            return filteredApps;
+        }
+
         // Function to update statistics
-        function updateStatistics(applications) {
-            const total = applications.length;
-            const inArea = applications.filter(app => {
+        function updateStatistics(allOriginalApplications, visibleApplications) {
+            // Total includes all applications (including hidden rejected ones)
+            const total = allOriginalApplications.length;
+            
+            // Count applications in Gan/Fonadhoo from visible applications only
+            const inArea = visibleApplications.filter(app => {
                 const location = app['Are you residing in L.Gan/Fonadhoo?'] || app['Location'] || '';
                 return location.toLowerCase().includes('yes');
             }).length;
-            const outArea = total - inArea;
             
+            // Count by status from visible applications only
+            let pendingAuditionCount = 0;
+            let calledBackCount = 0;
+            let pendingExcoCount = 0;
+            let approvedCount = 0;
+            
+            visibleApplications.forEach(app => {
+                const appId = generateApplicationId(app);
+                const status = (statusData.get(appId) || 'pending').toLowerCase();
+                
+                switch (status) {
+                    case 'pending audition':
+                        pendingAuditionCount++;
+                        break;
+                    case 'called back':
+                        calledBackCount++;
+                        break;
+                    case 'pending exco approval':
+                        pendingExcoCount++;
+                        break;
+                    case 'approved':
+                        approvedCount++;
+                        break;
+                }
+            });
+            
+            // Update the display
             totalApplicationsEl.textContent = total;
+            pendingAuditionCountEl.textContent = pendingAuditionCount;
+            calledBackCountEl.textContent = calledBackCount;
+            pendingExcoCountEl.textContent = pendingExcoCount;
+            approvedCountEl.textContent = approvedCount;
             inAreaCountEl.textContent = inArea;
-            outAreaCountEl.textContent = outArea;
         }
 
         // Function to display applications
@@ -1704,8 +2408,16 @@
                 return;
             }
             
+            // Filter out old rejected applications (older than 2 days)
+            const validApplications = filterValidApplications(applications);
+            
+            if (validApplications.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
             // Sort applications by timestamp (latest first)
-            const sortedApplications = sortApplicationsByTimestamp(applications);
+            const sortedApplications = sortApplicationsByTimestamp(validApplications);
             
             // Identify new applications
             const applicationsWithNewFlag = identifyNewApplications(sortedApplications);
@@ -1716,8 +2428,8 @@
             // Store all applications for filtering
             allApplications = [...finalSortedApplications];
             
-            // Update statistics (always show stats for all applications)
-            updateStatistics(finalSortedApplications);
+            // Update statistics (pass both original and filtered applications)
+            updateStatistics(applications, finalSortedApplications);
             statsContainer.style.display = 'block';
             
             // Show filter container
@@ -1870,10 +2582,35 @@
 
         // Initialize the page
         document.addEventListener('DOMContentLoaded', async function() {
+            // Set up filter system
+            setupFilterSystem();
+            
             // Wait for config to load before fetching applications
             await waitForConfig();
             console.log('Config loaded, fetching applications...');
             fetchApplications();
+        });
+
+        // Clean up polling when page unloads
+        window.addEventListener('beforeunload', function() {
+            stopStatusPolling();
+        });
+
+        // Also clean up when page becomes hidden (mobile browsers)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Page is hidden, stop polling to save resources
+                if (isPollingForUpdates) {
+                    console.log('Page hidden, pausing status polling');
+                    stopStatusPolling();
+                }
+            } else {
+                // Page is visible again, resume polling if there are pending updates
+                if (pendingStatusUpdates.size > 0 && !isPollingForUpdates) {
+                    console.log('Page visible again, resuming status polling');
+                    startStatusPolling();
+                }
+            }
         });
 
         // Refresh data every 2 minutes
