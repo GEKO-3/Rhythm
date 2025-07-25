@@ -1628,6 +1628,42 @@
             console.log('Config loaded, submitting form...');
             console.log('Form URL:', window.RhythmConfig.sponsorProposalForm);
             
+            // Get form entries
+            const entries = window.RhythmConfig.sponsorProposalEntries;
+            console.log('Form entries:', entries);
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append(entries.name, name);
+            formData.append(entries.phone, phone);
+            formData.append(entries.company, company);
+            formData.append(entries.interest, interest);
+            
+            console.log('Submitting with data:', {
+                [entries.name]: name,
+                [entries.phone]: phone,
+                [entries.company]: company,
+                [entries.interest]: interest
+            });
+            
+            // Submit using fetch with no-cors mode
+            fetch(window.RhythmConfig.sponsorProposalForm, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            }).then(() => {
+                console.log('Form submitted successfully via fetch');
+                handleSponsorSubmissionSuccess(name, submitBtn, originalText);
+            }).catch(error => {
+                console.error('Fetch submission failed, trying iframe method:', error);
+                // Fallback to iframe method
+                submitSponsorViaIframe(name, phone, company, interest, submitBtn, originalText);
+            });
+        }
+        
+        function submitSponsorViaIframe(name, phone, company, interest, submitBtn, originalText) {
+            console.log('Using iframe fallback method');
+            
             // Create hidden iframe
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
@@ -1666,10 +1702,8 @@
             const handleSubmission = () => {
                 if (!submitted) {
                     submitted = true;
-                    console.log('Form submitted successfully');
-                    
-                    // Save submission timestamp to prevent spam
-                    saveSubmissionTimestamp();
+                    console.log('Iframe form submitted successfully');
+                    handleSponsorSubmissionSuccess(name, submitBtn, originalText);
                     
                     // Clean up
                     setTimeout(() => {
@@ -1680,11 +1714,6 @@
                             document.body.removeChild(iframe);
                         }
                     }, 1000);
-                    
-                    // Show success message in form
-                    setTimeout(() => {
-                        showSuccessMessage(name);
-                    }, 1500);
                 }
             };
 
@@ -1693,30 +1722,42 @@
             
             // Add error handling
             iframe.addEventListener('error', (error) => {
-                console.error('Form submission error:', error);
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-                alert('There was an error submitting the form. Please try again.');
+                console.error('Iframe submission error:', error);
+                handleSponsorSubmissionError(submitBtn, originalText);
             });
 
             // Fallback timeout
             setTimeout(() => {
                 if (!submitted) {
-                    console.log('Form submission timeout - assuming success');
+                    console.log('Iframe submission timeout - assuming success');
                     handleSubmission();
                 }
             }, 5000);
 
             // Submit the form
             try {
-                console.log('Submitting form to:', hiddenForm.action);
+                console.log('Submitting iframe form to:', hiddenForm.action);
                 hiddenForm.submit();
             } catch (error) {
-                console.error('Form submission failed:', error);
-                submitBtn.disabled = false;
-                submitBtn.textContent = originalText;
-                alert('There was an error submitting the form. Please check your internet connection and try again.');
+                console.error('Iframe form submission failed:', error);
+                handleSponsorSubmissionError(submitBtn, originalText);
             }
+        }
+        
+        function handleSponsorSubmissionSuccess(name, submitBtn, originalText) {
+            // Save submission timestamp to prevent spam
+            saveSubmissionTimestamp();
+            
+            // Show success message in form
+            setTimeout(() => {
+                showSuccessMessage(name);
+            }, 1500);
+        }
+        
+        function handleSponsorSubmissionError(submitBtn, originalText) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
+            alert('There was an error submitting the form. Please check your internet connection and try again.');
         }
         
         // Smooth scrolling for better UX
