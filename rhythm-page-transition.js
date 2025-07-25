@@ -116,6 +116,9 @@ class RhythmPageTransition {
         timestamp: Date.now()
       };
       
+      // Mark this as navigation, not a fresh load
+      sessionStorage.setItem('navigationInProgress', 'true');
+      
       history.pushState(state, 'Songs - Rhythm Boduberu', 'songlist.html');
       window.location.href = 'songlist.html';
       
@@ -195,6 +198,9 @@ class RhythmPageTransition {
         songId: songId,
         timestamp: Date.now()
       };
+      
+      // Mark this as navigation, not a fresh load
+      sessionStorage.setItem('navigationInProgress', 'true');
       
       history.pushState(state, 'Lyrics - Rhythm Boduberu', 'lyrics-csv.html');
       window.location.href = 'lyrics-csv.html';

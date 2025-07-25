@@ -1991,9 +1991,10 @@
             }
           });
           
-          // Save current scroll position
+          // Save current scroll position and mark as navigation
           localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
           localStorage.setItem('selectedSongId', song.id);
+          sessionStorage.setItem('navigationInProgress', 'true'); // Mark this as navigation, not fresh load
           
           // Use shared page transition service for seamless navigation
           if (window.RhythmPageTransition) {
@@ -2115,20 +2116,30 @@
             LoadingScreen.show('Initializing services...');
             await this.waitForServices();
 
+            // Check if this is a fresh page load (not navigation from another page)
+            const isFreshLoad = !sessionStorage.getItem('navigationInProgress') && 
+                               !localStorage.getItem('songListScrollPosition');
+            
+            // Clear navigation flag if it exists
+            sessionStorage.removeItem('navigationInProgress');
+
             // Try shared data service first
             if (window.RhythmData) {
               console.log('Using shared data service');
               LoadingScreen.show('Loading songs...');
               
               try {
-                // Use fast cached data for navigation
-                await window.RhythmData.loadSongsData(false, false); // Don't skip loading events for initial load
+                // Force fresh data on fresh loads, use cache on navigation
+                const forceRefresh = isFreshLoad;
+                console.log(isFreshLoad ? '🔄 Fresh page load - fetching updated CSV data' : '⚡ Navigation - using cached data');
+                
+                await window.RhythmData.loadSongsData(forceRefresh, false);
                 const songs = await window.RhythmData.getAllSongs();
                 STATE.songs = songs;
                 window.songs = songs; // Global compatibility
                 
                 console.log('Songs loaded:', songs.length);
-                LoadingScreen.show('Songs loaded successfully!');
+                LoadingScreen.show(isFreshLoad ? 'CSV data updated successfully!' : 'Songs loaded successfully!');
                 
                 // Small delay to show success message
                 setTimeout(() => {
