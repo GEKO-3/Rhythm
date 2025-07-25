@@ -288,6 +288,11 @@
       padding: 0;
       margin: 0;
       margin-top: calc(max(env(safe-area-inset-top, 0px), 0px) + 85px);
+      /* Optimize for smooth scrolling and rendering */
+      will-change: scroll-position;
+      -webkit-overflow-scrolling: touch;
+      transform: translateZ(0); /* Force hardware acceleration */
+      contain: layout style; /* Optimize reflow performance */
     }
 
     ul#song-list li {
@@ -302,6 +307,12 @@
       font-family: var(--font-family);
       border: 1px solid transparent;
       backdrop-filter: blur(10px);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      /* Optimize for smooth rendering during scroll */
+      will-change: transform, background-color;
+      transform: translateZ(0); /* Force hardware acceleration */
+      contain: layout; /* Optimize reflow performance */
     }
 
     ul#song-list li:hover {
@@ -315,6 +326,16 @@
 
     ul#song-list li:active {
       transform: translateY(0);
+      background: var(--active-color);
+      color: var(--text-color);
+    }
+    
+    /* Ensure clicked state doesn't persist */
+    ul#song-list li:focus {
+      outline: none;
+      background: var(--card-bg);
+      color: var(--primary-color);
+      transform: none;
     }
     
     /* PIN Entry Styles */
@@ -446,12 +467,21 @@
       justify-content: center;
       align-items: center;
       z-index: 10000;
-      transition: opacity 0.6s ease-out;
+      transition: opacity 0.2s ease-out;
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .loading-screen:not(.fade-out) {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transition: none !important; /* No transition when showing */
     }
 
     .loading-screen.fade-out {
       opacity: 0;
       pointer-events: none;
+      visibility: hidden;
     }
 
     .loading-logo {
@@ -746,8 +776,11 @@
     <ul id="song-list"></ul>
   </div>
   <script src="lyrics-showlist-config.js"></script>
+  <script src="rhythm-session-manager.js"></script>
+  <script src="rhythm-data-service.js"></script>
+  <script src="rhythm-page-transition.js"></script>
   <script>
-    // Optimized Application Module
+    // Optimized Application Module using Shared Services
     const RhythmSongList = (function() {
       'use strict';
       
@@ -756,7 +789,7 @@
         PIN_AUTH: 'ODc2NQ==',
         MAX_ATTEMPTS: 5,
         LOCKOUT_DURATION: 60 * 60 * 1000, // 1 hour
-        SESSION_TIMEOUT: 3 * 60 * 1000, // 3 minutes
+        SESSION_TIMEOUT: 15 * 60 * 1000, // 15 minutes
         SEARCH_DEBOUNCE: 300,
         CSV_ENDPOINTS: {
           get songs() { return window.RhythmLyricsShowConfig?.lyricsSheet || 'fallback_url'; },
@@ -766,16 +799,15 @@
       };
 
       const STATE = {
-        pinAuthenticated: false,
         songs: [],
         currentShowList: [],
         currentGenreFilter: 'all',
+        searchDebounceTimer: null,
+        isLoadingData: false,
+        isInitialized: false,
+        searchTimeout: null,
         attemptCount: 0,
-        sessionTimer: null,
-        lockoutTimer: null,
-        lastActivityTime: Date.now(),
-        isPageVisible: true,
-        searchTimeout: null
+        pinAuthenticated: false
       };
 
       // DOM Elements Cache
@@ -928,11 +960,12 @@
               const session = JSON.parse(sessionData);
               const sessionAge = Date.now() - session.timestamp;
               
-              if (session.authenticated && sessionAge < CONFIG.SESSION_TIMEOUT) {
+              // Be more lenient with existing sessions - only expire if much older
+              if (session.authenticated && sessionAge < (CONFIG.SESSION_TIMEOUT * 3)) {
                 STATE.pinAuthenticated = true;
                 this.hidePinOverlay();
                 DataManager.loadSongsData();
-                SessionManager.startSessionTimeout();
+                SessionManager.refreshSession(); // Refresh instead of starting timeout
                 return;
               }
             } catch (e) {
@@ -1038,8 +1071,7 @@
             sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
             
             this.hidePinOverlay();
-            DataManager.loadSongsData();
-            SessionManager.startSessionTimeout();
+            App.loadData(); // Use App.loadData instead of DataManager.loadSongsData
           } else {
             STATE.attemptCount++;
             localStorage.setItem('pinAttemptCount', STATE.attemptCount.toString());
@@ -1132,17 +1164,34 @@
             if (document.visibilityState === 'visible') {
               STATE.isPageVisible = true;
               this.updateLastActivity();
-              if (STATE.pinAuthenticated && Date.now() - STATE.lastActivityTime > CONFIG.SESSION_TIMEOUT) {
-                this.expireSession();
+              // Don't expire session when page becomes visible - just refresh the session
+              if (STATE.pinAuthenticated) {
+                this.refreshSession();
               }
             } else {
               STATE.isPageVisible = false;
-              this.clearSessionTimeout();
+              // Only start timeout when page becomes hidden
+              if (STATE.pinAuthenticated) {
+                this.startBackgroundTimeout();
+              }
             }
           });
 
-          window.addEventListener('focus', () => this.updateLastActivity());
-          window.addEventListener('blur', () => this.clearSessionTimeout());
+          window.addEventListener('focus', () => {
+            STATE.isPageVisible = true;
+            this.updateLastActivity();
+            if (STATE.pinAuthenticated) {
+              this.clearSessionTimeout();
+              this.refreshSession();
+            }
+          });
+          
+          window.addEventListener('blur', () => {
+            // Don't clear session immediately on blur, only start timeout
+            if (STATE.pinAuthenticated) {
+              this.startBackgroundTimeout();
+            }
+          });
         },
 
         setupActivityTracking() {
@@ -1154,16 +1203,41 @@
 
         updateLastActivity() {
           STATE.lastActivityTime = Date.now();
-          if (STATE.pinAuthenticated && STATE.isPageVisible) {
-            this.startSessionTimeout();
+          if (STATE.pinAuthenticated) {
+            this.refreshSession();
+            // Clear any existing timeout since user is active
+            this.clearSessionTimeout();
           }
         },
 
-        startSessionTimeout() {
+        refreshSession() {
+          // Update session storage to keep it fresh
+          const sessionData = {
+            timestamp: Date.now(),
+            authenticated: true,
+            sessionType: 'songlist'
+          };
+          sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
+        },
+
+        startBackgroundTimeout() {
+          // Only start timeout when page is not visible/focused
           this.clearSessionTimeout();
           STATE.sessionTimer = setTimeout(() => {
-            this.expireSession();
+            // Only expire if page is still not visible
+            if (!STATE.isPageVisible || document.visibilityState === 'hidden') {
+              this.expireSession();
+            }
           }, CONFIG.SESSION_TIMEOUT);
+        },
+
+        startSessionTimeout() {
+          // Legacy method - now just refreshes session if page is visible
+          if (STATE.isPageVisible && document.visibilityState === 'visible') {
+            this.refreshSession();
+          } else {
+            this.startBackgroundTimeout();
+          }
         },
 
         clearSessionTimeout() {
@@ -1174,18 +1248,19 @@
         },
 
         expireSession() {
+          // Only expire if page is actually hidden/not focused
+          if (STATE.isPageVisible && document.visibilityState === 'visible') {
+            console.log('Skipping session expiry - page is visible');
+            return;
+          }
+
           STATE.pinAuthenticated = false;
           sessionStorage.removeItem('pinSession');
           this.clearSessionTimeout();
           
           LoadingScreen.hide();
           ELEMENTS.pinOverlay.classList.remove('hidden');
-          PinSecurity.clearPinInputs();
-          
-          setTimeout(() => ELEMENTS.pinDigits[0].focus(), 300);
-          
-          PinSecurity.showPinError('Session expired. Please enter PIN again.');
-          setTimeout(() => PinSecurity.clearPinError(), 3000);
+          // Session expired - will be handled by shared session manager events
         }
       };
 
@@ -1236,18 +1311,65 @@
 
         show(text = 'Loading Songs...') {
           if (ELEMENTS.loadingScreen) {
+            // Clear any pending hide timeouts
+            this.clearHideTimeouts();
+            
+            // Set navigation mode if this is a lyrics loading request
+            if (text.includes('lyrics') || text.includes('Lyrics')) {
+              this.navigationMode = true;
+            } else {
+              this.navigationMode = false;
+            }
+            
             ELEMENTS.loadingScreen.classList.remove('fade-out');
             ELEMENTS.loadingScreen.style.display = 'flex';
             ELEMENTS.loadingScreen.style.opacity = '1';
+            ELEMENTS.loadingScreen.style.visibility = 'visible';
+            ELEMENTS.loadingScreen.style.pointerEvents = 'auto';
+            ELEMENTS.loadingScreen.style.transition = 'none';
             
+            // Reset any fade-out classes
+            if (ELEMENTS.loadingLogo) {
+              ELEMENTS.loadingLogo.classList.remove('fade-out');
+            }
             if (ELEMENTS.loadingProgress) {
+              ELEMENTS.loadingProgress.classList.remove('fade-out');
               ELEMENTS.loadingProgress.textContent = text;
             }
+            if (ELEMENTS.patternContainer) {
+              ELEMENTS.patternContainer.classList.remove('fade-out');
+            }
+          }
+        },
+
+        clearHideTimeouts() {
+          if (this.hideTimeout1) {
+            clearTimeout(this.hideTimeout1);
+            this.hideTimeout1 = null;
+          }
+          if (this.hideTimeout2) {
+            clearTimeout(this.hideTimeout2);
+            this.hideTimeout2 = null;
+          }
+          if (this.hideTimeout3) {
+            clearTimeout(this.hideTimeout3);
+            this.hideTimeout3 = null;
           }
         },
 
         hide() {
           if (!ELEMENTS.loadingScreen) return;
+          
+          // Check if loading screen is in navigation mode (should not be hidden by songlist)
+          if (this.navigationMode) {
+            console.log('🛡️ Loading screen in navigation mode - ignoring hide request');
+            return;
+          }
+
+          console.log('⬇️ Hiding loading screen');
+          
+          // Clear any existing timeouts first
+          this.clearHideTimeouts();
 
           // Start enlarging animation
           ELEMENTS.loadingScreen.classList.add('fade-out');
@@ -1255,7 +1377,7 @@
           ELEMENTS.loadingScreen.style.opacity = '1';
 
           // Start fade out after a brief delay
-          setTimeout(() => {
+          this.hideTimeout1 = setTimeout(() => {
             ELEMENTS.loadingScreen.style.transition = 'opacity 0.6s ease-out';
             
             // Fade out logo and text
@@ -1272,12 +1394,12 @@
             }
             
             // Fade out background
-            setTimeout(() => {
+            this.hideTimeout2 = setTimeout(() => {
               ELEMENTS.loadingScreen.style.opacity = '0';
             }, 200);
             
             // Hide the loading screen completely
-            setTimeout(() => {
+            this.hideTimeout3 = setTimeout(() => {
               ELEMENTS.loadingScreen.style.display = 'none';
               ELEMENTS.loadingScreen.classList.remove('fade-out');
               if (ELEMENTS.loadingLogo) {
@@ -1289,8 +1411,20 @@
               if (ELEMENTS.patternContainer) {
                 ELEMENTS.patternContainer.classList.remove('fade-out');
               }
+              
+              // Clear timeout references and navigation mode
+              this.hideTimeout1 = null;
+              this.hideTimeout2 = null;
+              this.hideTimeout3 = null;
+              this.navigationMode = false;
             }, 1000);
           }, 200);
+        },
+        
+        forceHide() {
+          // Force hide even in navigation mode (for lyrics page completion)
+          this.navigationMode = false;
+          this.hide();
         }
       };
 
@@ -1463,6 +1597,10 @@
           ELEMENTS.filterBtn = document.getElementById('filter-btn');
           ELEMENTS.filterDropdown = document.querySelector('.filter-dropdown');
           ELEMENTS.filterContent = document.getElementById('filter-content');
+          
+          // Cache loading screen elements for immediate access
+          this.loadingScreenElement = document.getElementById('loading-screen');
+          this.loadingProgressElement = document.getElementById('loading-progress');
         },
 
         setupEventListeners() {
@@ -1615,45 +1753,271 @@
             return;
           }
 
-          // Render songs with DocumentFragment for better performance
-          const fragment = document.createDocumentFragment();
+          // Render songs with chunked rendering for smooth scrolling
+          this.renderSongsChunked(filteredSongs);
+        },
+
+        renderSongsChunked(songs) {
+          // Clear existing content
+          ELEMENTS.songList.innerHTML = '';
           
-          filteredSongs.forEach(song => {
-            const li = this.createSongElement(song);
-            fragment.appendChild(li);
-          });
+          // Render in chunks to prevent blocking and ensure smooth scrolling
+          const CHUNK_SIZE = 20; // Render 20 songs at a time
+          let currentIndex = 0;
           
-          ELEMENTS.songList.appendChild(fragment);
+          const renderChunk = () => {
+            const chunk = songs.slice(currentIndex, currentIndex + CHUNK_SIZE);
+            const fragment = document.createDocumentFragment();
+            
+            chunk.forEach(song => {
+              const li = this.createSongElement(song);
+              fragment.appendChild(li);
+            });
+            
+            ELEMENTS.songList.appendChild(fragment);
+            currentIndex += CHUNK_SIZE;
+            
+            // Continue rendering if there are more songs
+            if (currentIndex < songs.length) {
+              // Use requestAnimationFrame for smooth rendering
+              requestAnimationFrame(renderChunk);
+            }
+          };
+          
+          // Start rendering
+          renderChunk();
         },
 
         createSongElement(song) {
           const li = document.createElement('li');
           li.textContent = song.name;
           li.style.color = '#f5d467'; // All songs yellow since CSV doesn't have English lyrics
+          li.style.transition = 'all 0.1s ease'; // Smooth transitions for touch feedback
           
-          li.addEventListener('click', () => {
+          // Touch/scroll tracking for preventing accidental clicks
+          let touchStartY = 0;
+          let touchStartX = 0;
+          let touchStartTime = 0;
+          let hasMoved = false;
+          let isScrolling = false;
+          let scrollDetectionTimeout = null;
+          
+          li.addEventListener('click', (e) => {
+            // Prevent click if user was scrolling
+            if (isScrolling || hasMoved) {
+              e.preventDefault();
+              e.stopPropagation();
+              return;
+            }
+            
+            // Show loading screen IMMEDIATELY - before any other processing
+            this.showLoadingScreenImmediate();
+            
+            // Prevent any default behavior
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Handle the click immediately - no setTimeout needed
             this.handleSongClick(song);
           });
+          
+          // Add mousedown for even faster response on desktop
+          li.addEventListener('mousedown', (e) => {
+            // Only show loading for actual clicks, not during scroll
+            if (!isScrolling && !hasMoved) {
+              this.showLoadingScreenImmediate();
+            }
+          }, { passive: true });
+          
+          // Add touch event handlers with improved scroll detection
+          li.addEventListener('touchstart', (e) => {
+            const touch = e.touches[0];
+            touchStartY = touch.clientY;
+            touchStartX = touch.clientX;
+            touchStartTime = Date.now();
+            hasMoved = false;
+            isScrolling = false;
+            
+            // Clear any existing scroll detection timeout
+            if (scrollDetectionTimeout) {
+              clearTimeout(scrollDetectionTimeout);
+            }
+            
+            // Visual feedback only - don't trigger loading yet
+            li.style.background = 'var(--active-color)';
+            li.style.color = 'var(--text-color)';
+            li.style.transform = 'scale(0.98)'; // Subtle press effect
+          }, { passive: true });
+          
+          li.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            const touchCurrentY = touch.clientY;
+            const touchCurrentX = touch.clientX;
+            
+            const moveDistanceY = Math.abs(touchCurrentY - touchStartY);
+            const moveDistanceX = Math.abs(touchCurrentX - touchStartX);
+            
+            // More sensitive scroll detection - any movement over 5px
+            if (moveDistanceY > 5 || moveDistanceX > 5) {
+              hasMoved = true;
+              
+              // If vertical movement is greater, it's likely scrolling
+              if (moveDistanceY > moveDistanceX) {
+                isScrolling = true;
+              }
+              
+              // Reset visual feedback since this is movement
+              li.style.background = '';
+              li.style.color = '';
+              li.style.transform = ''; // Remove press effect
+            }
+          }, { passive: true });
+          
+          li.addEventListener('touchend', (e) => {
+            const touchEndTime = Date.now();
+            const touchDuration = touchEndTime - touchStartTime;
+            
+            // Set a timeout to reset scrolling state
+            scrollDetectionTimeout = setTimeout(() => {
+              isScrolling = false;
+              hasMoved = false;
+            }, 150); // Longer timeout for better scroll detection
+            
+            // Only handle as click if:
+            // 1. Touch was brief (less than 200ms for better responsiveness)
+            // 2. User didn't move much
+            // 3. Not currently scrolling
+            if (!hasMoved && !isScrolling && touchDuration < 200) {
+              // Show loading screen for valid tap
+              this.showLoadingScreenImmediate();
+              
+              e.preventDefault();
+              this.handleSongClick(song);
+            } else {
+              // Reset styling for scroll/invalid touch
+              setTimeout(() => {
+                if (!li.dataset.navigating) {
+                  li.style.background = '';
+                  li.style.color = '';
+                  li.style.transform = ''; // Reset scale
+                }
+              }, 100);
+            }
+          }, { passive: false });
+          
+          li.addEventListener('touchcancel', () => {
+            li.style.background = '';
+            li.style.color = '';
+          }, { passive: true });
           
           return li;
         },
 
+        showLoadingScreenImmediate() {
+          console.log('🚀 Showing loading screen immediately');
+          
+          // Prevent multiple rapid calls
+          if (this.loadingShown && !this.allowOverride) {
+            console.log('⚠️ Loading already shown, ignoring');
+            return;
+          }
+          this.loadingShown = true;
+          this.allowOverride = false;
+          
+          // Use cached loading screen element for maximum speed
+          if (!this.loadingScreenElement) {
+            this.loadingScreenElement = document.getElementById('loading-screen');
+            this.loadingProgressElement = document.getElementById('loading-progress');
+          }
+          
+          // Clear any pending hide operations from LoadingScreen and set navigation mode
+          if (window.LoadingScreen && typeof window.LoadingScreen.clearHideTimeouts === 'function') {
+            console.log('🛑 Clearing LoadingScreen timeouts and setting navigation mode');
+            window.LoadingScreen.clearHideTimeouts();
+            window.LoadingScreen.navigationMode = true;
+          }
+          
+          // Show loading screen with multiple methods for immediate response
+          if (window.LoadingScreen) {
+            window.LoadingScreen.show('Loading lyrics...');
+          }
+          
+          // Direct DOM manipulation as immediate fallback
+          if (this.loadingScreenElement) {
+            this.loadingScreenElement.style.display = 'flex';
+            this.loadingScreenElement.style.opacity = '1';
+            this.loadingScreenElement.style.visibility = 'visible';
+            this.loadingScreenElement.style.pointerEvents = 'auto';
+            this.loadingScreenElement.style.transition = 'none';
+            this.loadingScreenElement.classList.remove('fade-out');
+            
+            // Reset any child element fade-out states
+            const loadingLogo = this.loadingScreenElement.querySelector('.loading-logo');
+            const patternContainer = this.loadingScreenElement.querySelector('#pattern-container');
+            
+            if (loadingLogo) loadingLogo.classList.remove('fade-out');
+            if (patternContainer) patternContainer.classList.remove('fade-out');
+            
+            if (this.loadingProgressElement) {
+              this.loadingProgressElement.textContent = 'Loading lyrics...';
+              this.loadingProgressElement.classList.remove('fade-out');
+            }
+          }
+          
+          console.log('✅ Loading screen shown successfully');
+          
+          // Reset override flag after a short delay
+          setTimeout(() => {
+            this.allowOverride = true;
+          }, 500);
+        },
+
         handleSongClick(song) {
+          // Prevent multiple rapid clicks
+          if (this.navigating) return;
+          this.navigating = true;
+          
+          // Loading screen should already be visible from immediate show
+          // Don't show it again to avoid any delay
+          
+          // Clear active state immediately for better UX
+          this.clearAllActiveSongs();
+          
+          // Mark this song as navigating to prevent style reset
+          const songElements = document.querySelectorAll('ul#song-list li');
+          songElements.forEach(el => {
+            if (el.textContent.trim() === song.name) {
+              el.dataset.navigating = 'true';
+            }
+          });
+          
           // Save current scroll position
           localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
           localStorage.setItem('selectedSongId', song.id);
           
-          // Refresh session before navigating
-          if (STATE.pinAuthenticated) {
-            const sessionData = {
-              timestamp: Date.now(),
-              authenticated: true,
-              sessionType: 'songlist'
-            };
-            sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
+          // Use shared page transition service for seamless navigation
+          if (window.RhythmPageTransition) {
+            window.RhythmPageTransition.navigateToLyrics(song.id);
+          } else {
+            // Fallback: Refresh session before navigating
+            if (window.RhythmSession && window.RhythmSession.isAuthenticated()) {
+              window.RhythmSession.refreshSession();
+            }
+            
+            window.location.href = 'lyrics-csv.html';
           }
-          
-          window.location.href = 'lyrics-csv.html';
+        },
+        
+        clearAllActiveSongs() {
+          const allSongs = document.querySelectorAll('ul#song-list li');
+          allSongs.forEach(songElement => {
+            songElement.style.background = '';
+            songElement.style.color = '';
+            songElement.style.transform = '';
+            songElement.classList.remove('active');
+            songElement.removeAttribute('data-active');
+            songElement.removeAttribute('data-navigating');
+          });
         },
 
         showMessage(message, color = '#999') {
@@ -1685,14 +2049,92 @@
 
       // Main Application Object
       const App = {
-        init() {
-          document.addEventListener('DOMContentLoaded', () => {
-            LoadingScreen.init();
-            LoadingScreen.show('Initializing...');
-            PinSecurity.init();
-            SessionManager.init();
-            UI.init();
+        async init() {
+          document.addEventListener('DOMContentLoaded', async () => {
+            try {
+              console.log('Starting app initialization...');
+              LoadingScreen.init();
+              LoadingScreen.show('Initializing...');
+
+              // Initialize basic PIN system first
+              PinSecurity.init();
+              UI.init();
+
+              STATE.isInitialized = true;
+              console.log('App initialization complete');
+            } catch (error) {
+              console.error('Failed to initialize app:', error);
+              LoadingScreen.updateProgress('Initialization failed: ' + error.message);
+            }
           });
+        },
+
+        async waitForServices() {
+          return new Promise((resolve, reject) => {
+            console.log('Waiting for shared services...');
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds max wait
+            
+            const checkServices = () => {
+              attempts++;
+              console.log(`Checking services (attempt ${attempts}):`, {
+                RhythmSession: !!window.RhythmSession,
+                RhythmData: !!window.RhythmData,
+                RhythmPageTransition: !!window.RhythmPageTransition,
+                config: !!window.RhythmLyricsShowConfig
+              });
+              
+              if (window.RhythmSession && window.RhythmData && window.RhythmPageTransition) {
+                console.log('All services loaded successfully!');
+                resolve();
+              } else if (attempts >= maxAttempts) {
+                console.error('Services failed to load within timeout');
+                // Continue anyway for fallback functionality
+                resolve();
+              } else {
+                setTimeout(checkServices, 100);
+              }
+            };
+            checkServices();
+          });
+        },
+
+        async loadData() {
+          try {
+            // Check authentication state
+            const isAuthenticated = STATE.pinAuthenticated || 
+              (window.RhythmSession && window.RhythmSession.isAuthenticated());
+            
+            if (!isAuthenticated) {
+              console.log('Not authenticated, skipping data load');
+              LoadingScreen.hide();
+              return;
+            }
+
+            // Try shared data service first
+            if (window.RhythmData) {
+              console.log('Using shared data service');
+              LoadingScreen.show('Loading songs...');
+              
+              // Use fast cached data for navigation
+              await window.RhythmData.loadSongsData(false, false); // Don't skip loading events for initial load
+              const songs = await window.RhythmData.getAllSongs();
+              STATE.songs = songs;
+              
+              UI.renderSongs(STATE.songs);
+              UI.showUI();
+              LoadingScreen.hide();
+            } else {
+              // Use DataManager which handles its own loading flow
+              console.log('Using DataManager - it will handle the complete loading flow');
+              DataManager.loadSongsData();
+              // DataManager handles LoadingScreen and UI updates internally
+            }
+          } catch (error) {
+            console.error('Failed to load songs:', error);
+            LoadingScreen.updateProgress('Failed to load songs');
+            LoadingScreen.hide();
+          }
         },
 
         setFilter(genre) {
@@ -1710,7 +2152,6 @@
 
       return App;
     })();
-  </script>
   </script>
 </body>
 </html>

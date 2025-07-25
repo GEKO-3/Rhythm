@@ -73,15 +73,19 @@
       padding: 20px;
       background: var(--bg-opacity);
       border-radius: 10px;
-      transition: transform 0.3s ease, opacity 0.3s ease;
-      animation: slideIn 0.5s ease-in-out;
+      transition: all 0.2s ease;
+      animation: slideIn 0.3s ease-in-out;
       margin-top: 40px;
       margin-bottom: 40px;
       opacity: 0;
+      visibility: hidden;
+      transform: translateY(10px);
     }
     
     .container.ready {
       opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
     }
     
     .offline-indicator {
@@ -179,6 +183,32 @@
     .toggle-switch.disabled .toggle-label.english {
       text-decoration: line-through;
     }
+    .toggle-switch.generating {
+      cursor: wait;
+      opacity: 0.8;
+      background-color: #444;
+      border-color: #555;
+    }
+    .toggle-switch.generating .toggle-label.english::after {
+      content: " (generating...)";
+      font-size: 0.7em;
+      color: #888;
+    }
+    .toggle-switch.ready {
+      cursor: pointer;
+      opacity: 1;
+      background-color: #555;
+      border-color: #666;
+      transition: all 0.3s ease;
+    }
+    .toggle-switch.ready:hover {
+      border-color: var(--primary-color);
+      background-color: #666;
+      transform: scale(1.02);
+    }
+    .toggle-switch.ready:active {
+      transform: scale(0.98);
+    }
     .toggle-slider {
       position: absolute;
       top: 2px;
@@ -187,7 +217,7 @@
       height: 42px;
       background-color: var(--primary-color);
       border-radius: 21px;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, font-family 0.3s ease;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -199,6 +229,7 @@
     }
     .toggle-slider.english {
       transform: translateX(96px);
+      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
     }
     .toggle-labels {
       position: absolute;
@@ -621,7 +652,7 @@
       justify-content: center;
       align-items: center;
       z-index: 10000;
-      transition: opacity 0.6s ease-out;
+      transition: opacity 0.2s ease-out;
     }
 
     .loading-screen.fade-out {
@@ -751,109 +782,6 @@
         offlineIndicator.classList.remove('show');
       }
     }
-
-    // Loading screen functionality
-    function initializeLoadingScreen() {
-      const loadingScreen = document.getElementById('loading-screen');
-      const patternContainer = document.getElementById('pattern-container');
-      
-      if (!loadingScreen || !patternContainer) return;
-      
-      // Generate animated pattern lines - Optimized
-      function generatePatternLines() {
-        // Calculate how many lines needed to fill the screen (optimized for performance)
-        const viewportHeight = window.innerHeight;
-        const lineHeight = 40;
-        const numberOfLines = Math.ceil(viewportHeight / lineHeight) + 1;
-        
-        // Clear any existing lines
-        patternContainer.innerHTML = '';
-        
-        // Create pattern lines with performance optimizations
-        for (let i = 0; i < numberOfLines; i++) {
-          const line = document.createElement('div');
-          line.className = 'pattern-line';
-          line.style.top = (i * lineHeight) + 'px';
-          // Add performance optimizations
-          line.style.willChange = 'transform';
-          line.style.transform = 'translateZ(0)';
-          patternContainer.appendChild(line);
-        }
-        
-        console.log('Generated', numberOfLines, 'optimized pattern lines');
-      }
-      
-      // Generate pattern lines immediately
-      generatePatternLines();
-      
-      // Regenerate lines on resize
-      window.addEventListener('resize', generatePatternLines);
-      
-      return { loadingScreen, patternContainer };
-    }
-
-    // Update loading progress text
-    function updateLoadingProgress(text) {
-      const loadingProgress = document.getElementById('loading-progress');
-      if (loadingProgress) {
-        loadingProgress.textContent = text;
-      }
-    }
-
-    // Hide loading screen function
-    function hideLoadingScreen() {
-      const loadingScreen = document.getElementById('loading-screen');
-      const patternContainer = document.getElementById('pattern-container');
-      const loadingProgress = document.getElementById('loading-progress');
-      
-      if (!loadingScreen) return;
-      
-      // Start enlarging animation
-      function startEnlarging() {
-        const loadingLogo = loadingScreen.querySelector('.loading-logo');
-        if (loadingLogo) {
-          // Trigger the enlarging animation by adding fade-out class to screen
-          loadingScreen.classList.add('fade-out');
-          // But remove the opacity transition temporarily to only get the animation
-          loadingScreen.style.transition = 'none';
-          loadingScreen.style.opacity = '1';
-        }
-      }
-      
-      // Start the fade-out process
-      startEnlarging();
-      
-      setTimeout(function() {
-        // Restore the transition and start actual fade-out
-        loadingScreen.style.transition = 'opacity 0.6s ease-out';
-        
-        // First fade out the logo
-        const loadingLogo = loadingScreen.querySelector('.loading-logo');
-        if (loadingLogo) {
-          loadingLogo.classList.add('fade-out');
-        }
-        
-        // Fade out the progress text
-        if (loadingProgress) {
-          loadingProgress.classList.add('fade-out');
-        }
-        
-        // Fade out the pattern container along with the logo
-        if (patternContainer) {
-          patternContainer.classList.add('fade-out');
-        }
-        
-        // Then fade out the background 200ms later
-        setTimeout(function() {
-          loadingScreen.style.opacity = '0';
-        }, 200);
-        
-        // Remove loading screen from DOM after fade out completes
-        setTimeout(function() {
-          loadingScreen.remove();
-        }, 1000);
-      }, 200);
-    }
   </script>
 </head>
 <body>
@@ -891,7 +819,7 @@
         window.location.href='songlist'
       ">←</button>
       <div class="language-toggle">
-        <div class="toggle-switch" id="toggle-switch" onclick="toggleLanguage()">
+        <div class="toggle-switch" id="toggle-switch">
           <div class="toggle-slider" id="toggle-slider">ދިވެހި</div>
           <div class="toggle-labels">
             <div class="toggle-label dhivehi">ދިވެހި</div>
@@ -908,947 +836,1006 @@
     </div>
   </div>
   <script src="lyrics-showlist-config.js"></script>
+  <script src="rhythm-session-manager.js"></script>
+  <script src="rhythm-data-service.js"></script>
+  <script src="rhythm-page-transition.js"></script>
   <script src="reverse-transliteration.js"></script>
   <script>
-    // ===========================================
-    // PIN CONFIGURATION (Easy to change)
-    // ===========================================
-    const pinAuth = 'ODc2NQ=='; // Change this to update PIN
-    
-    // PIN Security Functions
-    function decodePinConfig(encoded) {
-      try {
-        const decoded = atob(encoded);
-        const reversed = decoded.split('').reverse().join('');
-        return reversed.split('').map(Number);
-      } catch (e) {
-        return [8, 7, 6, 5]; // Fallback PIN
-      }
-    }
-    
-    function validatePinStructure(pin) {
-      // Additional validation layer
-      const checksum = pin.reduce((sum, digit) => sum + digit, 0);
-      // Calculate expected checksum based on actual PIN
-      const expectedChecksum = actualPinConfig.reduce((sum, digit) => sum + digit, 0);
-      return checksum === expectedChecksum;
-    }
-    
-    // Get actual PIN configuration
-    const actualPinConfig = decodePinConfig(pinAuth);
-    
-    // PIN Protection System
-    let pinAuthenticated = false;
-    let pinOverlay, pinDigits, pinError;
-    let attemptCount = 0;
-    const maxAttempts = 5;
-    const lockoutDuration = 60 * 60 * 1000; // 1 hour in milliseconds
-    let lockoutTimer = null;
-    
-    // Session timeout system
-    const sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
-    let sessionTimer = null;
-    let lastActivityTime = Date.now();
-    let isPageVisible = true;
-    
-    // Note: Using sessionStorage instead of localStorage for PIN session
-    // This ensures users must re-enter PIN when browser/app is completely closed
-    
-    // Initialize PIN system on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      // Initialize loading screen first
-      initializeLoadingScreen();
-      updateLoadingProgress('Initializing...');
+    // Rhythm Lyrics Application using Shared Services
+    const RhythmLyrics = (function() {
+      'use strict';
       
-      // Initialize PIN system and session timeout
-      initializePinSystem();
-      initializeSessionTimeout();
-    });
-    
-    function initializeSessionTimeout() {
-      // Track page visibility
-      document.addEventListener('visibilitychange', function() {
-        if (document.visibilityState === 'visible') {
-          isPageVisible = true;
-          updateLastActivity();
-          // Check if session expired while away
-          if (pinAuthenticated && Date.now() - lastActivityTime > sessionTimeout) {
-            expireSession();
+      // Application state
+      const STATE = {
+        currentSong: null,
+        currentLanguage: 'dhivehi',
+        englishAvailable: false,
+        generatedEnglishLyrics: null,
+        isInitialized: false
+      };
+      
+      // DOM Elements
+      const ELEMENTS = {};
+      
+      // PIN Management using shared session manager
+      const PinManager = {
+        init() {
+          this.setupElements();
+          this.setupEventListeners();
+          this.checkAuthStatus();
+        },
+
+        setupElements() {
+          ELEMENTS.pinOverlay = document.getElementById('pin-overlay');
+          ELEMENTS.pinDigits = [...document.querySelectorAll('.pin-digit')];
+          ELEMENTS.pinError = document.getElementById('pin-error');
+        },
+
+        setupEventListeners() {
+          // Setup PIN input handlers
+          ELEMENTS.pinDigits.forEach((digit, index) => {
+            digit.addEventListener('input', (e) => this.handleDigitInput(e, index));
+            digit.addEventListener('keydown', (e) => this.handleDigitKeydown(e, index));
+            digit.addEventListener('paste', this.handlePaste.bind(this));
+          });
+
+          // Listen to session manager events
+          window.RhythmSession.on('authenticationSuccess', () => {
+            this.hidePinOverlay();
+            App.loadSongData();
+          });
+
+          window.RhythmSession.on('sessionExpired', () => {
+            this.showPinOverlay();
+          });
+
+          window.RhythmSession.on('sessionRestored', () => {
+            this.hidePinOverlay();
+            App.loadSongData();
+          });
+
+          window.RhythmSession.on('lockoutStarted', () => {
+            this.disablePinInputs();
+          });
+
+          window.RhythmSession.on('lockoutUpdate', (data) => {
+            const { minutes, seconds } = data;
+            this.showPinError(`Too many attempts. Try again in ${minutes}:${seconds.toString().padStart(2, '0')}`);
+          });
+
+          window.RhythmSession.on('lockoutCleared', () => {
+            this.enablePinInputs();
+            this.showPinError('Lockout expired. You may try again.');
+            setTimeout(() => {
+              this.clearPinError();
+              ELEMENTS.pinDigits[0].focus();
+            }, 2000);
+          });
+        },
+
+        checkAuthStatus() {
+          if (window.RhythmSession && window.RhythmSession.isAuthenticated()) {
+            // Don't hide loading screen here - let it continue until all content is loaded
+            this.hidePinOverlay();
+            App.loadSongData();
+          } else if (window.RhythmSession && window.RhythmSession.isLockedOut()) {
+            LoadingScreen.hide();
+            this.showPinOverlay();
+            this.disablePinInputs();
+          } else {
+            // Check for basic session in sessionStorage as fallback
+            const sessionData = sessionStorage.getItem('pinSession');
+            if (sessionData) {
+              try {
+                const session = JSON.parse(sessionData);
+                const sessionAge = Date.now() - session.timestamp;
+                if (session.authenticated && sessionAge < (15 * 60 * 1000 * 2)) { // 30 min fallback
+                  // Don't hide loading screen here - let it continue until all content is loaded
+                  this.hidePinOverlay();
+                  App.loadSongData();
+                  return;
+                }
+              } catch (e) {
+                // Invalid session data
+              }
+            }
+            
+            LoadingScreen.hide();
+            this.showPinOverlay();
+            setTimeout(() => ELEMENTS.pinDigits[0].focus(), 300);
           }
-        } else {
-          isPageVisible = false;
-          clearSessionTimeout();
-        }
-      });
-      
-      // Track user activity to reset session timer
-      const activityEvents = ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'];
-      activityEvents.forEach(event => {
-        document.addEventListener(event, updateLastActivity, true);
-      });
-      
-      // For mobile apps, also track window focus/blur
-      window.addEventListener('focus', function() {
-        updateLastActivity();
-      });
-      
-      window.addEventListener('blur', function() {
-        clearSessionTimeout();
-      });
-    }
-    
-    function updateLastActivity() {
-      lastActivityTime = Date.now();
-      if (pinAuthenticated && !isPageVisible) {
-        startSessionTimeout();
-      }
-    }
-    
-    function startSessionTimeout() {
-      clearSessionTimeout(); // Clear any existing timeout
-      
-      sessionTimer = setTimeout(() => {
-        expireSession();
-      }, sessionTimeout);
-    }
-    
-    function clearSessionTimeout() {
-      if (sessionTimer) {
-        clearTimeout(sessionTimer);
-        sessionTimer = null;
-      }
-    }
-    
-    function expireSession() {
-      pinAuthenticated = false;
-      sessionStorage.removeItem('pinSession');
-      
-      // Clear session timeout
-      clearSessionTimeout();
-      
-      // Show PIN overlay again
-      pinOverlay.classList.remove('hidden');
-      
-      // Hide loading screen to show PIN overlay
-      const loadingScreen = document.getElementById('loading-screen');
-      if (loadingScreen) {
-        loadingScreen.style.display = 'none';
-      }
-      
-      clearPinInputs();
-      
-      // Focus on first digit when user returns
-      setTimeout(() => {
-        pinDigits[0].focus();
-      }, 300);
-      
-      // Show session expired message
-      showPinError('Session expired. Please enter PIN again.');
-      setTimeout(() => {
-        clearPinError();
-      }, 3000);
-    }
-    
-    function initializePinSystem() {
-      pinOverlay = document.getElementById('pin-overlay');
-      pinDigits = [
-        ...document.querySelectorAll('.pin-digit')
-      ];
-      pinError = document.getElementById('pin-error');
-      
-      // Check if PIN was previously entered (but still require re-entry)
-      checkPinStatus();
-      
-      // Setup event listeners for each digit input
-      pinDigits.forEach((digit, index) => {
-        digit.addEventListener('input', (e) => handleDigitInput(e, index));
-        digit.addEventListener('keydown', (e) => handleDigitKeydown(e, index));
-        digit.addEventListener('paste', handlePaste);
-      });
-      
-      // Auto-focus first digit with delay for mobile
-      setTimeout(() => {
-        pinDigits[0].focus();
-      }, 500); // Increased delay to ensure DOM is ready
-    }
-    
-    function handleDigitInput(e, index) {
-      // Check if locked out
-      if (e.target.disabled) return;
-      
-      const value = e.target.value;
-      
-      // Only allow single digit numbers
-      if (!/^\d$/.test(value)) {
-        e.target.value = '';
-        return;
-      }
-      
-      // Clear any previous errors
-      clearPinError();
-      
-      // Mark as filled
-      e.target.classList.add('filled');
-      
-      // Move to next digit
-      if (index < 3) {
-        pinDigits[index + 1].focus();
-      } else {
-        // Last digit entered, verify PIN
-        verifyPin();
-      }
-    }
-    
-    function handleDigitKeydown(e, index) {
-      // Check if locked out
-      if (e.target.disabled) return;
-      
-      // Handle backspace
-      if (e.key === 'Backspace') {
-        e.target.value = '';
-        e.target.classList.remove('filled');
-        if (index > 0) {
-          pinDigits[index - 1].focus();
-        }
-      }
-      
-      // Handle Enter key
-      if (e.key === 'Enter') {
-        verifyPin();
-      }
-      
-      // Handle arrow keys
-      if (e.key === 'ArrowLeft' && index > 0) {
-        pinDigits[index - 1].focus();
-      }
-      if (e.key === 'ArrowRight' && index < 3) {
-        pinDigits[index + 1].focus();
-      }
-    }
-    
-    function handlePaste(e) {
-      e.preventDefault();
-      const pasteData = e.clipboardData.getData('text');
-      
-      // Check if pasted data is 4 digits
-      if (/^\d{4}$/.test(pasteData)) {
-        pinDigits.forEach((digit, index) => {
-          digit.value = pasteData[index];
-          digit.classList.add('filled');
-        });
-        verifyPin();
-      }
-    }
-    
-    function checkPinStatus() {
-      // Check if currently locked out
-      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
-      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
-        startLockout();
-        return;
-      }
-      
-      // Clear any expired lockout
-      if (lockoutEnd && Date.now() >= parseInt(lockoutEnd)) {
-        localStorage.removeItem('pinLockoutEnd');
-        localStorage.removeItem('pinAttemptCount');
-      }
-      
-      // Restore attempt count if not locked out
-      const savedAttempts = localStorage.getItem('pinAttemptCount');
-      if (savedAttempts) {
-        attemptCount = parseInt(savedAttempts);
-      }
-      
-      // Check for existing valid session from songlist.html
-      const sessionData = sessionStorage.getItem('pinSession');
-      if (sessionData) {
-        try {
-          const session = JSON.parse(sessionData);
-          const sessionAge = Date.now() - session.timestamp;
+        },
+
+        async handleDigitInput(e, index) {
+          if (e.target.disabled) return;
           
-          if (session.authenticated && sessionAge < sessionTimeout) {
-            // Valid session exists
-            updateLoadingProgress('Session found, loading songs...');
-            pinAuthenticated = true;
-            hidePinOverlay();
-            loadSongsData();
-            startSessionTimeout();
+          const value = e.target.value;
+          
+          if (!/^\d$/.test(value)) {
+            e.target.value = '';
             return;
           }
-        } catch (e) {
-          // Invalid session data
-          sessionStorage.removeItem('pinSession');
-        }
-      }
-      
-      // No valid session - show PIN overlay
-      updateLoadingProgress('Please enter PIN');
-      pinOverlay.classList.remove('hidden');
-      
-      // Hide loading screen temporarily to show PIN overlay
-      const loadingScreen = document.getElementById('loading-screen');
-      if (loadingScreen) {
-        loadingScreen.style.display = 'none';
-      }
-      
-      // Ensure keyboard opens when PIN overlay is shown
-      setTimeout(() => {
-        pinDigits[0].focus();
-      }, 300);
-    }
-    
-    function startLockout() {
-      const lockoutEnd = Date.now() + lockoutDuration;
-      localStorage.setItem('pinLockoutEnd', lockoutEnd.toString());
-      localStorage.setItem('pinAttemptCount', attemptCount.toString());
-      
-      // Disable all inputs
-      pinDigits.forEach(digit => digit.disabled = true);
-      
-      startLockoutTimer(lockoutEnd);
-    }
-    
-    function startLockoutTimer(lockoutEnd) {
-      function updateLockoutDisplay() {
-        const timeLeft = lockoutEnd - Date.now();
-        if (timeLeft <= 0) {
-          // Lockout expired
-          clearInterval(lockoutTimer);
-          localStorage.removeItem('pinLockoutEnd');
-          localStorage.removeItem('pinAttemptCount');
-          attemptCount = 0;
+
+          this.clearPinError();
+          e.target.classList.add('filled');
           
-          // Re-enable inputs
-          pinDigits.forEach(digit => {
+          if (index < 3) {
+            ELEMENTS.pinDigits[index + 1].focus();
+          } else {
+            await this.verifyPin();
+          }
+        },
+
+        handleDigitKeydown(e, index) {
+          if (e.target.disabled) return;
+          
+          if (e.key === 'Backspace') {
+            e.target.value = '';
+            e.target.classList.remove('filled');
+            if (index > 0) {
+              ELEMENTS.pinDigits[index - 1].focus();
+            }
+          }
+          
+          if (e.key === 'Enter') {
+            this.verifyPin();
+          }
+          
+          if (e.key === 'ArrowLeft' && index > 0) {
+            ELEMENTS.pinDigits[index - 1].focus();
+          }
+          if (e.key === 'ArrowRight' && index < 3) {
+            ELEMENTS.pinDigits[index + 1].focus();
+          }
+        },
+
+        handlePaste(e) {
+          e.preventDefault();
+          const pasteData = e.clipboardData.getData('text');
+          
+          if (/^\d{4}$/.test(pasteData)) {
+            ELEMENTS.pinDigits.forEach((digit, index) => {
+              digit.value = pasteData[index];
+              digit.classList.add('filled');
+            });
+            this.verifyPin();
+          }
+        },
+
+        async verifyPin() {
+          const enteredPin = ELEMENTS.pinDigits.map(digit => digit.value).join('');
+          
+          if (enteredPin.length !== 4) {
+            this.showPinError('Please enter all 4 digits');
+            return;
+          }
+
+          try {
+            await window.RhythmSession.authenticateWithPin(enteredPin);
+          } catch (error) {
+            this.showPinError(error.message);
+            this.clearPinInputs();
+            setTimeout(() => {
+              ELEMENTS.pinDigits[0].focus();
+            }, 1000);
+          }
+        },
+
+        showPinError(message) {
+          ELEMENTS.pinError.textContent = message;
+          ELEMENTS.pinDigits.forEach(digit => {
+            digit.classList.add('error');
+          });
+          setTimeout(() => {
+            ELEMENTS.pinDigits.forEach(digit => {
+              digit.classList.remove('error');
+            });
+          }, 500);
+        },
+
+        clearPinError() {
+          ELEMENTS.pinError.textContent = '';
+          ELEMENTS.pinDigits.forEach(digit => {
+            digit.classList.remove('error');
+          });
+        },
+
+        clearPinInputs() {
+          ELEMENTS.pinDigits.forEach(digit => {
+            digit.value = '';
+            digit.classList.remove('filled');
+          });
+        },
+
+        disablePinInputs() {
+          ELEMENTS.pinDigits.forEach(digit => digit.disabled = true);
+        },
+
+        enablePinInputs() {
+          ELEMENTS.pinDigits.forEach(digit => {
             digit.disabled = false;
             digit.value = '';
             digit.classList.remove('filled');
           });
-          
-          showPinError('Lockout expired. You may try again.');
-          setTimeout(() => {
-            clearPinError();
-            pinDigits[0].focus();
-          }, 2000);
-          return;
-        }
-        
-        const minutes = Math.floor(timeLeft / 60000);
-        const seconds = Math.floor((timeLeft % 60000) / 1000);
-        showPinError(`Too many attempts. Try again in ${minutes}:${seconds.toString().padStart(2, '0')}`);
-      }
-      
-      // Update immediately and then every second
-      updateLockoutDisplay();
-      lockoutTimer = setInterval(updateLockoutDisplay, 1000);
-    }
-    
-    function verifyPin() {
-      const enteredPin = pinDigits.map(digit => digit.value).join('');
-      
-      if (enteredPin.length !== 4) {
-        showPinError('Please enter all 4 digits');
-        return;
-      }
-      
-      // Check if currently locked out
-      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
-      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
-        showPinError('Account locked. Please wait.');
-        return;
-      }
-      
-      // Convert entered PIN to array for comparison
-      const enteredPinArray = enteredPin.split('').map(Number);
-      
-      // Multi-layer validation
-      const basicMatch = enteredPinArray.every((digit, index) => 
-        digit === actualPinConfig[index]
-      );
-      
-      const structureValid = validatePinStructure(enteredPinArray);
-      
-      if (basicMatch && structureValid) {
-        // Correct PIN
-        pinAuthenticated = true;
-        attemptCount = 0;
-        localStorage.removeItem('pinAttemptCount');
-        
-        // Create session
-        const sessionData = {
-          timestamp: Date.now(),
-          authenticated: true,
-          sessionType: 'lyrics'
-        };
-        sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
-        
-        hidePinOverlay();
-        loadSongsData();
-        startSessionTimeout();
-      } else {
-        // Incorrect PIN
-        attemptCount++;
-        localStorage.setItem('pinAttemptCount', attemptCount.toString());
-        
-        if (attemptCount >= maxAttempts) {
-          startLockout();
-        } else {
-          const remainingAttempts = maxAttempts - attemptCount;
-          showPinError(`Incorrect PIN. ${remainingAttempts} attempts remaining.`);
-          clearPinInputs();
-          setTimeout(() => {
-            pinDigits[0].focus();
-          }, 1000);
-        }
-      }
-    }
-    
-    function showPinError(message) {
-      pinError.textContent = message;
-      pinDigits.forEach(digit => {
-        digit.classList.add('error');
-      });
-      setTimeout(() => {
-        pinDigits.forEach(digit => {
-          digit.classList.remove('error');
-        });
-      }, 500);
-    }
-    
-    function clearPinError() {
-      pinError.textContent = '';
-      pinDigits.forEach(digit => {
-        digit.classList.remove('error');
-      });
-    }
-    
-    function clearPinInputs() {
-      pinDigits.forEach(digit => {
-        digit.value = '';
-        digit.classList.remove('filled');
-      });
-    }
-    
-    function hidePinOverlay() {
-      pinOverlay.classList.add('hidden');
-      
-      // Show loading screen again after PIN is verified
-      const loadingScreen = document.getElementById('loading-screen');
-      if (loadingScreen) {
-        loadingScreen.style.display = 'flex';
-      }
-      
-      // Don't hide loading screen here - let it persist until lyrics are fully rendered
-    }
-    
-    // CSV Data Loading Functions
-    function parseCSVLine(line) {
-      const result = [];
-      let current = '';
-      let inQuotes = false;
-      let i = 0;
-      
-      while (i < line.length) {
-        const char = line[i];
-        
-        if (char === '"') {
-          if (inQuotes && line[i + 1] === '"') {
-            // Escaped quote
-            current += '"';
-            i += 2;
-          } else {
-            // Toggle quote state
-            inQuotes = !inQuotes;
-            i++;
-          }
-        } else if (char === ',' && !inQuotes) {
-          // End of field
-          result.push(current.trim());
-          current = '';
-          i++;
-        } else {
-          current += char;
-          i++;
-        }
-      }
-      
-      // Add the last field
-      result.push(current.trim());
-      return result;
-    }
+        },
 
-    async function getSongsFromCSV() {
-      try {
-        updateLoadingProgress('Fetching song data...');
-        console.log('Fetching CSV from Google Sheets...');
-        const response = await fetch(window.RhythmLyricsShowConfig.lyricsSheet);
-        const csvText = await response.text();
-        console.log('CSV text length:', csvText.length);
-        
-        updateLoadingProgress('Processing song data...');
-        
-        // Parse CSV properly using state machine
-        const rows = [];
-        let currentRow = [];
-        let currentField = '';
-        let inQuotes = false;
-        let i = 0;
-        
-        while (i < csvText.length) {
-          const char = csvText[i];
-          const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
+        showPinOverlay() {
+          ELEMENTS.pinOverlay.classList.remove('hidden');
+        },
+
+        hidePinOverlay() {
+          ELEMENTS.pinOverlay.classList.add('hidden');
+        }
+      };
+
+      // Loading Screen Management
+      const LoadingScreen = {
+        init() {
+          this.setupElements();
+          this.generatePatternLines();
+        },
+
+        setupElements() {
+          ELEMENTS.loadingScreen = document.getElementById('loading-screen');
+          ELEMENTS.loadingProgress = document.getElementById('loading-progress');
+          ELEMENTS.patternContainer = document.getElementById('pattern-container');
+        },
+
+        generatePatternLines() {
+          if (!ELEMENTS.patternContainer) return;
           
-          if (char === '"') {
-            if (inQuotes && nextChar === '"') {
-              // Escaped quote
-              currentField += '"';
-              i += 2;
-            } else {
-              // Toggle quote state
-              inQuotes = !inQuotes;
-              i++;
-            }
-          } else if (char === ',' && !inQuotes) {
-            // End of field
-            currentRow.push(currentField);
-            currentField = '';
-            i++;
-          } else if ((char === '\n' || char === '\r') && !inQuotes) {
-            // End of row
-            if (currentField || currentRow.length > 0) {
-              currentRow.push(currentField);
-              if (currentRow.length > 0) {
-                rows.push(currentRow);
-              }
-              currentRow = [];
-              currentField = '';
-            }
-            // Skip \r\n combinations
-            if (char === '\r' && nextChar === '\n') {
-              i += 2;
-            } else {
-              i++;
-            }
-          } else {
-            currentField += char;
-            i++;
+          const viewportHeight = window.innerHeight;
+          const lineHeight = 40;
+          const numberOfLines = Math.ceil(viewportHeight / lineHeight) + 1;
+          
+          ELEMENTS.patternContainer.innerHTML = '';
+          
+          for (let i = 0; i < numberOfLines; i++) {
+            const line = document.createElement('div');
+            line.className = 'pattern-line';
+            line.style.top = (i * lineHeight) + 'px';
+            line.style.willChange = 'transform';
+            line.style.transform = 'translateZ(0)';
+            ELEMENTS.patternContainer.appendChild(line);
+          }
+        },
+
+        show(text = 'Loading...') {
+          if (ELEMENTS.loadingScreen) {
+            ELEMENTS.loadingScreen.style.display = 'flex';
+            ELEMENTS.loadingScreen.classList.remove('fade-out');
+          }
+          this.updateProgress(text);
+        },
+
+        hide() {
+          if (ELEMENTS.loadingScreen) {
+            ELEMENTS.loadingScreen.classList.add('fade-out');
+            setTimeout(() => {
+              ELEMENTS.loadingScreen.style.display = 'none';
+            }, 600);
+          }
+        },
+
+        updateProgress(text) {
+          if (ELEMENTS.loadingProgress) {
+            ELEMENTS.loadingProgress.textContent = text;
           }
         }
-        
-        // Add the last row if it exists
-        if (currentField || currentRow.length > 0) {
-          currentRow.push(currentField);
-          if (currentRow.length > 0) {
-            rows.push(currentRow);
-          }
-        }
-        
-        console.log('Parsed rows:', rows.length);
-        
-        // Process data rows and deduplicate by ID
-        const songMap = new Map();
-        
-        for (let i = 1; i < rows.length; i++) { // Skip header row
-          const columns = rows[i];
-          if (columns.length >= 5) { // Ensure we have all required columns
-            const timestamp = columns[0] ? columns[0].trim() : '';
-            const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
-            const name = columns[2] ? columns[2].trim() : '';
-            const genre = columns[3] ? columns[3].trim() : '';
-            const lyrics = columns[4] ? columns[4].trim() : '';
+      };
+
+      // Lyrics Management
+      const LyricsManager = {
+        init() {
+          this.setupElements();
+          this.setupEventListeners();
+        },
+
+        setupElements() {
+          ELEMENTS.songTitle = document.getElementById('song-title');
+          ELEMENTS.songLyrics = document.getElementById('song-lyrics');
+          ELEMENTS.lyricsTemplate = document.getElementById('lyrics-template');
+          ELEMENTS.sectionNavBar = document.getElementById('section-nav-bar');
+          ELEMENTS.toggleSlider = document.getElementById('toggle-slider');
+          ELEMENTS.toggleSwitch = document.getElementById('toggle-switch');
+          ELEMENTS.loadingIndicator = document.getElementById('loading-indicator');
+          
+          // Log the elements to help debug
+          console.log('🔍 Setup elements:', {
+            toggleSwitch: !!ELEMENTS.toggleSwitch,
+            toggleSlider: !!ELEMENTS.toggleSlider,
+            songTitle: !!ELEMENTS.songTitle
+          });
+        },
+
+        setupEventListeners() {
+          // Language toggle - initially disable until English lyrics are ready
+          if (ELEMENTS.toggleSwitch) {
+            // Remove any existing onclick attributes
+            ELEMENTS.toggleSwitch.removeAttribute('onclick');
             
-            if (!isNaN(id) && name && genre && lyrics) {
-              const song = { id, timestamp, name, genre, lyrics };
+            // Set initial disabled state
+            ELEMENTS.toggleSwitch.classList.add('disabled');
+            ELEMENTS.toggleSwitch.style.cursor = 'not-allowed';
+            ELEMENTS.toggleSwitch.style.opacity = '0.6';
+            
+            // Add a temporary click handler that shows a message
+            ELEMENTS.toggleSwitch.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('⚠️ Toggle clicked but English lyrics not ready yet');
+            });
+          }
+
+          // Back button using page transition manager
+          const backButton = document.querySelector('.back-button');
+          if (backButton) {
+            backButton.addEventListener('click', (e) => {
+              e.preventDefault();
+              if (window.RhythmPageTransition) {
+                window.RhythmPageTransition.navigateToSonglist();
+              } else {
+                window.location.href = 'songlist.html';
+              }
+            });
+          }
+        },
+
+        async loadSong() {
+          const selectedId = localStorage.getItem('selectedSongId');
+          if (!selectedId) {
+            this.showError('No song selected');
+            return;
+          }
+
+          try {
+            let song = null;
+            let usedPreloadedData = false;
+            
+            // First, check for preloaded song data from navigation
+            const preloadedSongData = sessionStorage.getItem('preloadedSong');
+            const preloadedTimestamp = sessionStorage.getItem('preloadedSongTimestamp');
+            
+            if (preloadedSongData && preloadedTimestamp) {
+              try {
+                const preloadedSong = JSON.parse(preloadedSongData);
+                const dataAge = Date.now() - parseInt(preloadedTimestamp);
+                
+                // Use preloaded data if it's recent (within 5 minutes) and matches
+                if (dataAge < 5 * 60 * 1000 && String(preloadedSong.id) === String(selectedId)) {
+                  song = preloadedSong;
+                  usedPreloadedData = true;
+                  console.log('Using preloaded song data for instant display');
+                }
+                
+                // Clear the preloaded data
+                sessionStorage.removeItem('preloadedSong');
+                sessionStorage.removeItem('preloadedSongTimestamp');
+              } catch (e) {
+                console.warn('Invalid preloaded song data:', e);
+                sessionStorage.removeItem('preloadedSong');
+                sessionStorage.removeItem('preloadedSongTimestamp');
+              }
+            }
+            
+            // If no preloaded data, get from shared data service
+            if (!song && window.RhythmData) {
+              song = await window.RhythmData.getSongById(selectedId);
+            }
+
+            if (song) {
+              STATE.currentSong = song;
+              this.displaySong(song);
               
-              // Keep only the most recent version of each song (by ID)
-              if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
-                songMap.set(id, song);
+              // Start lazy refresh timer for background data updates (only if we used preloaded data)
+              if (usedPreloadedData && window.RhythmData && typeof window.RhythmData.startLyricsPageTimer === 'function') {
+                window.RhythmData.startLyricsPageTimer();
+              }
+            } else {
+              this.showError('Song not found');
+            }
+          } catch (error) {
+            console.error('Failed to load song:', error);
+            this.showError('Failed to load song');
+          }
+        },
+
+        displaySong(song) {
+          if (ELEMENTS.songTitle) {
+            ELEMENTS.songTitle.textContent = song.name;
+          }
+
+          // Display Dhivehi lyrics first to ensure content is rendered
+          this.renderLyrics(song.lyrics, 'dhivehi');
+          
+          // Generate English lyrics immediately in background
+          this.generateEnglishLyrics(song.lyrics);
+          
+          // Show UI elements after lyrics are rendered
+          this.showUI();
+        },
+
+        async generateEnglishLyrics(dhivehiLyrics) {
+          console.log('🔄 Starting English lyrics generation...');
+          
+          // Check if we have cached English lyrics for this song
+          const cacheKey = `englishLyrics_${STATE.currentSong.id}`;
+          const cachedLyrics = localStorage.getItem(cacheKey);
+          
+          if (cachedLyrics) {
+            console.log('✅ Using cached English lyrics');
+            STATE.generatedEnglishLyrics = cachedLyrics;
+            STATE.englishAvailable = true;
+            this.enableLanguageToggle();
+            return;
+          }
+          
+          // Show generating state
+          if (ELEMENTS.toggleSwitch) {
+            ELEMENTS.toggleSwitch.classList.remove('disabled');
+            ELEMENTS.toggleSwitch.classList.add('generating');
+          }
+          
+          if (ELEMENTS.loadingIndicator) {
+            ELEMENTS.loadingIndicator.classList.add('show');
+          }
+
+          try {
+            // Small delay to allow UI to render first
+            await new Promise(resolve => setTimeout(resolve, 50));
+
+            if (window.reverseTransliterate) {
+              console.log('✅ Transliteration function available');
+              const lines = dhivehiLyrics.split('\n');
+              const transliteratedLines = lines.map(line => {
+                const trimmedLine = line.trim();
+                
+                // Keep section headers and separators as-is
+                if (/^[#$][A-Za-z0-9]+/.test(trimmedLine) || /^-+$/.test(trimmedLine)) {
+                  return line;
+                }
+                
+                // Handle highlighted lines (starting with *)
+                if (trimmedLine.startsWith('*')) {
+                  const content = trimmedLine.substring(1).trim();
+                  return '*' + window.reverseTransliterate(content);
+                }
+                
+                // Keep empty lines
+                if (!trimmedLine) {
+                  return line;
+                }
+                
+                // Transliterate regular content lines
+                return window.reverseTransliterate(trimmedLine);
+              });
+              
+              STATE.generatedEnglishLyrics = transliteratedLines.join('\n');
+              STATE.englishAvailable = true;
+              
+              // Cache the generated English lyrics
+              try {
+                localStorage.setItem(cacheKey, STATE.generatedEnglishLyrics);
+                console.log('✅ English lyrics cached for future use');
+              } catch (e) {
+                console.warn('⚠️ Could not cache English lyrics:', e);
+              }
+              
+              console.log('✅ English lyrics generated successfully');
+              
+              // Enable toggle switch and update UI
+              this.enableLanguageToggle();
+              
+            } else {
+              console.warn('⚠️ Transliteration function not available');
+              // Fallback: use original lyrics as placeholder
+              STATE.generatedEnglishLyrics = dhivehiLyrics;
+              STATE.englishAvailable = false;
+              
+              // Keep disabled state
+              if (ELEMENTS.toggleSwitch) {
+                ELEMENTS.toggleSwitch.classList.remove('generating');
+                ELEMENTS.toggleSwitch.classList.add('disabled');
               }
             }
-          }
-        }
-        
-        const result = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-        console.log('Final songs array:', result.length, 'songs');
-        updateLoadingProgress('Songs loaded successfully!');
-        return result;
-      } catch (error) {
-        console.error('Error fetching CSV:', error);
-        updateLoadingProgress('Error loading songs');
-        return [];
-      }
-    }
-    
-    function loadSongsData() {
-      // Only load songs after PIN is verified
-      if (!pinAuthenticated) {
-        console.log('PIN not authenticated - blocking song data load');
-        return;
-      }
-      
-      updateLoadingProgress('Preparing to load songs...');
-      
-      // Load CSV data
-      getSongsFromCSV()
-        .then(csvSongs => {
-          window.songs = csvSongs;
-          updateLoadingProgress('Initializing lyrics...');
-          initializeLyrics();
-        })
-        .catch(error => {
-          console.error('Failed to load songs data:', error);
-          updateLoadingProgress('Failed to load songs');
-          window.songs = [];
-          initializeLyrics();
-        });
-    }
-
-    // Helper functions for lyrics parsing and section management
-    function slugify(text) {
-      return text
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, '')
-        .replace(/[\s_-]+/g, '-')
-        .replace(/^-+|-+$/g, '');
-    }
-
-    function parseSections(lyrics) {
-      const lines = lyrics.split('\n');
-      // Store all sections in order of appearance
-      let orderedSections = [];
-      let htmlSections = [];
-      let currentSection = null;
-      let sectionType = null;
-      let sectionId = null;
-      let sectionName = null;
-      let yellowCount = 0;
-      let whiteCount = 0;
-
-      function pushSection() {
-        if (currentSection && currentSection.trim()) {
-          const blockClass = sectionType === 'yellow' ? 'section-block' : 'section-block';
-          htmlSections.push(`<div class="${blockClass}" id="${sectionId}"><div class="section-name-overlay">${sectionName}</div>${currentSection}</div>`);
-        }
-      }
-
-      function highlightAmpersandParts(line, highlightColor) {
-        return line.replace(/&([^&]*)&/g, `<span class="highlight-line">$1</span>`);
-      }
-
-      lines.forEach((line, idx) => {
-        const trimmedLine = line.trim();
-        
-        // Check if it's a break line (just dashes)
-        if (/^-+$/.test(trimmedLine)) {
-          pushSection();
-          htmlSections.push('<div class="break-line"></div>');
-          currentSection = null;
-          return;
-        }
-        
-        // Check if it's a section header (starts with # or $)
-        if (/^[#$][A-Za-z0-9]+/.test(trimmedLine)) {
-          pushSection();
-          
-          sectionType = trimmedLine.startsWith('#') ? 'yellow' : 'white';
-          sectionName = trimmedLine.substring(1); // Remove # or $
-          sectionId = slugify(trimmedLine);
-          
-          // Count sections for navigation
-          if (sectionType === 'yellow') {
-            yellowCount++;
-          } else {
-            whiteCount++;
-          }
-          
-          orderedSections.push({
-            id: sectionId,
-            name: sectionName,
-            type: sectionType,
-            fullName: trimmedLine
-          });
-          
-          currentSection = '';
-          return;
-        }
-        
-        // If we don't have a current section, create a default one
-        if (currentSection === null) {
-          yellowCount++;
-          sectionType = 'yellow';
-          sectionName = 'M';
-          sectionId = slugify('#M');
-          
-          orderedSections.push({
-            id: sectionId,
-            name: sectionName,
-            type: sectionType,
-            fullName: '#M'
-          });
-          
-          currentSection = '';
-        }
-        
-        // Process regular lyric lines
-        if (trimmedLine) {
-          let processedLine = trimmedLine;
-          
-          // Handle starred lines (Zuvaabu/highlighted)
-          if (processedLine.startsWith('*')) {
-            processedLine = processedLine.substring(1).trim();
-            processedLine = `<span class="highlight-line">${processedLine}</span>`;
-          }
-          
-          // Handle ampersand highlighting
-          processedLine = highlightAmpersandParts(processedLine, '#f5d000');
-          
-          currentSection += processedLine + '\n';
-        }
-        // Skip empty lines - don't add them to sections
-      });
-      
-      pushSection();
-      return { html: htmlSections.join(''), orderedSections };
-    }
-
-    function renderSectionButtons(orderedSections) {
-      window.sectionNavBar.innerHTML = '';
-      orderedSections.forEach((section) => {
-        const btn = document.createElement('button');
-        btn.className = section.type === 'yellow' ? 'yellow-btn' : 'white-btn';
-        btn.textContent = section.name;
-        btn.onclick = () => {
-          const element = document.getElementById(section.id);
-          if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } catch (error) {
+            console.error('❌ Error generating English lyrics:', error);
+            STATE.generatedEnglishLyrics = dhivehiLyrics;
+            STATE.englishAvailable = false;
             
-            // Flash effect
-            element.classList.add('flash');
-            setTimeout(() => element.classList.remove('flash'), 1000);
+            // Show error state
+            if (ELEMENTS.toggleSwitch) {
+              ELEMENTS.toggleSwitch.classList.remove('generating');
+              ELEMENTS.toggleSwitch.classList.add('disabled');
+            }
+          } finally {
+            if (ELEMENTS.loadingIndicator) {
+              ELEMENTS.loadingIndicator.classList.remove('show');
+            }
           }
-        };
-        window.sectionNavBar.appendChild(btn);
-      });
-    }
+        },
 
-    function createSectionOverlays(orderedSections, callback) {
-      // Remove existing overlays
-      document.querySelectorAll('.section-name-overlay').forEach(overlay => overlay.remove());
-      
-      // Create new overlays for each section
-      orderedSections.forEach(section => {
-        const sectionElement = document.getElementById(section.id);
-        if (sectionElement) {
-          const overlay = document.createElement('div');
-          overlay.className = 'section-name-overlay';
-          if (window.currentLanguage === 'english') {
-            overlay.classList.add('english');
+        enableLanguageToggle() {
+          console.log('🔄 Enabling language toggle...');
+          
+          // Enable toggle switch with ready state
+          if (ELEMENTS.toggleSwitch) {
+            ELEMENTS.toggleSwitch.classList.remove('disabled', 'generating');
+            ELEMENTS.toggleSwitch.classList.add('ready');
+            ELEMENTS.toggleSwitch.style.cursor = 'pointer';
+            ELEMENTS.toggleSwitch.style.opacity = '1';
+            
+            // Remove any existing event listeners to prevent duplicates
+            const newToggle = ELEMENTS.toggleSwitch.cloneNode(true);
+            ELEMENTS.toggleSwitch.parentNode.replaceChild(newToggle, ELEMENTS.toggleSwitch);
+            
+            // Update the references to the new elements
+            ELEMENTS.toggleSwitch = newToggle;
+            ELEMENTS.toggleSlider = newToggle.querySelector('#toggle-slider');
+            
+            // Add fresh click handler
+            ELEMENTS.toggleSwitch.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('🔄 Language toggle clicked');
+              this.toggleLanguage();
+            });
+            
+            // Also add keyboard support
+            ELEMENTS.toggleSwitch.addEventListener('keydown', (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔄 Language toggle activated via keyboard');
+                this.toggleLanguage();
+              }
+            });
+            
+            // Make it focusable for accessibility
+            ELEMENTS.toggleSwitch.setAttribute('tabindex', '0');
           }
-          overlay.textContent = section.name;
-          sectionElement.appendChild(overlay);
-        }
-      });
-      
-      // Call callback if provided to signal completion
-      if (callback) {
-        setTimeout(() => {
-          // Show all UI elements
+          
+          console.log('✅ Language toggle enabled and ready');
+        },
+
+        renderLyrics(lyrics, language) {
+          const { html, orderedSections } = this.parseSections(lyrics);
+          
+          if (ELEMENTS.songLyrics) {
+            ELEMENTS.songLyrics.innerHTML = html;
+          }
+
+          // Update language styling
+          this.updateLanguageDisplay(language);
+
+          // Create navigation buttons
+          this.renderSectionButtons(orderedSections);
+
+          // Create section overlays
+          setTimeout(() => {
+            this.createSectionOverlays(orderedSections);
+          }, 100);
+        },
+
+        parseSections(lyrics) {
+          const lines = lyrics.split('\n');
+          let orderedSections = [];
+          let htmlSections = [];
+          let currentSection = null;
+          let sectionType = null;
+          let sectionId = null;
+          let sectionName = null;
+
+          const pushSection = () => {
+            if (currentSection && currentSection.trim()) {
+              const blockClass = 'section-block';
+              htmlSections.push(`<div class="${blockClass}" id="${sectionId}"><div class="section-name-overlay">${sectionName}</div>${currentSection}</div>`);
+            }
+          };
+
+          const highlightAmpersandParts = (line) => {
+            return line.replace(/&([^&]*)&/g, `<span class="highlight-line">$1</span>`);
+          };
+
+          lines.forEach((line) => {
+            const trimmedLine = line.trim();
+            
+            if (/^-+$/.test(trimmedLine)) {
+              pushSection();
+              htmlSections.push('<div class="break-line"></div>');
+              currentSection = null;
+              return;
+            }
+            
+            if (/^[#$][A-Za-z0-9]+/.test(trimmedLine)) {
+              pushSection();
+              
+              sectionType = trimmedLine.startsWith('#') ? 'yellow' : 'white';
+              sectionName = trimmedLine.substring(1);
+              sectionId = this.slugify(trimmedLine);
+              
+              orderedSections.push({
+                id: sectionId,
+                name: sectionName,
+                type: sectionType,
+                fullName: trimmedLine
+              });
+              
+              currentSection = '';
+              return;
+            }
+            
+            if (currentSection === null) {
+              sectionType = 'yellow';
+              sectionName = 'M';
+              sectionId = this.slugify('#M');
+              
+              orderedSections.push({
+                id: sectionId,
+                name: sectionName,
+                type: sectionType,
+                fullName: '#M'
+              });
+              
+              currentSection = '';
+            }
+            
+            if (trimmedLine) {
+              let processedLine = trimmedLine;
+              
+              if (processedLine.startsWith('*')) {
+                processedLine = processedLine.substring(1).trim();
+                processedLine = `<span class="highlight-line">${processedLine}</span>`;
+              }
+              
+              processedLine = highlightAmpersandParts(processedLine);
+              currentSection += processedLine + '\n';
+            }
+          });
+          
+          pushSection();
+          return { html: htmlSections.join(''), orderedSections };
+        },
+
+        slugify(text) {
+          return text
+            .toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[\s_-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+        },
+
+        renderSectionButtons(orderedSections) {
+          if (!ELEMENTS.sectionNavBar) return;
+
+          ELEMENTS.sectionNavBar.innerHTML = '';
+          orderedSections.forEach((section) => {
+            const btn = document.createElement('button');
+            btn.className = section.type === 'yellow' ? 'yellow-btn' : 'white-btn';
+            btn.textContent = section.name;
+            btn.onclick = () => {
+              const element = document.getElementById(section.id);
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                element.classList.add('flash');
+                setTimeout(() => element.classList.remove('flash'), 1000);
+              }
+            };
+            ELEMENTS.sectionNavBar.appendChild(btn);
+          });
+        },
+
+        createSectionOverlays(orderedSections) {
+          document.querySelectorAll('.section-name-overlay').forEach(overlay => overlay.remove());
+          
+          orderedSections.forEach(section => {
+            const sectionElement = document.getElementById(section.id);
+            if (sectionElement) {
+              const overlay = document.createElement('div');
+              overlay.className = 'section-name-overlay';
+              if (STATE.currentLanguage === 'english') {
+                overlay.classList.add('english');
+              }
+              overlay.textContent = section.name;
+              sectionElement.appendChild(overlay);
+            }
+          });
+        },
+
+        updateLanguageDisplay(language) {
+          STATE.currentLanguage = language;
+          
+          // Update toggle slider position
+          this.updateToggleState(language);
+          
+          // Update section navigation bar position
+          if (ELEMENTS.sectionNavBar) {
+            if (language === 'english') {
+              ELEMENTS.sectionNavBar.classList.add('english');
+            } else {
+              ELEMENTS.sectionNavBar.classList.remove('english');
+            }
+          }
+          
+          // Update lyrics template styling
+          if (ELEMENTS.lyricsTemplate) {
+            if (language === 'english') {
+              ELEMENTS.lyricsTemplate.classList.add('english');
+              ELEMENTS.lyricsTemplate.style.direction = 'ltr';
+              ELEMENTS.lyricsTemplate.style.textAlign = 'left';
+            } else {
+              ELEMENTS.lyricsTemplate.classList.remove('english');
+              ELEMENTS.lyricsTemplate.style.direction = 'rtl';
+              ELEMENTS.lyricsTemplate.style.textAlign = 'right';
+            }
+          }
+        },
+
+        toggleLanguage() {
+          console.log('🔄 Toggle language called:', { 
+            currentLanguage: STATE.currentLanguage, 
+            englishAvailable: STATE.englishAvailable,
+            hasEnglishLyrics: !!STATE.generatedEnglishLyrics,
+            toggleReady: ELEMENTS.toggleSwitch && ELEMENTS.toggleSwitch.classList.contains('ready')
+          });
+          
+          // Check if toggle is in ready state and English is available
+          if (!STATE.englishAvailable || !STATE.generatedEnglishLyrics || 
+              !ELEMENTS.toggleSwitch || !ELEMENTS.toggleSwitch.classList.contains('ready')) {
+            console.warn('⚠️ English lyrics not available yet or toggle not ready');
+            
+            // Give visual feedback that it's not ready
+            if (ELEMENTS.toggleSwitch) {
+              ELEMENTS.toggleSwitch.style.animation = 'shake 0.5s';
+              setTimeout(() => {
+                if (ELEMENTS.toggleSwitch) {
+                  ELEMENTS.toggleSwitch.style.animation = '';
+                }
+              }, 500);
+            }
+            return;
+          }
+          
+          const newLanguage = STATE.currentLanguage === 'dhivehi' ? 'english' : 'dhivehi';
+          const lyrics = newLanguage === 'dhivehi' ? STATE.currentSong.lyrics : STATE.generatedEnglishLyrics;
+          
+          console.log(`🔄 Switching to ${newLanguage} language`);
+          
+          // Update the toggle UI immediately for snappy response
+          this.updateToggleState(newLanguage);
+          
+          // Render the lyrics with smooth transition
+          this.renderLyrics(lyrics, newLanguage);
+          
+          console.log('✅ Language switched successfully');
+        },
+
+        updateToggleState(language) {
+          console.log('🔄 Updating toggle state to:', language);
+          
+          // Update the slider element reference if needed
+          if (!ELEMENTS.toggleSlider && ELEMENTS.toggleSwitch) {
+            ELEMENTS.toggleSlider = ELEMENTS.toggleSwitch.querySelector('#toggle-slider');
+          }
+          
+          if (ELEMENTS.toggleSlider) {
+            if (language === 'english') {
+              ELEMENTS.toggleSlider.classList.add('english');
+              ELEMENTS.toggleSlider.textContent = 'English';
+              console.log('✅ Toggle slider set to English position');
+            } else {
+              ELEMENTS.toggleSlider.classList.remove('english');
+              ELEMENTS.toggleSlider.textContent = 'ދިވެހި';
+              console.log('✅ Toggle slider set to Dhivehi position');
+            }
+          } else {
+            console.warn('⚠️ Toggle slider element not found');
+          }
+        },
+
+        showUI() {
+          // Ensure all page elements are ready before showing
           const container = document.querySelector('.container');
-          const lyricsTemplate = document.getElementById('lyrics-template');
-          const sectionNavBar = document.getElementById('section-nav-bar');
+          const lyricsTemplate = ELEMENTS.lyricsTemplate;
+          const sectionNavBar = ELEMENTS.sectionNavBar;
+          const songTitle = ELEMENTS.songTitle;
           
-          if (container) container.classList.add('ready');
-          if (lyricsTemplate) lyricsTemplate.classList.add('ready');
-          if (sectionNavBar) sectionNavBar.classList.add('ready');
+          // Check if all essential elements exist and have content
+          const allElementsReady = container && lyricsTemplate && songTitle && 
+                                 songTitle.textContent && songTitle.textContent.trim() !== '';
           
-          // Wait a bit for the fade-in transition, then hide loading screen
-          setTimeout(callback, 300);
-        }, 50);
-      }
-    }
-    
-    // Generate English lyrics using reverse transliteration
-    function generateEnglishLyrics(dhivehiLyrics) {
-      if (!window.reverseTransliterate) {
-        console.error('Reverse transliteration function not available');
-        return dhivehiLyrics; // Fallback to original
-      }
-      
-      const lines = dhivehiLyrics.split('\n');
-      const transliteratedLines = lines.map(line => {
-        const trimmedLine = line.trim();
-        
-        // Keep section headers and breaks as-is
-        if (/^[#$][A-Za-z0-9]+/.test(trimmedLine) || /^-+$/.test(trimmedLine)) {
-          return line;
-        }
-        
-        // Handle starred lines
-        if (trimmedLine.startsWith('*')) {
-          const content = trimmedLine.substring(1).trim();
-          return '*' + window.reverseTransliterate(content);
-        }
-        
-        // Handle empty lines
-        if (!trimmedLine) {
-          return line;
-        }
-        
-        // Transliterate regular lines
-        return window.reverseTransliterate(trimmedLine);
-      });
-      
-      return transliteratedLines.join('\n');
-    }
-    
-    function initializeLyrics() {
-    const songTitle = document.getElementById('song-title');
-    const songLyrics = document.getElementById('song-lyrics');
-    const lyricsTemplate = document.getElementById('lyrics-template');
-    const sectionNavBar = document.getElementById('section-nav-bar');
-    const languageToggle = document.getElementById('language-toggle');
-    const toggleSlider = document.getElementById('toggle-slider');
-    const toggleSwitch = document.getElementById('toggle-switch');
-    const loadingIndicator = document.getElementById('loading-indicator');
-    const selectedId = localStorage.getItem('selectedSongId');
-    const song = window.songs.find(s => String(s.id) === String(selectedId));
-    
-    let currentLanguage = 'dhivehi'; // Default to Dhivehi
-    let englishAvailable = false; // Will be set to true after generation
-    let generatedEnglishLyrics = null;
-    
-    // Make these variables global so they can be accessed by the toggle function
-    window.currentSong = song;
-    window.currentLanguage = currentLanguage;
-    window.englishAvailable = englishAvailable;
-    window.sectionNavBar = sectionNavBar;
-    window.toggleSlider = toggleSlider;
-    window.songLyrics = songLyrics;
-    window.lyricsTemplate = lyricsTemplate;
-    window.generatedEnglishLyrics = generatedEnglishLyrics;
-    
-    function switchLanguage(language) {
-      if (language === 'english' && !window.englishAvailable) {
-        return; // Can't switch to English if not available
-      }
-      
-      window.currentLanguage = language;
-      
-      // Update toggle slider
-      if (language === 'english') {
-        window.toggleSlider.classList.add('english');
-        window.toggleSlider.textContent = 'English';
-        window.sectionNavBar.classList.add('english');
-      } else {
-        window.toggleSlider.classList.remove('english');
-        window.toggleSlider.textContent = 'ދިވެހި';
-        window.sectionNavBar.classList.remove('english');
-      }
-      
-      // Update lyrics display
-      const lyrics = language === 'dhivehi' ? window.currentSong.lyrics : window.generatedEnglishLyrics;
-      const { html, orderedSections } = parseSections(lyrics);
-      window.songLyrics.innerHTML = html;
-      
-      // Update text direction and font
-      const lyricsContainer = document.getElementById('lyrics-template');
-      if (language === 'english') {
-        lyricsContainer.classList.add('english');
-        lyricsContainer.style.direction = 'ltr';
-        lyricsContainer.style.textAlign = 'left';
-        lyricsContainer.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
-      } else {
-        lyricsContainer.classList.remove('english');
-        lyricsContainer.style.direction = 'rtl';
-        lyricsContainer.style.textAlign = 'right';
-        lyricsContainer.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
-      }
-      
-      // Update navigation buttons
-      renderSectionButtons(orderedSections);
-      
-      // Create section overlays
-      setTimeout(() => createSectionOverlays(orderedSections), 100);
-    }
-    
-    // Make switchLanguage global
-    window.switchLanguage = switchLanguage;
+          if (!allElementsReady) {
+            console.warn('Not all elements ready for UI display');
+            // Try again after a short delay
+            setTimeout(() => this.showUI(), 50);
+            return;
+          }
+          
+          // Show content immediately for faster perceived loading
+          if (container) {
+            container.classList.add('ready');
+            container.style.opacity = '1';
+            container.style.visibility = 'visible';
+            container.style.transform = 'translateY(0)';
+          }
+          
+          if (lyricsTemplate) {
+            lyricsTemplate.style.display = 'block';
+            lyricsTemplate.classList.add('ready');
+          }
+          
+          if (sectionNavBar) {
+            sectionNavBar.classList.add('ready');
+          }
+          
+          // Wait for content to be rendered, then hide loading screen
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              // Double RAF to ensure content is painted
+              setTimeout(() => {
+                // Use forceHide to override navigation mode protection
+                if (LoadingScreen && typeof LoadingScreen.forceHide === 'function') {
+                  LoadingScreen.forceHide();
+                } else {
+                  LoadingScreen.hide();
+                }
+              }, 100); // Small delay to ensure smooth transition
+            });
+          });
+        },
 
-    if (song) {
-      songTitle.textContent = song.name;
-      
-      // Generate English lyrics in the background
-      loadingIndicator.classList.add('show');
-      
-      // Use setTimeout to allow UI to update before heavy processing
-      setTimeout(() => {
-        try {
-          generatedEnglishLyrics = generateEnglishLyrics(song.lyrics);
-          window.generatedEnglishLyrics = generatedEnglishLyrics;
+        showError(message) {
+          if (ELEMENTS.songTitle) {
+            ELEMENTS.songTitle.textContent = 'Error';
+          }
+          if (ELEMENTS.songLyrics) {
+            ELEMENTS.songLyrics.innerHTML = message;
+          }
+          if (ELEMENTS.lyricsTemplate) {
+            ELEMENTS.lyricsTemplate.style.display = 'block';
+          }
           
-          englishAvailable = true;
-          window.englishAvailable = englishAvailable;
-          
-          // Enable the toggle switch
-          toggleSwitch.classList.remove('disabled');
-          
-          console.log('English lyrics generated successfully');
-        } catch (error) {
-          console.error('Error generating English lyrics:', error);
-          generatedEnglishLyrics = song.lyrics; // Fallback
-          window.generatedEnglishLyrics = generatedEnglishLyrics;
-        } finally {
-          loadingIndicator.classList.remove('show');
+          // Ensure loading screen is hidden when showing error
+          if (LoadingScreen && typeof LoadingScreen.forceHide === 'function') {
+            LoadingScreen.forceHide();
+          } else {
+            LoadingScreen.hide();
+          }
+          this.showUI();
         }
-      }, 100);
-      
-      // Initially show Dhivehi lyrics
-      updateLoadingProgress('Rendering sections...');
-      const { html, orderedSections } = parseSections(song.lyrics);
-      songLyrics.innerHTML = html;
-      lyricsTemplate.style.display = 'block';
-      
-      // Setup navigation
-      renderSectionButtons(orderedSections);
-      
-      // Create section overlays and hide loading screen after everything is ready
-      setTimeout(() => {
-        updateLoadingProgress('Finalizing...');
-        createSectionOverlays(orderedSections, () => {
-          // Hide loading screen after section overlays are created
-          hideLoadingScreen();
-        });
-      }, 100);
-    } else {
-      songTitle.textContent = 'Song not found';
-      songLyrics.innerHTML = 'The selected song could not be found.';
-      lyricsTemplate.style.display = 'block';
-      
-      // Show UI elements even for error case
-      setTimeout(() => {
-        const container = document.querySelector('.container');
-        const lyricsTemplate = document.getElementById('lyrics-template');
-        
-        if (container) container.classList.add('ready');
-        if (lyricsTemplate) lyricsTemplate.classList.add('ready');
-        
-        // Hide loading screen after showing error
-        setTimeout(() => hideLoadingScreen(), 300);
-      }, 100);
-    }
-    } // Close initializeLyrics function
-    
-    // Global toggle function that can be called from HTML
-    function toggleLanguage() {
-      if (!window.englishAvailable) {
-        return; // Don't allow toggle if English not available
-      }
-      
-      const newLanguage = window.currentLanguage === 'dhivehi' ? 'english' : 'dhivehi';
-      window.switchLanguage(newLanguage);
-    }
+      };
+
+      // Main Application
+      const App = {
+        async init() {
+          try {
+            LoadingScreen.init();
+            LoadingScreen.show('Loading lyrics...');
+
+            // Wait for shared services
+            await this.waitForServices();
+
+            // Set up data service event listeners to use our loading screen
+            this.setupDataServiceListeners();
+
+            // Initialize components
+            PinManager.init();
+            LyricsManager.init();
+
+            STATE.isInitialized = true;
+            
+            // Add failsafe to ensure loading screen doesn't stay forever
+            setTimeout(() => {
+              if (document.querySelector('.loading-screen:not(.fade-out)')) {
+                console.warn('Loading screen failsafe triggered - hiding after 10 seconds');
+                LoadingScreen.hide();
+              }
+            }, 10000);
+            
+          } catch (error) {
+            console.error('Failed to initialize lyrics app:', error);
+            LoadingScreen.updateProgress('Loading lyrics...');
+            
+            // Ensure loading screen is hidden on error
+            setTimeout(() => LoadingScreen.hide(), 2000);
+          }
+        },
+
+        setupDataServiceListeners() {
+          // Intercept data service loading events and use our loading screen
+          if (window.RhythmData) {
+            window.RhythmData.on('loadingStart', (type) => {
+              // Don't show loading screen if already showing PIN overlay
+              if (!ELEMENTS.pinOverlay || ELEMENTS.pinOverlay.classList.contains('hidden')) {
+                LoadingScreen.show('Loading lyrics...');
+              }
+            });
+
+            window.RhythmData.on('loadingProgress', (message) => {
+              LoadingScreen.updateProgress('Loading lyrics...');
+            });
+
+            window.RhythmData.on('loadingComplete', (type) => {
+              // Don't hide if we're in the process of loading song data
+              if (type === 'songs' && !STATE.isInitialized) {
+                LoadingScreen.updateProgress('Loading lyrics...');
+              }
+            });
+
+            window.RhythmData.on('loadingError', (type, error) => {
+              console.error(`Data loading error for ${type}:`, error);
+              LoadingScreen.updateProgress('Loading lyrics...');
+            });
+          }
+        },
+
+        async waitForServices() {
+          return new Promise((resolve) => {
+            let attempts = 0;
+            const maxAttempts = 20; // 2 seconds max wait
+            
+            const checkServices = () => {
+              attempts++;
+              if (window.RhythmSession && window.RhythmData && window.RhythmPageTransition) {
+                resolve();
+              } else if (attempts >= maxAttempts) {
+                console.warn('Shared services not available, continuing with fallback');
+                resolve();
+              } else {
+                setTimeout(checkServices, 100);
+              }
+            };
+            checkServices();
+          });
+        },
+
+        async loadSongData() {
+          if (!window.RhythmSession.isAuthenticated()) {
+            return;
+          }
+
+          // Keep the same loading message for seamless experience
+          LoadingScreen.updateProgress('Loading lyrics...');
+          
+          try {
+            // Use cached data for faster loading - don't force refresh
+            if (window.RhythmData) {
+              // Only load if we don't have any data at all
+              if (window.RhythmData.songs.length === 0) {
+                LoadingScreen.updateProgress('Loading lyrics...');
+                await window.RhythmData.loadSongsData(false, true); // Skip loading events
+              }
+            }
+            
+            LoadingScreen.updateProgress('Loading lyrics...');
+            
+            // Load the specific song
+            await LyricsManager.loadSong();
+          } catch (error) {
+            console.error('Failed to load song data:', error);
+            LyricsManager.showError('Failed to load song');
+          }
+        }
+      };
+
+      // Global functions for backward compatibility
+      window.toggleLanguage = () => {
+        console.log('🔄 Global toggleLanguage called');
+        if (LyricsManager && typeof LyricsManager.toggleLanguage === 'function') {
+          LyricsManager.toggleLanguage();
+        } else {
+          console.warn('⚠️ LyricsManager.toggleLanguage not available');
+        }
+      };
+
+      // Initialize application
+      document.addEventListener('DOMContentLoaded', () => {
+        App.init();
+      });
+
+      return App;
+    })();
   </script>
 </body>
 </html>
