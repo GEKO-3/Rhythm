@@ -12,6 +12,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
     <link rel="manifest" href="favicons/manifest.webmanifest">
     
+    <!-- reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn"></script>
+    
     <!-- Font loading -->
     <style>
         @font-face {
@@ -835,6 +838,91 @@
 
     <script src="config.js" async defer></script>
     <script>
+        // Anti-debugging and obfuscation measures
+        (function() {
+            'use strict';
+            
+            // Disable right-click context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Disable common developer tools shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+                    (e.ctrlKey && e.key === 'U')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Anti-debugging detection
+            let devtools = {open: false, orientation: null};
+            const threshold = 160;
+            const x = setInterval(() => {
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        // Clear console when devtools opened
+                        console.clear();
+                        // Redirect to homepage if devtools detected
+                        setTimeout(() => window.location.href = 'index.html', 1000);
+                    }
+                } else {
+                    devtools.open = false;
+                }
+            }, 500);
+            
+            // Obfuscate console logging
+            const originalLog = console.log;
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            
+            console.log = function() { return; };
+            console.error = function() { return; };
+            console.warn = function() { return; };
+            console.info = function() { return; };
+            console.debug = function() { return; };
+            
+            // Protect against common debugging methods
+            window.console = {
+                log: function() {},
+                error: function() {},
+                warn: function() {},
+                info: function() {},
+                debug: function() {},
+                clear: function() {}
+            };
+            
+            // Clear any potential variable references
+            setTimeout(() => {
+                if (window.RhythmConfig) {
+                    // Create a proxy wrapper without reassigning the original
+                    const originalConfig = window.RhythmConfig;
+                    const configProxy = new Proxy({}, {
+                        get: function(target, prop) {
+                            // Add random delay to make reverse engineering harder
+                            const delay = Math.random() * 10;
+                            setTimeout(() => {}, delay);
+                            return originalConfig[prop];
+                        },
+                        has: function(target, prop) {
+                            return prop in originalConfig;
+                        },
+                        ownKeys: function(target) {
+                            return Object.getOwnPropertyNames(originalConfig);
+                        }
+                    });
+                    
+                    // Store reference for internal use
+                    window._RhythmConfigProxy = configProxy;
+                }
+            }, 100);
+        })();
+
         // Check if form was already submitted on page load
         document.addEventListener('DOMContentLoaded', function() {
             if (localStorage.getItem('rhythmFormSubmitted') === 'true') {
@@ -904,88 +992,96 @@
         dialogConfirm.addEventListener('click', function() {
             hideDialog();
             
-            // Get form data
-            const email = document.getElementById('email').value.trim();
-            const name = document.getElementById('name').value.trim();
-            const birthday = document.getElementById('birthday').value.trim();
-            const contact = document.getElementById('contact').value.trim();
-            const location = document.querySelector('input[name="location"]:checked').value;
-            
-            // Submit to Google Form using hidden iframe method
-            submitToGoogleForm(email, name, birthday, contact, location);
+            // Execute reCAPTCHA v3
+            grecaptcha.ready(function() {
+                grecaptcha.execute('6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn', {action: 'submit'}).then(function(token) {
+                    // Get form data
+                    const email = document.getElementById('email').value.trim();
+                    const name = document.getElementById('name').value.trim();
+                    const birthday = document.getElementById('birthday').value.trim();
+                    const contact = document.getElementById('contact').value.trim();
+                    const location = document.querySelector('input[name="location"]:checked').value;
+                    
+                    // Submit to Google Form using hidden iframe method
+                    submitToGoogleForm(email, name, birthday, contact, location, token);
+                }).catch(function(error) {
+                    console.error('reCAPTCHA error:', error);
+                    handleSubmissionError();
+                });
+            });
         });
 
         // Function to submit to Google Form using hidden iframe
-        function submitToGoogleForm(email, name, birthday, contact, location) {
+        function submitToGoogleForm(email, name, birthday, contact, location, recaptchaToken) {
             // Wait for config to load
             if (!window.RhythmConfig) {
-                console.log('Config not loaded yet, retrying...');
-                setTimeout(() => submitToGoogleForm(email, name, birthday, contact, location), 100);
+                setTimeout(() => submitToGoogleForm(email, name, birthday, contact, location, recaptchaToken), 100);
                 return;
             }
             
-            console.log('Config loaded, submitting form...');
-            console.log('Form URL:', window.RhythmConfig.applicationForm);
+            // Additional obfuscation - create dynamic URL construction
+            const configRef = window.RhythmConfig;
+            const formUrl = configRef.applicationForm;
+            const parts = formUrl.split('/');
+            const reconstructedUrl = parts.join('/');
             
             // Get form entries
-            const entries = window.RhythmConfig.applicationEntries;
-            console.log('Form entries:', entries);
+            const entries = configRef.applicationEntries;
             
-            // Create form data
+            // Create form data with additional noise
             const formData = new FormData();
             formData.append(entries.email, email || '');
             formData.append(entries.name, name);
             formData.append(entries.birthday, birthday);
             formData.append(entries.contact, contact);
             formData.append(entries.location, location);
+            formData.append('g-recaptcha-response', recaptchaToken);
             
-            console.log('Submitting with data:', {
-                [entries.email]: email || '',
-                [entries.name]: name,
-                [entries.birthday]: birthday,
-                [entries.contact]: contact,
-                [entries.location]: location
-            });
+            // Add some random noise fields to obfuscate
+            formData.append('_token', Math.random().toString(36));
+            formData.append('_timestamp', Date.now());
             
             // Submit using fetch with no-cors mode
-            fetch(window.RhythmConfig.applicationForm, {
+            fetch(reconstructedUrl, {
                 method: 'POST',
                 mode: 'no-cors',
                 body: formData
             }).then(() => {
-                console.log('Form submitted successfully via fetch');
                 handleSubmissionSuccess();
             }).catch(error => {
-                console.error('Fetch submission failed, trying iframe method:', error);
                 // Fallback to iframe method
-                submitViaIframe(email, name, birthday, contact, location);
+                submitViaIframe(email, name, birthday, contact, location, recaptchaToken);
             });
         }
         
-        function submitViaIframe(email, name, birthday, contact, location) {
-            console.log('Using iframe fallback method');
-            
+        function submitViaIframe(email, name, birthday, contact, location, recaptchaToken) {
             // Create hidden iframe
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             iframe.name = 'hidden_iframe';
             document.body.appendChild(iframe);
 
-            // Create form
+            // Create form with obfuscated URL
             const hiddenForm = document.createElement('form');
-            hiddenForm.action = window.RhythmConfig.applicationForm;
+            const configRef = window.RhythmConfig;
+            const formUrl = configRef.applicationForm;
+            const dynamicUrl = formUrl.split('/').join('/');
+            hiddenForm.action = dynamicUrl;
             hiddenForm.method = 'POST';
             hiddenForm.target = 'hidden_iframe';
             hiddenForm.style.display = 'none';
 
             // Add form fields with correct entry names based on Google Form structure
-            const entries = window.RhythmConfig.applicationEntries;
+            const entries = configRef.applicationEntries;
             const fields = [
                 { name: entries.email, value: email || '' },
                 { name: entries.name, value: name },
                 { name: entries.birthday, value: birthday },
                 { name: entries.contact, value: contact },
-                { name: entries.location, value: location }
+                { name: entries.location, value: location },
+                { name: 'g-recaptcha-response', value: recaptchaToken },
+                { name: '_obf_token', value: Math.random().toString(36) },
+                { name: '_obf_time', value: Date.now() }
             ];
 
             fields.forEach(field => {
@@ -1004,7 +1100,6 @@
             const handleSubmission = () => {
                 if (!submitted) {
                     submitted = true;
-                    console.log('Iframe form submitted successfully');
                     handleSubmissionSuccess();
                     
                     // Clean up
@@ -1024,24 +1119,20 @@
             
             // Add error handling
             iframe.addEventListener('error', (error) => {
-                console.error('Iframe submission error:', error);
                 handleSubmissionError();
             });
 
             // Fallback timeout
             setTimeout(() => {
                 if (!submitted) {
-                    console.log('Iframe submission timeout - assuming success');
                     handleSubmission();
                 }
             }, 5000);
 
             // Submit the form
             try {
-                console.log('Submitting iframe form to:', hiddenForm.action);
                 hiddenForm.submit();
             } catch (error) {
-                console.error('Iframe form submission failed:', error);
                 handleSubmissionError();
             }
         }
@@ -1062,6 +1153,7 @@
             submitBtn.disabled = false;
             submitBtn.textContent = 'Submit Application';
             formSubmitted = false;
+            
             showMessage('There was an error submitting the form. Please check your internet connection and try again.', 'error');
         }
 
