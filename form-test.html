@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Test</title>
+</head>
+<body>
+    <h1>Google Form Test</h1>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse" method="POST" target="hidden_iframe">
+        <label>Email:</label><br>
+        <input type="email" name="entry.1045084900" value="test@example.com"><br><br>
+        
+        <label>Full Name:</label><br>
+        <input type="text" name="entry.1638269417" value="Test User" required><br><br>
+        
+        <label>Date of Birth (mm/dd/yyyy):</label><br>
+        <input type="text" name="entry.2119829349" value="01/15/1990"><br>
+        <input type="hidden" name="entry.286303387_day" value="15">
+        <input type="hidden" name="entry.286303387_month" value="01">
+        <input type="hidden" name="entry.286303387_year" value="1990"><br><br>
+        
+        <label>Contact Number:</label><br>
+        <input type="text" name="entry.286303387" value="+960 7123456" required><br><br>
+        
+        <label>Location:</label><br>
+        <input type="radio" name="entry.520958378" value="Yes" checked> Yes<br>
+        <input type="radio" name="entry.520958378" value="No"> No<br>
+        <input type="hidden" name="entry.520958378_sentinel" value=""><br><br>
+        
+        <button type="submit">Submit Test</button>
+    </form>
+    
+    <iframe name="hidden_iframe" style="display:none;"></iframe>
+    
+    <script>
+        document.querySelector('form').addEventListener('submit', function() {
+            alert('Form submitted! Check your Google Form responses.');
+        });
+    </script>
+</body>
+</html>

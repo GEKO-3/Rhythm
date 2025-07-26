@@ -1005,7 +1005,6 @@
                     // Submit to Google Form using hidden iframe method
                     submitToGoogleForm(email, name, birthday, contact, location, token);
                 }).catch(function(error) {
-                    console.error('reCAPTCHA error:', error);
                     handleSubmissionError();
                 });
             });
@@ -1019,6 +1018,18 @@
                 return;
             }
             
+            // Convert date from yyyy-mm-dd to separate components
+            let dateDay = '';
+            let dateMonth = '';
+            let dateYear = '';
+            
+            if (birthday) {
+                const [year, month, day] = birthday.split('-');
+                dateDay = day;
+                dateMonth = month;
+                dateYear = year;
+            }
+            
             // Additional obfuscation - create dynamic URL construction
             const configRef = window.RhythmConfig;
             const formUrl = configRef.applicationForm;
@@ -1028,14 +1039,24 @@
             // Get form entries
             const entries = configRef.applicationEntries;
             
-            // Create form data with additional noise
+            // Create form data with correct field mapping
             const formData = new FormData();
-            formData.append(entries.email, email || '');
-            formData.append(entries.name, name);
-            formData.append(entries.birthday, birthday);
-            formData.append(entries.contact, contact);
-            formData.append(entries.location, location);
+            formData.append(entries.email, email || ''); // entry.1045084900
+            formData.append(entries.name, name); // entry.1638269417  
+            formData.append(entries.birthday, contact); // entry.2119829349 (this is actually contact!)
+            formData.append(entries.contact, ''); // entry.286303387 (this is actually date base, but we use components)
+            formData.append(entries.location, location); // entry.520958378
             formData.append('g-recaptcha-response', recaptchaToken);
+            
+            // Add date components (the actual date fields)
+            if (birthday) {
+                formData.append('entry.286303387_day', dateDay);
+                formData.append('entry.286303387_month', dateMonth);
+                formData.append('entry.286303387_year', dateYear);
+            }
+            
+            // Add location sentinel (required for radio buttons)
+            formData.append('entry.520958378_sentinel', '');
             
             // Add some random noise fields to obfuscate
             formData.append('_token', Math.random().toString(36));
@@ -1055,6 +1076,18 @@
         }
         
         function submitViaIframe(email, name, birthday, contact, location, recaptchaToken) {
+            // Convert date from yyyy-mm-dd to separate components
+            let dateDay = '';
+            let dateMonth = '';
+            let dateYear = '';
+            
+            if (birthday) {
+                const [year, month, day] = birthday.split('-');
+                dateDay = day;
+                dateMonth = month;
+                dateYear = year;
+            }
+            
             // Create hidden iframe
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
@@ -1074,15 +1107,25 @@
             // Add form fields with correct entry names based on Google Form structure
             const entries = configRef.applicationEntries;
             const fields = [
-                { name: entries.email, value: email || '' },
-                { name: entries.name, value: name },
-                { name: entries.birthday, value: birthday },
-                { name: entries.contact, value: contact },
-                { name: entries.location, value: location },
+                { name: entries.email, value: email || '' }, // entry.1045084900
+                { name: entries.name, value: name }, // entry.1638269417
+                { name: entries.birthday, value: contact }, // entry.2119829349 (contact field!)
+                { name: entries.contact, value: '' }, // entry.286303387 (date base, but we use components)
+                { name: entries.location, value: location }, // entry.520958378
                 { name: 'g-recaptcha-response', value: recaptchaToken },
                 { name: '_obf_token', value: Math.random().toString(36) },
                 { name: '_obf_time', value: Date.now() }
             ];
+            
+            // Add date components (the actual date fields)
+            if (birthday) {
+                fields.push({ name: 'entry.286303387_day', value: dateDay });
+                fields.push({ name: 'entry.286303387_month', value: dateMonth });
+                fields.push({ name: 'entry.286303387_year', value: dateYear });
+            }
+            
+            // Add location sentinel (required for radio buttons)
+            fields.push({ name: 'entry.520958378_sentinel', value: '' });
 
             fields.forEach(field => {
                 const input = document.createElement('input');
@@ -1356,7 +1399,7 @@
             const dateValue = e.target.value; // This is in yyyy-mm-dd format
             if (dateValue) {
                 const [year, month, day] = dateValue.split('-');
-                // Display in dd/mm/yyyy format
+                // Display in dd/mm/yyyy format for user
                 birthdayDisplay.value = `${day}/${month}/${year}`;
             } else {
                 birthdayDisplay.value = '';

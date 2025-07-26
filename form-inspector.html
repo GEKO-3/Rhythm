@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Inspector</title>
+</head>
+<body>
+    <h1>Google Form Field Inspector</h1>
+    <p>Open this form in a new tab to inspect the field names:</p>
+    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/viewform" target="_blank">Open Google Form</a>
+    
+    <h2>Instructions to Find Correct Field Names:</h2>
+    <ol>
+        <li>Click the link above to open your Google Form</li>
+        <li>Right-click on the first input field (Email) and select "Inspect Element"</li>
+        <li>Look for the 'name' attribute, it should be something like "entry.xxxxxxxxx"</li>
+        <li>Repeat for each field and note down the correct names</li>
+        <li>Come back here and we'll update the form with the correct field names</li>
+    </ol>
+    
+    <h2>Current Field Mapping (based on your original info):</h2>
+    <ul>
+        <li><strong>Email:</strong> entry.1045084900</li>
+        <li><strong>Full Name:</strong> entry.1638269417</li>
+        <li><strong>Date of Birth:</strong> entry.2119829349 OR entry.286303387</li>
+        <li><strong>Contact Number:</strong> entry.286303387</li>
+        <li><strong>Location:</strong> entry.520958378</li>
+    </ul>
+    
+    <p><strong>Note:</strong> There seems to be confusion between date and contact fields. Both might be using entry.286303387.</p>
+    
+    <h2>Alternative: Quick Test All Possible Combinations</h2>
+    <button onclick="testAllCombinations()">Test All Field Combinations</button>
+    
+    <div id="testResults"></div>
+    
+    <script>
+        function testAllCombinations() {
+            const combinations = [
+                // Test if date and contact are swapped
+                {
+                    name: "Swapped Date/Contact Test",
+                    fields: {
+                        "entry.1045084900": "test@example.com",
+                        "entry.1638269417": "Test User Swap",
+                        "entry.286303387": "01/15/1990", // Date in contact field
+                        "entry.2119829349": "+960 7123456", // Contact in date field  
+                        "entry.520958378": "Yes"
+                    }
+                },
+                // Test original mapping
+                {
+                    name: "Original Mapping Test",
+                    fields: {
+                        "entry.1045084900": "test2@example.com",
+                        "entry.1638269417": "Test User Original",
+                        "entry.2119829349": "01/15/1990",
+                        "entry.286303387": "+960 7123456",
+                        "entry.520958378": "No"
+                    }
+                },
+                // Test minimal required fields only
+                {
+                    name: "Minimal Required Test",
+                    fields: {
+                        "entry.1638269417": "Test User Minimal",
+                        "entry.520958378": "Yes"
+                    }
+                }
+            ];
+            
+            combinations.forEach((combo, index) => {
+                setTimeout(() => {
+                    submitTestForm(combo.name, combo.fields);
+                }, index * 2000); // 2 second delay between tests
+            });
+        }
+        
+        function submitTestForm(testName, fields) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse';
+            form.target = 'test_iframe_' + Date.now();
+            form.style.display = 'none';
+            
+            // Create iframe
+            const iframe = document.createElement('iframe');
+            iframe.name = form.target;
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            // Add fields
+            Object.entries(fields).forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            });
+            
+            document.body.appendChild(form);
+            form.submit();
+            
+            // Show result
+            const resultDiv = document.getElementById('testResults');
+            resultDiv.innerHTML += `<p>✅ Submitted: ${testName}</p>`;
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(form);
+                document.body.removeChild(iframe);
+            }, 1000);
+        }
+    </script>
+    
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { background: #007cba; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #005a87; }
+        #testResults { margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px; }
+    </style>
+</body>
+</html>

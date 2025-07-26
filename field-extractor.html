@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Form Field Extractor</title>
+</head>
+<body>
+    <h1>Get Google Form Field Names</h1>
+    
+    <h2>Step 1: Extract Field Names</h2>
+    <p>Use this JavaScript code in your browser console on the Google Form page:</p>
+    
+    <textarea readonly style="width: 100%; height: 200px; font-family: monospace;">
+// Go to: https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/viewform
+// Open Developer Tools (F12)
+// Paste this code in the Console and press Enter:
+
+const inputs = document.querySelectorAll('input[name*="entry"], textarea[name*="entry"], select[name*="entry"]');
+const fieldMap = {};
+
+inputs.forEach((input, index) => {
+    const label = input.closest('[role="listitem"]')?.querySelector('[role="heading"]')?.textContent || 
+                  input.closest('.freebirdFormviewerViewItemsItemItem')?.querySelector('.freebirdFormviewerViewItemsItemItemTitle')?.textContent ||
+                  input.getAttribute('aria-label') || 
+                  `Field ${index + 1}`;
+    
+    fieldMap[label.trim()] = input.getAttribute('name');
+});
+
+console.log('=== GOOGLE FORM FIELD MAPPING ===');
+Object.entries(fieldMap).forEach(([label, name]) => {
+    console.log(`${label}: ${name}`);
+});
+
+console.log('\n=== COPY THIS MAPPING ===');
+console.log(JSON.stringify(fieldMap, null, 2));
+    </textarea>
+    
+    <h2>Step 2: Manual Inspection (Alternative)</h2>
+    <ol>
+        <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/viewform" target="_blank">Open your Google Form</a></li>
+        <li>Right-click on the Email field → "Inspect Element"</li>
+        <li>Look for: <code>&lt;input name="entry.XXXXXXX"&gt;</code></li>
+        <li>Note down the entry number for each field</li>
+        <li>Repeat for: Full Name, Date of Birth, Contact Number, Location</li>
+    </ol>
+    
+    <h2>Step 3: Test Current Mapping</h2>
+    <p>Current field mapping we're using:</p>
+    <ul>
+        <li>Email: entry.1045084900</li>
+        <li>Full Name: entry.1638269417</li>
+        <li>Date of Birth: entry.2119829349</li>
+        <li>Contact Number: entry.286303387</li>
+        <li>Location: entry.520958378</li>
+    </ul>
+    
+    <button onclick="testDirectSubmission()">Test Direct Submission</button>
+    <div id="testResult"></div>
+    
+    <h2>Step 4: Check Form Settings</h2>
+    <p>Make sure your Google Form is configured correctly:</p>
+    <ol>
+        <li>Go to your form editing page</li>
+        <li>Click the Settings tab (gear icon)</li>
+        <li>Under "Responses" make sure "Accepting responses" is ON</li>
+        <li>Check if you have any restrictions (like requiring sign-in)</li>
+    </ol>
+    
+    <script>
+        function testDirectSubmission() {
+            const resultDiv = document.getElementById('testResult');
+            resultDiv.innerHTML = '<p>🔄 Testing direct submission...</p>';
+            
+            // Create a simple test form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse';
+            form.target = 'test_iframe';
+            form.style.display = 'none';
+            
+            // Add test data
+            const testData = {
+                'entry.1045084900': 'test@example.com',
+                'entry.1638269417': 'Test User Direct',
+                'entry.2119829349': '01/15/1990',
+                'entry.286303387': '+960 7123456',
+                'entry.520958378': 'Yes'
+            };
+            
+            Object.entries(testData).forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            });
+            
+            // Create iframe
+            const iframe = document.createElement('iframe');
+            iframe.name = 'test_iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            document.body.appendChild(form);
+            
+            // Submit and handle response
+            iframe.onload = function() {
+                setTimeout(() => {
+                    resultDiv.innerHTML = '<p>✅ Submission attempt completed! Check your Google Form responses.</p>';
+                    document.body.removeChild(form);
+                    document.body.removeChild(iframe);
+                }, 1000);
+            };
+            
+            iframe.onerror = function() {
+                resultDiv.innerHTML = '<p>❌ Submission failed. Check form settings and field names.</p>';
+                document.body.removeChild(form);
+                document.body.removeChild(iframe);
+            };
+            
+            form.submit();
+        }
+    </script>
+    
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            line-height: 1.6; 
+        }
+        textarea { 
+            background: #f5f5f5; 
+            border: 1px solid #ddd; 
+            padding: 10px; 
+            border-radius: 5px; 
+        }
+        button { 
+            background: #007cba; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        button:hover { 
+            background: #005a87; 
+        }
+        code { 
+            background: #f0f0f0; 
+            padding: 2px 5px; 
+            border-radius: 3px; 
+            font-family: monospace; 
+        }
+        #testResult { 
+            margin-top: 10px; 
+            padding: 10px; 
+            background: #f9f9f9; 
+            border-radius: 5px; 
+        }
+    </style>
+</body>
+</html>

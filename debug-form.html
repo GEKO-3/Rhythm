@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Form Test</title>
+</head>
+<body>
+    <h1>Google Form Debug Test</h1>
+    <p>Testing different field combinations to find the correct mapping...</p>
+    
+    <!-- Test 1: Basic fields only -->
+    <h2>Test 1: Basic Fields Only</h2>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse" method="POST" target="test1_iframe">
+        <input type="text" name="entry.1638269417" value="Test User 1" placeholder="Name">
+        <input type="text" name="entry.520958378" value="Yes" placeholder="Location">
+        <button type="submit">Submit Test 1</button>
+    </form>
+    <iframe name="test1_iframe" style="display:none;"></iframe>
+    
+    <!-- Test 2: With email -->
+    <h2>Test 2: With Email</h2>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse" method="POST" target="test2_iframe">
+        <input type="email" name="entry.1045084900" value="test2@example.com" placeholder="Email">
+        <input type="text" name="entry.1638269417" value="Test User 2" placeholder="Name">
+        <input type="text" name="entry.520958378" value="No" placeholder="Location">
+        <button type="submit">Submit Test 2</button>
+    </form>
+    <iframe name="test2_iframe" style="display:none;"></iframe>
+    
+    <!-- Test 3: Different date format -->
+    <h2>Test 3: Simple Date</h2>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse" method="POST" target="test3_iframe">
+        <input type="text" name="entry.1638269417" value="Test User 3" placeholder="Name">
+        <input type="text" name="entry.2119829349" value="01/15/1990" placeholder="Date">
+        <input type="text" name="entry.520958378" value="Yes" placeholder="Location">
+        <button type="submit">Submit Test 3</button>
+    </form>
+    <iframe name="test3_iframe" style="display:none;"></iframe>
+    
+    <!-- Test 4: Contact field -->
+    <h2>Test 4: With Contact</h2>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse" method="POST" target="test4_iframe">
+        <input type="text" name="entry.1638269417" value="Test User 4" placeholder="Name">
+        <input type="text" name="entry.286303387" value="+960 7123456" placeholder="Contact">
+        <input type="text" name="entry.520958378" value="No" placeholder="Location">
+        <button type="submit">Submit Test 4</button>
+    </form>
+    <iframe name="test4_iframe" style="display:none;"></iframe>
+
+    <!-- Test 5: Check if we're using wrong date field -->
+    <h2>Test 5: Date in Contact Field</h2>
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse" method="POST" target="test5_iframe">
+        <input type="text" name="entry.1638269417" value="Test User 5" placeholder="Name">
+        <input type="text" name="entry.286303387" value="01/15/1990" placeholder="Date in Contact Field">
+        <input type="text" name="entry.520958378" value="Yes" placeholder="Location">
+        <button type="submit">Submit Test 5</button>
+    </form>
+    <iframe name="test5_iframe" style="display:none;"></iframe>
+    
+    <script>
+        // Add submit handlers to show feedback
+        document.querySelectorAll('form').forEach((form, index) => {
+            form.addEventListener('submit', function() {
+                console.log(`Test ${index + 1} submitted`);
+                setTimeout(() => {
+                    alert(`Test ${index + 1} submitted! Check Google Form responses.`);
+                }, 500);
+            });
+        });
+    </script>
+    
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { color: #333; margin-top: 30px; }
+        form { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        input { margin: 5px; padding: 5px; }
+        button { background: #007cba; color: white; padding: 8px 16px; border: none; }
+    </style>
+</body>
+</html>
