@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Form Field Inspector - Updated</title>
+</head>
+<body>
+    <h1>Google Form Field Inspector - Updated Version</h1>
+    <button onclick="inspectForm()">Inspect Updated Form Fields</button>
+    <div id="results"></div>
+
+    <script>
+        function inspectForm() {
+            const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/viewform';
+            
+            fetch(formUrl)
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    
+                    const fields = [];
+                    
+                    // Look for input fields with entry names
+                    const inputs = doc.querySelectorAll('input[name*="entry"]');
+                    inputs.forEach(input => {
+                        const label = findFieldLabel(input, doc);
+                        fields.push({
+                            type: 'input',
+                            name: input.name,
+                            inputType: input.type,
+                            label: label,
+                            id: input.id
+                        });
+                    });
+                    
+                    // Look for textarea fields
+                    const textareas = doc.querySelectorAll('textarea[name*="entry"]');
+                    textareas.forEach(textarea => {
+                        const label = findFieldLabel(textarea, doc);
+                        fields.push({
+                            type: 'textarea',
+                            name: textarea.name,
+                            label: label,
+                            id: textarea.id
+                        });
+                    });
+                    
+                    // Look for select fields
+                    const selects = doc.querySelectorAll('select[name*="entry"]');
+                    selects.forEach(select => {
+                        const label = findFieldLabel(select, doc);
+                        fields.push({
+                            type: 'select',
+                            name: select.name,
+                            label: label,
+                            id: select.id
+                        });
+                    });
+                    
+                    displayResults(fields);
+                })
+                .catch(error => {
+                    document.getElementById('results').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+                    console.error('Error:', error);
+                });
+        }
+        
+        function findFieldLabel(element, doc) {
+            // Try to find label by looking at nearby elements
+            const elementId = element.id;
+            if (elementId) {
+                const label = doc.querySelector(`label[for="${elementId}"]`);
+                if (label) return label.textContent.trim();
+            }
+            
+            // Look for aria-label
+            const ariaLabel = element.getAttribute('aria-label');
+            if (ariaLabel) return ariaLabel;
+            
+            // Look for nearby text content
+            let parent = element.parentElement;
+            for (let i = 0; i < 5 && parent; i++) {
+                const text = parent.textContent;
+                if (text && text.length < 100) {
+                    const cleanText = text.trim().replace(/\n+/g, ' ').replace(/\s+/g, ' ');
+                    if (cleanText.includes('Email') || cleanText.includes('Name') || 
+                        cleanText.includes('Birth') || cleanText.includes('Contact') || 
+                        cleanText.includes('residing')) {
+                        return cleanText;
+                    }
+                }
+                parent = parent.parentElement;
+            }
+            
+            return 'Unknown';
+        }
+        
+        function displayResults(fields) {
+            const resultsDiv = document.getElementById('results');
+            
+            if (fields.length === 0) {
+                resultsDiv.innerHTML = '<p>No form fields found.</p>';
+                return;
+            }
+            
+            let html = '<h2>Found Form Fields:</h2><table border="1" style="border-collapse: collapse; width: 100%;"><tr><th>Type</th><th>Entry Name</th><th>Input Type</th><th>Label/Context</th></tr>';
+            
+            fields.forEach(field => {
+                html += `<tr>
+                    <td>${field.type}</td>
+                    <td><strong>${field.name}</strong></td>
+                    <td>${field.inputType || field.type}</td>
+                    <td>${field.label}</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            
+            // Also show mapping for easy copy
+            html += '<h3>Field Mapping for Code:</h3><pre>';
+            fields.forEach(field => {
+                const context = field.label.toLowerCase();
+                if (context.includes('email')) {
+                    html += `Email: ${field.name}\n`;
+                } else if (context.includes('name')) {
+                    html += `Name: ${field.name}\n`;
+                } else if (context.includes('birth') || context.includes('date')) {
+                    html += `Birthday: ${field.name}\n`;
+                } else if (context.includes('contact') || context.includes('number')) {
+                    html += `Contact: ${field.name}\n`;
+                } else if (context.includes('residing') || context.includes('location')) {
+                    html += `Location: ${field.name}\n`;
+                }
+            });
+            html += '</pre>';
+            
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

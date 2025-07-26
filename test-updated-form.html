@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Updated Form Submission</title>
+</head>
+<body>
+    <h1>Test Updated Google Form Submission</h1>
+    <p>Testing with the new field mappings after changing date to text field.</p>
+    
+    <button onclick="testSubmission()">Test Submission</button>
+    <div id="result"></div>
+    
+    <h2>New Field Mapping</h2>
+    <ul>
+        <li>Email: entry.1045084900 (Field 3)</li>
+        <li>Full Name: entry.1638269417 (Field 4)</li>
+        <li>Date of Birth: entry.2119829349 (Field 5) - Now text field</li>
+        <li>Contact Number: entry.286303387 (Field 1)</li>
+        <li>Location: entry.520958378 (Field 2) - Radio button</li>
+        <li>Location Sentinel: entry.520958378_sentinel</li>
+    </ul>
+    
+    <script>
+        function testSubmission() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>🔄 Testing submission with updated field mapping...</p>';
+            
+            // Create test form
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = 'https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse';
+            form.target = 'test_iframe';
+            form.style.display = 'none';
+            
+            // Test data with updated mapping
+            const testData = {
+                'entry.1045084900': 'test.updated@example.com', // Email
+                'entry.1638269417': 'Test User Updated', // Full Name
+                'entry.286303387': '15/01/1990', // Date of Birth (text field, dd/mm/yyyy)
+                'entry.2119829349': '+960 7123456', // Contact Number
+                'entry.520958378': 'Yes', // Location
+                'entry.520958378_sentinel': '' // Location sentinel
+            };
+            
+            // Add fields to form
+            Object.entries(testData).forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            });
+            
+            // Create iframe
+            const iframe = document.createElement('iframe');
+            iframe.name = 'test_iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            
+            document.body.appendChild(form);
+            
+            // Handle submission result
+            iframe.onload = function() {
+                setTimeout(() => {
+                    resultDiv.innerHTML = `
+                        <p style="color: green;">✅ Test submission completed!</p>
+                        <p>Check your Google Form responses to see if the data was received.</p>
+                        <p><strong>Test Data Sent:</strong></p>
+                        <ul>
+                            <li>Email: test.updated@example.com</li>
+                            <li>Name: Test User Updated</li>
+                            <li>Birthday: 15/01/1990 (text format)</li>
+                            <li>Contact: +960 7123456</li>
+                            <li>Location: Yes</li>
+                        </ul>
+                    `;
+                    document.body.removeChild(form);
+                    document.body.removeChild(iframe);
+                }, 1000);
+            };
+            
+            iframe.onerror = function() {
+                resultDiv.innerHTML = '<p style="color: red;">❌ Test submission failed.</p>';
+                document.body.removeChild(form);
+                document.body.removeChild(iframe);
+            };
+            
+            form.submit();
+        }
+    </script>
+    
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            line-height: 1.6; 
+        }
+        button { 
+            background: #4CAF50; 
+            color: white; 
+            padding: 15px 30px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 16px;
+        }
+        button:hover { 
+            background: #45a049; 
+        }
+        #result { 
+            margin-top: 20px; 
+            padding: 15px; 
+            background: #f9f9f9; 
+            border-radius: 5px; 
+            border-left: 4px solid #4CAF50;
+        }
+        ul {
+            margin-top: 10px;
+        }
+        li {
+            margin: 5px 0;
+        }
+    </style>
+</body>
+</html>
