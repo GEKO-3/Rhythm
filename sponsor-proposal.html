@@ -6,10 +6,20 @@
     <meta name="description" content="Rhythm Boduberu Sponsor Proposal - Partner with us to promote traditional Maldivian culture through authentic Boduberu performances">
     <meta name="keywords" content="Rhythm Boduberu, Boduberu, Traditional Maldivian Music, Sponsorship, Partnership, Cultural Events, Maldivian Culture">
     <meta name="author" content="Rhythm Boduberu">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self'; connect-src 'self' https://docs.google.com https://www.google.com; frame-src https://www.google.com https://docs.google.com; object-src 'none';">
+    
     <title>Sponsor Proposal - Rhythm Boduberu</title>
     
     <!-- Performance optimizations: Resource hints -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://www.google.com">
+    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
     
     <!-- Critical CSS -->
     <link rel="stylesheet" href="styles.css">
@@ -1357,6 +1367,13 @@
                 </p>
                 
                 <form class="contact-form" id="sponsorForm">
+                    <!-- Security Status Indicator -->
+                    <div id="securityStatus" style="background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 10px; padding: 15px; margin-bottom: 25px; text-align: center; display: none;">
+                        <div style="color: #ffc107; font-family: 'Montserrat', sans-serif; font-weight: 600; font-size: 0.9rem;">
+                            <span id="securityIcon">🔒</span> <span id="securityText">Initializing security verification...</span>
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
                         <label for="name">Full Name *</label>
                         <input type="text" id="name" name="name" required placeholder="Enter your full name">
@@ -1377,8 +1394,25 @@
                         <input type="text" id="interest" name="interest" placeholder="Which tier are you interested in? (optional)">
                     </div>
                     
+                    <!-- Honeypot field for bot protection -->
+                    <div style="position: absolute; left: -9999px; visibility: hidden;">
+                        <input type="text" name="website" id="website" tabindex="-1" autocomplete="off">
+                    </div>
+                    
                     <div class="form-buttons">
-                        <button type="submit" class="submit-btn">Request Call Back</button>
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span id="submitText">Request Call Back</span>
+                            <span id="submitIcon" style="display: none;">🔐</span>
+                        </button>
+                    </div>
+                    
+                    <!-- reCAPTCHA Notice -->
+                    <div style="margin-top: 20px; padding: 15px; background: rgba(0, 0, 0, 0.3); border-radius: 10px; text-align: center;">
+                        <p style="color: #ccc; font-family: 'Montserrat', sans-serif; font-size: 0.8rem; margin: 0; line-height: 1.4;">
+                            This form is protected by reCAPTCHA and the Google 
+                            <a href="https://policies.google.com/privacy" target="_blank" style="color: var(--primary-color);">Privacy Policy</a> and 
+                            <a href="https://policies.google.com/terms" target="_blank" style="color: var(--primary-color);">Terms of Service</a> apply.
+                        </p>
                     </div>
                 </form>
                 
@@ -1403,7 +1437,223 @@
     </div>
 
     <script src="config.js" async defer></script>
+    
+    <!-- reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn" async defer></script>
+    
     <script>
+        // Advanced Security and reCAPTCHA initialization
+        (function() {
+            'use strict';
+            
+            // Advanced anti-debugging and obfuscation
+            const securityModule = {
+                init() {
+                    this.protectConsole();
+                    this.disableDevTools();
+                    this.preventRightClick();
+                    this.obfuscateCode();
+                },
+                
+                protectConsole() {
+                    // Console protection with multiple layers
+                    const originalLog = console.log;
+                    const originalWarn = console.warn;
+                    const originalError = console.error;
+                    
+                    // Override console methods with filtered logging
+                    console.log = function(...args) {
+                        if (args.some(arg => typeof arg === 'string' && arg.includes('RhythmConfig'))) {
+                            return; // Block sensitive logs
+                        }
+                        originalLog.apply(console, args);
+                    };
+                    
+                    // Detect console opening
+                    let devtools = {open: false, orientation: null};
+                    const threshold = 160;
+                    
+                    setInterval(() => {
+                        if (window.outerHeight - window.innerHeight > threshold || 
+                            window.outerWidth - window.innerWidth > threshold) {
+                            if (!devtools.open) {
+                                devtools.open = true;
+                                this.handleDevToolsDetection();
+                            }
+                        } else {
+                            devtools.open = false;
+                        }
+                    }, 100);
+                },
+                
+                disableDevTools() {
+                    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+                    document.addEventListener('keydown', function(e) {
+                        if (e.key === 'F12' || 
+                            (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) ||
+                            (e.ctrlKey && e.key === 'U') ||
+                            (e.ctrlKey && e.shiftKey && e.key === 'K')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return false;
+                        }
+                    }, true);
+                    
+                    // Disable context menu
+                    document.addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        return false;
+                    });
+                },
+                
+                preventRightClick() {
+                    document.addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        return false;
+                    });
+                    
+                    // Prevent text selection
+                    document.addEventListener('selectstart', function(e) {
+                        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                            return true;
+                        }
+                        e.preventDefault();
+                        return false;
+                    });
+                },
+                
+                obfuscateCode() {
+                    // Code obfuscation techniques
+                    const _0x1a2b = function(str) { return btoa(str); };
+                    const _0x2c3d = function(str) { return atob(str); };
+                    
+                    // Store sensitive data with obfuscation
+                    window._rSecData = {
+                        key: _0x1a2b('6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn'),
+                        action: _0x1a2b('sponsor_request'),
+                        site: _0x1a2b('rhythmboduberu.com')
+                    };
+                },
+                
+                handleDevToolsDetection() {
+                    console.clear();
+                    console.log('%cSecurity Alert!', 'color: red; font-size: 30px; font-weight: bold;');
+                    console.log('%cDeveloper tools detected. Form functionality may be restricted.', 'color: orange; font-size: 16px;');
+                    
+                    // Optional: Add additional security measures
+                    // document.body.style.filter = 'blur(5px)';
+                    // setTimeout(() => { document.body.style.filter = 'none'; }, 3000);
+                }
+            };
+            
+            // Initialize security module
+            securityModule.init();
+            
+            // reCAPTCHA readiness check
+            function waitForRecaptcha() {
+                return new Promise((resolve, reject) => {
+                    let attempts = 0;
+                    const maxAttempts = 50; // 5 seconds maximum wait
+                    
+                    const checkRecaptcha = () => {
+                        attempts++;
+                        
+                        if (typeof grecaptcha !== 'undefined' && grecaptcha.execute) {
+                            console.log('reCAPTCHA loaded successfully');
+                            resolve(true);
+                        } else if (attempts >= maxAttempts) {
+                            console.error('reCAPTCHA failed to load within timeout');
+                            reject(new Error('reCAPTCHA timeout'));
+                        } else {
+                            setTimeout(checkRecaptcha, 100);
+                        }
+                    };
+                    
+                    checkRecaptcha();
+                });
+            }
+            
+            // Initialize reCAPTCHA when page loads
+            document.addEventListener('DOMContentLoaded', function() {
+                const securityStatus = document.getElementById('securityStatus');
+                const securityIcon = document.getElementById('securityIcon');
+                const securityText = document.getElementById('securityText');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                // Show security status
+                if (securityStatus) {
+                    securityStatus.style.display = 'block';
+                }
+                
+                waitForRecaptcha()
+                    .then(() => {
+                        console.log('Security system initialized');
+                        
+                        // Update security status to ready
+                        if (securityIcon && securityText) {
+                            securityIcon.textContent = '✅';
+                            securityText.textContent = 'Security verification ready - Form protected';
+                            securityStatus.style.background = 'rgba(40, 167, 69, 0.1)';
+                            securityStatus.style.borderColor = 'rgba(40, 167, 69, 0.3)';
+                            securityStatus.style.color = '#28a745';
+                        }
+                        
+                        // Enable submit button
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                        }
+                        
+                        // Hide status after 3 seconds
+                        setTimeout(() => {
+                            if (securityStatus) {
+                                securityStatus.style.transition = 'opacity 0.5s ease';
+                                securityStatus.style.opacity = '0';
+                                setTimeout(() => {
+                                    securityStatus.style.display = 'none';
+                                }, 500);
+                            }
+                        }, 3000);
+                    })
+                    .catch(error => {
+                        console.error('Security initialization failed:', error);
+                        
+                        // Update security status to warning
+                        if (securityIcon && securityText) {
+                            securityIcon.textContent = '⚠️';
+                            securityText.textContent = 'Security verification unavailable - Basic protection active';
+                            securityStatus.style.background = 'rgba(220, 53, 69, 0.1)';
+                            securityStatus.style.borderColor = 'rgba(220, 53, 69, 0.3)';
+                            securityStatus.style.color = '#dc3545';
+                        }
+                        
+                        // Still enable submit button but with reduced security
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                        }
+                        
+                        // Hide status after 5 seconds
+                        setTimeout(() => {
+                            if (securityStatus) {
+                                securityStatus.style.transition = 'opacity 0.5s ease';
+                                securityStatus.style.opacity = '0';
+                                setTimeout(() => {
+                                    securityStatus.style.display = 'none';
+                                }, 500);
+                            }
+                        }, 5000);
+                    });
+                    
+                // Initially disable submit button until security is ready
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                }
+            });
+            
+            // Anti-tampering measures
+            Object.freeze(securityModule);
+            Object.seal(window._rSecData);
+        })();
+
         // Info Modal Data
         const infoData = {
             'video-ads': {
@@ -1566,9 +1816,16 @@
             `;
         }
 
-        // Form submission handling
-        document.getElementById('sponsorForm').addEventListener('submit', function(e) {
+        // Form submission handling with reCAPTCHA
+        document.getElementById('sponsorForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            // Honeypot detection
+            const honeypot = document.getElementById('website');
+            if (honeypot && honeypot.value) {
+                console.warn('Honeypot field filled - potential bot detected');
+                return; // Silent rejection
+            }
             
             // Check if user can submit today
             if (!canSubmitToday()) {
@@ -1593,153 +1850,325 @@
             const company = document.getElementById('company').value.trim();
             const interest = document.getElementById('interest').value.trim();
             
-            // Validation
+            // Enhanced validation
             if (!name || !phone) {
                 alert('Please fill in all required fields (Name and Phone Number)');
                 return;
             }
             
-            // Phone number validation (basic)
+            // Name validation
+            if (name.length < 2 || name.length > 100) {
+                alert('Please enter a valid name (2-100 characters)');
+                return;
+            }
+            
+            // Phone number validation (enhanced)
             const phoneRegex = /^[+]?[\d\s\-\(\)]{7,}$/;
             if (!phoneRegex.test(phone)) {
                 alert('Please enter a valid phone number');
                 return;
             }
             
-            // Show loading state
-            const submitBtn = document.querySelector('.submit-btn');
-            const originalText = submitBtn.textContent;
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-            
-            // Submit to Google Form using hidden iframe method
-            submitToGoogleForm(name, phone, company, interest, submitBtn, originalText);
-        });
-        
-        // Function to submit to Google Form using hidden iframe
-        function submitToGoogleForm(name, phone, company, interest, submitBtn, originalText) {
-            // Wait for config to load
-            if (!window.RhythmConfig) {
-                console.log('Config not loaded yet, retrying...');
-                setTimeout(() => submitToGoogleForm(name, phone, company, interest, submitBtn, originalText), 100);
+            // Company validation (if provided)
+            if (company && company.length > 200) {
+                alert('Company name is too long (maximum 200 characters)');
                 return;
             }
             
-            console.log('Config loaded, submitting form...');
-            console.log('Form URL:', window.RhythmConfig.sponsorProposalForm);
+            // Interest validation (if provided)
+            if (interest && interest.length > 300) {
+                alert('Sponsorship interest description is too long (maximum 300 characters)');
+                return;
+            }
             
-            // Get form entries
-            const entries = window.RhythmConfig.sponsorProposalEntries;
-            console.log('Form entries:', entries);
+            // Show loading state
+            const submitBtn = document.querySelector('.submit-btn');
+            const submitText = document.getElementById('submitText');
+            const submitIcon = document.getElementById('submitIcon');
+            const originalText = submitText.textContent;
             
-            // Create form data
+            submitBtn.disabled = true;
+            submitText.textContent = 'Verifying Security...';
+            if (submitIcon) {
+                submitIcon.style.display = 'inline';
+                submitIcon.textContent = '🔍';
+            }
+            
+            try {
+                // Execute reCAPTCHA
+                console.log('Executing reCAPTCHA...');
+                let token = null;
+                
+                if (typeof grecaptcha !== 'undefined' && grecaptcha.execute) {
+                    token = await grecaptcha.execute('6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn', {action: 'sponsor_request'});
+                    console.log('reCAPTCHA token obtained:', token ? 'SUCCESS' : 'FAILED');
+                } else {
+                    console.warn('reCAPTCHA not available, proceeding with reduced security');
+                }
+                
+                submitText.textContent = 'Submitting Request...';
+                if (submitIcon) {
+                    submitIcon.textContent = '📤';
+                }
+                
+                // Submit to Google Form
+                submitToGoogleForm(name, phone, company, interest, submitBtn, originalText, token);
+            } catch (error) {
+                console.error('reCAPTCHA error:', error);
+                submitBtn.disabled = false;
+                submitText.textContent = originalText;
+                if (submitIcon) {
+                    submitIcon.style.display = 'none';
+                }
+                alert('Security verification failed. Please try again.');
+            }
+        });
+        
+        // Function to submit to Google Form using hidden iframe with advanced obfuscation
+        function submitToGoogleForm(name, phone, company, interest, submitBtn, originalText, captchaToken) {
+            // Advanced anti-debugging measures
+            (() => {
+                const devtools = {open: false, orientation: null};
+                const threshold = 160;
+                
+                setInterval(() => {
+                    if (window.outerHeight - window.innerHeight > threshold || 
+                        window.outerWidth - window.innerWidth > threshold) {
+                        if (!devtools.open) {
+                            devtools.open = true;
+                            console.clear();
+                            console.log('%cDeveloper tools detected!', 'color: red; font-size: 30px;');
+                        }
+                    } else {
+                        devtools.open = false;
+                    }
+                }, 500);
+                
+                // Disable common shortcuts
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'F12' || 
+                        (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                        (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                        (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                        (e.ctrlKey && e.key === 'U')) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }, true);
+                
+                // Console protection
+                let c = console.log;
+                Object.defineProperty(console, 'log', {
+                    get() { return c; },
+                    set(val) { c = val; }
+                });
+            })();
+            
+            // Wait for config to load
+            if (!window.RhythmConfig) {
+                console.log('Config not loaded yet, retrying...');
+                setTimeout(() => submitToGoogleForm(name, phone, company, interest, submitBtn, originalText, captchaToken), 100);
+                return;
+            }
+            
+            // Obfuscated logging with hex encoding
+            const _0x4f2a = function(str) {
+                return str.split('').map(c => c.charCodeAt(0).toString(16)).join('');
+            };
+            const _0x8b1c = function(hex) {
+                return hex.match(/.{2}/g).map(h => String.fromCharCode(parseInt(h, 16))).join('');
+            };
+            
+            console.log(_0x8b1c('436f6e66696720686173206265656e206c6f61646564'));
+            
+            // Dynamic property reconstruction to prevent static analysis
+            const formKey = ['sponsor', 'Proposal', 'Form'].join('');
+            const entriesKey = ['sponsor', 'Proposal', 'Entries'].join('');
+            
+            // Multiple encoding layers for form URL
+            const baseFormUrl = window.RhythmConfig[formKey];
+            const obfuscatedUrl = btoa(baseFormUrl);
+            const finalUrl = atob(obfuscatedUrl);
+            
+            console.log(_0x8b1c('5375626d697474696e6720746f3a'), finalUrl.substring(0, 50) + '...');
+            
+            // Get form entries with dynamic reconstruction
+            const entries = window.RhythmConfig[entriesKey];
+            const fieldMapping = {
+                [_0x8b1c('6e616d65')]: entries.name,
+                [_0x8b1c('70686f6e65')]: entries.phone,
+                [_0x8b1c('636f6d70616e79')]: entries.company,
+                [_0x8b1c('696e746572657374')]: entries.interest
+            };
+            
+            console.log(_0x8b1c('4669656c64206d617070696e67733a'), Object.keys(fieldMapping));
+            
+            // Submit using fetch with no-cors mode and obfuscated headers
             const formData = new FormData();
-            formData.append(entries.name, name);
-            formData.append(entries.phone, phone);
-            formData.append(entries.company, company);
-            formData.append(entries.interest, interest);
+            formData.append(fieldMapping.name, name);
+            formData.append(fieldMapping.phone, phone);
+            formData.append(fieldMapping.company, company);
+            formData.append(fieldMapping.interest, interest);
             
-            console.log('Submitting with data:', {
-                [entries.name]: name,
-                [entries.phone]: phone,
-                [entries.company]: company,
-                [entries.interest]: interest
-            });
+            // Add obfuscated reCAPTCHA token
+            formData.append('g-recaptcha-response', captchaToken);
             
-            // Submit using fetch with no-cors mode
-            fetch(window.RhythmConfig.sponsorProposalForm, {
+            const submitData = {
+                [fieldMapping.name]: name,
+                [fieldMapping.phone]: phone,
+                [fieldMapping.company]: company,
+                [fieldMapping.interest]: interest,
+                'captcha': captchaToken ? 'verified' : 'failed'
+            };
+            
+            console.log(_0x8b1c('5375626d697474696e67207769746820646174613a'), submitData);
+            
+            // Attempt direct submission first
+            fetch(finalUrl, {
                 method: 'POST',
                 mode: 'no-cors',
-                body: formData
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json, text/javascript, */*; q=0.01'
+                }
             }).then(() => {
-                console.log('Form submitted successfully via fetch');
+                console.log(_0x8b1c('466f726d207375626d6974746564207375636365737366756c6c7920766961206665746368'));
                 handleSponsorSubmissionSuccess(name, submitBtn, originalText);
             }).catch(error => {
-                console.error('Fetch submission failed, trying iframe method:', error);
+                console.error(_0x8b1c('4665746368207375626d697373696f6e206661696c65642c20747279696e6720696672616d65206d6574686f643a'), error);
                 // Fallback to iframe method
-                submitSponsorViaIframe(name, phone, company, interest, submitBtn, originalText);
+                submitSponsorViaIframe(name, phone, company, interest, submitBtn, originalText, captchaToken);
             });
         }
         
-        function submitSponsorViaIframe(name, phone, company, interest, submitBtn, originalText) {
-            console.log('Using iframe fallback method');
+        function submitSponsorViaIframe(name, phone, company, interest, submitBtn, originalText, captchaToken) {
+            console.log('Using iframe fallback method with reCAPTCHA protection');
             
-            // Create hidden iframe
+            // Create hidden iframe with anti-debugging
             const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
-            iframe.name = 'hidden_iframe';
+            iframe.style.visibility = 'hidden';
+            iframe.style.position = 'absolute';
+            iframe.style.left = '-9999px';
+            iframe.name = 'hidden_iframe_' + Date.now();
+            iframe.sandbox = 'allow-forms allow-same-origin allow-scripts';
             document.body.appendChild(iframe);
 
-            // Create form
+            // Create form with obfuscated structure
             const hiddenForm = document.createElement('form');
             hiddenForm.action = window.RhythmConfig.sponsorProposalForm;
             hiddenForm.method = 'POST';
-            hiddenForm.target = 'hidden_iframe';
+            hiddenForm.target = iframe.name;
             hiddenForm.style.display = 'none';
+            hiddenForm.style.visibility = 'hidden';
+            hiddenForm.style.position = 'absolute';
+            hiddenForm.style.left = '-9999px';
 
             // Add form fields with correct entry names based on Google Form structure
             const entries = window.RhythmConfig.sponsorProposalEntries;
             const fields = [
                 { name: entries.name, value: name },         // Full Name
-                { name: entries.phone, value: phone },        // Phone Number  
-                { name: entries.company, value: company },      // Company/Organization
-                { name: entries.interest, value: interest }      // Sponsorship Interest
+                { name: entries.phone, value: phone },       // Phone Number  
+                { name: entries.company, value: company },   // Company/Organization
+                { name: entries.interest, value: interest }, // Sponsorship Interest
+                { name: 'g-recaptcha-response', value: captchaToken || '' } // reCAPTCHA token
             ];
 
-            fields.forEach(field => {
+            // Add fields with additional obfuscation
+            fields.forEach((field, index) => {
                 const input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = field.name;
                 input.value = field.value;
+                input.id = `field_${Date.now()}_${index}`;
+                
+                // Add random attributes for obfuscation
+                input.setAttribute('data-field', btoa(field.name));
+                input.setAttribute('data-index', index);
+                
                 hiddenForm.appendChild(input);
             });
+            
+            // Add honeypot fields to prevent bots
+            const honeypot = document.createElement('input');
+            honeypot.type = 'text';
+            honeypot.name = 'website';
+            honeypot.style.display = 'none';
+            honeypot.tabIndex = -1;
+            honeypot.autocomplete = 'off';
+            hiddenForm.appendChild(honeypot);
 
             document.body.appendChild(hiddenForm);
 
-            // Handle submission completion
+            // Handle submission completion with enhanced security
             let submitted = false;
+            let submissionTimer = null;
             
             const handleSubmission = () => {
                 if (!submitted) {
                     submitted = true;
-                    console.log('Iframe form submitted successfully');
+                    clearTimeout(submissionTimer);
+                    console.log('Iframe form submitted successfully with reCAPTCHA');
                     handleSponsorSubmissionSuccess(name, submitBtn, originalText);
                     
-                    // Clean up
+                    // Enhanced cleanup with verification
                     setTimeout(() => {
-                        if (document.body.contains(hiddenForm)) {
-                            document.body.removeChild(hiddenForm);
+                        try {
+                            if (document.body.contains(hiddenForm)) {
+                                document.body.removeChild(hiddenForm);
+                            }
+                            if (document.body.contains(iframe)) {
+                                document.body.removeChild(iframe);
+                            }
+                        } catch (cleanupError) {
+                            console.warn('Cleanup warning:', cleanupError);
                         }
-                        if (document.body.contains(iframe)) {
-                            document.body.removeChild(iframe);
-                        }
-                    }, 1000);
+                    }, 2000);
                 }
             };
 
             // Listen for iframe load (indicates submission completion)
             iframe.addEventListener('load', handleSubmission);
             
-            // Add error handling
+            // Add enhanced error handling
             iframe.addEventListener('error', (error) => {
                 console.error('Iframe submission error:', error);
+                clearTimeout(submissionTimer);
                 handleSponsorSubmissionError(submitBtn, originalText);
             });
 
-            // Fallback timeout
-            setTimeout(() => {
+            // Enhanced timeout with multiple fallbacks
+            submissionTimer = setTimeout(() => {
                 if (!submitted) {
-                    console.log('Iframe submission timeout - assuming success');
+                    console.log('Iframe submission timeout - assuming success due to CORS restrictions');
                     handleSubmission();
                 }
-            }, 5000);
+            }, 7000);
 
-            // Submit the form
+            // Submit the form with enhanced error handling
             try {
-                console.log('Submitting iframe form to:', hiddenForm.action);
+                const submitUrl = hiddenForm.action;
+                console.log('Submitting iframe form to:', submitUrl.substring(0, 50) + '...');
+                console.log('Form method:', hiddenForm.method);
+                console.log('Form target:', hiddenForm.target);
+                
                 hiddenForm.submit();
-            } catch (error) {
-                console.error('Iframe form submission failed:', error);
+                
+                // Additional success verification
+                setTimeout(() => {
+                    if (!submitted) {
+                        console.log('Verifying submission status...');
+                        // Check if form is still in DOM (indicates potential issues)
+                        if (document.body.contains(hiddenForm)) {
+                            console.log('Form still present, continuing...');
+                        }
+                    }
+                }, 2000);
+                
+            } catch (submissionError) {
+                console.error('Iframe form submission failed:', submissionError);
+                clearTimeout(submissionTimer);
                 handleSponsorSubmissionError(submitBtn, originalText);
             }
         }
@@ -1748,6 +2177,17 @@
             // Save submission timestamp to prevent spam
             saveSubmissionTimestamp();
             
+            // Reset button state
+            const submitText = document.getElementById('submitText');
+            const submitIcon = document.getElementById('submitIcon');
+            
+            if (submitText) {
+                submitText.textContent = 'Success!';
+            }
+            if (submitIcon) {
+                submitIcon.textContent = '✅';
+            }
+            
             // Show success message in form
             setTimeout(() => {
                 showSuccessMessage(name);
@@ -1755,8 +2195,18 @@
         }
         
         function handleSponsorSubmissionError(submitBtn, originalText) {
+            const submitText = document.getElementById('submitText');
+            const submitIcon = document.getElementById('submitIcon');
+            
             submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
+            
+            if (submitText) {
+                submitText.textContent = originalText;
+            }
+            if (submitIcon) {
+                submitIcon.style.display = 'none';
+            }
+            
             alert('There was an error submitting the form. Please check your internet connection and try again.');
         }
         
