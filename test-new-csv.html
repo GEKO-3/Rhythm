@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test New Applications CSV</title>
+</head>
+<body>
+    <h1>Test New Applications CSV Connection</h1>
+    
+    <button onclick="testNewCSV()">Test New CSV URL</button>
+    <div id="result"></div>
+    
+    <script src="config.js"></script>
+    <script>
+        function testNewCSV() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<p>🔄 Testing new CSV connection...</p>';
+            
+            if (!window.RhythmConfig) {
+                resultDiv.innerHTML = '<p style="color: red;">❌ Config not loaded!</p>';
+                return;
+            }
+            
+            const csvUrl = window.RhythmConfig.applicationsSheet;
+            resultDiv.innerHTML += `<p><strong>CSV URL:</strong> ${csvUrl}</p>`;
+            
+            fetch(csvUrl)
+                .then(response => response.text())
+                .then(csvText => {
+                    const lines = csvText.trim().split('\n');
+                    const headers = lines[0].split(',').map(h => h.replace(/"/g, ''));
+                    
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <h3>✅ CSV Connection Successful!</h3>
+                            <p><strong>Total Records:</strong> ${lines.length - 1}</p>
+                            <p><strong>CSV Headers:</strong></p>
+                            <ul>
+                                ${headers.map(header => `<li>${header}</li>`).join('')}
+                            </ul>
+                            
+                            <h4>Sample Records (First 3):</h4>
+                            <table border="1" style="border-collapse: collapse; width: 100%; font-size: 12px;">
+                                <tr>
+                                    ${headers.map(h => `<th style="padding: 5px; background: #f0f0f0;">${h}</th>`).join('')}
+                                </tr>
+                                ${lines.slice(1, 4).map(line => {
+                                    const values = line.split(',').map(v => v.replace(/"/g, ''));
+                                    return `<tr>${values.map(v => `<td style="padding: 5px; border: 1px solid #ddd;">${v}</td>`).join('')}</tr>`;
+                                }).join('')}
+                            </table>
+                            
+                            <h4>Field Mapping Verification:</h4>
+                            <ul>
+                                <li>✅ Timestamp: ${headers.includes('Timestamp') ? 'Found' : 'Missing'}</li>
+                                <li>✅ Email: ${headers.includes('Email') ? 'Found' : 'Missing'}</li>
+                                <li>✅ Full Name: ${headers.includes('Full Name') ? 'Found' : 'Missing'}</li>
+                                <li>✅ Date of Birth: ${headers.includes('Date of Birth') ? 'Found' : 'Missing'}</li>
+                                <li>✅ Contact Number: ${headers.includes('Contact Number') ? 'Found' : 'Missing'}</li>
+                                <li>✅ Location: ${headers.includes('Are you residing in L.Gan/Fonadhoo?') ? 'Found' : 'Missing'}</li>
+                            </ul>
+                        </div>
+                    `;
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<p style="color: red;">❌ Error fetching CSV: ${error.message}</p>`;
+                });
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', function() {
+            setTimeout(testNewCSV, 1000);
+        });
+    </script>
+    
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            line-height: 1.6; 
+        }
+        button { 
+            background: #007cba; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 10px 0;
+        }
+        button:hover { 
+            background: #005a87; 
+        }
+        #result { 
+            margin-top: 15px; 
+            padding: 10px; 
+            background: #f9f9f9; 
+            border-radius: 5px; 
+            min-height: 20px;
+        }
+        table { 
+            margin: 10px 0; 
+            max-width: 100%; 
+            overflow-x: auto; 
+        }
+        th, td { 
+            text-align: left; 
+            max-width: 150px; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            white-space: nowrap; 
+        }
+        ul { margin: 10px 0; }
+        li { margin: 5px 0; }
+    </style>
+</body>
+</html>

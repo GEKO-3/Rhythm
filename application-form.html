@@ -1018,11 +1018,13 @@
                 return;
             }
             
-            // Convert date from yyyy-mm-dd to mm/dd/yyyy format for Google Forms
+            // Convert date from yyyy-mm-dd to mm/dd/yyyy format for Google Forms (no leading zeros)
             let formattedDate = '';
             if (birthday) {
                 const [year, month, day] = birthday.split('-');
-                formattedDate = `${month}/${day}/${year}`; // Convert to mm/dd/yyyy format for Google Forms
+                const monthNum = parseInt(month, 10); // Remove leading zero
+                const dayNum = parseInt(day, 10); // Remove leading zero
+                formattedDate = `${monthNum}/${dayNum}/${year}`; // Convert to m/d/yyyy format for Google Forms
             }
             
             // Additional obfuscation - create dynamic URL construction
@@ -1064,11 +1066,13 @@
         }
         
         function submitViaIframe(email, name, birthday, contact, location, recaptchaToken) {
-            // Convert date from yyyy-mm-dd to mm/dd/yyyy format for Google Forms
+            // Convert date from yyyy-mm-dd to mm/dd/yyyy format for Google Forms (no leading zeros)
             let formattedDate = '';
             if (birthday) {
                 const [year, month, day] = birthday.split('-');
-                formattedDate = `${month}/${day}/${year}`; // Convert to mm/dd/yyyy format for Google Forms
+                const monthNum = parseInt(month, 10); // Remove leading zero
+                const dayNum = parseInt(day, 10); // Remove leading zero
+                formattedDate = `${monthNum}/${dayNum}/${year}`; // Convert to m/d/yyyy format for Google Forms
             }
             
             // Create hidden iframe

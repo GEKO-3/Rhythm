@@ -32,11 +32,11 @@
             form.target = 'test_iframe';
             form.style.display = 'none';
             
-            // Test data with updated mapping (mm/dd/yyyy format for Google Forms)
+            // Test data with updated mapping (m/d/yyyy format for Google Forms - no leading zeros)
             const testData = {
                 'entry.1045084900': 'test.updated@example.com', // Email
                 'entry.1638269417': 'Test User Updated', // Full Name
-                'entry.286303387': '01/15/1990', // Date of Birth (mm/dd/yyyy format for Google Forms)
+                'entry.286303387': '1/15/1990', // Date of Birth (m/d/yyyy format for Google Forms)
                 'entry.2119829349': '+960 7123456', // Contact Number
                 'entry.520958378': 'Yes', // Location
                 'entry.520958378_sentinel': '' // Location sentinel

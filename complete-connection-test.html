@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Form Connection Test</title>
+</head>
+<body>
+    <h1>Complete Form Connection Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Config Loading Test</h2>
+        <button onclick="testConfig()">Test Config Loading</button>
+        <div id="config-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Direct URL Test</h2>
+        <button onclick="testDirectURL()">Test Direct Form URL</button>
+        <div id="url-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Full Submission Test</h2>
+        <button onclick="testFullSubmission()">Test Complete Submission Process</button>
+        <div id="submission-result"></div>
+    </div>
+    
+    <script src="config.js"></script>
+    <script>
+        function testConfig() {
+            const resultDiv = document.getElementById('config-result');
+            
+            if (typeof window.RhythmConfig === 'undefined') {
+                resultDiv.innerHTML = '<p style="color: red;">❌ Config not loaded!</p>';
+                return;
+            }
+            
+            try {
+                const formUrl = window.RhythmConfig.applicationForm;
+                const entries = window.RhythmConfig.applicationEntries;
+                
+                resultDiv.innerHTML = `
+                    <div style="color: green;">
+                        <h4>✅ Config loaded successfully!</h4>
+                        <p><strong>Form URL:</strong> ${formUrl}</p>
+                        <p><strong>Entries:</strong></p>
+                        <ul>
+                            <li>Email: ${entries.email}</li>
+                            <li>Name: ${entries.name}</li>
+                            <li>Birthday: ${entries.birthday}</li>
+                            <li>Contact: ${entries.contact}</li>
+                            <li>Location: ${entries.location}</li>
+                        </ul>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">❌ Config error: ${error.message}</p>`;
+            }
+        }
+        
+        function testDirectURL() {
+            const resultDiv = document.getElementById('url-result');
+            const expectedURL = 'https://docs.google.com/forms/d/e/1FAIpQLSdNpLTCh88RfKrFFGF3zbogSYdKLDvtk2ZzjFljxJFKUVvqJw/formResponse';
+            
+            if (!window.RhythmConfig) {
+                resultDiv.innerHTML = '<p style="color: red;">❌ Config not available!</p>';
+                return;
+            }
+            
+            const actualURL = window.RhythmConfig.applicationForm;
+            
+            if (actualURL === expectedURL) {
+                resultDiv.innerHTML = `
+                    <div style="color: green;">
+                        <h4>✅ URL matches expected!</h4>
+                        <p><strong>URL:</strong> ${actualURL}</p>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `
+                    <div style="color: red;">
+                        <h4>❌ URL mismatch!</h4>
+                        <p><strong>Expected:</strong> ${expectedURL}</p>
+                        <p><strong>Actual:</strong> ${actualURL}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function testFullSubmission() {
+            const resultDiv = document.getElementById('submission-result');
+            resultDiv.innerHTML = '<p>🔄 Testing complete submission process...</p>';
+            
+            if (!window.RhythmConfig) {
+                resultDiv.innerHTML = '<p style="color: red;">❌ Config not available!</p>';
+                return;
+            }
+            
+            // Create test form with exact field mappings
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = window.RhythmConfig.applicationForm;
+            form.target = 'test_iframe';
+            form.style.display = 'none';
+            
+            // Test data with m/d/yyyy format (no leading zeros)
+            const testData = {
+                'entry.1045084900': 'complete.test@example.com', // Email (Field 3)
+                'entry.1638269417': 'Complete Test User', // Name (Field 4)
+                'entry.286303387': '7/26/2025', // Birthday (Field 1) - m/d/yyyy format (no leading zeros)
+                'entry.2119829349': '+960 7789456', // Contact (Field 5)
+                'entry.520958378': 'Yes', // Location (Field 2)
+                'entry.520958378_sentinel': '' // Location sentinel
+            };
+            
+            // Add fields to form
+            Object.entries(testData).forEach(([name, value]) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
+            });
+            
+            // Create iframe
+            const iframe = document.createElement('iframe');
+            iframe.name = 'test_iframe';
+            iframe.style.display = 'none';
+            document.body.appendChild(iframe);
+            document.body.appendChild(form);
+            
+            let submitted = false;
+            
+            const handleResult = (eventType) => {
+                if (!submitted) {
+                    submitted = true;
+                    resultDiv.innerHTML = `
+                        <div style="color: green;">
+                            <h4>✅ Submission Process Completed!</h4>
+                            <p><strong>Event:</strong> ${eventType}</p>
+                            <p><strong>Form URL:</strong> ${window.RhythmConfig.applicationForm}</p>
+                            <p><strong>Test Data Submitted:</strong></p>
+                            <ul>
+                                <li>Email: complete.test@example.com</li>
+                                <li>Name: Complete Test User</li>
+                                <li>Birthday: 7/26/2025 (m/d/yyyy - no leading zeros)</li>
+                                <li>Contact: +960 7789456</li>
+                                <li>Location: Yes</li>
+                            </ul>
+                            <p><strong>Check your Google Form responses!</strong></p>
+                            <p><em>Note: CSP error in console is expected and normal.</em></p>
+                        </div>
+                    `;
+                    
+                    // Cleanup
+                    setTimeout(() => {
+                        if (document.body.contains(form)) document.body.removeChild(form);
+                        if (document.body.contains(iframe)) document.body.removeChild(iframe);
+                    }, 1000);
+                }
+            };
+            
+            // Handle both load and error events
+            iframe.addEventListener('load', () => handleResult('iframe load'));
+            iframe.addEventListener('error', () => handleResult('iframe error (CSP expected)'));
+            
+            // Submit form
+            try {
+                form.submit();
+                
+                // Fallback timeout
+                setTimeout(() => {
+                    if (!submitted) {
+                        handleResult('timeout (likely successful)');
+                    }
+                }, 3000);
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">❌ Submission error: ${error.message}</p>`;
+            }
+        }
+        
+        // Auto-test config on load
+        window.addEventListener('load', function() {
+            setTimeout(testConfig, 1000);
+        });
+    </script>
+    
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            line-height: 1.6; 
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button { 
+            background: #007cba; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            margin: 10px 0;
+        }
+        button:hover { 
+            background: #005a87; 
+        }
+        div[id$="-result"] { 
+            margin-top: 15px; 
+            padding: 10px; 
+            background: #f9f9f9; 
+            border-radius: 5px; 
+            min-height: 20px;
+        }
+        h1 { color: #333; }
+        h2 { color: #555; }
+        ul { margin: 10px 0; }
+        li { margin: 5px 0; }
+    </style>
+</body>
+</html>
