@@ -466,19 +466,125 @@
     </script>
     
     <script>
-        // Video fallback handling - optimized
+        // Enhanced video fallback handling with autoplay fixes
         document.addEventListener('DOMContentLoaded', function() {
             const video = document.querySelector('.video-background');
             const fallback = document.querySelector('.video-fallback');
             
-            if (video) {
-                video.addEventListener('error', function() {
+            if (video && fallback) {
+                // Hide fallback initially
+                fallback.style.display = 'none';
+                
+                // Function to attempt video play
+                const attemptVideoPlay = () => {
+                    if (video.readyState >= 3) { // HAVE_FUTURE_DATA or better
+                        const playPromise = video.play();
+                        
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                console.log('Video autoplay successful');
+                                fallback.style.display = 'none';
+                                video.style.display = 'block';
+                            }).catch(error => {
+                                console.log('Video autoplay failed:', error);
+                                handleVideoFailure();
+                            });
+                        }
+                    } else {
+                        // Video not ready, try again in a bit
+                        setTimeout(attemptVideoPlay, 100);
+                    }
+                };
+                
+                // Function to handle video failure
+                const handleVideoFailure = () => {
+                    console.log('Switching to fallback background');
                     video.style.display = 'none';
-                    if (fallback) fallback.style.display = 'block';
+                    fallback.style.display = 'block';
+                };
+                
+                // Video event listeners
+                video.addEventListener('loadstart', function() {
+                    console.log('Video loading started');
+                });
+                
+                video.addEventListener('loadedmetadata', function() {
+                    console.log('Video metadata loaded');
                 });
                 
                 video.addEventListener('loadeddata', function() {
-                    if (fallback) fallback.style.display = 'none';
+                    console.log('Video data loaded');
+                    fallback.style.display = 'none';
+                    video.style.display = 'block';
+                    
+                    // Try to play the video
+                    attemptVideoPlay();
+                });
+                
+                video.addEventListener('canplay', function() {
+                    console.log('Video can start playing');
+                    attemptVideoPlay();
+                });
+                
+                video.addEventListener('canplaythrough', function() {
+                    console.log('Video can play through');
+                    attemptVideoPlay();
+                });
+                
+                video.addEventListener('error', function(e) {
+                    console.error('Video error:', e);
+                    handleVideoFailure();
+                });
+                
+                video.addEventListener('stalled', function() {
+                    console.log('Video stalled');
+                    setTimeout(() => {
+                        if (video.readyState < 3) {
+                            handleVideoFailure();
+                        }
+                    }, 3000);
+                });
+                
+                // Set video attributes for better autoplay support
+                video.muted = true;
+                video.playsInline = true;
+                video.autoplay = true;
+                video.loop = true;
+                
+                // Force load the video
+                video.load();
+                
+                // Fallback timeout - if video doesn't start playing within 5 seconds
+                setTimeout(() => {
+                    if (video.paused || video.readyState < 3) {
+                        console.log('Video timeout - using fallback');
+                        handleVideoFailure();
+                    }
+                }, 5000);
+                
+                // Try to play immediately if possible
+                if (video.readyState >= 3) {
+                    attemptVideoPlay();
+                }
+                
+                // User interaction handler to restart video if needed
+                document.addEventListener('click', function() {
+                    if (video.paused && video.style.display !== 'none') {
+                        video.play().catch(() => {
+                            console.log('Video play on click failed');
+                        });
+                    }
+                }, { once: true });
+                
+                // Handle visibility change to restart video
+                document.addEventListener('visibilitychange', function() {
+                    if (!document.hidden && video.paused && video.style.display !== 'none') {
+                        setTimeout(() => {
+                            video.play().catch(() => {
+                                console.log('Video play on visibility change failed');
+                            });
+                        }, 100);
+                    }
                 });
             }
         });

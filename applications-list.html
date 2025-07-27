@@ -584,7 +584,7 @@
             border: 1px solid rgba(245, 208, 0, 0.3);
             border-radius: 8px;
             margin-bottom: 5px;
-            z-index: 2000;
+            z-index: 1000;
             display: none;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
         }
@@ -810,121 +810,118 @@
             text-align: center;
         }
 
-        .filter-dropdown-container {
-            position: relative;
-            max-width: 300px;
+        .filter-toggle-container {
+            max-width: 350px;
             margin: 0 auto;
         }
 
-        .filter-dropdown-button {
+        .filter-toggle-button {
             width: 100%;
-            padding: 12px 16px;
+            padding: 15px 20px;
             border: 2px solid rgba(245, 208, 0, 0.3);
-            border-radius: 8px;
+            border-radius: 10px;
             background: rgba(245, 208, 0, 0.1);
             color: var(--primary-color);
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: 'Montserrat', Arial, sans-serif;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 8px;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .filter-dropdown-button:hover {
+        .filter-toggle-button:hover {
             background: rgba(245, 208, 0, 0.2);
             border-color: rgba(245, 208, 0, 0.5);
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 208, 0, 0.2);
         }
 
-        .filter-dropdown-button .selected-filter {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .filter-toggle-button:active {
+            transform: translateY(0);
+            background: rgba(245, 208, 0, 0.3);
         }
 
-        .filter-dropdown-button .dropdown-arrow {
+        .filter-toggle-button .filter-icon {
+            font-size: 1.2rem;
             transition: transform 0.3s ease;
         }
 
-        .filter-dropdown-button.open .dropdown-arrow {
-            transform: rotate(180deg);
+        .filter-toggle-button .filter-text {
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
-        .filter-dropdown-menu {
+        .filter-toggle-button .filter-indicator {
             position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: rgba(42, 42, 42, 0.95);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(245, 208, 0, 0.3);
-            border-radius: 8px;
-            margin-top: 5px;
-            z-index: 2000;
-            display: none;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .filter-dropdown-menu.show {
-            display: block;
-        }
-
-        .filter-option {
-            padding: 12px 16px;
-            cursor: pointer;
+            right: 15px;
+            font-size: 0.9rem;
+            opacity: 0.7;
             transition: all 0.3s ease;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1px solid rgba(245, 208, 0, 0.1);
         }
 
-        .filter-option:last-child {
-            border-bottom: none;
+        .filter-toggle-button:hover .filter-indicator {
+            opacity: 1;
+            transform: translateX(2px);
         }
 
-        .filter-option:hover {
+        /* Filter button color variations based on current filter */
+        .filter-toggle-button.all {
+            color: var(--primary-color);
+            border-color: rgba(245, 208, 0, 0.3);
             background: rgba(245, 208, 0, 0.1);
         }
 
-        .filter-option.active {
-            background: rgba(245, 208, 0, 0.2);
-            color: var(--primary-color);
-        }
-
-        .filter-option.all {
-            color: var(--primary-color);
-        }
-
-        .filter-option.approved {
+        .filter-toggle-button.approved {
             color: var(--success-color);
+            border-color: rgba(68, 255, 68, 0.3);
+            background: rgba(68, 255, 68, 0.1);
         }
 
-        .filter-option.rejected {
+        .filter-toggle-button.rejected {
             color: var(--error-color);
+            border-color: rgba(255, 68, 68, 0.3);
+            background: rgba(255, 68, 68, 0.1);
         }
 
-        .filter-option.pending {
+        .filter-toggle-button.pending {
             color: #ffaa00;
+            border-color: rgba(255, 170, 0, 0.3);
+            background: rgba(255, 170, 0, 0.1);
         }
 
-        .filter-option.pending-audition {
+        .filter-toggle-button.pending-audition {
             color: #8a2be2;
+            border-color: rgba(138, 43, 226, 0.3);
+            background: rgba(138, 43, 226, 0.1);
         }
 
-        .filter-option.pending-exco-approval {
+        .filter-toggle-button.pending-exco-approval {
             color: #1e90ff;
+            border-color: rgba(30, 144, 255, 0.3);
+            background: rgba(30, 144, 255, 0.1);
         }
 
-        .filter-option.called-back {
+        .filter-toggle-button.called-back {
             color: #00bfff;
+            border-color: rgba(0, 191, 255, 0.3);
+            background: rgba(0, 191, 255, 0.1);
+        }
+
+        /* Animation for filter transitions */
+        .filter-toggle-button.changing {
+            animation: filterChange 0.4s ease;
+        }
+
+        @keyframes filterChange {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); border-width: 3px; }
+            100% { transform: scale(1); }
         }
 
         .empty-state {
@@ -1007,19 +1004,14 @@
                 font-size: 0.9rem;
             }
 
-            .filter-dropdown-container {
+            .filter-toggle-container {
                 max-width: 90%;
                 width: 90%;
             }
 
-            .filter-dropdown-button {
+            .filter-toggle-button {
                 font-size: 0.9rem;
-                padding: 10px 14px;
-            }
-
-            .filter-option {
-                font-size: 0.9rem;
-                padding: 10px 14px;
+                padding: 12px 16px;
             }
         }
 
@@ -1075,19 +1067,14 @@
                 font-size: 0.85rem;
             }
 
-            .filter-dropdown-container {
+            .filter-toggle-container {
                 max-width: 100%;
                 width: 100%;
             }
 
-            .filter-dropdown-button {
+            .filter-toggle-button {
                 font-size: 0.9rem;
-                padding: 10px 14px;
-            }
-
-            .filter-option {
-                font-size: 0.85rem;
-                padding: 8px 12px;
+                padding: 12px 16px;
             }
         }
     </style>
@@ -1162,37 +1149,12 @@
         <!-- Filter System -->
         <div id="filter-container" class="filter-container" style="display: none;">
             <div class="filter-title">Filter by Status</div>
-            <div class="filter-dropdown-container">
-                <button class="filter-dropdown-button" id="filter-dropdown-button">
-                    <div class="selected-filter">
-                        <span class="filter-icon">📋</span>
-                        <span class="filter-text">All Applications</span>
-                    </div>
-                    <span class="dropdown-arrow">▼</span>
+            <div class="filter-toggle-container">
+                <button class="filter-toggle-button all" id="filter-toggle-button">
+                    <span class="filter-icon">📋</span>
+                    <span class="filter-text">All Applications</span>
+                    <span class="filter-indicator">�</span>
                 </button>
-                <div class="filter-dropdown-menu" id="filter-dropdown-menu">
-                    <div class="filter-option all active" data-filter="all">
-                        <span>📋</span> All Applications
-                    </div>
-                    <div class="filter-option pending" data-filter="pending">
-                        <span>⏳</span> Pending Review
-                    </div>
-                    <div class="filter-option pending-audition" data-filter="pending audition">
-                        <span>🎵</span> Pending Audition
-                    </div>
-                    <div class="filter-option pending-exco-approval" data-filter="pending exco approval">
-                        <span>📋</span> Pending Exco Approval
-                    </div>
-                    <div class="filter-option called-back" data-filter="called back">
-                        <span>📞</span> Called Back
-                    </div>
-                    <div class="filter-option approved" data-filter="approved">
-                        <span>✅</span> Approved
-                    </div>
-                    <div class="filter-option rejected" data-filter="rejected">
-                        <span>❌</span> Rejected
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -1229,6 +1191,19 @@
         let currentFilter = 'all';
         let allApplications = [];
         let filteredApplications = [];
+
+        // Filter options array for cycling
+        const filterOptions = [
+            { key: 'all', icon: '📋', text: 'All Applications', class: 'all' },
+            { key: 'pending', icon: '⏳', text: 'Pending Review', class: 'pending' },
+            { key: 'pending audition', icon: '🎵', text: 'Pending Audition', class: 'pending-audition' },
+            { key: 'pending exco approval', icon: '📋', text: 'Pending Exco Approval', class: 'pending-exco-approval' },
+            { key: 'called back', icon: '📞', text: 'Called Back', class: 'called-back' },
+            { key: 'approved', icon: '✅', text: 'Approved', class: 'approved' },
+            { key: 'rejected', icon: '❌', text: 'Rejected', class: 'rejected' }
+        ];
+
+        let currentFilterIndex = 0;
 
         // CSV URLs using getter functions for delayed access
         const CSV_URL = () => window.RhythmConfig?.applicationsSheet || '';
@@ -1653,6 +1628,8 @@
         function updateFilterCounts() {
             if (allApplications.length === 0) return;
             
+            console.log('Updating filter counts...');
+            
             // Count applications by status
             const statusCounts = {
                 all: allApplications.length,
@@ -1666,7 +1643,8 @@
             
             allApplications.forEach(app => {
                 const appId = generateApplicationId(app);
-                const status = statusData.get(appId) || 'pending';
+                const status = (statusData.get(appId) || 'pending').toLowerCase();
+                
                 if (statusCounts.hasOwnProperty(status)) {
                     statusCounts[status]++;
                 } else {
@@ -1676,16 +1654,23 @@
             
             console.log('Updated status counts:', statusCounts);
             
-            // Update filter options with counts (optional visual enhancement)
-            const filterOptions = document.querySelectorAll('.filter-option');
+            // Update the filter options array with counts
             filterOptions.forEach(option => {
-                const filterType = option.dataset.filter;
-                if (statusCounts.hasOwnProperty(filterType)) {
-                    const currentText = option.textContent.split('(')[0].trim(); // Remove existing count
-                    const count = statusCounts[filterType];
-                    option.innerHTML = option.innerHTML.split('(')[0] + (filterType !== 'all' ? ` (${count})` : '');
+                const count = statusCounts[option.key] || 0;
+                const baseText = option.text.split(' (')[0]; // Remove existing count
+                
+                if (option.key === 'all') {
+                    option.text = baseText;
+                } else {
+                    option.text = count > 0 ? `${baseText} (${count})` : baseText;
                 }
             });
+            
+            // Update the current toggle button display
+            const currentOption = filterOptions[currentFilterIndex];
+            updateToggleButton(currentOption);
+            
+            console.log('Filter counts updated');
         }
 
         // Function to show pending update visual feedback
@@ -2033,73 +2018,122 @@
 
         // Function to setup filter system
         function setupFilterSystem() {
-            const dropdownButton = document.getElementById('filter-dropdown-button');
-            const dropdownMenu = document.getElementById('filter-dropdown-menu');
-            const filterOptions = document.querySelectorAll('.filter-option');
+            const toggleButton = document.getElementById('filter-toggle-button');
             
-            // Toggle dropdown on button click
-            dropdownButton.addEventListener('click', function(e) {
+            console.log('Setting up filter toggle system...');
+            console.log('Toggle button:', toggleButton);
+            
+            if (!toggleButton) {
+                console.error('Filter toggle button not found!');
+                return;
+            }
+            
+            // Check if already set up to avoid duplicate listeners
+            if (toggleButton.dataset.setupComplete) {
+                console.log('Filter system already set up, skipping...');
+                return;
+            }
+            
+            // Mark as set up
+            toggleButton.dataset.setupComplete = 'true';
+            
+            // Toggle filter on button click
+            toggleButton.addEventListener('click', function(e) {
+                e.preventDefault();
                 e.stopPropagation();
-                dropdownMenu.classList.toggle('show');
-                dropdownButton.classList.toggle('open');
+                
+                console.log('Filter toggle button clicked');
+                
+                // Add changing animation
+                toggleButton.classList.add('changing');
+                setTimeout(() => {
+                    toggleButton.classList.remove('changing');
+                }, 400);
+                
+                // Cycle to next filter
+                currentFilterIndex = (currentFilterIndex + 1) % filterOptions.length;
+                const selectedFilter = filterOptions[currentFilterIndex];
+                
+                console.log('Cycling to filter:', selectedFilter);
+                
+                // Update button appearance
+                updateToggleButton(selectedFilter);
+                
+                // Update current filter
+                const previousFilter = currentFilter;
+                currentFilter = selectedFilter.key;
+                console.log('Filter changed from', previousFilter, 'to', currentFilter);
+                
+                // Apply filter
+                console.log('Applying filter after toggle...');
+                applyFilter();
             });
             
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.filter-dropdown-container')) {
-                    dropdownMenu.classList.remove('show');
-                    dropdownButton.classList.remove('open');
+            // Handle keyboard navigation (spacebar and enter)
+            toggleButton.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleButton.click();
                 }
             });
             
-            // Handle filter option selection
-            filterOptions.forEach(option => {
-                option.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    
-                    // Remove active class from all options
-                    filterOptions.forEach(opt => opt.classList.remove('active'));
-                    
-                    // Add active class to selected option
-                    this.classList.add('active');
-                    
-                    // Update dropdown button text and icon
-                    const icon = this.querySelector('span').textContent;
-                    const text = this.textContent.trim().substring(2); // Remove emoji
-                    dropdownButton.querySelector('.filter-icon').textContent = icon;
-                    dropdownButton.querySelector('.filter-text').textContent = text;
-                    
-                    // Update current filter
-                    currentFilter = this.dataset.filter;
-                    
-                    // Close dropdown
-                    dropdownMenu.classList.remove('show');
-                    dropdownButton.classList.remove('open');
-                    
-                    // Apply filter
-                    applyFilter();
-                });
-            });
+            // Initialize with first filter option
+            updateToggleButton(filterOptions[currentFilterIndex]);
+            
+            console.log('Filter toggle system setup complete');
+        }
+
+        // Function to update toggle button appearance
+        function updateToggleButton(filterOption) {
+            const toggleButton = document.getElementById('filter-toggle-button');
+            if (!toggleButton) return;
+            
+            const buttonIcon = toggleButton.querySelector('.filter-icon');
+            const buttonText = toggleButton.querySelector('.filter-text');
+            
+            if (buttonIcon && buttonText) {
+                buttonIcon.textContent = filterOption.icon;
+                buttonText.textContent = filterOption.text;
+            }
+            
+            // Update button class for color theming
+            toggleButton.className = `filter-toggle-button ${filterOption.class}`;
+            
+            console.log('Updated toggle button:', filterOption);
         }
 
         // Function to apply filter
         function applyFilter() {
+            console.log('Applying filter:', currentFilter);
+            console.log('All applications count:', allApplications.length);
+            
             if (currentFilter === 'all') {
                 filteredApplications = [...allApplications];
             } else {
                 filteredApplications = allApplications.filter(app => {
                     const appId = generateApplicationId(app);
-                    const appStatus = statusData.get(appId) || 'pending';
-                    return appStatus.toLowerCase() === currentFilter.toLowerCase();
+                    const appStatus = (statusData.get(appId) || 'pending').toLowerCase();
+                    const filterMatch = appStatus === currentFilter.toLowerCase();
+                    
+                    console.log(`App: ${app['Full Name'] || 'Unknown'}, Status: ${appStatus}, Filter: ${currentFilter}, Match: ${filterMatch}`);
+                    return filterMatch;
                 });
             }
             
+            console.log('Filtered applications count:', filteredApplications.length);
+            
             // Re-render the applications grid with filtered data
             renderApplicationsGrid(filteredApplications);
+            
+            // Update filter counts
+            updateFilterCounts();
         }
 
         // Function to render applications grid (separated from display logic)
         function renderApplicationsGrid(applications) {
+            console.log('Rendering applications grid with', applications.length, 'applications');
+            console.log('Current filter:', currentFilter);
+            
             // Clear existing tiles
             applicationsGrid.innerHTML = '';
             
@@ -2107,7 +2141,7 @@
                 applicationsGrid.style.display = 'none';
                 emptyState.style.display = 'block';
                 emptyState.querySelector('.empty-title').textContent = currentFilter === 'all' ? 'No Applications Yet' : 'No Applications Found';
-                emptyState.querySelector('.empty-message').textContent = currentFilter === 'all' ? 'No member applications have been submitted yet.' : `No applications found with the selected filter.`;
+                emptyState.querySelector('.empty-message').textContent = currentFilter === 'all' ? 'No member applications have been submitted yet.' : `No applications found with the selected filter: ${currentFilter}`;
                 return;
             }
             
@@ -2125,6 +2159,8 @@
                     console.log(`Application ${index} marked as NEW:`, application['Full Name']);
                 }
             });
+            
+            console.log('Successfully rendered', applications.length, 'application tiles');
         }
         function setupApprovalSystem(tile, uid) {
             const button = tile.querySelector('.approval-button');
@@ -2436,12 +2472,16 @@
             filterContainer.style.display = 'block';
             
             // Setup filter system if not already setup
-            if (!document.getElementById('filter-dropdown-button').hasAttribute('data-setup')) {
+            if (!document.getElementById('filter-toggle-button').hasAttribute('data-setup')) {
                 setupFilterSystem();
-                document.getElementById('filter-dropdown-button').setAttribute('data-setup', 'true');
+                document.getElementById('filter-toggle-button').setAttribute('data-setup', 'true');
             }
             
+            // Update filter counts first
+            updateFilterCounts();
+            
             // Apply current filter
+            console.log('Applying initial filter:', currentFilter);
             applyFilter();
             
             // Store current applications for next comparison
