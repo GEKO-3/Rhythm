@@ -59,7 +59,7 @@
     <link rel="canonical" href="https://rhythmboduberu.com">
     
     <!-- Security headers via meta tags (Cloudflare compatible) -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://w.soundcloud.com https://api.soundcloud.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://challenges.cloudflare.com; img-src 'self' data: https:; media-src 'self' https:; font-src 'self' data:; connect-src 'self' https: wss:; frame-src 'self' https://w.soundcloud.com https://challenges.cloudflare.com; object-src 'none'; base-uri 'self';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: data: blob: *; style-src 'self' 'unsafe-inline' https: http: data: *; img-src 'self' 'unsafe-inline' data: blob: https: http: *; media-src 'self' https: http: data: blob: *; font-src 'self' data: https: http: *; connect-src 'self' https: http: wss: ws: data: blob: *; frame-src 'self' https: http: data: *; object-src 'none'; base-uri 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
