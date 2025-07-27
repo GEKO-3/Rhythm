@@ -58,6 +58,14 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://rhythmboduberu.com">
     
+    <!-- Security headers via meta tags -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://w.soundcloud.com https://api.soundcloud.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; media-src 'self' https:; font-src 'self' data:; connect-src 'self' https: wss:; frame-src 'self' https://w.soundcloud.com; object-src 'none'; base-uri 'self';">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+    
     <!-- Additional SEO meta tags for Boduberu searches -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
     <meta name="googlebot" content="index, follow">
@@ -238,6 +246,147 @@
     <script src="https://w.soundcloud.com/player/api.js" defer></script>
     <script src="music-data.js" defer></script>
     <script src="music-player.js" defer></script>
+    
+    <!-- Security measures -->
+    <script>
+        // Advanced anti-debugging and security measures
+        (function() {
+            'use strict';
+            
+            // Disable right-click context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Disable common developer tools shortcuts
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'F12' || 
+                    (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) ||
+                    (e.ctrlKey && e.key === 'U') ||
+                    (e.ctrlKey && e.shiftKey && e.key === 'K')) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Advanced anti-debugging detection
+            let devtools = {open: false, orientation: null};
+            const threshold = 160;
+            
+            const detectDevtools = setInterval(() => {
+                if (window.outerHeight - window.innerHeight > threshold || 
+                    window.outerWidth - window.innerWidth > threshold) {
+                    if (!devtools.open) {
+                        devtools.open = true;
+                        // Clear console when devtools opened
+                        console.clear();
+                        console.log('%cSecurity Alert!', 'color: red; font-size: 30px; font-weight: bold;');
+                        console.log('%cDeveloper tools detected. For security reasons, please close the developer tools.', 'color: orange; font-size: 16px;');
+                        
+                        // Optional: Blur the page content
+                        document.body.style.filter = 'blur(3px)';
+                        setTimeout(() => {
+                            document.body.style.filter = 'none';
+                        }, 2000);
+                    }
+                } else {
+                    devtools.open = false;
+                }
+            }, 500);
+            
+            // Disable text selection on sensitive elements
+            document.addEventListener('selectstart', function(e) {
+                // Allow text selection only on specific elements if needed
+                const allowedElements = ['INPUT', 'TEXTAREA'];
+                if (!allowedElements.includes(e.target.tagName)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Protect against common debugging methods
+            const originalConsole = window.console;
+            window.console = {
+                log: function() {},
+                error: function() {},
+                warn: function() {},
+                info: function() {},
+                debug: function() {},
+                clear: function() {},
+                trace: function() {},
+                assert: function() {},
+                time: function() {},
+                timeEnd: function() {}
+            };
+            
+            // Detect and prevent debugging attempts
+            let debugDetected = false;
+            const checkDebugger = () => {
+                const start = performance.now();
+                debugger;
+                const end = performance.now();
+                if (end - start > 100) {
+                    if (!debugDetected) {
+                        debugDetected = true;
+                        console.clear();
+                        // Redirect or take action if debugger is detected
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                }
+            };
+            
+            // Run debugger detection periodically
+            setInterval(checkDebugger, 1000);
+            
+            // Prevent common inspection methods
+            document.addEventListener('keydown', function(e) {
+                // Prevent Ctrl+Shift+K (Firefox), Ctrl+Shift+E, etc.
+                if (e.ctrlKey && e.shiftKey && ['K', 'E', 'R', 'S'].includes(e.key)) {
+                    e.preventDefault();
+                    return false;
+                }
+                
+                // Prevent F7 (caret browsing), F1 (help), etc.
+                if (['F1', 'F7', 'F11'].includes(e.key)) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+            
+            // Disable drag and drop to prevent file inspection
+            document.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            document.addEventListener('drop', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Clear any potential debugging variables periodically
+            setInterval(() => {
+                try {
+                    // Clear common debugging variables
+                    delete window.debug;
+                    delete window.console;
+                    delete window.eval;
+                } catch (e) {
+                    // Ignore errors
+                }
+            }, 5000);
+            
+            // Anti-tampering for critical functions
+            Object.freeze(Object.prototype);
+            Object.freeze(Array.prototype);
+            Object.freeze(Function.prototype);
+            
+        })();
+    </script>
+    
     <script>
         // Video fallback handling - optimized
         document.addEventListener('DOMContentLoaded', function() {
