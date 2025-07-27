@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare Protection Test - Rhythm Boduberu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5d000, #ff6b35);
+            color: #333;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #f5d000;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .warning { background: #fff3cd; color: #856404; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button {
+            background: #f5d000;
+            color: #333;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #e6c000;
+        }
+        .code {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Cloudflare Protection Test</h1>
+        <p><strong>Rhythm Boduberu</strong> - Security Status Check</p>
+        
+        <div class="test-section">
+            <h3>1. Cloudflare Detection</h3>
+            <div id="cf-detection" class="status info">Checking...</div>
+            <p>This test checks if your site is behind Cloudflare protection.</p>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Security Headers</h3>
+            <div id="security-headers" class="status info">Checking...</div>
+            <p>Verifying security headers are properly set.</p>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Response Headers</h3>
+            <button onclick="checkHeaders()">Check Headers</button>
+            <div id="headers-result" class="code" style="display:none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Protection Features</h3>
+            <div id="protection-features"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. Performance Test</h3>
+            <button onclick="performanceTest()">Test Load Time</button>
+            <div id="performance-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>6. Quick Actions</h3>
+            <button onclick="window.location.href='/'">Test Index Page</button>
+            <button onclick="window.location.href='/application-form.html'">Test Application Form</button>
+            <button onclick="window.location.href='/sponsor-proposal.html'">Test Sponsor Proposal</button>
+        </div>
+    </div>
+
+    <script>
+        // Cloudflare Detection
+        function detectCloudflare() {
+            const cfDetection = document.getElementById('cf-detection');
+            
+            // Check for Cloudflare indicators
+            const indicators = [
+                typeof window.__cf !== 'undefined',
+                typeof window.cloudflare !== 'undefined',
+                document.querySelector('meta[name="cf-protected"]'),
+                navigator.userAgent.includes('Cloudflare'),
+                window.cfProtected === true
+            ];
+
+            const cfDetected = indicators.some(indicator => indicator);
+            
+            if (cfDetected) {
+                cfDetection.className = 'status success';
+                cfDetection.innerHTML = '✅ Cloudflare Protection Detected';
+            } else {
+                cfDetection.className = 'status warning';
+                cfDetection.innerHTML = '⚠️ Cloudflare Protection Not Detected';
+            }
+        }
+
+        // Security Headers Check
+        function checkSecurityHeaders() {
+            const headersDiv = document.getElementById('security-headers');
+            
+            // Check meta tags for security headers
+            const csp = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
+            const xss = document.querySelector('meta[http-equiv="X-XSS-Protection"]');
+            const nosniff = document.querySelector('meta[http-equiv="X-Content-Type-Options"]');
+            const frameOptions = document.querySelector('meta[http-equiv="X-Frame-Options"]');
+            
+            const securityScore = [csp, xss, nosniff, frameOptions].filter(Boolean).length;
+            
+            if (securityScore >= 3) {
+                headersDiv.className = 'status success';
+                headersDiv.innerHTML = `✅ Security Headers Present (${securityScore}/4)`;
+            } else {
+                headersDiv.className = 'status warning';
+                headersDiv.innerHTML = `⚠️ Some Security Headers Missing (${securityScore}/4)`;
+            }
+        }
+
+        // Check Response Headers
+        function checkHeaders() {
+            const resultDiv = document.getElementById('headers-result');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = 'Fetching headers...';
+            
+            fetch(window.location.href, { method: 'HEAD' })
+                .then(response => {
+                    let headersText = 'Response Headers:\n\n';
+                    for (let [key, value] of response.headers.entries()) {
+                        headersText += `${key}: ${value}\n`;
+                    }
+                    resultDiv.innerHTML = headersText;
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = 'Error fetching headers: ' + error.message;
+                });
+        }
+
+        // Check Protection Features
+        function checkProtectionFeatures() {
+            const featuresDiv = document.getElementById('protection-features');
+            const features = [];
+            
+            // Check for various protection features
+            if (document.querySelector('meta[name="cf-protected"]')) {
+                features.push('✅ Cloudflare Protection Meta Tag');
+            }
+            
+            if (typeof window.cfProtected !== 'undefined') {
+                features.push('✅ Client-side Protection Markers');
+            }
+            
+            // Check if right-click is disabled
+            try {
+                const contextmenuDisabled = !document.dispatchEvent(new Event('contextmenu', { cancelable: true }));
+                if (contextmenuDisabled) {
+                    features.push('✅ Right-click Protection');
+                }
+            } catch (e) {
+                // Ignore
+            }
+            
+            // Check console protection
+            if (typeof console.log !== 'function' || console.log.toString().includes('function () {}')) {
+                features.push('✅ Console Protection');
+            }
+            
+            featuresDiv.innerHTML = features.length > 0 ? features.join('<br>') : '⚠️ No protection features detected';
+        }
+
+        // Performance Test
+        function performanceTest() {
+            const resultDiv = document.getElementById('performance-result');
+            const startTime = performance.now();
+            
+            fetch(window.location.href)
+                .then(response => {
+                    const endTime = performance.now();
+                    const loadTime = Math.round(endTime - startTime);
+                    
+                    let status = 'success';
+                    let message = '';
+                    
+                    if (loadTime < 500) {
+                        message = `🚀 Excellent (${loadTime}ms)`;
+                    } else if (loadTime < 1000) {
+                        message = `✅ Good (${loadTime}ms)`;
+                        status = 'info';
+                    } else if (loadTime < 2000) {
+                        message = `⚠️ Average (${loadTime}ms)`;
+                        status = 'warning';
+                    } else {
+                        message = `❌ Slow (${loadTime}ms)`;
+                        status = 'error';
+                    }
+                    
+                    resultDiv.innerHTML = `<div class="status ${status}">${message}</div>`;
+                })
+                .catch(error => {
+                    resultDiv.innerHTML = `<div class="status error">Error: ${error.message}</div>`;
+                });
+        }
+
+        // Run tests on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            detectCloudflare();
+            checkSecurityHeaders();
+            checkProtectionFeatures();
+        });
+    </script>
+</body>
+</html>

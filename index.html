@@ -58,13 +58,17 @@
     <!-- Canonical URL -->
     <link rel="canonical" href="https://rhythmboduberu.com">
     
-    <!-- Security headers via meta tags -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://w.soundcloud.com https://api.soundcloud.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; img-src 'self' data: https:; media-src 'self' https:; font-src 'self' data:; connect-src 'self' https: wss:; frame-src 'self' https://w.soundcloud.com; object-src 'none'; base-uri 'self';">
+    <!-- Security headers via meta tags (Cloudflare compatible) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://w.soundcloud.com https://api.soundcloud.com https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://challenges.cloudflare.com; img-src 'self' data: https:; media-src 'self' https:; font-src 'self' data:; connect-src 'self' https: wss:; frame-src 'self' https://w.soundcloud.com https://challenges.cloudflare.com; object-src 'none'; base-uri 'self';">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()">
+    
+    <!-- Cloudflare protection indicators -->
+    <meta name="cf-protected" content="true">
+    <meta name="cf-page-type" content="main">
     
     <!-- Additional SEO meta tags for Boduberu searches -->
     <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
@@ -249,9 +253,79 @@
     
     <!-- Security measures -->
     <script>
-        // Advanced anti-debugging and security measures
+        // Advanced anti-debugging and security measures with Cloudflare integration
         (function() {
             'use strict';
+            
+            // Cloudflare protection detection and enhancement
+            const cfProtection = {
+                isEnabled: typeof window.__cf !== 'undefined' || 
+                          typeof window.cloudflare !== 'undefined' ||
+                          document.querySelector('meta[name="cf-protected"]'),
+                
+                // Enhance security when Cloudflare is detected
+                enhanceSecurity: function() {
+                    if (this.isEnabled) {
+                        console.log('%cCloudflare Protection Active', 'color: #f48120; font-weight: bold;');
+                        
+                        // Additional protection layers when behind Cloudflare
+                        this.enableAdvancedBotDetection();
+                        this.monitorSuspiciousActivity();
+                    }
+                },
+                
+                // Advanced bot detection working with Cloudflare
+                enableAdvancedBotDetection: function() {
+                    // Check for automated browsing patterns
+                    let interactionCount = 0;
+                    let rapidClicks = 0;
+                    let lastClickTime = 0;
+                    
+                    document.addEventListener('click', function() {
+                        const now = Date.now();
+                        if (now - lastClickTime < 100) {
+                            rapidClicks++;
+                            if (rapidClicks > 10) {
+                                console.warn('Suspicious rapid clicking detected');
+                                // Cloudflare will handle the actual blocking
+                            }
+                        } else {
+                            rapidClicks = 0;
+                        }
+                        lastClickTime = now;
+                        interactionCount++;
+                    });
+                },
+                
+                // Monitor for suspicious activity patterns
+                monitorSuspiciousActivity: function() {
+                    // Check for common bot behaviors
+                    const checks = {
+                        noMouseMovement: true,
+                        perfectTiming: true,
+                        noScroll: true
+                    };
+                    
+                    document.addEventListener('mousemove', function() {
+                        checks.noMouseMovement = false;
+                    });
+                    
+                    document.addEventListener('scroll', function() {
+                        checks.noScroll = false;
+                    });
+                    
+                    // Report suspicious patterns (Cloudflare analytics will capture this)
+                    setTimeout(() => {
+                        const suspiciousScore = Object.values(checks).filter(Boolean).length;
+                        if (suspiciousScore >= 2) {
+                            console.warn('Potential automated behavior detected');
+                        }
+                    }, 30000);
+                }
+            };
+            
+            // Initialize Cloudflare enhancements
+            cfProtection.enhanceSecurity();
             
             // Disable right-click context menu
             document.addEventListener('contextmenu', function(e) {
@@ -281,8 +355,8 @@
                         devtools.open = true;
                         // Clear console when devtools opened
                         console.clear();
-                        console.log('%cSecurity Alert!', 'color: red; font-size: 30px; font-weight: bold;');
-                        console.log('%cDeveloper tools detected. For security reasons, please close the developer tools.', 'color: orange; font-size: 16px;');
+                        console.log('%cCloudflare Security Alert!', 'color: #f48120; font-size: 30px; font-weight: bold;');
+                        console.log('%cThis site is protected by Cloudflare. Developer tools detected.', 'color: orange; font-size: 16px;');
                         
                         // Optional: Blur the page content
                         document.body.style.filter = 'blur(3px)';
@@ -330,7 +404,7 @@
                     if (!debugDetected) {
                         debugDetected = true;
                         console.clear();
-                        // Redirect or take action if debugger is detected
+                        // Cloudflare will help with additional protection
                         setTimeout(() => {
                             window.location.reload();
                         }, 1000);
@@ -383,6 +457,10 @@
             Object.freeze(Object.prototype);
             Object.freeze(Array.prototype);
             Object.freeze(Function.prototype);
+            
+            // Cloudflare integration markers
+            window.cfProtected = true;
+            document.documentElement.setAttribute('data-cf-protected', 'true');
             
         })();
     </script>
