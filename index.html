@@ -45,7 +45,7 @@
     <meta property="og:title" content="Rhythm Boduberu | Premier Traditional Maldivian Boduberu Music Group">
     <meta property="og:description" content="Experience authentic Boduberu performances with Rhythm Boduberu - Maldives' premier traditional Boduberu music group. Search for Boduberu music in Maldives - we are the leading Boduberu group. Book us for cultural events and traditional music performances.">
     <meta property="og:image" content="https://rhythmboduberu.com/favicons/favicon.png">
-    <meta property="og:url" content="https://rhythmboduberu.com">
+    <meta property="og:url" content="https://rhythmboduberu.com/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Rhythm Boduberu">
     
@@ -55,8 +55,16 @@
     <meta name="twitter:description" content="Experience authentic Boduberu performances with Rhythm Boduberu - Maldives' premier traditional Boduberu music group. Search for Boduberu music in Maldives.">
     <meta name="twitter:image" content="https://rhythmboduberu.com/favicons/favicon.png">
     
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://rhythmboduberu.com">
+    <!-- Canonical URL - Primary domain preference -->
+    <link rel="canonical" href="https://rhythmboduberu.com/">
+    
+    <!-- Additional canonical and indexing directives -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    
+    <!-- Prevent duplicate content issues -->
+    <meta property="og:url" content="https://rhythmboduberu.com/">
+    <meta name="twitter:url" content="https://rhythmboduberu.com/">
     
     <!-- Security headers via meta tags (Cloudflare compatible) -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: data: blob: *; style-src 'self' 'unsafe-inline' https: http: data: *; img-src 'self' 'unsafe-inline' data: blob: https: http: *; media-src 'self' https: http: data: blob: *; font-src 'self' data: https: http: *; connect-src 'self' https: http: wss: ws: data: blob: *; frame-src 'self' https: http: data: *; object-src 'none'; base-uri 'self';">
@@ -1858,10 +1866,16 @@
             }
         });
         
-        // Loading screen functionality
-        window.addEventListener('load', function() {
+        // Enhanced Loading screen functionality with better reliability
+        (function() {
             const loadingScreen = document.getElementById('loading-screen');
             const patternContainer = document.getElementById('pattern-container');
+            let loadingScreenRemoved = false;
+            
+            if (!loadingScreen) {
+                console.warn('Loading screen element not found');
+                return;
+            }
             
             // Generate animated pattern lines - Optimized
             function generatePatternLines() {
@@ -1870,7 +1884,7 @@
                 // Calculate how many lines needed to fill the screen (optimized for performance)
                 const viewportHeight = window.innerHeight;
                 const lineHeight = 40;
-                const numberOfLines = Math.ceil(viewportHeight / lineHeight) + 1; // Reduced extra lines from 2 to 1
+                const numberOfLines = Math.ceil(viewportHeight / lineHeight) + 1;
                 
                 // Clear any existing lines
                 patternContainer.innerHTML = '';
@@ -1889,40 +1903,48 @@
                 console.log('Generated', numberOfLines, 'optimized pattern lines');
             }
             
-            // Generate pattern lines on load
+            // Generate pattern lines immediately
             generatePatternLines();
             
             // Regenerate lines on resize
             window.addEventListener('resize', generatePatternLines);
             
-            // Ensure minimum display time of 2 seconds, regardless of page load speed
-            const minDisplayTime = 2000; // 2 seconds minimum
+            // Loading screen timing configuration
+            const minDisplayTime = 1500; // Reduced from 2000ms to 1.5s for faster experience
+            const maxDisplayTime = 5000; // Maximum 5 seconds before force removal
             const startTime = Date.now();
             
-            // Start enlarging animation 800ms before fade-out begins
+            // Start enlarging animation
             function startEnlarging() {
+                if (loadingScreenRemoved) return;
+                
                 const loadingLogo = loadingScreen.querySelector('.loading-logo');
                 if (loadingLogo) {
-                    // Trigger the enlarging animation by adding fade-out class to screen
                     loadingScreen.classList.add('fade-out');
-                    // But remove the opacity transition temporarily to only get the animation
                     loadingScreen.style.transition = 'none';
                     loadingScreen.style.opacity = '1';
                 }
             }
             
-            function startFadeOut() {
+            function removeLoadingScreen() {
+                if (loadingScreenRemoved) return;
+                loadingScreenRemoved = true;
+                
+                console.log('Removing loading screen...');
+                
                 const elapsedTime = Date.now() - startTime;
                 const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
                 
-                // Start enlarging animation 800ms before fade-out
+                // Start enlarging animation before fade-out
                 const enlargingTime = Math.max(0, remainingTime - 200);
                 
                 setTimeout(function() {
-                    startEnlarging();
+                    if (loadingScreenRemoved) startEnlarging();
                 }, enlargingTime);
                 
                 setTimeout(function() {
+                    if (!loadingScreenRemoved) return;
+                    
                     // Restore the transition and start actual fade-out
                     loadingScreen.style.transition = 'opacity 0.6s ease-out';
                     
@@ -1939,29 +1961,73 @@
                     
                     // Then fade out the background 200ms later
                     setTimeout(function() {
-                        loadingScreen.style.opacity = '0';
+                        if (loadingScreen && loadingScreen.parentNode) {
+                            loadingScreen.style.opacity = '0';
+                        }
                     }, 200);
                     
                     // Remove loading screen from DOM after fade out completes
-                    // Give extra time for the scaling animation to be visible
                     setTimeout(function() {
-                        loadingScreen.remove();
-                    }, 1000); // Increased to 1 second to see the scaling effect
+                        if (loadingScreen && loadingScreen.parentNode) {
+                            loadingScreen.remove();
+                            console.log('Loading screen removed successfully');
+                        }
+                    }, 1000);
                 }, remainingTime);
             }
             
-            // Check if page is ready, but enforce minimum display time
+            // Multiple triggers to ensure loading screen is removed
+            
+            // 1. DOMContentLoaded - Fastest, when DOM is ready
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('DOMContentLoaded fired');
+                setTimeout(removeLoadingScreen, 100);
+            });
+            
+            // 2. Window load - When all resources are loaded
+            window.addEventListener('load', function() {
+                console.log('Window load fired');
+                setTimeout(removeLoadingScreen, 50);
+            });
+            
+            // 3. Fallback timeout - Force removal after maximum time
             setTimeout(function() {
-                if (document.readyState === 'complete') {
-                    startFadeOut();
-                } else {
-                    // If not fully loaded, wait a bit more but still respect minimum time
-                    setTimeout(function() {
-                        startFadeOut();
-                    }, 500);
+                console.log('Force removing loading screen after timeout');
+                removeLoadingScreen();
+            }, maxDisplayTime);
+            
+            // 4. Interactive readyState - Alternative to DOMContentLoaded
+            if (document.readyState === 'interactive' || document.readyState === 'complete') {
+                console.log('Document already ready, removing loading screen');
+                setTimeout(removeLoadingScreen, 100);
+            }
+            
+            // 5. Safety check - Regular interval to check if we should remove
+            const safetyInterval = setInterval(function() {
+                if (loadingScreenRemoved) {
+                    clearInterval(safetyInterval);
+                    return;
                 }
-            }, 100); // Small initial delay to let everything settle
-        });
+                
+                const elapsed = Date.now() - startTime;
+                
+                // Remove if minimum time has passed and document is ready
+                if (elapsed >= minDisplayTime && 
+                    (document.readyState === 'interactive' || document.readyState === 'complete')) {
+                    console.log('Safety check triggered loading screen removal');
+                    clearInterval(safetyInterval);
+                    removeLoadingScreen();
+                }
+                
+                // Force remove after max time regardless
+                if (elapsed >= maxDisplayTime) {
+                    console.log('Safety check force removing loading screen');
+                    clearInterval(safetyInterval);
+                    removeLoadingScreen();
+                }
+            }, 500);
+            
+        })();
     </script>
 </body>
 </html>
