@@ -668,33 +668,38 @@ footer a:hover {
 /* Mobile Footer Responsiveness */
 @media (max-width: 768px) {
     .site-footer {
-        padding: 40px 20px 35px;
+        padding: 30px 20px 25px;
         margin: 0;
         border-radius: 0;
-        min-height: 180px;
+        min-height: 200px;
         width: 100%;
     }
     
     .footer-content {
         grid-template-columns: 1fr;
-        gap: 30px;
+        gap: 25px;
         text-align: center;
         max-width: 100%;
-        min-height: 100px;
+        min-height: 150px;
+        padding: 0;
     }
     
     .footer-logo {
         order: 1;
+        margin-bottom: 5px;
     }
     
     .footer-social {
         order: 2;
-        gap: 12px;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 10px 0;
     }
     
     .footer-social-link {
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         border-radius: 10px;
     }
     
@@ -703,14 +708,35 @@ footer a:hover {
         height: 20px;
     }
     
+    .social-icon-img {
+        width: 20px;
+        height: 20px;
+    }
+    
     .footer-contact {
         order: 3;
         font-size: 13px;
+        margin: 15px 0;
+    }
+    
+    .footer-phone {
+        margin-bottom: 8px;
+    }
+    
+    .phone-button {
+        padding: 8px 12px;
+        margin: 3px;
+        font-size: 13px;
+    }
+    
+    .footer-email {
+        font-size: 12px;
     }
     
     .footer-copyright {
         order: 4;
         font-size: 11px;
+        margin-top: 10px;
     }
     
     .footer-brand {
@@ -1480,6 +1506,80 @@ footer a:hover {
 @media (max-width: 480px) {
     .carousel-nav {
         display: none;
+    }
+    
+    /* Footer Small Mobile Styles */
+    .site-footer {
+        padding: 25px 15px 20px;
+        min-height: 180px;
+    }
+    
+    .footer-content {
+        gap: 20px;
+        padding: 0 5px;
+    }
+    
+    .footer-brand {
+        font-size: 16px;
+        letter-spacing: 0.8px;
+    }
+    
+    .footer-logo-img {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .footer-social {
+        gap: 12px;
+        margin: 8px 0;
+    }
+    
+    .footer-social-link {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+    }
+    
+    .social-icon-img {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .footer-contact {
+        font-size: 12px;
+        margin: 12px 0;
+    }
+    
+    .footer-phone {
+        margin-bottom: 6px;
+        line-height: 1.6;
+    }
+    
+    .phone-button {
+        padding: 6px 10px;
+        margin: 2px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
+    
+    .contact-icon {
+        width: 14px;
+        height: 14px;
+        margin-right: 4px;
+    }
+    
+    .footer-email {
+        font-size: 11px;
+    }
+    
+    .footer-copyright {
+        font-size: 10px;
+        margin-top: 8px;
+    }
+    
+    .footer-tagline {
+        font-size: 9px;
+        margin-top: 3px;
     }
     
     /* Join Section Small Mobile Styles */
