@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="description" content="Rhythm Boduberu - Premier Traditional Maldivian Boduberu Music Group. Experience authentic Boduberu performances, traditional Maldivian music, and cultural entertainment. Search for Boduberu music in Maldives - we are the leading Boduberu group. Contact us for bookings: 7576784 / 9128889">
     <meta name="keywords" content="Boduberu, Rhythm Boduberu, Boduberu music, Boduberu group, Boduberu performance, Traditional Maldivian Music, Maldivian Boduberu, Boduberu band, Boduberu drum, Boduberu show, Boduberu entertainment, Maldivian cultural music, traditional music Maldives, Boduberu performances, Maldivian drums, cultural entertainment Maldives, Rhythm, bookings, performances, Beru, Dhivehi music, Maldivian traditional band, Maldives, Male, Music, Boduberu Songs, Boduberu Song, Laamu, Laamu Atoll, Boduberu Challenge, Fenbandiyaa, Fen Bandiyaa, Kosgovaaney, Kos Govaaney, Maakunbe, Fathis, Fathihaa, Dhunfini Rey, Baburu, Kaasi Majaa, Taki, Nala, Nala Lava, Nala Beru, Boduberu Dance, Maldivian Culture, Maldivian Music, Traditional Music Group, Cultural Music Maldives, Rhythm Boduberu Group, Inbeynge Rhythm Boduberu, Maldivian Boduberu Group, Rhythm Boduberu Band, Rhythm Boduberu Music, Rhythm Boduberu Performances, Rhythm Boduberu Entertainment, Rhythm Boduberu Booking, Rhythm Boduberu Contact, Rhythm Boduberu Maldives, Thinberu, Bodu Beru, Dhivehi, Dhivehi Lava, Laamu Boduberu, Maldives traditional music, Traditional Maldivian dance, Maldivian drumming, Boduberu show Maldives, Boduberu instruments, Boduberu history, Boduberu songs, Dhivehi culture, Maldives folk music, Boduberu rhythm, Maldivian cultural performance, Boduberu costume, Island music Maldives, Boduberu beats, Boduberu sound, Boduberu live performance, Hire Boduberu band, Book Boduberu show, Boduberu for weddings, Traditional music entertainment Maldives, Boduberu cultural event, Maldives music events, Boduberu in Male Maldives, Boduberu Hulhumale, Maldives local music, Dhivehi songs Maldives, Maldives heritage music, Cultural music shows Maldives, Traditional Maldivian music show, Boduberu for tourists, Maldives cultural experience, Local music in Maldives resorts, Authentic Maldives performance, Boduberu for resorts, Boduberu music video, Traditional Maldivian dance video, Maldivian drumming performance, Maldives culture music, Boduberu song live, #Boduberu, #MaldivianMusic, #DhivehiMusic, #MaldivesCulture, #TraditionalMaldivianMusic, #BoduberuVibes, #IslandRhythms, #MaldivianDrums, #CulturalDanceMaldives, #RhythmBoduberu, #BoduberuPerformance, #BoduberuGroup, #BoduberuMusic">
     <meta name="author" content="Rhythm Boduberu">
@@ -51,9 +54,25 @@
             100% { transform: translateX(100%) translateZ(0); }
         }
         
-        /* Hide body until loading is complete */
+        /* Hide body until loading is complete - but allow interactions */
         body.loading {
             overflow: hidden;
+        }
+        
+        /* Force interactivity on mobile */
+        body, html, * {
+            -webkit-touch-callout: default !important;
+            -webkit-user-select: auto !important;
+            -moz-user-select: auto !important;
+            user-select: auto !important;
+            pointer-events: auto !important;
+        }
+        
+        /* Ensure no blur on any element */
+        body, html, main, section, div {
+            filter: none !important;
+            -webkit-filter: none !important;
+            -moz-filter: none !important;
         }
         
         /* Video fallback gradient animation */
@@ -266,6 +285,84 @@
     </script>
 </head>
 <body class="loading">
+    <script>
+        // Immediate fix for interaction and blur issues - AGGRESSIVE MOBILE FIX
+        (function() {
+            // Clear any blur effects immediately - all prefixes
+            const clearBlur = function(element) {
+                element.style.filter = 'none !important';
+                element.style.webkitFilter = 'none !important';
+                element.style.mozFilter = 'none !important';
+                element.style.msFilter = 'none !important';
+                element.style.setProperty('filter', 'none', 'important');
+                element.style.setProperty('-webkit-filter', 'none', 'important');
+            };
+            
+            // Apply to all elements
+            clearBlur(document.body);
+            clearBlur(document.documentElement);
+            clearBlur(document.querySelector('html'));
+            
+            // Force interactivity everywhere
+            const forceInteractive = function(element) {
+                element.style.pointerEvents = 'auto';
+                element.style.userSelect = 'auto';
+                element.style.webkitUserSelect = 'auto';
+                element.style.mozUserSelect = 'auto';
+                element.style.msUserSelect = 'auto';
+                element.style.webkitTouchCallout = 'default';
+                element.style.setProperty('pointer-events', 'auto', 'important');
+            };
+            
+            forceInteractive(document.body);
+            forceInteractive(document.documentElement);
+            
+            // Remove loading class immediately for mobile
+            document.body.classList.remove('loading');
+            document.body.style.overflow = 'auto';
+            
+            // Mobile-specific fixes
+            if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                console.log('Mobile device detected - applying mobile fixes');
+                
+                // Force remove all possible blocking styles
+                document.body.style.webkitTransform = 'none';
+                document.body.style.transform = 'none';
+                document.body.style.backfaceVisibility = 'visible';
+                document.body.style.webkitBackfaceVisibility = 'visible';
+                
+                // Ensure viewport is interactive
+                document.documentElement.style.touchAction = 'auto';
+                document.body.style.touchAction = 'auto';
+                
+                // Force remove loading class faster on mobile
+                setTimeout(function() {
+                    document.body.classList.remove('loading');
+                    document.body.style.overflow = 'auto';
+                    clearBlur(document.body);
+                    forceInteractive(document.body);
+                }, 50);
+            }
+            
+            // Set a very short timeout to ensure everything is cleared
+            setTimeout(function() {
+                document.body.classList.remove('loading');
+                document.body.style.overflow = 'auto';
+                clearBlur(document.body);
+                clearBlur(document.documentElement);
+                forceInteractive(document.body);
+                
+                // Clear on all sections
+                const mainSection = document.querySelector('.main-section');
+                if (mainSection) {
+                    clearBlur(mainSection);
+                    forceInteractive(mainSection);
+                }
+            }, 100);
+            
+            console.log('Immediate blur/interaction fix applied for mobile');
+        })();
+    </script>
     <!-- Hidden H1 for SEO - Main page heading -->
     <h1 style="position: absolute; left: -10000px; top: auto; width: 1px; height: 1px; overflow: hidden;">Rhythm Boduberu</h1>
     
@@ -304,7 +401,16 @@
         ">
     </div>
     
-    <section class="main-section">
+    <section class="main-section" style="
+        position: relative;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        pointer-events: auto;
+    ">
         <div class="video-fallback" style="
             position: absolute;
             top: 0;
@@ -328,12 +434,21 @@
             <source src="src/bg-video.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
-        <div class="background-overlay"></div>
+        <div class="background-overlay" style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.6) 100%), rgba(245, 208, 0, 0.15);
+            z-index: 3;
+            pointer-events: none;
+        "></div>
         
-        <div class="image-container">
+        <div class="image-container" style="position: relative; z-index: 10; pointer-events: auto;">
             <img src="src/Rhytham Logo.webp" alt="Rhythm Boduberu">
         </div>
-        <div class="container">
+        <div class="container" style="position: relative; z-index: 10; pointer-events: auto;">
             <a href="https://www.facebook.com/share/15pXtBHaRS/?mibextid=wwXIfr" target="_blank" class="link-button" aria-label="Visit Example Link 1">
                 <img src="src/Facebook.png" alt="Facebook">
             </a>
@@ -350,7 +465,7 @@
                 <img src="src/Youtube.png" alt="Youtube">
             </a>
         </div>
-        <div class="container2">
+        <div class="container2" style="position: relative; z-index: 10; pointer-events: auto;">
             <a href="https://invite.viber.com/?g2=AQBr7RgqaOJOp1SaLAlHeZH%2BrPk4S3rwDdiOGwLstgf9PWiKNB9kWaZS3SSn%2Bw1o" class="link-button2" aria-label="Join Our Viber Community">
                 <img src="src/Viber.png" alt="Join Our Viber Community">
             </a>
@@ -526,11 +641,13 @@
                 }, { once: true });
             }
             
-            // Initialize video as soon as DOM is available
+            // Initialize video as soon as DOM is available (but avoid conflicts)
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializeVideo);
+                document.addEventListener('DOMContentLoaded', function() {
+                    setTimeout(initializeVideo, 100); // Small delay to avoid conflicts
+                });
             } else {
-                initializeVideo();
+                setTimeout(initializeVideo, 100);
             }
             
         })();
@@ -666,29 +783,67 @@
                 }
             }, 500);
             
-            // Disable text selection on sensitive elements
+            // Disable text selection on sensitive elements - but allow music player interactions
             document.addEventListener('selectstart', function(e) {
-                // Allow text selection only on specific elements if needed
+                // Allow text selection and interactions on music player elements
                 const allowedElements = ['INPUT', 'TEXTAREA'];
-                if (!allowedElements.includes(e.target.tagName)) {
-                    e.preventDefault();
-                    return false;
+                const musicElements = ['music-tile', 'owl-carousel', 'carousel-nav'];
+                
+                if (allowedElements.includes(e.target.tagName) || 
+                    musicElements.some(cls => e.target.classList.contains(cls)) ||
+                    e.target.closest('.music-section') ||
+                    e.target.closest('.owl-carousel')) {
+                    return true; // Allow selection/interaction
                 }
+                
+                e.preventDefault();
+                return false;
             });
             
-            // Protect against common debugging methods
+            // Protect against common debugging methods - but preserve console for functionality
             const originalConsole = window.console;
+            
+            // Create a selective console that allows basic functionality but blocks debugging
             window.console = {
-                log: function() {},
-                error: function() {},
-                warn: function() {},
-                info: function() {},
-                debug: function() {},
-                clear: function() {},
-                trace: function() {},
-                assert: function() {},
-                time: function() {},
-                timeEnd: function() {}
+                log: function(...args) {
+                    // Allow music player and functional logs
+                    if (args.some(arg => typeof arg === 'string' && 
+                        (arg.includes('Music') || arg.includes('Player') || arg.includes('Carousel') || 
+                         arg.includes('Track') || arg.includes('Loading') || arg.includes('Video') ||
+                         arg.includes('swipe') || arg.includes('Detected')))) {
+                        originalConsole.log.apply(originalConsole, args);
+                    }
+                },
+                error: function(...args) {
+                    // Always allow errors for debugging functionality issues
+                    originalConsole.error.apply(originalConsole, args);
+                },
+                warn: function(...args) {
+                    // Always allow warnings
+                    originalConsole.warn.apply(originalConsole, args);
+                },
+                info: function(...args) {
+                    // Allow info messages for functionality
+                    originalConsole.info.apply(originalConsole, args);
+                },
+                debug: function() {
+                    // Block debug messages
+                },
+                clear: function() {
+                    // Block console clearing
+                },
+                trace: function() {
+                    // Block trace
+                },
+                assert: function(...args) {
+                    originalConsole.assert.apply(originalConsole, args);
+                },
+                time: function(...args) {
+                    originalConsole.time.apply(originalConsole, args);
+                },
+                timeEnd: function(...args) {
+                    originalConsole.timeEnd.apply(originalConsole, args);
+                }
             };
             
             // Detect and prevent debugging attempts
@@ -738,22 +893,38 @@
                 return false;
             });
             
-            // Clear any potential debugging variables periodically
+            // Clear any potential debugging variables periodically - but preserve jQuery and music functionality
             setInterval(() => {
                 try {
-                    // Clear common debugging variables
+                    // Clear common debugging variables but preserve essential functionality
                     delete window.debug;
-                    delete window.console;
-                    delete window.eval;
+                    // Don't delete console or eval as they might be needed by music player
+                    
+                    // Preserve jQuery and music player functionality
+                    if (typeof window.$ === 'undefined' && typeof jQuery !== 'undefined') {
+                        window.$ = jQuery;
+                    }
                 } catch (e) {
                     // Ignore errors
                 }
             }, 5000);
             
-            // Anti-tampering for critical functions
-            Object.freeze(Object.prototype);
-            Object.freeze(Array.prototype);
-            Object.freeze(Function.prototype);
+            // Anti-tampering for critical functions - but preserve music player functionality
+            try {
+                Object.freeze(Object.prototype);
+                Object.freeze(Array.prototype);
+                Object.freeze(Function.prototype);
+                
+                // Preserve essential music player globals
+                if (typeof jQuery !== 'undefined') {
+                    window.$ = jQuery;
+                }
+                if (typeof musicData !== 'undefined') {
+                    window.musicData = musicData;
+                }
+            } catch (e) {
+                console.warn('Anti-tampering protection had conflicts:', e);
+            }
             
             // Cloudflare integration markers
             window.cfProtected = true;
@@ -2067,9 +2238,16 @@
                 return;
             }
             
-            // Ensure body is not blurred during loading
+            // Ensure body is not blurred during loading and always clear filters
             document.body.style.filter = 'none';
+            document.body.style.webkitFilter = 'none';
+            document.body.style.mozFilter = 'none';
             console.log('Cleared any existing body blur effects');
+            
+            // Force remove any blur classes or styles that might be applied
+            document.body.classList.remove('blur', 'blurred');
+            document.documentElement.style.filter = 'none';
+            document.documentElement.style.webkitFilter = 'none';
             
             // Generate animated pattern lines - Optimized
             function generatePatternLines() {
@@ -2129,6 +2307,31 @@
                 // Remove loading class from body immediately
                 document.body.classList.remove('loading');
                 
+                // Ensure no blur or interaction blocking - AGGRESSIVE
+                document.body.style.filter = 'none';
+                document.body.style.webkitFilter = 'none';
+                document.body.style.mozFilter = 'none';
+                document.body.style.pointerEvents = 'auto';
+                document.documentElement.style.filter = 'none';
+                document.documentElement.style.webkitFilter = 'none';
+                document.documentElement.style.pointerEvents = 'auto';
+                
+                // Make loading screen non-interactive immediately
+                if (loadingScreen) {
+                    loadingScreen.style.pointerEvents = 'none';
+                    loadingScreen.style.userSelect = 'none';
+                    loadingScreen.style.zIndex = '9999';
+                    loadingScreen.style.position = 'fixed';
+                }
+                
+                // Force main section to be interactive
+                const mainSection = document.querySelector('.main-section');
+                if (mainSection) {
+                    mainSection.style.pointerEvents = 'auto';
+                    mainSection.style.zIndex = '1';
+                    mainSection.style.position = 'relative';
+                }
+                
                 const elapsedTime = Date.now() - startTime;
                 const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
                 
@@ -2168,6 +2371,59 @@
                         if (loadingScreen && loadingScreen.parentNode) {
                             loadingScreen.remove();
                             console.log('Loading screen removed successfully');
+                            
+                            // Final cleanup - ensure page is fully interactive
+                            document.body.style.filter = 'none';
+                            document.body.style.webkitFilter = 'none';
+                            document.body.style.mozFilter = 'none';
+                            document.body.style.pointerEvents = 'auto';
+                            document.body.style.userSelect = 'auto';
+                            document.body.style.overflow = 'auto';
+                            document.body.classList.remove('loading');
+                            
+                            // Ensure all main sections are interactive
+                            const mainSection = document.querySelector('.main-section');
+                            if (mainSection) {
+                                mainSection.style.pointerEvents = 'auto';
+                                mainSection.style.userSelect = 'auto';
+                                mainSection.style.filter = 'none';
+                                mainSection.style.webkitFilter = 'none';
+                            }
+                            
+                            const imageContainer = document.querySelector('.image-container');
+                            if (imageContainer) {
+                                imageContainer.style.pointerEvents = 'auto';
+                                imageContainer.style.userSelect = 'auto';
+                            }
+                            
+                            const containers = document.querySelectorAll('.container, .container2');
+                            containers.forEach(container => {
+                                container.style.pointerEvents = 'auto';
+                                container.style.userSelect = 'auto';
+                                container.style.filter = 'none';
+                                container.style.webkitFilter = 'none';
+                            });
+                            
+                            // Ensure music section is fully interactive
+                            const musicSection = document.querySelector('.music-section');
+                            if (musicSection) {
+                                musicSection.style.pointerEvents = 'auto';
+                                musicSection.style.userSelect = 'auto';
+                                musicSection.style.filter = 'none';
+                                musicSection.style.webkitFilter = 'none';
+                            }
+                            
+                            const musicCarousel = document.querySelector('#music-carousel');
+                            if (musicCarousel) {
+                                musicCarousel.style.pointerEvents = 'auto';
+                                musicCarousel.style.userSelect = 'auto';
+                            }
+                            
+                            const musicTiles = document.querySelectorAll('.music-tile');
+                            musicTiles.forEach(tile => {
+                                tile.style.pointerEvents = 'auto';
+                                tile.style.userSelect = 'auto';
+                            });
                         }
                     }, 1000);
                 }, remainingTime);
