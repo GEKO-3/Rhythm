@@ -113,8 +113,19 @@
         .subtitle-text {
             color: rgba(255, 255, 255, 0.8);
             font-size: 1em;
-            margin-bottom: 40px;
+            margin-bottom: 20px;
             font-weight: 300;
+        }
+
+        .studio-opening-text {
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+            font-family: 'Aldrich', Arial, sans-serif;
         }
 
         /* Infinite carousel */
@@ -134,7 +145,7 @@
             display: flex;
             align-items: center;
             height: 100%;
-            animation: scroll-left 30s linear infinite;
+            animation: scroll-left 60s linear infinite;
             gap: 30px;
         }
 
@@ -163,7 +174,7 @@
 
         @keyframes scroll-left {
             0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-120px * 8 - 30px * 7)); }
+            100% { transform: translateX(calc(-120px * 23 - 30px * 22)); }
         }
 
         /* Mobile responsive */
@@ -182,6 +193,11 @@
                 font-size: 0.9em;
             }
 
+            .studio-opening-text {
+                font-size: 1.2em;
+                letter-spacing: 1.5px;
+            }
+
             .carousel-container {
                 height: 100px;
                 bottom: 30px;
@@ -194,7 +210,7 @@
 
             @keyframes scroll-left {
                 0% { transform: translateX(0); }
-                100% { transform: translateX(calc(-80px * 8 - 20px * 7)); }
+                100% { transform: translateX(calc(-80px * 23 - 20px * 22)); }
             }
         }
 
@@ -229,61 +245,158 @@
         <img src="src/Logo_1.svg" alt="Rhythm Boduberu Logo" class="title-logo">
         <div class="title-text">RHYTHM BODUBERU</div>
         <div class="subtitle-text">Premier Traditional Maldivian Music Group</div>
+        <div class="studio-opening-text">Studio Opening</div>
     </div>
 
     <!-- Infinite carousel at bottom -->
     <div class="carousel-container">
         <div class="carousel-track">
-            <!-- PNG images with transparent backgrounds -->
+            <!-- First set of sponsors -->
             <div class="carousel-item">
-                <img src="src/Logo.png" alt="Rhythm Logo">
+                <img src="src/Sponsors/Artboard 1.png" alt="Sponsor 1">
             </div>
             <div class="carousel-item">
-                <img src="src/rythmtitle.png" alt="Rhythm Title">
+                <img src="src/Sponsors/Artboard 4.png" alt="Sponsor 4">
             </div>
             <div class="carousel-item">
-                <img src="src/Facebook.png" alt="Facebook">
+                <img src="src/Sponsors/Artboard 5.png" alt="Sponsor 5">
             </div>
             <div class="carousel-item">
-                <img src="src/Instagram.png" alt="Instagram">
+                <img src="src/Sponsors/Artboard 6.png" alt="Sponsor 6">
             </div>
             <div class="carousel-item">
-                <img src="src/Tiktok.png" alt="TikTok">
+                <img src="src/Sponsors/Artboard 7.png" alt="Sponsor 7">
             </div>
             <div class="carousel-item">
-                <img src="src/Soundcloud.png" alt="SoundCloud">
+                <img src="src/Sponsors/Artboard 8.png" alt="Sponsor 8">
             </div>
             <div class="carousel-item">
-                <img src="src/Youtube.png" alt="YouTube">
+                <img src="src/Sponsors/Artboard 9.png" alt="Sponsor 9">
             </div>
             <div class="carousel-item">
-                <img src="src/Viber.png" alt="Viber">
+                <img src="src/Sponsors/Artboard 10.png" alt="Sponsor 10">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 11.png" alt="Sponsor 11">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 12.png" alt="Sponsor 12">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 13.png" alt="Sponsor 13">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 14.png" alt="Sponsor 14">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 15.png" alt="Sponsor 15">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 16.png" alt="Sponsor 16">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 17.png" alt="Sponsor 17">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 19.png" alt="Sponsor 19">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 20.png" alt="Sponsor 20">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 21.png" alt="Sponsor 21">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 22.png" alt="Sponsor 22">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 23.png" alt="Sponsor 23">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 24.png" alt="Sponsor 24">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 25.png" alt="Sponsor 25">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 26.png" alt="Sponsor 26">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 27.png" alt="Sponsor 27">
             </div>
             
-            <!-- Duplicate set for seamless loop -->
+            <!-- Duplicate set for seamless infinite loop -->
             <div class="carousel-item">
-                <img src="src/Logo.png" alt="Rhythm Logo">
+                <img src="src/Sponsors/Artboard 1.png" alt="Sponsor 1">
             </div>
             <div class="carousel-item">
-                <img src="src/rythmtitle.png" alt="Rhythm Title">
+                <img src="src/Sponsors/Artboard 4.png" alt="Sponsor 4">
             </div>
             <div class="carousel-item">
-                <img src="src/Facebook.png" alt="Facebook">
+                <img src="src/Sponsors/Artboard 5.png" alt="Sponsor 5">
             </div>
             <div class="carousel-item">
-                <img src="src/Instagram.png" alt="Instagram">
+                <img src="src/Sponsors/Artboard 6.png" alt="Sponsor 6">
             </div>
             <div class="carousel-item">
-                <img src="src/Tiktok.png" alt="TikTok">
+                <img src="src/Sponsors/Artboard 7.png" alt="Sponsor 7">
             </div>
             <div class="carousel-item">
-                <img src="src/Soundcloud.png" alt="SoundCloud">
+                <img src="src/Sponsors/Artboard 8.png" alt="Sponsor 8">
             </div>
             <div class="carousel-item">
-                <img src="src/Youtube.png" alt="YouTube">
+                <img src="src/Sponsors/Artboard 9.png" alt="Sponsor 9">
             </div>
             <div class="carousel-item">
-                <img src="src/Viber.png" alt="Viber">
+                <img src="src/Sponsors/Artboard 10.png" alt="Sponsor 10">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 11.png" alt="Sponsor 11">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 12.png" alt="Sponsor 12">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 13.png" alt="Sponsor 13">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 14.png" alt="Sponsor 14">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 15.png" alt="Sponsor 15">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 16.png" alt="Sponsor 16">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 17.png" alt="Sponsor 17">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 19.png" alt="Sponsor 19">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 20.png" alt="Sponsor 20">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 21.png" alt="Sponsor 21">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 22.png" alt="Sponsor 22">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 23.png" alt="Sponsor 23">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 24.png" alt="Sponsor 24">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 25.png" alt="Sponsor 25">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 26.png" alt="Sponsor 26">
+            </div>
+            <div class="carousel-item">
+                <img src="src/Sponsors/Artboard 27.png" alt="Sponsor 27">
             </div>
         </div>
     </div>
@@ -315,14 +428,30 @@
         // Preload images for smooth carousel
         function preloadImages() {
             const images = [
-                'src/Logo.png',
-                'src/rythmtitle.png',
-                'src/Facebook.png',
-                'src/Instagram.png',
-                'src/Tiktok.png',
-                'src/Soundcloud.png',
-                'src/Youtube.png',
-                'src/Viber.png'
+                'src/Sponsors/Artboard 1.png',
+                'src/Sponsors/Artboard 4.png',
+                'src/Sponsors/Artboard 5.png',
+                'src/Sponsors/Artboard 6.png',
+                'src/Sponsors/Artboard 7.png',
+                'src/Sponsors/Artboard 8.png',
+                'src/Sponsors/Artboard 9.png',
+                'src/Sponsors/Artboard 10.png',
+                'src/Sponsors/Artboard 11.png',
+                'src/Sponsors/Artboard 12.png',
+                'src/Sponsors/Artboard 13.png',
+                'src/Sponsors/Artboard 14.png',
+                'src/Sponsors/Artboard 15.png',
+                'src/Sponsors/Artboard 16.png',
+                'src/Sponsors/Artboard 17.png',
+                'src/Sponsors/Artboard 19.png',
+                'src/Sponsors/Artboard 20.png',
+                'src/Sponsors/Artboard 21.png',
+                'src/Sponsors/Artboard 22.png',
+                'src/Sponsors/Artboard 23.png',
+                'src/Sponsors/Artboard 24.png',
+                'src/Sponsors/Artboard 25.png',
+                'src/Sponsors/Artboard 26.png',
+                'src/Sponsors/Artboard 27.png'
             ];
 
             images.forEach(src => {
