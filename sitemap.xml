@@ -3,18 +3,13 @@
         xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://rhythmboduberu.com/</loc>
-    <lastmod>2025-07-27</lastmod>
+    <lastmod>2025-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://rhythmboduberu.com/src/Logo.png</image:loc>
+      <image:loc>https://rhythmboduberu.com/src/Logo_1.svg</image:loc>
       <image:title>Rhythm Boduberu - Premier Maldivian Boduberu Music Group Logo</image:title>
       <image:caption>Official logo of Rhythm Boduberu, premier traditional Maldivian Boduberu music group specializing in authentic Boduberu performances</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://rhythmboduberu.com/src/Rhytham Logo.webp</image:loc>
-      <image:title>Rhythm Boduberu Official Logo</image:title>
-      <image:caption>Rhythm Boduberu traditional Maldivian Boduberu music group official logo</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://rhythmboduberu.com/favicons/favicon.png</image:loc>
@@ -24,19 +19,19 @@
   </url>
   <url>
     <loc>https://rhythmboduberu.com/index.html</loc>
-    <lastmod>2025-07-27</lastmod>
+    <lastmod>2025-08-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://rhythmboduberu.com/application-form.html</loc>
-    <lastmod>2025-07-27</lastmod>
+    <lastmod>2025-08-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://rhythmboduberu.com/sponsor-proposal.html</loc>
-    <lastmod>2025-07-27</lastmod>
+    <lastmod>2025-08-25</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
