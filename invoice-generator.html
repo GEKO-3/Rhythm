@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice Generator - Rhythm Boduberu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Font Face Declarations */
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Aldrich';
+            src: url('Fonts/Aldrich-Regular.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Regular.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Medium.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 500;
+            font-style: normal;
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-SemiBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 600;
+            font-style: normal;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .form-section h2 {
+            color: #f5d000;
+            margin-bottom: 25px;
+            font-size: 24px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #f5d000;
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.1);
+        }
+
+        .service-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f5d000;
+        }
+
+        .service-item input {
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            background: #f5d000;
+            color: #000;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: #e6b800;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #545b62;
+        }
+
+        .invoice-preview {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-height: 800px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .invoice {
+            padding: 40px;
+            font-size: 14px;
+            line-height: 1.6;
+            background: white;
+        }
+
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #f5d000;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .invoice-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .invoice-logo img {
+            width: 60px;
+            height: 60px;
+        }
+
+        .invoice-logo-text h1 {
+            color: #f5d000;
+            font-size: 28px;
+            margin-bottom: 5px;
+            font-family: 'Aldrich', Arial, sans-serif;
+            font-weight: normal;
+        }
+
+        .invoice-logo-text p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .invoice-title {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .invoice-title h2 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .invoice-number {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .invoice-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .billing-info h3 {
+            color: #f5d000;
+            margin-bottom: 15px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .billing-info p {
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .services-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .services-table th {
+            background: #f5d000;
+            color: #000;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .services-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .services-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .services-table .amount {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .invoice-totals {
+            margin-left: auto;
+            width: 250px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .total-row.final {
+            background: #f5d000;
+            color: #000;
+            font-weight: bold;
+            font-size: 18px;
+            padding: 15px;
+            border: none;
+            margin-top: 10px;
+        }
+
+        .invoice-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #f5d000;
+            text-align: center;
+        }
+
+        .invoice-footer h3 {
+            color: #f5d000;
+            margin-bottom: 15px;
+        }
+
+        .invoice-footer p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #f5d000;
+            color: #000;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .print-btn:hover {
+            background: #e6b800;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .invoice {
+                padding: 15px;
+                font-size: 12px;
+            }
+            
+            .invoice-header {
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: flex-start !important;
+                text-align: left !important;
+                gap: 10px !important;
+                flex-wrap: nowrap;
+            }
+            
+            .invoice-logo {
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                flex-shrink: 1;
+                min-width: 0;
+            }
+            
+            .invoice-logo img {
+                width: 35px;
+                height: 35px;
+                flex-shrink: 0;
+            }
+            
+            .invoice-logo-text {
+                min-width: 0;
+                flex-shrink: 1;
+            }
+            
+            .invoice-logo-text h1 {
+                font-size: 14px;
+                line-height: 1.2;
+                margin-bottom: 2px;
+                word-break: break-word;
+            }
+            
+            .invoice-logo-text p {
+                font-size: 9px;
+                line-height: 1.2;
+                display: none; /* Hide on very small screens */
+            }
+            
+            .invoice-title {
+                text-align: right !important;
+                flex-shrink: 0;
+                min-width: 80px;
+            }
+            
+            .invoice-title h2 {
+                font-size: 16px;
+                margin-bottom: 3px;
+                line-height: 1.2;
+            }
+            
+            .invoice-number {
+                font-size: 10px;
+                line-height: 1.3;
+            }
+            
+            .invoice-details {
+                display: grid !important;
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+                margin-bottom: 20px !important;
+            }
+            
+            .billing-info h3 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            
+            .billing-info p {
+                font-size: 11px;
+                margin-bottom: 5px;
+            }
+            
+            .services-table {
+                font-size: 10px;
+            }
+            
+            .services-table th,
+            .services-table td {
+                padding: 6px 3px;
+                font-size: 10px;
+            }
+            
+            .invoice-totals {
+                width: 180px;
+                margin-left: auto;
+            }
+            
+            .total-row {
+                font-size: 10px;
+                padding: 6px 0;
+            }
+            
+            .total-row.final {
+                font-size: 12px;
+                padding: 10px;
+            }
+            
+            .invoice-footer {
+                margin-top: 20px;
+                padding-top: 15px;
+            }
+            
+            .invoice-footer h3 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+            
+            .invoice-footer p {
+                font-size: 10px;
+                margin-bottom: 3px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white !important;
+                padding: 0;
+                font-size: 12pt;
+            }
+            
+            .form-section,
+            .print-btn {
+                display: none !important;
+            }
+            
+            .container {
+                grid-template-columns: 1fr;
+                max-width: none;
+                margin: 0;
+                gap: 0;
+            }
+            
+            .invoice-preview {
+                box-shadow: none;
+                border-radius: 0;
+                background: white !important;
+                max-height: none;
+                overflow: visible;
+            }
+            
+            .invoice-preview::before {
+                display: none !important;
+            }
+            
+            .invoice {
+                padding: 20px;
+                background: white !important;
+                backdrop-filter: none !important;
+            }
+            
+            .invoice-header {
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                text-align: left !important;
+                gap: 20px !important;
+            }
+            
+            .invoice-logo {
+                display: flex !important;
+                align-items: center !important;
+                gap: 15px !important;
+                flex-shrink: 0;
+            }
+            
+            .invoice-title {
+                text-align: right !important;
+                flex-shrink: 0;
+            }
+            
+            .invoice-details {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 40px !important;
+                margin-bottom: 30px !important;
+            }
+            
+            .services-table {
+                font-size: 11pt;
+            }
+            
+            .services-table th,
+            .services-table td {
+                padding: 8px 12px;
+            }
+            
+            .invoice-totals {
+                width: 250px;
+                margin-left: auto;
+            }
+            
+            .total-row {
+                font-size: 11pt;
+            }
+            
+            .total-row.final {
+                font-size: 14pt;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Form Section -->
+        <div class="form-section">
+            <h2>Invoice Generator</h2>
+            
+            <form id="invoiceForm">
+                <div class="form-group">
+                    <label for="invoiceNumber">Invoice Number:</label>
+                    <input type="text" id="invoiceNumber" value="RBG-001" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="invoiceDate">Date:</label>
+                    <input type="date" id="invoiceDate" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="clientName">Client Name:</label>
+                    <input type="text" id="clientName" placeholder="Enter client name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="clientAddress">Client Address:</label>
+                    <textarea id="clientAddress" rows="3" placeholder="Enter client address"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="clientPhone">Client Phone:</label>
+                    <input type="tel" id="clientPhone" placeholder="Enter phone number">
+                </div>
+
+                <div class="form-group">
+                    <label for="clientEmail">Client Email:</label>
+                    <input type="email" id="clientEmail" placeholder="Enter email address">
+                </div>
+
+                <h3 style="color: #f5d000; margin: 25px 0 15px 0;">Services</h3>
+                
+                <div id="servicesContainer">
+                    <div class="service-item">
+                        <input type="text" placeholder="Service Description" class="service-desc" required>
+                        <input type="number" placeholder="Quantity" class="service-qty" min="1" value="1" required>
+                        <input type="number" placeholder="Rate (MVR)" class="service-rate" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <button type="button" class="btn btn-secondary" onclick="addService()">Add Another Service</button>
+
+                <div class="form-group">
+                    <label for="discountRate">Discount (%):</label>
+                    <input type="number" id="discountRate" min="0" max="100" step="0.01" value="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Additional Notes:</label>
+                    <textarea id="notes" rows="3" placeholder="Payment terms, special instructions, etc."></textarea>
+                </div>
+
+                <button type="button" class="btn" onclick="generateInvoice()">Generate Invoice</button>
+            </form>
+        </div>
+
+        <!-- Invoice Preview -->
+        <div class="invoice-preview">
+            <div class="invoice">
+                <div class="invoice-header">
+                    <div class="invoice-logo">
+                        <img src="src/Logo_1.svg" alt="Rhythm Boduberu Logo">
+                        <div class="invoice-logo-text">
+                            <h1>RHYTHM BODUBERU</h1>
+                            <p>Premier Traditional Maldivian Music Group</p>
+                        </div>
+                    </div>
+                    <div class="invoice-title">
+                        <h2>INVOICE</h2>
+                        <p class="invoice-number">Invoice #: <span id="displayInvoiceNumber">RBG-001</span></p>
+                        <p class="invoice-number">Date: <span id="displayDate">-</span></p>
+                    </div>
+                </div>
+
+                <div class="invoice-details">
+                    <div class="billing-info">
+                        <h3>From:</h3>
+                        <p><strong>Rhythm Boduberu</strong></p>
+                        <p>Phone: +960 7576784 / +960 9965411</p>
+                        <p>Email: info@rhythmboduberu.com</p>
+                        <p>Website: rhythmboduberu.com</p>
+                    </div>
+                    <div class="billing-info">
+                        <h3>Bill To:</h3>
+                        <div id="clientInfo">
+                            <p id="displayClientName">-</p>
+                            <p id="displayClientAddress">-</p>
+                            <p id="displayClientPhone">-</p>
+                            <p id="displayClientEmail">-</p>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="services-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Qty</th>
+                            <th>Rate</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="servicesTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align: center; color: #666;">No services added</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="invoice-totals">
+                    <div class="total-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotalAmount">MVR 0.00</span>
+                    </div>
+                    <div class="total-row">
+                        <span>Discount (<span id="discountPercentage">0</span>%):</span>
+                        <span id="discountAmount">-MVR 0.00</span>
+                    </div>
+                    <div class="total-row final">
+                        <span>Total:</span>
+                        <span id="totalAmount">MVR 0.00</span>
+                    </div>
+                </div>
+
+                <div class="invoice-footer">
+                    <h3>Contact Information</h3>
+                    <p>For bookings and inquiries, contact us:</p>
+                    <p>Phone: +960 7576784 / +960 9965411</p>
+                    <p>Email: info@rhythmboduberu.com</p>
+                    <p>Website: www.rhythmboduberu.com</p>
+                    <p style="margin-top: 20px; font-style: italic;" id="additionalNotes"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="print-btn" onclick="printInvoice()">🖨️ Print</button>
+
+    <script>
+        // Set current date by default
+        document.getElementById('invoiceDate').valueAsDate = new Date();
+
+        let serviceCount = 1;
+
+        function addService() {
+            serviceCount++;
+            const container = document.getElementById('servicesContainer');
+            const serviceDiv = document.createElement('div');
+            serviceDiv.className = 'service-item';
+            serviceDiv.innerHTML = `
+                <input type="text" placeholder="Service Description" class="service-desc" required>
+                <input type="number" placeholder="Quantity" class="service-qty" min="1" value="1" required>
+                <input type="number" placeholder="Rate (MVR)" class="service-rate" min="0" step="0.01" required>
+                <button type="button" class="btn btn-secondary" onclick="removeService(this)" style="width: auto; margin-top: 10px;">Remove</button>
+            `;
+            container.appendChild(serviceDiv);
+        }
+
+        function removeService(button) {
+            button.parentElement.remove();
+            generateInvoice(); // Refresh the invoice
+        }
+
+        function generateInvoice() {
+            // Update invoice number and date
+            document.getElementById('displayInvoiceNumber').textContent = document.getElementById('invoiceNumber').value || 'RBG-001';
+            document.getElementById('displayDate').textContent = document.getElementById('invoiceDate').value || new Date().toISOString().split('T')[0];
+
+            // Update client information
+            document.getElementById('displayClientName').textContent = document.getElementById('clientName').value || '-';
+            document.getElementById('displayClientAddress').textContent = document.getElementById('clientAddress').value || '-';
+            document.getElementById('displayClientPhone').textContent = document.getElementById('clientPhone').value ? 'Phone: ' + document.getElementById('clientPhone').value : '';
+            document.getElementById('displayClientEmail').textContent = document.getElementById('clientEmail').value ? 'Email: ' + document.getElementById('clientEmail').value : '';
+
+            // Generate services table
+            const servicesTableBody = document.getElementById('servicesTableBody');
+            const serviceItems = document.querySelectorAll('.service-item');
+            
+            let subtotal = 0;
+            let tableHTML = '';
+
+            serviceItems.forEach(item => {
+                const desc = item.querySelector('.service-desc').value;
+                const qty = parseFloat(item.querySelector('.service-qty').value) || 0;
+                const rate = parseFloat(item.querySelector('.service-rate').value) || 0;
+                const amount = qty * rate;
+
+                if (desc && qty > 0 && rate >= 0) {
+                    subtotal += amount;
+                    tableHTML += `
+                        <tr>
+                            <td>${desc}</td>
+                            <td>${qty}</td>
+                            <td>MVR ${rate.toFixed(2)}</td>
+                            <td class="amount">MVR ${amount.toFixed(2)}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if (tableHTML === '') {
+                servicesTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #666;">No services added</td></tr>';
+            } else {
+                servicesTableBody.innerHTML = tableHTML;
+            }
+
+            // Calculate totals
+            const discountRate = parseFloat(document.getElementById('discountRate').value) || 0;
+            const discountAmount = (subtotal * discountRate) / 100;
+            const total = subtotal - discountAmount;
+
+            document.getElementById('subtotalAmount').textContent = `MVR ${subtotal.toFixed(2)}`;
+            document.getElementById('discountPercentage').textContent = discountRate.toFixed(1);
+            document.getElementById('discountAmount').textContent = `-MVR ${discountAmount.toFixed(2)}`;
+            document.getElementById('totalAmount').textContent = `MVR ${total.toFixed(2)}`;
+
+            // Update additional notes
+            document.getElementById('additionalNotes').textContent = document.getElementById('notes').value || '';
+        }
+
+        function printInvoice() {
+            window.print();
+        }
+
+        // Auto-generate invoice when form fields change
+        document.getElementById('invoiceForm').addEventListener('input', generateInvoice);
+        document.getElementById('invoiceForm').addEventListener('change', generateInvoice);
+
+        // Initialize invoice
+        generateInvoice();
+    </script>
+</body>
+</html>
