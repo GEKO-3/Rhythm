@@ -32,6 +32,9 @@ class RhythmPageTransition {
   setupNavigationInterception() {
     // Intercept back button navigation
     document.addEventListener('click', (e) => {
+      // Ensure e.target is an element with closest method
+      if (!e.target || typeof e.target.closest !== 'function') return;
+      
       const backButton = e.target.closest('.back-button');
       if (backButton) {
         e.preventDefault();
@@ -52,6 +55,9 @@ class RhythmPageTransition {
     // Preload lyrics page when hovering over songs
     if (this.currentPage === 'songlist') {
       document.addEventListener('mouseenter', (e) => {
+        // Ensure e.target is an element with closest method
+        if (!e.target || typeof e.target.closest !== 'function') return;
+        
         const songItem = e.target.closest('[data-song-id]');
         if (songItem) {
           const songId = songItem.dataset.songId;
@@ -61,6 +67,9 @@ class RhythmPageTransition {
       
       // Preload on touch start for mobile
       document.addEventListener('touchstart', (e) => {
+        // Ensure e.target is an element with closest method
+        if (!e.target || typeof e.target.closest !== 'function') return;
+        
         const songItem = e.target.closest('[data-song-id]');
         if (songItem) {
           const songId = songItem.dataset.songId;
@@ -177,18 +186,21 @@ class RhythmPageTransition {
       // Store selected song ID
       localStorage.setItem('selectedSongId', songId);
       
-      // Preload song data to ensure it's available on the new page
-      if (window.RhythmData) {
-        // Use existing cached data - don't force reload for navigation
-        if (!window.RhythmData.songs.length) {
-          await window.RhythmData.loadSongsData(false, true); // Skip loading events
-        }
-        // Ensure the specific song is available
-        const song = await window.RhythmData.getSongById(songId);
-        if (song) {
-          // Store the song data in sessionStorage for instant access
-          sessionStorage.setItem('preloadedSong', JSON.stringify(song));
-          sessionStorage.setItem('preloadedSongTimestamp', Date.now().toString());
+      // Preload song data from Firebase to ensure it's available on the new page
+      if (window.rhythmDB) {
+        try {
+          // Get the song from Firebase using the songId (which is now the song name)
+          const songsObject = await window.rhythmDB.getAllSongsAsObject();
+          const song = songsObject[songId]; // songId is the song name, so we can use it as key
+          
+          if (song) {
+            // Store the song data in sessionStorage for instant access
+            sessionStorage.setItem('preloadedSong', JSON.stringify(song));
+            sessionStorage.setItem('preloadedSongTimestamp', Date.now().toString());
+          }
+        } catch (error) {
+          console.warn('Failed to preload song from Firebase:', error);
+          // Continue with navigation even if preload fails
         }
       }
       
@@ -202,8 +214,8 @@ class RhythmPageTransition {
       // Mark this as navigation, not a fresh load
       sessionStorage.setItem('navigationInProgress', 'true');
       
-      history.pushState(state, 'Lyrics - Rhythm Boduberu', 'lyrics-csv.html');
-      window.location.href = 'lyrics-csv.html';
+      history.pushState(state, 'Lyrics - Rhythm Boduberu', 'lyrics.html');
+      window.location.href = 'lyrics.html';
       
     } catch (error) {
       console.error('Navigation failed:', error);

@@ -26,6 +26,9 @@
     <!-- Critical CSS -->
     <link rel="stylesheet" href="styles.css">
     
+    <!-- Load Firebase Database Service -->
+    <script type="module" src="firebase-db.js"></script>
+    
     <!-- Preload critical fonts -->
     <link rel="preload" href="Fonts/Montserrat-Regular.ttf" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="Fonts/Montserrat-Bold.ttf" as="font" type="font/ttf" crossorigin>
@@ -1913,8 +1916,8 @@
                     submitIcon.textContent = '📤';
                 }
                 
-                // Submit to Google Form
-                submitToGoogleForm(name, phone, company, interest, submitBtn, originalText, token);
+                // Submit to Firebase
+                submitToFirebase(name, phone, company, interest, submitBtn, originalText, token);
             } catch (error) {
                 console.error('reCAPTCHA error:', error);
                 submitBtn.disabled = false;
@@ -1926,7 +1929,88 @@
             }
         });
         
-        // Function to submit to Google Form using hidden iframe with advanced obfuscation
+        // Function to submit to Firebase
+        async function submitToFirebase(name, phone, company, interest, submitBtn, originalText, captchaToken) {
+            try {
+                // Check if Firebase is available, if not try to import it
+                if (!window.rhythmDB) {
+                    try {
+                        const firebaseModule = await import('./firebase-db.js');
+                        window.rhythmDB = firebaseModule.rhythmDB;
+                        window.ensureFirebaseInitialized = firebaseModule.ensureInitialized;
+                    } catch (importError) {
+                        console.error('Failed to import Firebase:', importError);
+                        throw new Error('Failed to load Firebase service');
+                    }
+                }
+                
+                // Initialize Firebase if needed
+                if (typeof window.ensureFirebaseInitialized !== 'undefined') {
+                    await window.ensureFirebaseInitialized();
+                }
+                
+                if (!window.rhythmDB || typeof window.rhythmDB.submitSponsorRequest !== 'function') {
+                    throw new Error('Firebase database service not available');
+                }
+                
+                // Prepare sponsor data
+                const sponsorData = {
+                    name: name,
+                    phone: phone,
+                    company: company || '',
+                    sponsorshipInterest: interest || '',
+                    recaptchaToken: captchaToken,
+                    userAgent: navigator.userAgent,
+                    timestamp: Date.now()
+                };
+                
+                // Submit to Firebase
+                const sponsorId = await window.rhythmDB.submitSponsorRequest(sponsorData);
+                
+                // Handle success
+                handleSubmissionSuccess(submitBtn, originalText);
+                
+                // Store submission timestamp
+                localStorage.setItem('rhythmSponsorSubmitted', new Date().toDateString());
+                
+            } catch (error) {
+                console.error('Error submitting sponsor request:', error);
+                handleSubmissionError(submitBtn, originalText);
+            }
+        }
+        
+        // Handle successful submission
+        function handleSubmissionSuccess(submitBtn, originalText) {
+            const form = document.getElementById('sponsorForm');
+            form.innerHTML = `
+                <div style="text-align: center; padding: 40px 20px;">
+                    <div style="background: linear-gradient(135deg, rgba(68, 255, 68, 0.2), rgba(68, 255, 68, 0.1)); border: 2px solid rgba(68, 255, 68, 0.3); border-radius: 15px; padding: 30px; margin-bottom: 25px;">
+                        <h3 style="color: var(--success-color, #44ff44); font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 1.5rem; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px;">Request Submitted</h3>
+                        <p style="color: #e0e0e0; font-family: 'Montserrat', sans-serif; font-size: 1.1rem; line-height: 1.6; margin-bottom: 15px;">Thank you for your interest in sponsoring Rhythm Boduberu!</p>
+                        <p style="color: #ccc; font-family: 'Montserrat', sans-serif; font-size: 1rem; line-height: 1.6; margin: 0;">We will review your proposal and get back to you within 2-3 business days.</p>
+                    </div>
+                    <div style="color: #999; font-family: 'Montserrat', sans-serif; font-size: 0.9rem; font-style: italic;">
+                        <p style="margin: 0;">Your request has been securely submitted to our database.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Handle submission error  
+        function handleSubmissionError(submitBtn, originalText) {
+            const submitText = document.getElementById('submitText');
+            const submitIcon = document.getElementById('submitIcon');
+            
+            submitBtn.disabled = false;
+            submitText.textContent = originalText;
+            if (submitIcon) {
+                submitIcon.style.display = 'none';
+            }
+            
+            alert('There was an error submitting your request. Please try again or contact us directly.');
+        }
+        
+        // Original Google Form submission function (keeping as fallback)
         function submitToGoogleForm(name, phone, company, interest, submitBtn, originalText, captchaToken) {
             // Advanced anti-debugging measures
             (() => {

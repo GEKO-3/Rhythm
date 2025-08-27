@@ -7,6 +7,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
 <link rel="manifest" href="favicons/manifest.webmanifest">
+  <!-- Load Firebase Database Service -->
+  <script type="module" src="firebase-db.js"></script>
   <style>
     /* Local font definitions */
     @font-face {
@@ -309,6 +311,27 @@
       background: #1976d2;
       color: #fff;
     }
+    
+    /* Mobile-friendly song suggestions */
+    .song-suggestion-item {
+      padding: 12px 15px;
+      cursor: pointer;
+      border-bottom: 1px solid #333;
+      color: #f5d000;
+      font-family: 'Montserrat', Arial, sans-serif;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s;
+      -webkit-tap-highlight-color: rgba(245, 208, 0, 0.1);
+    }
+    .song-suggestion-item:hover,
+    .song-suggestion-item:focus {
+      background-color: rgba(245, 208, 0, 0.1);
+    }
+    .song-suggestion-item:last-child {
+      border-bottom: none;
+    }
+    
     @media (max-width: 600px) {
       html, body {
         font-size: 18px;
@@ -377,7 +400,10 @@
 </head>
 <body>
   <div class="container">
-    <input id="song-name-input" type="text" placeholder="Song Name" autocomplete="off" list="song-names-list" style="width:100%;max-width:600px;margin-bottom:18px;font-size:1.2em;padding:10px 12px;border-radius:7px;border:1px solid #aaa;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
+    <div class="song-name-container" style="position:relative;width:100%;max-width:600px;margin-bottom:18px;">
+      <input id="song-name-input" type="text" placeholder="Song Name" autocomplete="off" style="width:100%;font-size:1.2em;padding:10px 12px;border-radius:7px;border:1px solid #aaa;outline:none;box-sizing:border-box;display:block;font-family:'Montserrat',Arial,sans-serif;background:#1b1b1b;color:#FFFFFF;font-weight:bold;" />
+      <div id="song-suggestions-dropdown" style="display:none;position:absolute;top:100%;left:0;right:0;background:rgba(43,43,43,0.98);border:1px solid #444;border-radius:5px;z-index:1000;box-shadow:0px 8px 16px 0px rgba(0,0,0,0.2);margin-top:2px;max-height:200px;overflow-y:auto;"></div>
+    </div>
     <datalist id="song-names-list"></datalist>
     
     <div class="genre-container" style="width:100%;max-width:600px;margin-bottom:18px;position:relative;">
@@ -399,6 +425,12 @@
       <button onclick="addBreak()">Add Break</button>
       <button onclick="copyToClipboard()">Copy to Clipboard</button>
       <button onclick="resetTool()">Reset</button>
+    </div>
+    
+    <!-- Firebase Submission Controls -->
+    <div class="controls">
+      <button id="submitBtn" onclick="saveSongToDatabase()">Save Song</button>
+      <div id="saveStatus" style="margin-top: 10px; font-weight: bold;"></div>
     </div>
   </div>
   <script>
@@ -653,21 +685,9 @@
         alert(msg);
         return;
       }
-      // Get next available id from songs.js
-      let nextId = 1;
-      try {
-        // Try to fetch songs.js and parse max id
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', '/songs.js', false); // synchronous
-        xhr.send(null);
-        if (xhr.status === 200) {
-          const match = xhr.responseText.match(/id:\s*(\d+)/g);
-          if (match) {
-            const ids = match.map(m => parseInt(m.match(/\d+/)[0], 10));
-            nextId = Math.max(...ids) + 1;
-          }
-        }
-      } catch (e) {}
+      
+      // This function is for generating lyrics in the old songs.js format
+      // Since we're using Firebase now, this is just for copying formatted lyrics
       let lyrics = '';
       children.forEach(child => {
         if (child.classList.contains('section')) {
@@ -690,9 +710,9 @@
           lyrics += '-\n';
         }
       });
+      
       const lyricsEscaped = lyrics.trim().replace(/`/g, '\u0060');
       const output = `{
-  id: ${loadedSongId ? loadedSongId : nextId},
   name: \`${songName.replace(/`/g, '\u0060')}\`,
   genre: '${selectedGenre}',
   lyrics: \`${lyricsEscaped}\`
@@ -840,9 +860,14 @@
         }
       });
     }
-    // Song name input save/load
+    // Song name input save/load (but not if we're in edit mode)
     const songNameInput = document.getElementById('song-name-input');
-    songNameInput.value = localStorage.getItem('lyricsEditorSongName') || '';
+    
+    // Only load from localStorage if we're not in edit mode
+    if (!localStorage.getItem('editSongName')) {
+      songNameInput.value = localStorage.getItem('lyricsEditorSongName') || '';
+    }
+    
     songNameInput.addEventListener('input', function() {
       // Capitalize first letter of every word as you type
       let value = songNameInput.value;
@@ -855,10 +880,35 @@
         songNameInput.setSelectionRange(pos, pos);
       }
       localStorage.setItem('lyricsEditorSongName', songNameInput.value);
+      
+      // Show filtered suggestions
+      showFilteredSuggestions(songNameInput.value.trim());
+    });
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.song-name-container')) {
+        hideSuggestions();
+      }
+    });
+    
+    // Hide suggestions on mobile when scrolling
+    document.addEventListener('scroll', function() {
+      hideSuggestions();
+    });
+    
+    // Handle focus to show suggestions
+    songNameInput.addEventListener('focus', function() {
+      if (songNameInput.value.trim() && Object.keys(songIdMap).length > 0) {
+        showFilteredSuggestions(songNameInput.value.trim());
+      }
     });
 
-    // Genre dropdown functionality
-    let selectedGenre = localStorage.getItem('lyricsEditorGenre') || '';
+    // Genre dropdown functionality (but not if we're in edit mode)
+    let selectedGenre = '';
+    if (!localStorage.getItem('editSongName')) {
+      selectedGenre = localStorage.getItem('lyricsEditorGenre') || '';
+    }
     const genreBtn = document.getElementById('genre-btn');
     const genreDropdown = document.getElementById('genre-dropdown');
     
@@ -909,144 +959,150 @@
     document.addEventListener('click', function() {
       genreDropdown.style.display = 'none';
     });
-    // Populate song name suggestions from songs.js
-    let songIdMap = {};
-    function populateSongNameSuggestions() {
-      fetch('/songs.js')
-        .then(response => response.text())
-        .then(jsText => {
-          // Extract id, name, genre and lyrics from the JS file
-          const songRegex = /{\s*id:\s*(\d+),\s*name:\s*([`'"])(.*?)\2,\s*genre:\s*([`'"])(.*?)\4,\s*lyrics:\s*([`'"])([\s\S]*?)\6/g;
-          const datalist = document.getElementById('song-names-list');
-          datalist.innerHTML = '';
-          songIdMap = {};
-          let match;
-          while ((match = songRegex.exec(jsText)) !== null) {
-            const id = match[1];
-            const name = match[3];
-            const genre = match[5];
-            const lyrics = match[7];
-            const option = document.createElement('option');
-            option.value = `${id} - ${name}`;
-            datalist.appendChild(option);
-            songIdMap[`${id} - ${name}`] = { id, name, genre, lyrics };
-          }
-        });
-    }
-    populateSongNameSuggestions();
-
-    // Load lyrics into fields if user selects an existing song
-    let loadedSongId = null;
-    songNameInput.addEventListener('change', function() {
-      const song = songIdMap[songNameInput.value];
-      if (song) {
-        songNameInput.value = song.name;
-        loadedSongId = parseInt(song.id, 10);
-        
-        // Set the genre
-        selectedGenre = song.genre || '';
-        localStorage.setItem('lyricsEditorGenre', selectedGenre);
-        updateGenreButton();
-        
-        document.getElementById('sections').innerHTML = '';
-        sectionCount = 0;
-        const lines = song.lyrics.split(/\r?\n/);
-        let currentSection = null;
-        let sectionPrefix = '#';
-        let sectionIndex = 0;
-        let afterBreak = false;
-        const sectionOrder = ['M', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'N'];
-        lines.forEach(line => {
-          if (/^[-]+$/.test(line.trim())) {
-            // Add break line
-            const breakDiv = document.createElement('div');
-            breakDiv.className = 'break-line';
-            breakDiv.innerHTML = '<button class="remove-break-btn" title="Remove Break" onclick="this.parentNode.remove()">×</button>';
-            document.getElementById('sections').appendChild(breakDiv);
-            afterBreak = true;
-            sectionPrefix = '$';
-            sectionIndex = 0;
-            currentSection = null;
-            return;
-          }
-          // Detect section header
-          let match = line.match(/^(#|\$)([A-Za-z0-9]+)/);
-          if (match) {
-            sectionPrefix = match[1];
-            let label = match[2];
-            sectionIndex = sectionOrder.indexOf(label);
-            if (sectionIndex === -1) sectionIndex = 0;
-            currentSection = addSection(line, true, true); // skip initial line
-            sectionCount++;
-            return;
-          }
-          // If line is a break section (e.g., $M, $1, etc.)
-          if (/^(\$[A-Za-z0-9]+)/.test(line.trim())) {
-            sectionPrefix = '$';
-            let label = line.trim().substring(1);
-            sectionIndex = sectionOrder.indexOf(label);
-            if (sectionIndex === -1) sectionIndex = 0;
-            currentSection = addSection(line, true, true); // skip initial line
-            sectionCount++;
-            return;
-          }
-          // If no section header, auto-add
-          if (!currentSection) {
-            let autoLabel = sectionPrefix + sectionOrder[sectionIndex];
-            currentSection = addSection(autoLabel, true, true); // skip initial line
-            sectionCount++;
-          }
-          // Add line to current section as a new input
-          if (currentSection) {
-            if (line.trim() !== '') { // Only add non-empty lines
-              const linesDiv = currentSection.querySelector('.lines');
-              const lineDiv = document.createElement('div');
-              lineDiv.className = 'line';
-              lineDiv.innerHTML = `
-                <input type="text" placeholder="މިތާ ލިޔޭ ލަވަ، ފަހަރަކު ބައިތެއް" />
-                <button class="star-line-btn" title="Nagaa / Zuvaabu">N</button>
-                <button class="remove-line-btn" title="Remove Line" onclick="removeLine(this.parentNode)">×</button>
-              `;
-              linesDiv.appendChild(lineDiv);
-              const lineInput = lineDiv.querySelector('input[type="text"]');
-              let text = line;
-              let starred = false;
-              if (text.startsWith('*')) {
-                starred = true;
-                text = text.slice(1);
-              }
-              lineInput.value = text;
-              setupThaanaTransliteration(lineInput);
-              setupInputNavigation(lineInput);
-              const starBtn = lineDiv.querySelector('.star-line-btn');
-              if (starred) {
-                starBtn.classList.add('active');
-                starBtn.textContent = 'Z';
-              } else {
-                starBtn.textContent = 'N';
-              }
-              setLineHighlight(lineDiv);
-              lineInput.addEventListener('input', saveState);
-              starBtn.addEventListener('click', function() {
-                starBtn.classList.toggle('active');
-                starBtn.textContent = starBtn.classList.contains('active') ? 'Z' : 'N';
-                setLineHighlight(lineDiv);
-                saveState();
-              });
-              lineInput.addEventListener('input', saveState);
-            }
-          }
-          // If next line is a new section, increment index
-          if (line.trim() === '') {
-            sectionIndex++;
-            currentSection = null;
-          }
-        });
-      }
-    });
     
-    // Handle imported text from transliteration tool
+    // Populate song name suggestions from Firebase
+    let songIdMap = {};
+    async function populateSongNameSuggestions() {
+      try {
+        // Allow loading suggestions unless we're explicitly in edit mode from songs-download
+        if (window.pendingEditSongName) {
+          console.log('Skipping song suggestions - in edit mode from songs-download');
+          return;
+        }
+        
+        // Wait for Firebase to be available
+        let attempts = 0;
+        while (!window.rhythmDB && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        if (!window.rhythmDB) {
+          console.log('Firebase not available for song suggestions');
+          return;
+        }
+        
+        // Get songs from Firebase
+        const songs = await window.rhythmDB.getAllSongs();
+        const datalist = document.getElementById('song-names-list');
+        datalist.innerHTML = '';
+        songIdMap = {};
+        
+        songs.forEach(song => {
+          const option = document.createElement('option');
+          option.value = song.name;
+          datalist.appendChild(option);
+          songIdMap[song.name] = song;
+        });
+        
+        console.log('Loaded', songs.length, 'song suggestions from Firebase');
+        
+      } catch (error) {
+        console.error('Error loading song suggestions:', error);
+      }
+    }
+    
+    // Mobile-friendly suggestion functions
+    function showFilteredSuggestions(inputValue) {
+      const dropdown = document.getElementById('song-suggestions-dropdown');
+      if (!dropdown || !songIdMap || Object.keys(songIdMap).length === 0) {
+        return;
+      }
+      
+      // Clear existing suggestions
+      dropdown.innerHTML = '';
+      
+      if (!inputValue) {
+        dropdown.style.display = 'none';
+        return;
+      }
+      
+      // Filter songs based on input
+      const filteredSongs = Object.values(songIdMap).filter(song => 
+        song.name.toLowerCase().includes(inputValue.toLowerCase())
+      );
+      
+      if (filteredSongs.length === 0) {
+        dropdown.style.display = 'none';
+        return;
+      }
+      
+      // Limit to first 8 suggestions for mobile performance
+      const displaySongs = filteredSongs.slice(0, 8);
+      
+      displaySongs.forEach(song => {
+        const item = document.createElement('div');
+        item.className = 'song-suggestion-item';
+        item.textContent = song.name;
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          selectSuggestion(song);
+        });
+        // Add touch support for mobile
+        item.addEventListener('touchend', function(e) {
+          e.preventDefault();
+          selectSuggestion(song);
+        });
+        dropdown.appendChild(item);
+      });
+      
+      dropdown.style.display = 'block';
+    }
+    
+    function hideSuggestions() {
+      const dropdown = document.getElementById('song-suggestions-dropdown');
+      if (dropdown) {
+        dropdown.style.display = 'none';
+      }
+    }
+    
+    function selectSuggestion(song) {
+      const songNameInput = document.getElementById('song-name-input');
+      songNameInput.value = song.name;
+      hideSuggestions();
+      
+      console.log('User selected existing song from suggestions:', song.name);
+      
+      // Set flags to indicate this is now edit mode
+      window.isUpdateMode = true;
+      window.originalSongKey = song.name;
+      window.pendingEditSongName = song.name;
+      
+      // Use the proper edit loading function to ensure all fields are populated correctly
+      loadSongForEditing(song);
+      
+      console.log('Switched to edit mode for selected song:', song.name);
+    }
+    
+    // Initialize suggestions after page loads
+    setTimeout(() => {
+      if (!window.pendingEditSongName && !window.isUpdateMode) {
+        populateSongNameSuggestions();
+      }
+    }, 500); // Reduced delay to load suggestions faster
+    
+    // Handle imported text from transliteration tool and edit data
     function handleImportedText() {
+      // First, check for edit song name from songs-download.html
+      const editSongName = localStorage.getItem('editSongName');
+      if (editSongName) {
+        console.log('Edit mode detected for song:', editSongName);
+        
+        // Clear the edit flag to prevent reload issues
+        localStorage.removeItem('editSongName');
+        
+        // Set flag to load song data once Firebase is ready
+        window.pendingEditSongName = editSongName;
+        
+        // Try to load the song data after Firebase is initialized
+        setTimeout(() => {
+          loadSongFromFirebase(editSongName);
+        }, 500);
+        
+        return; // Exit early, don't process URL params if we have edit data
+      }
+      
+      // Handle imported text from URL parameters (transliteration tool)
       const urlParams = new URLSearchParams(window.location.search);
       const importedText = urlParams.get('import');
       const songName = urlParams.get('songName');
@@ -1074,6 +1130,129 @@
           alert('Error processing imported text. Please try again.');
         }
       }
+    }
+    
+    // Function to load song from Firebase for editing
+    async function loadSongFromFirebase(songName) {
+      console.log('Loading song from Firebase:', songName);
+      
+      try {
+        // FIRST: Clear all existing localStorage data to prevent conflicts
+        console.log('Clearing existing localStorage data...');
+        localStorage.removeItem('lyricsEditorSongName');
+        localStorage.removeItem('lyricsEditorGenre');
+        localStorage.removeItem('lyricsEditorData');
+        
+        // Wait for Firebase to be available
+        let attempts = 0;
+        while (!window.rhythmDB && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        if (!window.rhythmDB) {
+          console.error('Firebase service not available');
+          alert('Database connection not available. Please refresh the page.');
+          return;
+        }
+        
+        // Get the song from Firebase
+        const song = await window.rhythmDB.getSong(songName);
+        
+        if (!song) {
+          console.error('Song not found in Firebase:', songName);
+          alert('Song not found in database: ' + songName);
+          return;
+        }
+        
+        console.log('Found song in Firebase:', song);
+        
+        // Load the song data into the form
+        loadSongForEditing(song);
+        
+      } catch (error) {
+        console.error('Error loading song from Firebase:', error);
+        alert('Failed to load song data: ' + error.message);
+      }
+    }
+    
+    // Function to load song data for editing
+    function loadSongForEditing(songData) {
+      console.log('Loading song for editing:', songData.name);
+      console.log('Song data:', songData);
+      
+      // STEP 1: Completely clear all existing form data and reset variables
+      document.getElementById('sections').innerHTML = '';
+      sectionCount = 0;
+      selectedGenre = ''; // Reset global genre variable
+      
+      // STEP 2: Clear and reset the song name input field
+      const songNameInput = document.getElementById('song-name-input');
+      if (songNameInput) {
+        songNameInput.value = ''; // Clear first
+        console.log('Cleared song name input');
+        
+        // Use setTimeout to ensure this happens after any other page initialization
+        setTimeout(() => {
+          songNameInput.value = songData.name; // Set new value
+          localStorage.setItem('lyricsEditorSongName', songData.name);
+          console.log('Set song name after delay:', songData.name);
+          console.log('Song name input value is now:', songNameInput.value);
+        }, 100);
+      } else {
+        console.error('Song name input not found');
+      }
+      
+      // STEP 3: Clear and reset genre selection
+      const genreBtn = document.getElementById('genre-btn');
+      if (genreBtn) {
+        // Reset genre button to default state first
+        genreBtn.textContent = 'Select Genre ▼';
+        genreBtn.style.color = '#f5d000';
+        genreBtn.style.borderColor = '#444';
+        console.log('Reset genre button');
+        
+        // Now set the correct genre if available with delay
+        if (songData.genre) {
+          setTimeout(() => {
+            selectedGenre = songData.genre;
+            genreBtn.textContent = selectedGenre + ' ▼';
+            genreBtn.style.borderColor = '#f5d000';
+            localStorage.setItem('lyricsEditorGenre', selectedGenre);
+            console.log('Set genre after delay:', songData.genre);
+            console.log('Genre button text is now:', genreBtn.textContent);
+            console.log('selectedGenre variable is now:', selectedGenre);
+          }, 150);
+        }
+      } else {
+        console.error('Genre button not found');
+      }
+      
+      // STEP 4: Load lyrics content
+      if (songData.lyrics) {
+        // importTextToLyrics will handle clearing existing sections
+        importTextToLyrics(songData.lyrics);
+        console.log('Imported lyrics');
+      } else {
+        // Create empty section if no lyrics
+        addSection();
+      }
+      
+      // STEP 5: Set update mode flags
+      window.isUpdateMode = true;
+      window.originalSongKey = songData.name; // Use song name as Firebase key
+      
+      // STEP 6: Update submit button text
+      const submitBtn = document.getElementById('submitBtn');
+      if (submitBtn) {
+        setTimeout(() => {
+          submitBtn.textContent = 'Update Song';
+          console.log('Updated submit button to Update Song');
+        }, 200);
+      }
+      
+      console.log('Song loaded for editing. Update mode:', window.isUpdateMode);
+      console.log('Original Firebase key:', window.originalSongKey);
     }
     
     // Function to import text and create sections/lines
@@ -1216,8 +1395,218 @@
       });
     }
     
+    // Firebase Database Submission
+    let rhythmDB;
+    let existingSongs = {};
+    
+    async function initializeFirebase() {
+      try {
+        console.log('Attempting to load Firebase module...');
+        const module = await import('./firebase-db.js');
+        console.log('Firebase module loaded, creating database instance...');
+        
+        rhythmDB = new module.RhythmFirebaseDB();
+        
+        console.log('Database instance created, loading existing songs...');
+        
+        // Load existing songs to check for duplicates
+        const songsObject = await rhythmDB.getAllSongsAsObject();
+        existingSongs = {};
+        
+        if (songsObject && typeof songsObject === 'object') {
+          Object.entries(songsObject).forEach(([songName, song]) => {
+            if (song && song.name) {
+              existingSongs[song.name.toLowerCase()] = song;
+            }
+          });
+        }
+        
+        console.log('Loaded', Object.keys(existingSongs).length, 'existing songs');
+        
+        // Check if current song exists
+        checkIfSongExists();
+        
+        // Clear any error messages
+        document.getElementById('saveStatus').innerHTML = '<div style="color: #4CAF50;">✓ Connected to database</div>';
+        
+      } catch (error) {
+        console.error('Failed to initialize Firebase:', error);
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
+        document.getElementById('saveStatus').innerHTML = `<div style="color: #ff4444;">Error: ${error.message || 'Failed to connect to database'}</div>`;
+      }
+    }
+    
+    function checkIfSongExists() {
+      const songNameElement = document.getElementById('song-name-input');
+      const submitBtn = document.getElementById('submitBtn');
+      
+      if (!songNameElement || !submitBtn) {
+        console.warn('Required elements not found for checkIfSongExists');
+        return;
+      }
+      
+      const songName = songNameElement.value.trim();
+      
+      if (songName && existingSongs[songName.toLowerCase()]) {
+        submitBtn.textContent = 'Update Song';
+      } else {
+        submitBtn.textContent = 'Save Song';
+      }
+    }
+    
+    async function saveSongToDatabase() {
+      const statusDiv = document.getElementById('saveStatus');
+      statusDiv.innerHTML = '<div style="color: #f5d000;">Saving...</div>';
+      
+      try {
+        // Initialize Firebase if not already done
+        if (!rhythmDB) {
+          await initializeFirebase();
+          if (!rhythmDB) {
+            statusDiv.innerHTML = '<div style="color: #ff4444;">Database not connected</div>';
+            return;
+          }
+        }
+        
+        // Get song name
+        const songNameElement = document.getElementById('song-name-input');
+        if (!songNameElement) {
+          statusDiv.innerHTML = '<div style="color: #ff4444;">Error: Song name field not found</div>';
+          return;
+        }
+        
+        const songName = songNameElement.value.trim();
+        if (!songName) {
+          statusDiv.innerHTML = '<div style="color: #ff4444;">Please enter a song name</div>';
+          return;
+        }
+        
+        // Get genre
+        const genreButton = document.getElementById('genre-btn');
+        if (!genreButton) {
+          statusDiv.innerHTML = '<div style="color: #ff4444;">Error: Genre button not found</div>';
+          return;
+        }
+        
+        const genre = genreButton.textContent === 'Select Genre' ? '' : genreButton.textContent;
+        if (!genre) {
+          statusDiv.innerHTML = '<div style="color: #ff4444;">Please select a genre</div>';
+          return;
+        }
+        
+        // Compile lyrics from all sections
+        let lyrics = '';
+        const sections = document.querySelectorAll('.section');
+        
+        sections.forEach((section, sectionIndex) => {
+          // Get section title
+          const titleInput = section.querySelector('input[type="text"]');
+          const sectionTitle = titleInput ? titleInput.value.trim() : '';
+          
+          if (sectionTitle) {
+            lyrics += `[${sectionTitle}]\n`;
+          }
+          
+          // Get all lines in this section
+          const lines = section.querySelectorAll('.line input[type="text"]');
+          lines.forEach(lineInput => {
+            if (!lineInput) {
+              console.warn('Found null lineInput element, skipping...');
+              return;
+            }
+            
+            const lineText = lineInput.value.trim();
+            if (lineText) {
+              // Check if this line is starred (Z mode)
+              const starBtn = lineInput.parentElement.querySelector('.star-line-btn');
+              const isStarred = starBtn && starBtn.classList.contains('active');
+              
+              if (isStarred) {
+                lyrics += `*${lineText}\n`;
+              } else {
+                lyrics += `${lineText}\n`;
+              }
+            }
+          });
+          
+          // Add spacing between sections
+          if (sectionIndex < sections.length - 1) {
+            lyrics += '\n';
+          }
+        });
+        
+        if (!lyrics.trim()) {
+          statusDiv.innerHTML = '<div style="color: #ff4444;">Please add some lyrics</div>';
+          return;
+        }
+        
+        // Create song object
+        const songData = {
+          name: songName,
+          genre: genre,
+          lyrics: lyrics.trim()
+        };
+        
+        // Check if this is an update operation from edit mode
+        const isUpdateMode = window.isUpdateMode && window.originalSongKey;
+        let result;
+        
+        if (isUpdateMode) {
+          // Update existing song using original Firebase key
+          result = await rhythmDB.updateSong(window.originalSongKey, songData);
+          statusDiv.innerHTML = `<div style="color: #4CAF50;">✓ Song updated successfully!</div>`;
+          
+          // Clear update mode flags
+          window.isUpdateMode = false;
+          window.originalSongKey = null;
+        } else {
+          // Check if song exists by name for regular operation
+          const existingSong = existingSongs[songName.toLowerCase()];
+          
+          if (existingSong) {
+            // Update existing song
+            result = await rhythmDB.updateSong(songName, songData);
+            statusDiv.innerHTML = `<div style="color: #4CAF50;">✓ Song updated successfully!</div>`;
+          } else {
+            // Save new song
+            result = await rhythmDB.addSong(songData);
+            statusDiv.innerHTML = `<div style="color: #4CAF50;">✓ Song saved successfully!</div>`;
+            
+            // Add to existing songs cache
+            existingSongs[songName.toLowerCase()] = songData;
+          }
+        }
+        
+        // Update button text
+        checkIfSongExists();
+        
+      } catch (error) {
+        console.error('Error saving song:', error);
+        statusDiv.innerHTML = '<div style="color: #ff4444;">Error saving song. Please try again.</div>';
+      }
+    }
+    
     // Call handleImportedText when page loads
-    document.addEventListener('DOMContentLoaded', handleImportedText);
+    document.addEventListener('DOMContentLoaded', function() {
+      handleImportedText();
+      
+      // Add event listener to song name input to check for existing songs
+      const songNameInput = document.getElementById('song-name-input');
+      if (songNameInput) {
+        songNameInput.addEventListener('input', checkIfSongExists);
+      }
+      
+      // Initialize Firebase on page load
+      initializeFirebase();
+      
+      // Load song suggestions early for direct page visits
+      setTimeout(() => {
+        if (!window.pendingEditSongName) {
+          populateSongNameSuggestions();
+        }
+      }, 1000);
+    });
   </script>
 </body>
 </html>

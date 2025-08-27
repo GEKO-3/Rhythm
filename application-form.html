@@ -24,6 +24,9 @@
     <!-- reCAPTCHA v3 -->
     <script src="https://www.google.com/recaptcha/api.js?render=6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn"></script>
     
+    <!-- Load Firebase Database Service -->
+    <script type="module" src="firebase-db.js"></script>
+    
     <!-- Font loading -->
     <style>
         @font-face {
@@ -854,8 +857,72 @@
         </div>
     </div>
 
+    <!-- Debug Panel (only visible with ?debug=true) -->
+    <div id="debug-panel" style="display: none; position: fixed; top: 10px; right: 10px; width: 350px; max-height: 500px; background: rgba(0,0,0,0.95); color: #00ff00; font-family: monospace; font-size: 11px; padding: 15px; border-radius: 8px; overflow-y: auto; z-index: 10000; border: 2px solid #333; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+        <div style="color: #fff; font-weight: bold; margin-bottom: 10px; border-bottom: 1px solid #333; padding-bottom: 5px;">🔧 Debug Log:</div>
+        <div id="debug-log"></div>
+        <button id="clear-debug" style="background: #333; color: #fff; border: 1px solid #555; padding: 5px 10px; border-radius: 3px; margin-top: 10px; cursor: pointer; font-size: 10px;">Clear Log</button>
+    </div>
+
     <script src="config.js" async defer></script>
     <script>
+        // Debug System for Visible Logging
+        const DEBUG_MODE = new URLSearchParams(window.location.search).has('debug');
+        const debugPanel = document.getElementById('debug-panel');
+        const debugLog = document.getElementById('debug-log');
+        const clearButton = document.getElementById('clear-debug');
+        
+        if (DEBUG_MODE) {
+            debugPanel.style.display = 'block';
+            clearButton.onclick = () => debugLog.innerHTML = '';
+        }
+        
+        function debugMessage(message, type = 'info') {
+            if (!DEBUG_MODE) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const colors = {
+                info: '#00ff00',
+                warning: '#ffff00', 
+                error: '#ff4444',
+                success: '#44ff44'
+            };
+            
+            const logEntry = document.createElement('div');
+            logEntry.style.color = colors[type] || colors.info;
+            logEntry.style.marginBottom = '3px';
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            
+            debugLog.appendChild(logEntry);
+            debugLog.scrollTop = debugLog.scrollHeight;
+            
+            // Also keep console logging as backup
+            console.log(`[DEBUG] ${message}`);
+        }
+        
+        // Test debug system
+        debugMessage('🚀 Debug system initialized', 'success');
+        
+        // Check if Firebase script is loading
+        window.addEventListener('load', function() {
+            debugMessage('📄 Page fully loaded', 'info');
+            debugMessage('Firebase DB available: ' + (!!window.rhythmDB), 'info');
+            debugMessage('Firebase init function: ' + (!!window.ensureFirebaseInitialized), 'info');
+            
+            if (window.rhythmDB) {
+                debugMessage('Available methods: ' + Object.getOwnPropertyNames(Object.getPrototypeOf(window.rhythmDB)).join(', '), 'info');
+                debugMessage('submitApplication method: ' + (typeof window.rhythmDB.submitApplication), 'info');
+            }
+            
+            // Check again after a delay in case module loads asynchronously
+            setTimeout(() => {
+                debugMessage('⏰ Delayed check - Firebase DB: ' + (!!window.rhythmDB), 'info');
+                if (window.rhythmDB) {
+                    debugMessage('⏰ Delayed - submitApplication: ' + (typeof window.rhythmDB.submitApplication), 'info');
+                }
+            }, 1000);
+        });
+        
         // Anti-debugging and obfuscation measures
         (function() {
             'use strict';
@@ -1008,11 +1075,15 @@
         });
 
         dialogConfirm.addEventListener('click', function() {
+            debugMessage('🔘 Dialog confirm button clicked', 'info');
             hideDialog();
             
             // Execute reCAPTCHA v3
+            debugMessage('🔐 Starting reCAPTCHA verification...', 'info');
             grecaptcha.ready(function() {
                 grecaptcha.execute('6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn', {action: 'submit'}).then(function(token) {
+                    debugMessage('✅ reCAPTCHA token received: ' + token.substring(0, 20) + '...', 'success');
+                    
                     // Get form data
                     const email = document.getElementById('email').value.trim();
                     const name = document.getElementById('name').value.trim();
@@ -1020,156 +1091,75 @@
                     const contact = document.getElementById('contact').value.trim();
                     const location = document.querySelector('input[name="location"]:checked').value;
                     
-                    // Submit to Google Form using hidden iframe method
-                    submitToGoogleForm(email, name, birthday, contact, location, token);
+                    debugMessage('📝 Form data collected, calling submitToFirebase', 'info');
+                    
+                    // Submit to Firebase
+                    submitToFirebase(email, name, birthday, contact, location, token);
                 }).catch(function(error) {
+                    debugMessage('❌ reCAPTCHA error: ' + error.message, 'error');
                     handleSubmissionError();
                 });
             });
         });
 
-        // Function to submit to Google Form using hidden iframe
-        function submitToGoogleForm(email, name, birthday, contact, location, recaptchaToken) {
-            // Wait for config to load
-            if (!window.RhythmConfig) {
-                setTimeout(() => submitToGoogleForm(email, name, birthday, contact, location, recaptchaToken), 100);
-                return;
-            }
-            
-            // Convert date from yyyy-mm-dd to mm/dd/yyyy format for Google Forms (no leading zeros)
-            let formattedDate = '';
-            if (birthday) {
-                const [year, month, day] = birthday.split('-');
-                const monthNum = parseInt(month, 10); // Remove leading zero
-                const dayNum = parseInt(day, 10); // Remove leading zero
-                formattedDate = `${monthNum}/${dayNum}/${year}`; // Convert to m/d/yyyy format for Google Forms
-            }
-            
-            // Additional obfuscation - create dynamic URL construction
-            const configRef = window.RhythmConfig;
-            const formUrl = configRef.applicationForm;
-            const parts = formUrl.split('/');
-            const reconstructedUrl = parts.join('/');
-            
-            // Get form entries
-            const entries = configRef.applicationEntries;
-            
-            // Create form data with correct field mapping based on extracted fields
-            const formData = new FormData();
-            formData.append('entry.1045084900', email || ''); // Field 3 - Email
-            formData.append('entry.1638269417', name); // Field 4 - Full Name  
-            formData.append('entry.286303387', formattedDate || ''); // Field 1 - Date of Birth (text field)
-            formData.append('entry.2119829349', contact); // Field 5 - Contact Number
-            formData.append('entry.520958378', location); // Field 2 - Location (radio button)
-            formData.append('g-recaptcha-response', recaptchaToken);
-            
-            // Add location sentinel (required for radio buttons)
-            formData.append('entry.520958378_sentinel', '');
-            
-            // Add some random noise fields to obfuscate
-            formData.append('_token', Math.random().toString(36));
-            formData.append('_timestamp', Date.now());
-            
-            // Submit using fetch with no-cors mode
-            fetch(reconstructedUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            }).then(() => {
-                handleSubmissionSuccess();
-            }).catch(error => {
-                // Fallback to iframe method
-                submitViaIframe(email, name, birthday, contact, location, recaptchaToken);
-            });
-        }
-        
-        function submitViaIframe(email, name, birthday, contact, location, recaptchaToken) {
-            // Convert date from yyyy-mm-dd to mm/dd/yyyy format for Google Forms (no leading zeros)
-            let formattedDate = '';
-            if (birthday) {
-                const [year, month, day] = birthday.split('-');
-                const monthNum = parseInt(month, 10); // Remove leading zero
-                const dayNum = parseInt(day, 10); // Remove leading zero
-                formattedDate = `${monthNum}/${dayNum}/${year}`; // Convert to m/d/yyyy format for Google Forms
-            }
-            
-            // Create hidden iframe
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.name = 'hidden_iframe';
-            document.body.appendChild(iframe);
-
-            // Create form with obfuscated URL
-            const hiddenForm = document.createElement('form');
-            const configRef = window.RhythmConfig;
-            const formUrl = configRef.applicationForm;
-            const dynamicUrl = formUrl.split('/').join('/');
-            hiddenForm.action = dynamicUrl;
-            hiddenForm.method = 'POST';
-            hiddenForm.target = 'hidden_iframe';
-            hiddenForm.style.display = 'none';
-
-            // Add form fields with correct entry names based on extracted field mapping
-            const fields = [
-                { name: 'entry.1045084900', value: email || '' }, // Field 3 - Email
-                { name: 'entry.1638269417', value: name }, // Field 4 - Full Name
-                { name: 'entry.286303387', value: formattedDate || '' }, // Field 1 - Date of Birth (text field)
-                { name: 'entry.2119829349', value: contact }, // Field 5 - Contact Number
-                { name: 'entry.520958378', value: location }, // Field 2 - Location (radio button)
-                { name: 'g-recaptcha-response', value: recaptchaToken },
-                { name: '_obf_token', value: Math.random().toString(36) },
-                { name: '_obf_time', value: Date.now() }
-            ];
-            
-            // Add location sentinel (required for radio buttons)
-            fields.push({ name: 'entry.520958378_sentinel', value: '' });
-
-            fields.forEach(field => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = field.name;
-                input.value = field.value;
-                hiddenForm.appendChild(input);
-            });
-
-            document.body.appendChild(hiddenForm);
-
-            // Handle submission completion - CSP will block iframe loading but submission may still work
-            let submitted = false;
-            
-            const handleSubmission = () => {
-                if (!submitted) {
-                    submitted = true;
-                    handleSubmissionSuccess();
-                    
-                    // Clean up
-                    setTimeout(() => {
-                        if (document.body.contains(hiddenForm)) {
-                            document.body.removeChild(hiddenForm);
-                        }
-                        if (document.body.contains(iframe)) {
-                            document.body.removeChild(iframe);
-                        }
-                    }, 1000);
-                }
-            };
-
-            // Google Forms blocks iframe loading due to CSP, but submission still works
-            // We'll treat any iframe event as a successful submission
-            iframe.addEventListener('load', handleSubmission);
-            iframe.addEventListener('error', handleSubmission); // CSP error means submission likely worked
-            
-            // Start submission immediately since we know CSP will block
-            setTimeout(() => {
-                if (!submitted) {
-                    handleSubmission(); // Assume success after brief delay
-                }
-            }, 2000); // Reduced timeout since we know iframe will be blocked
-
-            // Submit the form
+        // Function to submit to Firebase
+        async function submitToFirebase(email, name, birthday, contact, location, recaptchaToken) {
             try {
-                hiddenForm.submit();
+                debugMessage('🔥 Starting Firebase submission...', 'info');
+                debugMessage('Form data: email=' + email + ', name=' + name + ', location=' + location, 'info');
+                
+                // Check if Firebase is available, if not try to import it
+                if (!window.rhythmDB) {
+                    debugMessage('🔄 Firebase not available globally, trying dynamic import...', 'warning');
+                    try {
+                        const firebaseModule = await import('./firebase-db.js');
+                        window.rhythmDB = firebaseModule.rhythmDB;
+                        window.ensureFirebaseInitialized = firebaseModule.ensureInitialized;
+                        debugMessage('✅ Firebase imported dynamically', 'success');
+                    } catch (importError) {
+                        debugMessage('❌ Failed to import Firebase: ' + importError.message, 'error');
+                        throw new Error('Failed to load Firebase service');
+                    }
+                }
+                
+                // Wait for Firebase to be ready
+                if (typeof window.ensureFirebaseInitialized !== 'undefined') {
+                    debugMessage('🔄 Initializing Firebase...', 'info');
+                    await window.ensureFirebaseInitialized();
+                }
+                
+                debugMessage('🔥 Firebase window object available: ' + (!!window.rhythmDB), 'info');
+                
+                if (!window.rhythmDB) {
+                    throw new Error('Firebase database not available');
+                }
+                
+                debugMessage('✅ Firebase database available', 'success');
+                debugMessage('submitApplication method type: ' + (typeof window.rhythmDB.submitApplication), 'info');
+                
+                // Prepare application data
+                const applicationData = {
+                    email: email,
+                    fullName: name,
+                    dateOfBirth: birthday,
+                    contactNumber: contact,
+                    location: location,
+                    recaptchaToken: recaptchaToken,
+                    userAgent: navigator.userAgent,
+                    timestamp: Date.now()
+                };
+                
+                debugMessage('📝 Submitting application to Firebase...', 'info');
+                
+                // Submit to Firebase
+                const applicationId = await window.rhythmDB.submitApplication(applicationData);
+                
+                debugMessage('✅ Application submitted successfully: ' + applicationId, 'success');
+                handleSubmissionSuccess();
+                
             } catch (error) {
+                debugMessage('❌ Error submitting application: ' + error.message, 'error');
+                debugMessage('Error stack: ' + error.stack, 'error');
                 handleSubmissionError();
             }
         }
@@ -1208,11 +1198,16 @@
         form.addEventListener('submit', function(e) {
             e.preventDefault(); // Always prevent default first
             
+            debugMessage('🚀 Form submit event triggered', 'info');
+            
             // Check if already submitted
             if (localStorage.getItem('rhythmFormSubmitted') === 'true') {
+                debugMessage('❌ Form already submitted', 'error');
                 showMessage('You have already submitted this form and cannot submit it again.', 'error');
                 return;
             }
+            
+            debugMessage('✅ Form not previously submitted, proceeding...', 'success');
             
             hideMessage();
             formSubmitted = true;
@@ -1221,6 +1216,8 @@
             loading.style.display = 'block';
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
+            
+            debugMessage('🔄 Validating form fields...', 'info');
             
             // Validate required fields
             const name = document.getElementById('name').value.trim();
@@ -1324,6 +1321,7 @@
             }
             
             // All validations passed, show confirmation dialog
+            debugMessage('✅ All validations passed, showing dialog', 'success');
             showDialog();
         });
 

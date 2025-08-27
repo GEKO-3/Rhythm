@@ -8,6 +8,8 @@
   <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
 <link rel="manifest" href="favicons/manifest.webmanifest">
+  <!-- Load Firebase Database Service -->
+  <script type="module" src="firebase-db.js"></script>
   <style>
     /* Load local fonts from Fonts folder */
     @font-face {
@@ -751,6 +753,13 @@
     document.addEventListener('DOMContentLoaded', function() {
       initializePinSystem();
       initializeSessionTimeout();
+      
+      // DEBUG: Force load songs data after a delay for testing
+      console.log('DEBUG: Forcing songs data load in 3 seconds...');
+      setTimeout(() => {
+        console.log('DEBUG: Attempting to load songs data...');
+        loadSongsData();
+      }, 3000);
     });
     
     function initializeSessionTimeout() {
@@ -1227,36 +1236,183 @@
       pinOverlay.classList.add('hidden');
     }
     
-    function loadSongsData() {
+    async function loadSongsData() {
       // Only load songs after PIN is verified
       if (!pinAuthenticated) {
         console.log('PIN not authenticated - blocking song data load');
-        return;
+        console.log('DEBUG: Temporarily allowing data load for testing...');
+        // return; // TEMPORARILY COMMENTED OUT FOR DEBUGGING
       }
       
-      // Load songs.js first, then showlist.js
-      fetch('/songs.js') // Use original filename for proper caching
-        .then(response => response.text())
-        .then(scriptContent => {
-          // Replace const with window assignment to make it global
-          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
-          eval(modifiedScript);
+      try {
+        console.log('🎵 LYRICS PAGE: Starting to load songs data from Firebase...');
+        console.log('DEBUG: pinAuthenticated =', pinAuthenticated);
+        
+        // Hide loading screen if it's still showing from navigation
+        const navigationLoadingScreen = document.getElementById('loading-screen');
+        if (navigationLoadingScreen) {
+          navigationLoadingScreen.style.display = 'none';
+          console.log('🎵 LYRICS PAGE: Hidden loading screen from songlist navigation');
+        }
+        
+        // Ensure Firebase is initialized
+        if (typeof window.ensureFirebaseInitialized !== 'undefined') {
+          await window.ensureFirebaseInitialized();
+        }
+        
+        // Use Firebase database to load lyrics data
+        if (!window.rhythmDB) {
+          console.error('DEBUG: Firebase database not found!');
+          console.log('DEBUG: Available globals:', Object.keys(window).filter(key => key.includes('rhythm') || key.includes('Firebase')));
+          throw new Error('Firebase database not loaded. Please ensure firebase-db.js is loaded first.');
+        }
+        
+        console.log('DEBUG: Firebase DB found!');
+        
+        // Fetch lyrics data from Firebase
+        const songsData = await window.rhythmDB.getAllSongs();
+        
+        // Validate the data type and content
+        if (!songsData) {
+          throw new Error('No songs data received from Firebase database');
+        }
+        
+        // Ensure songsData is an array
+        let songsArray = Array.isArray(songsData) ? songsData : [];
+        
+        console.log(`Loaded ${songsArray.length} songs from Firebase`);
+        console.log('Data type check - songsData is array:', Array.isArray(songsData));
+        
+        if (songsArray.length === 0) {
+          console.log('⚠️ No songs in cache - trying force refresh from Firebase...');
+          try {
+            const freshData = await window.rhythmDB.getAllSongs(true, true); // forceRefresh = true
+            songsArray = Array.isArray(freshData) ? freshData : [];
+            console.log(`Force refresh loaded ${songsArray.length} songs`);
+          } catch (refreshError) {
+            console.warn('Force refresh failed:', refreshError);
+          }
           
-          // Now load showlist.js
-          return fetch('/showlist.js');
-        })
-        .then(response => response.text())
-        .then(showlistContent => {
-          // Replace const with window assignment to make it global
-          const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
-          eval(modifiedShowlist);
-          
-          // Initialize after both files are loaded
-          initializeLyrics();
-        })
-        .catch(error => {
-          console.error('Failed to load songs data:', error);
+          if (songsArray.length === 0) {
+            console.log('⚠️ No songs found even after refresh - initializing with empty data');
+            window.songs = [];
+            window.showList = [];
+            
+            // Show a helpful message to the user
+            document.body.insertAdjacentHTML('beforeend', `
+              <div id="no-songs-message" style="
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #2d2d2d;
+                color: #f5d000;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+                z-index: 1000;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+              ">
+                <h3>🎵 No Songs Found</h3>
+                <p>The database appears to be empty.</p>
+                <p>Add songs using the <a href="lyrics-edit.html" style="color: #f5d000;">lyrics editor</a> to get started!</p>
+                <button onclick="document.getElementById('no-songs-message').remove()" 
+                        style="background: #f5d000; color: #1f1f1f; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px;">
+                  OK
+                </button>
+              </div>
+            `);
+            
+            return; // Exit early but don't throw error
+          }
+        }
+        
+        console.log('Sample Firebase song:', songsArray[0]);
+        
+        // Convert Firebase data to the expected format
+        window.songs = [];
+        window.showList = [];
+        
+        console.log('Processing Firebase songs data...');
+        
+        // Process each song from Firebase
+        songsArray.forEach((song, index) => {
+          if (song.name && song.name.trim() !== '') {
+            const songData = {
+              id: song.name, // Use song name as stable ID
+              name: song.name,
+              genre: song.genre || 'Unknown',
+              lyrics: song.lyrics || '',
+              englishLyrics: song.englishLyrics || '',
+              showInList: song.showInList === true,
+              artist: song.artist || 'Unknown',
+              dateAdded: song.dateAdded
+            };
+            
+            // Clean up lyrics formatting
+            if (songData.lyrics) {
+              songData.lyrics = songData.lyrics
+                .replace(/\\n/g, '\n')
+                .replace(/\r\n/g, '\n')
+                .trim();
+            }
+            
+            if (songData.englishLyrics) {
+              songData.englishLyrics = songData.englishLyrics
+                .replace(/\\n/g, '\n')
+                .replace(/\r\n/g, '\n')
+                .trim();
+            }
+            
+            window.songs.push(songData);
+            
+            // Add to show list if marked to show
+            if (songData.showInList) {
+              window.showList.push(songData.name);
+            }
+          }
         });
+        
+        console.log(`Processed ${window.songs.length} songs, ${window.showList.length} in show list`);
+        console.log('Sample processed song:', window.songs[0]);
+        console.log('Show list:', window.showList);
+        
+        // Hide loading screen if it's still showing from navigation
+        const navigationLoadingScreen2 = document.getElementById('loading-screen');
+        if (navigationLoadingScreen2) {
+          navigationLoadingScreen2.style.display = 'none';
+          console.log('Hidden loading screen from songlist navigation');
+        }
+        
+        // Initialize after data is loaded
+        initializeLyrics();
+        
+      } catch (error) {
+        console.error('Failed to load songs data from Firebase:', error);
+        
+        // Show user-friendly error message
+        const errorDiv = document.createElement('div');
+        errorDiv.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: rgba(255, 0, 0, 0.9);
+          color: white;
+          padding: 20px;
+          border-radius: 10px;
+          text-align: center;
+          z-index: 10000;
+          max-width: 400px;
+        `;
+        errorDiv.innerHTML = `
+          <h3>Error Loading Songs</h3>
+          <p>Failed to load lyrics data from Firebase database.</p>
+          <p style="font-size: 0.9em; color: #ffcccc;">Error: ${error.message}</p>
+          <button onclick="this.parentElement.remove(); loadSongsData();" style="margin-top: 10px; padding: 5px 10px; background: white; color: red; border: none; border-radius: 5px; cursor: pointer;">Retry</button>
+        `;
+        document.body.appendChild(errorDiv);
+      }
     }
     
     // Dynamic script loader to hide from sources

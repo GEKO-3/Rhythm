@@ -775,6 +775,7 @@
     </div>
     <ul id="song-list"></ul>
   </div>
+  <script type="module" src="firebase-db.js"></script>
   <script src="lyrics-showlist-config.js"></script>
   <script src="rhythm-session-manager.js"></script>
   <script src="rhythm-data-service.js"></script>
@@ -792,9 +793,21 @@
         SESSION_TIMEOUT: 15 * 60 * 1000, // 15 minutes
         SEARCH_DEBOUNCE: 300,
         CSV_ENDPOINTS: {
-          get songs() { return window.RhythmLyricsShowConfig?.lyricsSheet || 'fallback_url'; },
-          get showlist() { return window.RhythmLyricsShowConfig?.showListSheet || 'fallback_url'; },
-          get cancel() { return window.RhythmLyricsShowConfig?.cancelSheet || 'fallback_url'; }
+          get songs() { 
+            return window.RhythmCSVConfig?.endpoints?.lyrics || 
+                   window.RhythmLyricsShowConfig?.lyricsSheet || 
+                   'fallback_url'; 
+          },
+          get showlist() { 
+            return window.RhythmCSVConfig?.endpoints?.showlist || 
+                   window.RhythmLyricsShowConfig?.showListSheet || 
+                   'fallback_url'; 
+          },
+          get cancel() { 
+            return window.RhythmCSVConfig?.endpoints?.cancel || 
+                   window.RhythmLyricsShowConfig?.cancelSheet || 
+                   'fallback_url'; 
+          }
         }
       };
 
@@ -807,7 +820,7 @@
         isInitialized: false,
         searchTimeout: null,
         attemptCount: 0,
-        pinAuthenticated: false
+        pinAuthenticated: true // TEMPORARY: Skip PIN for debugging
       };
 
       // DOM Elements Cache
@@ -1430,6 +1443,69 @@
 
       // Data Management Module
       const DataManager = {
+        rhythmDB: null,
+
+        async initializeFirebase() {
+          try {
+            console.log('Attempting to initialize Firebase...');
+            const module = await import('./firebase-db.js');
+            console.log('Firebase module imported successfully');
+            this.rhythmDB = new module.RhythmFirebaseDB();
+            console.log('Firebase initialized for songlist');
+            return true;
+          } catch (error) {
+            console.error('Failed to initialize Firebase:', error);
+            console.error('Error details:', error.message);
+            return false;
+          }
+        },
+
+        async getSongsFromFirebase() {
+          try {
+            console.log('Starting Firebase song loading...');
+            LoadingScreen.show('Loading songs from database...');
+            
+            if (!this.rhythmDB) {
+              console.log('Firebase not initialized, initializing now...');
+              const initialized = await this.initializeFirebase();
+              if (!initialized) {
+                console.log('Firebase initialization failed');
+                throw new Error('Firebase not available');
+              }
+            }
+            
+            console.log('Getting songs from Firebase...');
+            const songsObject = await this.rhythmDB.getAllSongsAsObject();
+            console.log('Firebase returned:', songsObject);
+            const songs = [];
+            
+            // Convert Firebase songs to the expected format
+            // Use song name as ID since Firebase uses song names as keys
+            Object.entries(songsObject).forEach(([songName, song]) => {
+              if (song && song.name && song.genre && song.lyrics) {
+                songs.push({
+                  id: song.name, // Use song name as stable ID
+                  timestamp: song.lastModified || song.dateAdded || new Date().toISOString(),
+                  name: song.name,
+                  genre: song.genre,
+                  lyrics: song.lyrics
+                });
+              }
+            });
+            
+            // Sort by name
+            songs.sort((a, b) => a.name.localeCompare(b.name));
+            
+            console.log('Successfully loaded', songs.length, 'songs from Firebase');
+            LoadingScreen.show(`Loaded ${songs.length} songs from database!`);
+            return songs;
+            
+          } catch (error) {
+            console.error('Error loading from Firebase:', error);
+            LoadingScreen.show('Failed to load songs from database');
+            throw error; // Don't fallback, just throw the error
+          }
+        },
         async loadSongsData() {
           if (!STATE.pinAuthenticated) {
             console.warn('PIN not authenticated - blocking song data load');
@@ -1440,13 +1516,13 @@
           LoadingScreen.show('Loading Songs...');
 
           try {
-            const [csvSongs] = await Promise.all([
-              this.getSongsFromCSV(),
+            const [firebaseSongs] = await Promise.all([
+              this.getSongsFromFirebase(),
               this.loadLatestShowlist()
             ]);
             
-            STATE.songs = csvSongs;
-            window.songs = csvSongs; // Global compatibility
+            STATE.songs = firebaseSongs;
+            window.songs = firebaseSongs; // Global compatibility
             
             // Show completion message before hiding
             LoadingScreen.show('Songs loaded successfully!');
@@ -1470,112 +1546,37 @@
           }
         },
 
-        async getSongsFromCSV() {
-          try {
-            LoadingScreen.show('Fetching songs data...');
-            const response = await Utils.fetchWithRetry(CONFIG.CSV_ENDPOINTS.songs);
-            const csvText = await response.text();
-            
-            LoadingScreen.show('Processing songs...');
-            
-            // Cache for offline use
-            if ('caches' in window) {
-              const cache = await caches.open('rhythm-csv-data');
-              await cache.put('csv-songs-data', new Response(csvText, {
-                headers: { 'Content-Type': 'text/csv' }
-              }));
-            }
-            
-            return this.processCSVData(csvText);
-          } catch (error) {
-            console.error('Error fetching CSV:', error);
-            LoadingScreen.show('Loading from cache...');
-            return this.loadFromCache();
-          }
-        },
-
-        async loadFromCache() {
-          if ('caches' in window) {
-            try {
-              const cache = await caches.open('rhythm-csv-data');
-              const cachedResponse = await cache.match('csv-songs-data');
-              
-              if (cachedResponse) {
-                const csvText = await cachedResponse.text();
-                return this.processCSVData(csvText);
-              }
-            } catch (error) {
-              console.error('Error loading from cache:', error);
-            }
-          }
-          return [];
-        },
-
-        processCSVData(csvText) {
-          const rows = Utils.parseCSV(csvText);
-          const songMap = new Map();
-          
-          for (let i = 1; i < rows.length; i++) {
-            const columns = rows[i];
-            if (columns.length >= 5) {
-              const [timestamp, idStr, name, genre, lyrics] = columns.map(col => col.trim());
-              const id = parseInt(idStr, 10);
-              
-              if (!isNaN(id) && name && genre && lyrics) {
-                const song = { id, timestamp, name, genre, lyrics };
-                
-                if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
-                  songMap.set(id, song);
-                }
-              }
-            }
-          }
-          
-          return Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-        },
-
         async loadLatestShowlist() {
           try {
-            LoadingScreen.show('Loading show list...');
-            const [showlistResponse, cancelResponse] = await Promise.all([
-              Utils.fetchWithRetry(CONFIG.CSV_ENDPOINTS.showlist),
-              Utils.fetchWithRetry(CONFIG.CSV_ENDPOINTS.cancel)
-            ]);
+            console.log('Loading show list from Firebase...');
             
-            const [showlistCsv, cancelCsv] = await Promise.all([
-              showlistResponse.text(),
-              cancelResponse.text()
-            ]);
-            
-            const showlistRows = Utils.parseCSV(showlistCsv);
-            const cancelRows = Utils.parseCSV(cancelCsv);
-            
-            if (showlistRows.length <= 1) {
+            if (!window.rhythmDB) {
+              console.log('Firebase not available, using empty showlist');
               STATE.currentShowList = [];
               return;
             }
             
-            const latestRow = showlistRows[showlistRows.length - 1];
-            const [, latestUID, latestShowList] = latestRow.map(col => col.trim());
+            // Get the current showlist from Firebase (as song names)
+            const showlist = await window.rhythmDB.getShowListNames();
+            console.log('Loaded showlist from Firebase:', showlist);
             
-            const isCancelled = cancelRows.some(row => 
-              row[1] === latestUID && row[2] && row[2].toLowerCase() === 'yes'
-            );
-            
-            if (!isCancelled && latestShowList) {
-              STATE.currentShowList = latestShowList.split('\n')
+            if (showlist && Array.isArray(showlist) && showlist.length > 0) {
+              STATE.currentShowList = showlist
                 .map(song => song.trim())
                 .filter(song => song);
               window.currentShowList = STATE.currentShowList; // Global compatibility
+              console.log('Set current showlist to:', STATE.currentShowList.length, 'songs');
             } else {
               STATE.currentShowList = [];
               if (STATE.currentGenreFilter === 'showlist') {
                 STATE.currentGenreFilter = 'all';
                 localStorage.setItem('songListFilter', STATE.currentGenreFilter);
               }
+              console.log('No showlist found in Firebase, using empty list');
             }
+            
           } catch (error) {
-            console.error('Failed to load latest showlist:', error);
+            console.error('Failed to load latest showlist from Firebase:', error);
             STATE.currentShowList = [];
             if (STATE.currentGenreFilter === 'showlist') {
               STATE.currentGenreFilter = 'all';
@@ -1670,20 +1671,18 @@
             return;
           }
           
-          // Count songs by genre
+          // Count songs by genre dynamically
           const genreCounts = {
             all: STATE.songs.length,
-            Baburu: 0,
-            Kaasi: 0,
-            Nala: 0,
-            Taki: 0,
-            Thinberu: 0,
-            Zamaanee: 0,
             showlist: 0
           };
           
+          // Dynamically count all genres in the database
           STATE.songs.forEach(song => {
-            if (genreCounts.hasOwnProperty(song.genre)) {
+            if (song.genre && song.genre.trim()) {
+              if (!genreCounts.hasOwnProperty(song.genre)) {
+                genreCounts[song.genre] = 0;
+              }
               genreCounts[song.genre]++;
             }
           });
@@ -1701,14 +1700,13 @@
             dropdownContent += `<a data-filter="showlist" ${STATE.currentGenreFilter === 'showlist' ? 'class="active"' : ''}>Show List (${genreCounts.showlist})</a>`;
           }
           
-          dropdownContent += `
-            <a data-filter="Baburu" ${STATE.currentGenreFilter === 'Baburu' ? 'class="active"' : ''}>Baburu (${genreCounts.Baburu})</a>
-            <a data-filter="Kaasi" ${STATE.currentGenreFilter === 'Kaasi' ? 'class="active"' : ''}>Kaasi (${genreCounts.Kaasi})</a>
-            <a data-filter="Nala" ${STATE.currentGenreFilter === 'Nala' ? 'class="active"' : ''}>Nala (${genreCounts.Nala})</a>
-            <a data-filter="Taki" ${STATE.currentGenreFilter === 'Taki' ? 'class="active"' : ''}>Taki (${genreCounts.Taki})</a>
-            <a data-filter="Thinberu" ${STATE.currentGenreFilter === 'Thinberu' ? 'class="active"' : ''}>Thinberu (${genreCounts.Thinberu})</a>
-            <a data-filter="Zamaanee" ${STATE.currentGenreFilter === 'Zamaanee' ? 'class="active"' : ''}>Zamaanee (${genreCounts.Zamaanee})</a>
-          `;
+          // Add all genres dynamically (excluding 'all' and 'showlist')
+          Object.keys(genreCounts)
+            .filter(genre => genre !== 'all' && genre !== 'showlist')
+            .sort() // Sort genres alphabetically
+            .forEach(genre => {
+              dropdownContent += `<a data-filter="${genre}" ${STATE.currentGenreFilter === genre ? 'class="active"' : ''}>${genre} (${genreCounts[genre]})</a>`;
+            });
           
           ELEMENTS.filterContent.innerHTML = dropdownContent;
           
@@ -1791,124 +1789,42 @@
         createSongElement(song) {
           const li = document.createElement('li');
           li.textContent = song.name;
-          li.style.color = '#f5d467'; // All songs yellow since CSV doesn't have English lyrics
-          li.style.transition = 'all 0.1s ease'; // Smooth transitions for touch feedback
+          li.style.color = '#f5d467';
+          li.style.transition = 'all 0.1s ease';
+          li.style.padding = '15px'; // Make it easier to click
+          li.style.margin = '5px 0';
+          li.style.border = '2px solid transparent';
+          li.style.cursor = 'pointer'; // Show it's clickable
           
-          // Touch/scroll tracking for preventing accidental clicks
-          let touchStartY = 0;
-          let touchStartX = 0;
-          let touchStartTime = 0;
-          let hasMoved = false;
-          let isScrolling = false;
-          let scrollDetectionTimeout = null;
+          // Set data attributes for navigation
+          li.dataset.songId = song.id;
           
+          // Add hover effect for better feedback
+          li.addEventListener('mouseenter', () => {
+            li.style.border = '2px solid #f5d467';
+            li.style.backgroundColor = 'rgba(245, 212, 103, 0.1)';
+          });
+          
+          li.addEventListener('mouseleave', () => {
+            li.style.border = '2px solid transparent';
+            li.style.backgroundColor = '';
+          });
+          
+          // Simplified click handler for debugging
           li.addEventListener('click', (e) => {
-            // Prevent click if user was scrolling
-            if (isScrolling || hasMoved) {
-              e.preventDefault();
-              e.stopPropagation();
-              return;
-            }
-            
-            // Show loading screen IMMEDIATELY - before any other processing
-            this.showLoadingScreenImmediate();
-            
-            // Prevent any default behavior
+            console.log('🎵 CLICK EVENT FIRED! Song clicked:', song.name, 'ID:', song.id);
             e.preventDefault();
             e.stopPropagation();
             
-            // Handle the click immediately - no setTimeout needed
+            // Immediate visual feedback
+            li.style.backgroundColor = '#ff0000';
+            
+            // Show loading screen
+            this.showLoadingScreenImmediate();
+            
+            // Handle the click
             this.handleSongClick(song);
           });
-          
-          // Add mousedown for even faster response on desktop
-          li.addEventListener('mousedown', (e) => {
-            // Only show loading for actual clicks, not during scroll
-            if (!isScrolling && !hasMoved) {
-              this.showLoadingScreenImmediate();
-            }
-          }, { passive: true });
-          
-          // Add touch event handlers with improved scroll detection
-          li.addEventListener('touchstart', (e) => {
-            const touch = e.touches[0];
-            touchStartY = touch.clientY;
-            touchStartX = touch.clientX;
-            touchStartTime = Date.now();
-            hasMoved = false;
-            isScrolling = false;
-            
-            // Clear any existing scroll detection timeout
-            if (scrollDetectionTimeout) {
-              clearTimeout(scrollDetectionTimeout);
-            }
-            
-            // Visual feedback only - don't trigger loading yet
-            li.style.background = 'var(--active-color)';
-            li.style.color = 'var(--text-color)';
-            li.style.transform = 'scale(0.98)'; // Subtle press effect
-          }, { passive: true });
-          
-          li.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            const touchCurrentY = touch.clientY;
-            const touchCurrentX = touch.clientX;
-            
-            const moveDistanceY = Math.abs(touchCurrentY - touchStartY);
-            const moveDistanceX = Math.abs(touchCurrentX - touchStartX);
-            
-            // More sensitive scroll detection - any movement over 5px
-            if (moveDistanceY > 5 || moveDistanceX > 5) {
-              hasMoved = true;
-              
-              // If vertical movement is greater, it's likely scrolling
-              if (moveDistanceY > moveDistanceX) {
-                isScrolling = true;
-              }
-              
-              // Reset visual feedback since this is movement
-              li.style.background = '';
-              li.style.color = '';
-              li.style.transform = ''; // Remove press effect
-            }
-          }, { passive: true });
-          
-          li.addEventListener('touchend', (e) => {
-            const touchEndTime = Date.now();
-            const touchDuration = touchEndTime - touchStartTime;
-            
-            // Set a timeout to reset scrolling state
-            scrollDetectionTimeout = setTimeout(() => {
-              isScrolling = false;
-              hasMoved = false;
-            }, 150); // Longer timeout for better scroll detection
-            
-            // Only handle as click if:
-            // 1. Touch was brief (less than 200ms for better responsiveness)
-            // 2. User didn't move much
-            // 3. Not currently scrolling
-            if (!hasMoved && !isScrolling && touchDuration < 200) {
-              // Show loading screen for valid tap
-              this.showLoadingScreenImmediate();
-              
-              e.preventDefault();
-              this.handleSongClick(song);
-            } else {
-              // Reset styling for scroll/invalid touch
-              setTimeout(() => {
-                if (!li.dataset.navigating) {
-                  li.style.background = '';
-                  li.style.color = '';
-                  li.style.transform = ''; // Reset scale
-                }
-              }, 100);
-            }
-          }, { passive: false });
-          
-          li.addEventListener('touchcancel', () => {
-            li.style.background = '';
-            li.style.color = '';
-          }, { passive: true });
           
           return li;
         },
@@ -1973,39 +1889,28 @@
         },
 
         handleSongClick(song) {
+          console.log('🎵 handleSongClick called for:', song.name, 'ID:', song.id);
+          
           // Prevent multiple rapid clicks
-          if (this.navigating) return;
+          if (this.navigating) {
+            console.log('Already navigating, ignoring click');
+            return;
+          }
           this.navigating = true;
           
-          // Loading screen should already be visible from immediate show
-          // Don't show it again to avoid any delay
-          
-          // Clear active state immediately for better UX
-          this.clearAllActiveSongs();
-          
-          // Mark this song as navigating to prevent style reset
-          const songElements = document.querySelectorAll('ul#song-list li');
-          songElements.forEach(el => {
-            if (el.textContent.trim() === song.name) {
-              el.dataset.navigating = 'true';
-            }
-          });
-          
-          // Save current scroll position and mark as navigation
-          localStorage.setItem('songListScrollPosition', window.pageYOffset || document.documentElement.scrollTop);
+          // Save song selection data
           localStorage.setItem('selectedSongId', song.id);
-          sessionStorage.setItem('navigationInProgress', 'true'); // Mark this as navigation, not fresh load
+          sessionStorage.setItem('navigationInProgress', 'true');
+          console.log('Saved selectedSongId:', song.id);
           
-          // Use shared page transition service for seamless navigation
-          if (window.RhythmPageTransition) {
-            window.RhythmPageTransition.navigateToLyrics(song.id);
-          } else {
-            // Fallback: Refresh session before navigating
-            if (window.RhythmSession && window.RhythmSession.isAuthenticated()) {
-              window.RhythmSession.refreshSession();
-            }
-            
-            window.location.href = 'lyrics-csv.html';
+          // Force direct navigation (bypass page transition for now)
+          console.log('🎵 Forcing direct navigation to lyrics.html');
+          
+          try {
+            window.location.href = 'lyrics.html';
+          } catch (error) {
+            console.error('Navigation failed:', error);
+            this.navigating = false;
           }
         },
         
@@ -2123,43 +2028,12 @@
             // Clear navigation flag if it exists
             sessionStorage.removeItem('navigationInProgress');
 
-            // Try shared data service first
-            if (window.RhythmData) {
-              console.log('Using shared data service');
-              LoadingScreen.show('Loading songs...');
-              
-              try {
-                // Force fresh data on fresh loads, use cache on navigation
-                const forceRefresh = isFreshLoad;
-                console.log(isFreshLoad ? '🔄 Fresh page load - fetching updated CSV data' : '⚡ Navigation - using cached data');
-                
-                await window.RhythmData.loadSongsData(forceRefresh, false);
-                const songs = await window.RhythmData.getAllSongs();
-                STATE.songs = songs;
-                window.songs = songs; // Global compatibility
-                
-                console.log('Songs loaded:', songs.length);
-                LoadingScreen.show(isFreshLoad ? 'CSV data updated successfully!' : 'Songs loaded successfully!');
-                
-                // Small delay to show success message
-                setTimeout(() => {
-                  LoadingScreen.hide();
-                  UI.initializeSongList();
-                }, 800);
-              } catch (dataError) {
-                console.error('Shared data service failed, falling back to DataManager:', dataError);
-                // Fallback to DataManager
-                DataManager.loadSongsData();
-              }
-            } else {
-              // Use DataManager which handles its own loading flow
-              console.log('Using DataManager - it will handle the complete loading flow');
-              DataManager.loadSongsData();
-              // DataManager handles LoadingScreen and UI updates internally
-            }
+            // Use Firebase database for songs only
+            console.log('Using Firebase database for songs');
+            DataManager.loadSongsData();
           } catch (error) {
             console.error('Failed to load songs:', error);
-            LoadingScreen.updateProgress('Failed to load songs');
+            LoadingScreen.show('Failed to load songs');
             setTimeout(() => LoadingScreen.hide(), 2000);
           }
         },

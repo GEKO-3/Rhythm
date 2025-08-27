@@ -12,6 +12,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
     <link rel="manifest" href="favicons/manifest.webmanifest">
     
+    <!-- Load Firebase Database Service -->
+    <script type="module" src="firebase-db.js"></script>
+    
     <!-- Font loading -->
     <style>
         @font-face {
@@ -576,17 +579,32 @@
 
         .approval-dropdown {
             position: absolute;
-            bottom: 100%;
             left: 0;
             right: 0;
-            background: rgba(42, 42, 42, 0.95);
+            background: rgba(30, 30, 30, 0.98);
             backdrop-filter: blur(15px);
-            border: 1px solid rgba(245, 208, 0, 0.3);
+            border: 2px solid rgba(245, 208, 0, 0.4);
             border-radius: 8px;
-            margin-bottom: 5px;
             z-index: 1000;
             display: none;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            max-height: 250px;
+            overflow-y: auto;
+            color: #ffffff;
+        }
+        
+        /* Default positioning - dropdown opens downward */
+        .approval-dropdown {
+            top: 100%;
+            margin-top: 5px;
+        }
+        
+        /* When dropdown should open upward */
+        .approval-dropdown.dropdown-up {
+            top: auto;
+            bottom: 100%;
+            margin-top: 0;
+            margin-bottom: 5px;
         }
 
         .approval-dropdown.show {
@@ -594,13 +612,19 @@
         }
 
         .approval-option {
-            padding: 12px 16px;
+            padding: 14px 16px;
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            color: #ffffff;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .approval-option:last-child {
+            border-bottom: none;
         }
 
         .approval-option:hover {
@@ -609,6 +633,16 @@
 
         .approval-option.approve {
             color: var(--success-color);
+            background: rgba(68, 255, 68, 0.08);
+            border-bottom: 1px solid rgba(68, 255, 68, 0.2);
+            font-weight: 700;
+            font-size: 1.02em;
+        }
+
+        .approval-option.approve:hover {
+            background: rgba(68, 255, 68, 0.2);
+            color: #ffffff;
+            transform: translateX(2px);
         }
 
         .approval-option.reject {
@@ -625,6 +659,155 @@
 
         .approval-option.called-back {
             color: #00bfff;
+        }
+
+        /* Status Selection Modal */
+        .status-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .status-modal.show {
+            display: flex;
+        }
+
+        .status-modal-content {
+            background: rgba(30, 30, 30, 0.95);
+            border: 2px solid rgba(245, 208, 0, 0.4);
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            color: #ffffff;
+            position: relative;
+        }
+
+        .status-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(245, 208, 0, 0.3);
+        }
+
+        .status-modal-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--accent-color);
+        }
+
+        .status-modal-close {
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .status-modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .status-options-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .status-modal-option {
+            padding: 16px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .status-modal-option:hover {
+            background: rgba(245, 208, 0, 0.15);
+            border-color: rgba(245, 208, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .status-modal-option.approve {
+            border-color: var(--success-color);
+            background: rgba(68, 255, 68, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-modal-option.approve:hover {
+            background: rgba(68, 255, 68, 0.25);
+            border-color: var(--success-color);
+            color: #ffffff;
+        }
+
+        .status-modal-option.reject {
+            border-color: var(--error-color);
+            background: rgba(255, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+
+        .status-modal-option.reject:hover {
+            background: rgba(255, 68, 68, 0.25);
+            border-color: var(--error-color);
+            color: #ffffff;
+        }
+
+        .status-modal-option.pending-audition {
+            border-color: #8a2be2;
+            background: rgba(138, 43, 226, 0.1);
+            color: #8a2be2;
+        }
+
+        .status-modal-option.pending-audition:hover {
+            background: rgba(138, 43, 226, 0.25);
+            border-color: #8a2be2;
+            color: #ffffff;
+        }
+
+        .status-modal-option.pending-exco {
+            border-color: #1e90ff;
+            background: rgba(30, 144, 255, 0.1);
+            color: #1e90ff;
+        }
+
+        .status-modal-option.pending-exco:hover {
+            background: rgba(30, 144, 255, 0.25);
+            border-color: #1e90ff;
+            color: #ffffff;
+        }
+
+        .status-modal-option.called-back {
+            border-color: #00bfff;
+            background: rgba(0, 191, 255, 0.1);
+            color: #00bfff;
+        }
+
+        .status-modal-option.called-back:hover {
+            background: rgba(0, 191, 255, 0.25);
+            border-color: #00bfff;
+            color: #ffffff;
         }
 
         .approval-option:first-child {
@@ -1169,6 +1352,7 @@
         </div>
     </main>
 
+
     <script src="config.js"></script>
     <script>
         // DOM elements
@@ -1205,21 +1389,22 @@
 
         let currentFilterIndex = 0;
 
-        // CSV URLs using getter functions for delayed access
-        const CSV_URL = () => window.RhythmConfig?.applicationsSheet || '';
-        const STATUS_CSV_URL = () => window.RhythmConfig?.applicationsStatusSheet || '';
-        const FORM_URL = () => window.RhythmConfig?.applicationsStatusForm || '';
+        // Firebase only - no CSV dependencies needed
 
-        // Store previously loaded applications and status data
+        // Store previously loaded applications data
         let previousApplications = [];
-        let statusData = new Map(); // Map of UID -> status
         let initialLoad = true;
         
-        // Status update tracking
-        let pendingStatusUpdates = new Map(); // Map of UID -> {status, timestamp}
-        let isPollingForUpdates = false;
-        let statusPollingInterval = null;
-        let lastUpdateTimestamp = 0;
+        // Helper function to get application status by UID
+        function getApplicationStatus(uid) {
+            // Try to find in allApplications first
+            let app = allApplications.find(a => a.UID === uid);
+            if (!app) {
+                // Fallback to previousApplications
+                app = previousApplications.find(a => a.UID === uid);
+            }
+            return app ? (app.Status || 'pending').toLowerCase() : 'pending';
+        }
         
         // Function to get seen applications from localStorage
         function getSeenApplications() {
@@ -1271,26 +1456,61 @@
         // Function to fetch status data from CSV
         async function fetchStatusData() {
             try {
-                const targetUrl = STATUS_CSV_URL();
+                // Get the URL - try new config first, then legacy
+                let targetUrl = '';
+                if (window.RhythmCSVConfig && window.RhythmCSVConfig.endpoints.applicationsStatus) {
+                    targetUrl = window.RhythmCSVConfig.endpoints.applicationsStatus;
+                    console.log('Using new CSV config status URL:', targetUrl);
+                } else {
+                    targetUrl = STATUS_CSV_URL();
+                    console.log('Using legacy config status URL:', targetUrl);
+                }
                 
                 if (!targetUrl) {
                     console.log('Status sheet URL not available');
                     return new Map();
                 }
-                
+
                 console.log('Fetching status data from CSV...');
-                console.log('Status CSV URL:', targetUrl);
-                
-                // Use the same approach as fetchApplicationsData
+
+                // Try new config helper first if available
+                if (window.RhythmCSVConfig && window.RhythmCSVConfig.fetchCSV) {
+                    try {
+                        console.log('Using new CSV config helper for status...');
+                        const csvText = await window.RhythmCSVConfig.fetchCSV(targetUrl);
+                        console.log('New config - status CSV data length:', csvText.length);
+                        
+                        if (!csvText.trim()) {
+                            console.log('Empty status CSV data received');
+                            return new Map();
+                        }
+                        
+                        const statusEntries = parseCSV(csvText);
+                        const statusMap = new Map();
+                        statusEntries.forEach(entry => {
+                            if (entry.UID && entry.Status) {
+                                statusMap.set(entry.UID.toString(), entry.Status);
+                            }
+                        });
+                        console.log('Status map created with', statusMap.size, 'entries');
+                        return statusMap;
+                        
+                    } catch (newConfigError) {
+                        console.warn('New config status method failed, trying fallback:', newConfigError);
+                    }
+                }
+
+                // Direct fetch attempt for status data
                 const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                
+
                 let response;
                 try {
                     // Try direct fetch first
                     response = await fetch(targetUrl, {
                         method: 'GET',
                         headers: {
-                            'Accept': 'text/csv,text/plain,*/*'
+                            'Accept': 'text/csv,text/plain,*/*',
+                            'Cache-Control': 'no-cache'
                         }
                     });
                 } catch (corsError) {
@@ -1302,15 +1522,15 @@
                         }
                     });
                 }
-                
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                
+
                 const csvText = await response.text();
                 console.log('Status CSV data length:', csvText.length);
                 console.log('Status CSV data preview:', csvText.substring(0, 200));
-                
+
                 if (!csvText.trim()) {
                     console.log('Empty status CSV data received');
                     return new Map();
@@ -1376,125 +1596,58 @@
                     console.error('Alternative status fetch also failed:', alternativeError);
                 }
                 
-                console.warn('All status fetch methods failed, returning empty map');
+                console.log('Status data is now managed by Firebase applications - no separate fetching needed');
+                // Status data is now embedded in the Firebase application records
                 return new Map();
             }
         }
 
-        // Function to submit status to Google Form
+        // Function to submit status to Firebase
         async function submitStatusToForm(uid, status) {
             try {
-                const formUrl = FORM_URL();
+                console.log(`Attempting to update status: UID=${uid}, Status=${status}`);
                 
-                if (!formUrl) {
-                    throw new Error('Form URL not available');
+                // Check if Firebase is available
+                if (!window.rhythmDB) {
+                    try {
+                        const firebaseModule = await import('./firebase-db.js');
+                        window.rhythmDB = firebaseModule.rhythmDB;
+                        window.ensureFirebaseInitialized = firebaseModule.ensureInitialized;
+                    } catch (importError) {
+                        console.error('Failed to import Firebase:', importError);
+                        throw new Error('Failed to load Firebase service');
+                    }
                 }
                 
-                console.log(`Attempting to submit: UID=${uid}, Status=${status}`);
+                // Initialize Firebase if needed
+                if (typeof window.ensureFirebaseInitialized !== 'undefined') {
+                    await window.ensureFirebaseInitialized();
+                }
                 
-                // Record this pending update with timestamp
-                const updateTimestamp = Date.now();
-                pendingStatusUpdates.set(uid, {
-                    status: status.toLowerCase(),
-                    timestamp: updateTimestamp
-                });
-                lastUpdateTimestamp = updateTimestamp;
+                if (!window.rhythmDB || typeof window.rhythmDB.updateApplicationStatus !== 'function') {
+                    throw new Error('Firebase database service not available');
+                }
                 
-                console.log(`Recorded pending update: UID=${uid}, Status=${status}, Timestamp=${updateTimestamp}`);
+                // Update status in Firebase
+                await window.rhythmDB.updateApplicationStatus(uid, status);
                 
-                // Show visual feedback for pending update
-                showPendingUpdate(uid);
+                // Update local applications data immediately for UI responsiveness
+                const localApp = previousApplications.find(app => app.UID === uid);
+                if (localApp) {
+                    localApp.Status = status;
+                }
                 
-                // Create form data
-                const formData = new FormData();
-                const entries = window.RhythmConfig.applicationsStatusEntries;
-                formData.append(entries.uid, uid); // UID field
-                formData.append(entries.status, status); // Status field
+                const allApp = allApplications.find(app => app.UID === uid);
+                if (allApp) {
+                    allApp.Status = status;
+                }
                 
-                // Try direct fetch first
-                const response = await fetch(formUrl, {
-                    method: 'POST',
-                    mode: 'no-cors', // This is important for Google Forms
-                    body: formData
-                });
-                
-                console.log(`Form submission response status: ${response.status || 'no-cors'}`);
-                
-                // Update local status data immediately for UI responsiveness
-                statusData.set(uid, status.toLowerCase());
-                
-                // Start polling for updates to confirm the change
-                startStatusPolling();
-                
-                console.log(`Status ${status} submitted for UID ${uid}, polling started`);
+                console.log(`Status ${status} updated successfully for UID ${uid}`);
                 return true;
                 
             } catch (error) {
-                console.error('Error submitting status:', error);
-                
-                // Fallback method using iframe
-                try {
-                    const formUrl = FORM_URL();
-                    
-                    if (!formUrl) {
-                        throw new Error('Form URL not available');
-                    }
-                    
-                    console.log('Trying fallback iframe method...');
-                    
-                    // Create a hidden iframe for form submission
-                    const iframe = document.createElement('iframe');
-                    iframe.style.display = 'none';
-                    iframe.name = 'hidden_iframe';
-                    document.body.appendChild(iframe);
-                    
-                    // Create form
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = formUrl;
-                    form.target = 'hidden_iframe';
-                    
-                    // Add UID field
-                    const uidInput = document.createElement('input');
-                    uidInput.type = 'hidden';
-                    const entries = window.RhythmConfig.applicationsStatusEntries;
-                    uidInput.name = entries.uid;
-                    uidInput.value = uid;
-                    form.appendChild(uidInput);
-                    
-                    // Add Status field
-                    const statusInput = document.createElement('input');
-                    statusInput.type = 'hidden';
-                    statusInput.name = entries.status;
-                    statusInput.value = status;
-                    form.appendChild(statusInput);
-                    
-                    // Submit form
-                    document.body.appendChild(form);
-                    form.submit();
-                    
-                    // Clean up
-                    setTimeout(() => {
-                        document.body.removeChild(form);
-                        document.body.removeChild(iframe);
-                    }, 2000);
-                    
-                    // Update local status data
-                    statusData.set(uid, status.toLowerCase());
-                    
-                    // Start polling for updates
-                    startStatusPolling();
-                    
-                    console.log(`Fallback method: Status ${status} submitted for UID ${uid}, polling started`);
-                    return true;
-                    
-                } catch (fallbackError) {
-                    console.error('Fallback submission also failed:', fallbackError);
-                    
-                    // Remove the pending update since submission failed
-                    pendingStatusUpdates.delete(uid);
-                    return false;
-                }
+                console.error('Error updating status:', error);
+                return false;
             }
         }
 
@@ -1642,8 +1795,8 @@
             };
             
             allApplications.forEach(app => {
-                const appId = generateApplicationId(app);
-                const status = (statusData.get(appId) || 'pending').toLowerCase();
+                // Get status directly from Firebase data (Status field)
+                const status = (app.Status || 'pending').toLowerCase();
                 
                 if (statusCounts.hasOwnProperty(status)) {
                     statusCounts[status]++;
@@ -1846,10 +1999,10 @@
             const tile = document.createElement('div');
             tile.className = 'application-tile compact'; // Start in compact mode
             
-            // Store application ID for click handling
-            const appId = generateApplicationId(application);
-            tile.dataset.applicationId = appId;
-            tile.dataset.uid = appId; // For status updates
+            // Store Firebase UID for click handling
+            const firebaseUID = application['UID'] || application.UID || '';
+            
+            tile.dataset.uid = firebaseUID; // Use Firebase UID for status updates
             
             // Map CSV headers to expected fields
             const timestamp = application['Timestamp'] || application['timestamp'] || '';
@@ -1863,8 +2016,8 @@
             const isInArea = location.toLowerCase().includes('yes');
             const locationText = isInArea ? 'Residing in Gan/Fonadhoo' : 'Not residing in Gan/Fonadhoo';
             
-            // Get current approval status
-            const currentStatus = statusData.get(appId) || 'pending';
+            // Get current approval status from Firebase application data
+            const currentStatus = application['Status'] || application['status'] || 'pending audition';
             const cssStatus = currentStatus.replace(/\s+/g, '-').toLowerCase();
             
             // Format phone number for display and calling
@@ -1897,27 +2050,10 @@
                     <div class="email">${email || 'No email provided'}</div>
                     <div class="location-status">${locationText}</div>
                     <div class="approval-system" style="position: relative;">
-                        <button class="approval-button ${cssStatus}" data-uid="${appId}">
+                        <button class="approval-button ${cssStatus}" data-uid="${firebaseUID}">
                             <span class="status-icon">${getStatusIcon(currentStatus)}</span>
                             <span class="status-text">${getStatusText(currentStatus)}</span>
                         </button>
-                        <div class="approval-dropdown">
-                            <div class="approval-option approve" data-status="approved">
-                                <span>✅</span> Approve
-                            </div>
-                            <div class="approval-option reject" data-status="rejected">
-                                <span>❌</span> Reject
-                            </div>
-                            <div class="approval-option pending-audition" data-status="pending audition">
-                                <span>🎵</span> Pending Audition
-                            </div>
-                            <div class="approval-option pending-exco" data-status="pending exco approval">
-                                <span>📋</span> Pending Exco Approval
-                            </div>
-                            <div class="approval-option called-back" data-status="called back">
-                                <span>📞</span> Called Back
-                            </div>
-                        </div>
                     </div>
                 </div>
             `;
@@ -1936,7 +2072,7 @@
                 
                 // Mark as seen when expanded
                 if (tile.classList.contains('expanded')) {
-                    markApplicationAsSeen(appId);
+                    markApplicationAsSeen(firebaseUID);
                     
                     // Remove NEW tag if present
                     const newTag = tile.querySelector('.new-tag');
@@ -1956,7 +2092,7 @@
             }
             
             // Set up approval system event listeners (only for expanded mode)
-            setupApprovalSystem(tile, appId);
+            setupApprovalSystem(tile, firebaseUID);
             
             return tile;
         }
@@ -1997,8 +2133,8 @@
                 const button = tile.querySelector('.approval-button');
                 
                 if (uid && button) {
-                    // Get the current status from our status data
-                    const currentStatus = statusData.get(uid) || 'pending';
+                    // Get the current status from our application data
+                    const currentStatus = getApplicationStatus(uid);
                     const cssStatus = currentStatus.replace(/\s+/g, '-').toLowerCase();
                     
                     // Update button appearance
@@ -2111,8 +2247,8 @@
                 filteredApplications = [...allApplications];
             } else {
                 filteredApplications = allApplications.filter(app => {
-                    const appId = generateApplicationId(app);
-                    const appStatus = (statusData.get(appId) || 'pending').toLowerCase();
+                    // Get status directly from Firebase data (Status field)
+                    const appStatus = (app.Status || 'pending').toLowerCase();
                     const filterMatch = appStatus === currentFilter.toLowerCase();
                     
                     console.log(`App: ${app['Full Name'] || 'Unknown'}, Status: ${appStatus}, Filter: ${currentFilter}, Match: ${filterMatch}`);
@@ -2164,10 +2300,8 @@
         }
         function setupApprovalSystem(tile, uid) {
             const button = tile.querySelector('.approval-button');
-            const dropdown = tile.querySelector('.approval-dropdown');
-            const options = tile.querySelectorAll('.approval-option');
             
-            // Toggle dropdown on button click (only in expanded mode)
+            // Open modal when button is clicked (only in expanded mode)
             button.addEventListener('click', function(e) {
                 e.stopPropagation();
                 
@@ -2176,77 +2310,161 @@
                     return;
                 }
                 
-                // Close all other dropdowns
-                document.querySelectorAll('.approval-dropdown.show').forEach(dd => {
-                    if (dd !== dropdown) dd.classList.remove('show');
-                });
-                
-                dropdown.classList.toggle('show');
+                // Show the status modal
+                showStatusModal(uid, button);
             });
+        }
+        
+        // Function to show status selection modal
+        function showStatusModal(uid, button) {
+            const modal = document.getElementById('statusModal');
+            const closeBtn = modal.querySelector('.status-modal-close');
+            const options = modal.querySelectorAll('.status-modal-option');
+            
+            console.log('🔥 Opening modal for UID:', uid);
+            
+            // Clean up any existing event listeners first
+            cleanupModalListeners();
+            
+            // Show modal
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            
+            // Store current context
+            modal.currentUID = uid;
+            modal.currentButton = button;
+            
+            // Close modal function
+            const closeModal = () => {
+                modal.classList.remove('show');
+                document.body.style.overflow = 'auto';
+                cleanupModalListeners();
+                delete modal.currentUID;
+                delete modal.currentButton;
+            };
+            
+            // Store cleanup function for later use
+            modal.cleanupFunction = closeModal;
+            
+            // Close on X button
+            const handleCloseClick = () => closeModal();
+            closeBtn.addEventListener('click', handleCloseClick);
+            modal.closeClickHandler = handleCloseClick;
+            
+            // Close on backdrop click
+            const handleBackdropClick = (e) => {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            };
+            modal.addEventListener('click', handleBackdropClick);
+            modal.backdropClickHandler = handleBackdropClick;
+            
+            // Close on Escape key
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+            modal.escapeHandler = handleEscape;
             
             // Handle option selection
             options.forEach(option => {
-                option.addEventListener('click', async function(e) {
+                const handleOptionClick = async (e) => {
                     e.stopPropagation();
                     
-                    const newStatus = this.dataset.status;
-                    const statusIcon = this.querySelector('span').textContent;
-                    const statusText = this.textContent.trim().substring(2); // Remove emoji
+                    const currentUID = modal.currentUID;
+                    const currentButton = modal.currentButton;
                     
-                    // Convert status for CSS class (replace spaces with hyphens)
+                    console.log('🔥 Option clicked for UID:', currentUID);
+                    
+                    if (!currentUID || !currentButton) {
+                        console.error('❌ Missing UID or button reference');
+                        closeModal();
+                        return;
+                    }
+                    
+                    const newStatus = option.dataset.status;
+                    const statusIcon = option.querySelector('span').textContent;
+                    const statusText = option.textContent.trim().substring(2);
+                    
                     const cssStatus = newStatus.replace(/\s+/g, '-').toLowerCase();
                     
-                    // Show loading state on button
-                    const originalButtonContent = button.innerHTML;
-                    button.innerHTML = '<span class="status-icon">⏳</span><span class="status-text">Updating...</span>';
-                    button.disabled = true;
-                    button.style.opacity = '0.7';
+                    // Close modal immediately
+                    closeModal();
                     
-                    // Update button appearance immediately for responsiveness
+                    // Show loading state
+                    const originalButtonContent = currentButton.innerHTML;
+                    currentButton.innerHTML = '<span class="status-icon">⏳</span><span class="status-text">Updating...</span>';
+                    currentButton.disabled = true;
+                    currentButton.style.opacity = '0.7';
+                    
+                    // Update button appearance
                     setTimeout(() => {
-                        button.className = `approval-button ${cssStatus}`;
-                        button.querySelector('.status-icon').textContent = statusIcon;
-                        button.querySelector('.status-text').textContent = statusText;
-                        button.disabled = false;
-                        button.style.opacity = '1';
+                        currentButton.className = `approval-button ${cssStatus}`;
+                        currentButton.querySelector('.status-icon').textContent = statusIcon;
+                        currentButton.querySelector('.status-text').textContent = statusText;
+                        currentButton.disabled = false;
+                        currentButton.style.opacity = '1';
                     }, 500);
                     
-                    // Hide dropdown
-                    dropdown.classList.remove('show');
-                    
-                    // Submit to Google Form (this will start polling automatically)
-                    const success = await submitStatusToForm(uid, newStatus);
+                    // Submit to Firebase
+                    console.log('🔥 Submitting status update for UID:', currentUID, 'Status:', newStatus);
+                    const success = await submitStatusToForm(currentUID, newStatus);
                     
                     if (success) {
-                        // Show success feedback
-                        button.style.transform = 'scale(0.95)';
+                        currentButton.style.transform = 'scale(0.95)';
                         setTimeout(() => {
-                            button.style.transform = 'scale(1)';
+                            currentButton.style.transform = 'scale(1)';
                         }, 150);
                         
-                        console.log(`Status update submitted for UID ${uid}: ${newStatus}`);
-                        console.log('Polling system will verify the update in the CSV');
-                        
-                        // Update filter counts immediately
+                        console.log(`✅ Status successfully updated for UID ${currentUID}: ${newStatus}`);
                         updateFilterCounts();
-                        
-                        // Re-apply current filter to update the display
                         applyFilter();
                     } else {
-                        // Revert button if submission failed
-                        button.innerHTML = originalButtonContent;
-                        button.disabled = false;
-                        button.style.opacity = '1';
-                        
+                        currentButton.innerHTML = originalButtonContent;
+                        currentButton.disabled = false;
+                        currentButton.style.opacity = '1';
                         alert('Failed to update status. Please try again.');
                     }
-                });
+                };
+                
+                option.addEventListener('click', handleOptionClick);
+                // Store handler reference for cleanup
+                option.modalClickHandler = handleOptionClick;
             });
+        }
+        
+        // Function to clean up modal event listeners
+        function cleanupModalListeners() {
+            const modal = document.getElementById('statusModal');
+            const closeBtn = modal.querySelector('.status-modal-close');
+            const options = modal.querySelectorAll('.status-modal-option');
             
-            // Close dropdown when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!tile.contains(e.target)) {
-                    dropdown.classList.remove('show');
+            // Clean up close button listener
+            if (modal.closeClickHandler) {
+                closeBtn.removeEventListener('click', modal.closeClickHandler);
+                delete modal.closeClickHandler;
+            }
+            
+            // Clean up backdrop listener
+            if (modal.backdropClickHandler) {
+                modal.removeEventListener('click', modal.backdropClickHandler);
+                delete modal.backdropClickHandler;
+            }
+            
+            // Clean up escape listener
+            if (modal.escapeHandler) {
+                document.removeEventListener('keydown', modal.escapeHandler);
+                delete modal.escapeHandler;
+            }
+            
+            // Clean up option listeners
+            options.forEach(option => {
+                if (option.modalClickHandler) {
+                    option.removeEventListener('click', option.modalClickHandler);
+                    delete option.modalClickHandler;
                 }
             });
         }
@@ -2259,10 +2477,8 @@
                 if (!a.isNew && b.isNew) return 1;
                 
                 // Second, sort by status priority (pending review first, rejected last)
-                const appIdA = generateApplicationId(a);
-                const appIdB = generateApplicationId(b);
-                const statusA = (statusData.get(appIdA) || 'pending').toLowerCase();
-                const statusB = (statusData.get(appIdB) || 'pending').toLowerCase();
+                const statusA = (a.Status || 'pending').toLowerCase();
+                const statusB = (b.Status || 'pending').toLowerCase();
                 
                 // Define status priority (lower number = higher priority)
                 const getStatusPriority = (status) => {
@@ -2322,13 +2538,13 @@
                 return appsWithoutNewFlag;
             }
             
-            const previousIds = new Set(previousApplications.map(generateApplicationId));
+            const previousIds = new Set(previousApplications.map(app => app.UID || ''));
             let newApplicationCount = 0;
             
             const appsWithNewFlag = currentApplications.map(app => {
-                const appId = generateApplicationId(app);
-                const wasNotPreviouslyLoaded = !previousIds.has(appId);
-                const hasNotBeenSeen = !seenApps.has(appId);
+                const appUID = app.UID || '';
+                const wasNotPreviouslyLoaded = !previousIds.has(appUID);
+                const hasNotBeenSeen = !seenApps.has(appUID);
                 const isNew = wasNotPreviouslyLoaded && hasNotBeenSeen;
                 
                 if (isNew) {
@@ -2346,11 +2562,10 @@
 
         // Function to check if an application should be hidden (rejected and older than 2 days)
         function shouldHideApplication(application) {
-            const appId = generateApplicationId(application);
-            const appStatus = statusData.get(appId) || 'pending';
+            const appStatus = (application.Status || 'pending').toLowerCase();
             
             // Only hide if status is rejected
-            if (appStatus.toLowerCase() !== 'rejected') {
+            if (appStatus !== 'rejected') {
                 return false;
             }
             
@@ -2406,8 +2621,7 @@
             let approvedCount = 0;
             
             visibleApplications.forEach(app => {
-                const appId = generateApplicationId(app);
-                const status = (statusData.get(appId) || 'pending').toLowerCase();
+                const status = (app.Status || 'pending').toLowerCase();
                 
                 switch (status) {
                     case 'pending audition':
@@ -2503,121 +2717,66 @@
             errorContainer.style.display = 'block';
         }
 
-        // Function to fetch and display applications
+        // Function to fetch and display applications from Firebase
         async function fetchApplications() {
             try {
-                // Fetch both applications and status data in parallel
-                const [applicationsData, statusMap] = await Promise.all([
-                    fetchApplicationsData(),
-                    fetchStatusData()
-                ]);
+                loadingContainer.style.display = 'block';
+                errorContainer.style.display = 'none';
                 
-                // Update global status data
-                statusData = statusMap;
+                console.log('🔥 Loading applications from Firebase...');
                 
-                if (!applicationsData || applicationsData.length === 0) {
-                    displayApplications([]);
-                    return;
+                // Check if Firebase is available, if not try to import it
+                if (!window.rhythmDB) {
+                    try {
+                        const firebaseModule = await import('./firebase-db.js');
+                        window.rhythmDB = firebaseModule.rhythmDB;
+                        window.ensureFirebaseInitialized = firebaseModule.ensureInitialized;
+                    } catch (importError) {
+                        console.error('Failed to import Firebase:', importError);
+                        throw new Error('Failed to load Firebase service');
+                    }
                 }
                 
-                displayApplications(applicationsData);
-                
-                // Update existing approval buttons if this isn't the first load
-                if (!initialLoad) {
-                    updateApprovalButtons();
+                // Initialize Firebase if needed
+                if (typeof window.ensureFirebaseInitialized !== 'undefined') {
+                    await window.ensureFirebaseInitialized();
                 }
+                
+                if (!window.rhythmDB || typeof window.rhythmDB.getAllApplications !== 'function') {
+                    throw new Error('Firebase database service not available');
+                }
+                
+                // Get applications from Firebase
+                const firebaseApplications = await window.rhythmDB.getAllApplications();
+                console.log('Retrieved', firebaseApplications.length, 'applications from Firebase');
+                
+                // Convert Firebase data to display format
+                const applications = firebaseApplications.map(app => ({
+                    'Timestamp': app.timestamp ? new Date(app.timestamp).toLocaleString() : app.submittedAt || new Date().toLocaleString(),
+                    'Full Name': app.fullName || '',
+                    'Date of Birth': app.dateOfBirth || '',
+                    'Contact Number': app.contactNumber || '',
+                    'Email Address': app.email || '',
+                    'Location': app.location || '',
+                    'Status': app.status || 'Pending Audition',
+                    'UID': app.id || ''
+                }));
+                
+                console.log('Formatted', applications.length, 'applications for display');
+                
+                // Store data globally
+                allApplications = applications;
+                
+                // Show data
+                displayApplications(applications);
+                
+                loadingContainer.style.display = 'none';
                 
             } catch (error) {
-                console.error('Error fetching data:', error);
+                console.error('❌ Error loading applications:', error);
+                loadingContainer.style.display = 'none';
                 showError();
             }
-        }
-
-        // Function to fetch applications data
-        async function fetchApplicationsData() {
-            try {
-                // Get the URL using the getter function
-                const targetUrl = CSV_URL();
-                
-                if (!targetUrl) {
-                    throw new Error('Applications sheet URL not available');
-                }
-                
-                console.log('Fetching applications from:', targetUrl);
-                
-                // Use a CORS proxy to fetch the CSV data
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                
-                let response;
-                try {
-                    // Try direct fetch first
-                    response = await fetch(targetUrl, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'text/csv,text/plain,*/*'
-                        }
-                    });
-                } catch (corsError) {
-                    // If CORS fails, try with proxy
-                    response = await fetch(proxyUrl + targetUrl, {
-                        method: 'GET',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    });
-                }
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const csvText = await response.text();
-                console.log('Applications CSV data length:', csvText.length);
-                
-                if (!csvText.trim()) {
-                    return [];
-                }
-                
-                return parseCSV(csvText);
-                
-            } catch (error) {
-                console.error('Error fetching applications:', error);
-                
-                // Try alternative method using a different CORS proxy
-                try {
-                    const targetUrl = CSV_URL();
-                    if (!targetUrl) {
-                        throw new Error('Applications sheet URL not available');
-                    }
-                    
-                    console.log('Trying alternative CORS proxy...');
-                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`);
-                    const data = await response.json();
-                    
-                    if (data.contents) {
-                        console.log('Alternative method - applications CSV data length:', data.contents.length);
-                        return parseCSV(data.contents);
-                    }
-                } catch (alternativeError) {
-                    console.error('Alternative fetch also failed:', alternativeError);
-                }
-                
-                throw new Error('Failed to fetch applications data');
-            }
-        }
-
-        // Function to wait for config to load
-        function waitForConfig() {
-            return new Promise((resolve) => {
-                const checkConfig = () => {
-                    if (window.RhythmConfig && window.RhythmConfig.applicationsSheet) {
-                        resolve();
-                    } else {
-                        setTimeout(checkConfig, 100);
-                    }
-                };
-                checkConfig();
-            });
         }
 
         // Initialize the page
@@ -2625,9 +2784,8 @@
             // Set up filter system
             setupFilterSystem();
             
-            // Wait for config to load before fetching applications
-            await waitForConfig();
-            console.log('Config loaded, fetching applications...');
+            // Load applications from Firebase
+            console.log('Loading applications from Firebase...');
             fetchApplications();
         });
 
@@ -2637,24 +2795,40 @@
         });
 
         // Also clean up when page becomes hidden (mobile browsers)
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                // Page is hidden, stop polling to save resources
-                if (isPollingForUpdates) {
-                    console.log('Page hidden, pausing status polling');
-                    stopStatusPolling();
-                }
-            } else {
-                // Page is visible again, resume polling if there are pending updates
-                if (pendingStatusUpdates.size > 0 && !isPollingForUpdates) {
-                    console.log('Page visible again, resuming status polling');
-                    startStatusPolling();
-                }
-            }
-        });
-
-        // Refresh data every 2 minutes
+        // Refresh data every 2 minutes to keep applications up to date
         setInterval(fetchApplications, 2 * 60 * 1000);
     </script>
+    
+    <!-- Status Selection Modal -->
+    <div id="statusModal" class="status-modal">
+        <div class="status-modal-content">
+            <div class="status-modal-header">
+                <div class="status-modal-title">Change Status</div>
+                <button class="status-modal-close">&times;</button>
+            </div>
+            <div class="status-options-grid">
+                <div class="status-modal-option approve" data-status="approved">
+                    <span>✅</span>
+                    <span>Approve</span>
+                </div>
+                <div class="status-modal-option reject" data-status="rejected">
+                    <span>❌</span>
+                    <span>Reject</span>
+                </div>
+                <div class="status-modal-option pending-audition" data-status="pending audition">
+                    <span>🎵</span>
+                    <span>Pending Audition</span>
+                </div>
+                <div class="status-modal-option pending-exco" data-status="pending exco approval">
+                    <span>📋</span>
+                    <span>Pending Exco Approval</span>
+                </div>
+                <div class="status-modal-option called-back" data-status="called back">
+                    <span>📞</span>
+                    <span>Called Back</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

@@ -12,6 +12,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
     <link rel="manifest" href="favicons/manifest.webmanifest">
     
+    <!-- Load Firebase Database Service -->
+    <script type="module" src="firebase-db.js"></script>
+    
     <!-- Font loading -->
     <style>
         @font-face {
@@ -623,6 +626,7 @@
         </div>
     </main>
 
+    <script src="csv-config.js"></script>
     <script src="config.js"></script>
     <script>
         // DOM elements
@@ -638,9 +642,11 @@
         const pendingCallbackCountEl = document.getElementById('pending-callback-count');
 
         // CSV URLs
-        const CSV_URL = () => window.RhythmConfig.sponsorCallbackSheet;
-        const STATUS_CSV_URL = () => window.RhythmConfig.sponsorCallbackStatusSheet;
-        const FORM_URL = () => window.RhythmConfig.sponsorCallbackForm;
+        const CSV_URL = () => window.RhythmCSVConfig?.endpoints?.sponsorCallback || 
+                             window.RhythmConfig?.sponsorCallbackSheet || '';
+        const STATUS_CSV_URL = () => window.RhythmCSVConfig?.endpoints?.sponsorCallbackStatus || 
+                                    window.RhythmConfig?.sponsorCallbackStatusSheet || '';
+        const FORM_URL = () => window.RhythmConfig?.sponsorCallbackForm || '';
 
         // Store previously loaded sponsors and callback data
         let previousSponsors = [];
@@ -1318,57 +1324,54 @@
         // Function to fetch sponsors data
         async function fetchSponsorsData() {
             try {
-                // Use a CORS proxy to fetch the CSV data
-                const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                const targetUrl = CSV_URL();
+                console.log('Fetching sponsor requests from Firebase...');
                 
-                let response;
-                try {
-                    // Try direct fetch first
-                    response = await fetch(targetUrl, {
-                        method: 'GET',
-                        headers: {
-                            'Accept': 'text/csv,text/plain,*/*'
-                        }
-                    });
-                } catch (corsError) {
-                    // If CORS fails, try with proxy
-                    response = await fetch(proxyUrl + targetUrl, {
-                        method: 'GET',
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest'
-                        }
-                    });
+                // Check if Firebase is available, if not try to import it
+                if (!window.rhythmDB) {
+                    try {
+                        const firebaseModule = await import('./firebase-db.js');
+                        window.rhythmDB = firebaseModule.rhythmDB;
+                        window.ensureFirebaseInitialized = firebaseModule.ensureInitialized;
+                    } catch (importError) {
+                        console.error('Failed to import Firebase:', importError);
+                        throw new Error('Failed to load Firebase service');
+                    }
                 }
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                // Initialize Firebase if needed
+                if (typeof window.ensureFirebaseInitialized !== 'undefined') {
+                    await window.ensureFirebaseInitialized();
                 }
                 
-                const csvText = await response.text();
-                
-                if (!csvText.trim()) {
-                    return [];
+                if (!window.rhythmDB || typeof window.rhythmDB.getAllSponsorRequests !== 'function') {
+                    throw new Error('Firebase database service not available');
                 }
                 
-                return parseCSV(csvText);
+                // Get all sponsor requests from Firebase
+                const firebaseSponsors = await window.rhythmDB.getAllSponsorRequests();
+                console.log('Retrieved', Object.keys(firebaseSponsors).length, 'sponsor requests from Firebase');
+                
+                // Convert Firebase data to match the expected format
+                const sponsors = [];
+                Object.entries(firebaseSponsors).forEach(([id, sponsor]) => {
+                    const formattedSponsor = {
+                        'Timestamp': sponsor.timestamp ? new Date(sponsor.timestamp).toLocaleString() : new Date().toLocaleString(),
+                        'Name': sponsor.name || '',
+                        'Phone': sponsor.phone || '',
+                        'Company': sponsor.company || '',
+                        'Interest': sponsor.sponsorshipInterest || '',
+                        'Status': sponsor.status || 'Pending',
+                        'UID': id
+                    };
+                    sponsors.push(formattedSponsor);
+                });
+                
+                console.log('Formatted', sponsors.length, 'sponsor requests for display');
+                return sponsors;
                 
             } catch (error) {
-                console.error('Error fetching sponsors:', error);
-                
-                // Try alternative method using a different CORS proxy
-                try {
-                    const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(CSV_URL())}`);
-                    const data = await response.json();
-                    
-                    if (data.contents) {
-                        return parseCSV(data.contents);
-                    }
-                } catch (alternativeError) {
-                    console.error('Alternative fetch also failed:', alternativeError);
-                }
-                
-                throw new Error('Failed to fetch sponsors data');
+                console.error('Error fetching sponsor requests from Firebase:', error);
+                throw error;
             }
         }
 

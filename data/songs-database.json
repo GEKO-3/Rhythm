@@ -1,0 +1,38 @@
+{
+  "songs": [
+    {
+      "id": 1,
+      "name": "Sample Song 1",
+      "genre": "Traditional",
+      "lyrics": "ތިރީގައި ހުރި ލައިރިކްސް\nދެ ލައިން އޮތީ",
+      "englishLyrics": "These are sample lyrics\nWith two lines",
+      "showInList": true,
+      "dateAdded": "2025-01-01",
+      "artist": "Unknown"
+    },
+    {
+      "id": 2,
+      "name": "Sample Song 2", 
+      "genre": "Modern",
+      "lyrics": "މިއީ ދެވަނަ މުސިކް\nއެއްވެސް ލައިރިކްސް ނެތް",
+      "englishLyrics": "This is the second song\nNo proper lyrics available",
+      "showInList": false,
+      "dateAdded": "2025-01-02",
+      "artist": "Various"
+    }
+  ],
+  "showList": [
+    {
+      "id": 1,
+      "songId": 1,
+      "showDate": "2025-02-01",
+      "venue": "Main Hall",
+      "status": "confirmed"
+    }
+  ],
+  "metadata": {
+    "lastUpdated": "2025-01-26T00:00:00Z",
+    "version": "1.0",
+    "totalSongs": 2
+  }
+}

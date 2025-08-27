@@ -28,6 +28,9 @@
   <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
   <link rel="manifest" href="favicons/manifest.webmanifest">
   
+  <!-- Firebase Database Service -->
+  <script type="module" src="firebase-db.js"></script>
+  
   <style>
     html, body {
       touch-action: pan-x pan-y;
@@ -419,7 +422,14 @@
     <div class="stats" id="stats">
       Loading songs...
     </div>
-    
+
+    <!-- Loading Container for Firebase -->
+    <div id="loadingContainer" style="display: none; text-align: center; padding: 40px;">
+      <div style="font-family: 'Montserrat', Arial, sans-serif; font-size: 18px; color: #666;">
+        🔥 Loading songs from Firebase...
+      </div>
+    </div>
+
     <div class="songs-list" id="songsList">
       <!-- Songs will be populated here -->
     </div>
@@ -429,22 +439,89 @@
   <canvas id="lyrics-canvas"></canvas>
 
   <script>
-    // Dynamic script loader to hide from sources
-    (function(){
-      // Load script via fetch to hide from sources
-      fetch('/songs.js') // Use original filename for proper caching
-        .then(response => response.text())
-        .then(scriptContent => {
-          // Replace const with window assignment to make it global
-          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
-          eval(modifiedScript);
-          // Initialize after songs.js is loaded
-          initializeSongsDownload();
-        })
-        .catch(error => {
-          console.error('Failed to load songs data:', error);
-        });
-    })();
+    // Firebase Integration for Songs Download
+    let rhythmDB = null;
+    let loadingContainer = null;
+    
+    // Initialize Firebase and load songs
+    async function loadFirebaseAndSongs() {
+      try {
+        // Show loading state
+        loadingContainer = document.getElementById('loadingContainer');
+        if (loadingContainer) {
+          loadingContainer.style.display = 'block';
+        }
+        
+        // Wait for Firebase service to be available
+        let attempts = 0;
+        while (!window.rhythmDB && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
+        }
+        
+        if (!window.rhythmDB) {
+          throw new Error('Firebase service not available after waiting');
+        }
+        
+        console.log('✅ Firebase service loaded');
+        
+        // Get songs from Firebase
+        const firebaseSongs = await window.rhythmDB.getAllSongs();
+        console.log('📦 Loaded', firebaseSongs.length, 'songs from Firebase');
+        
+        // Convert Firebase songs to the expected format
+        window.songs = firebaseSongs.map((song, index) => ({
+          id: index + 1, // Generate numeric ID for backwards compatibility
+          name: song.name,
+          genre: song.genre || 'Unknown',
+          lyrics: song.lyrics || '',
+          englishLyrics: song.englishLyrics || '',
+          artist: song.artist || '',
+          showInList: song.showInList !== false, // Default to true
+          dateAdded: song.dateAdded,
+          lastModified: song.lastModified,
+          firebaseKey: song.name // Store original Firebase key for updates
+        }));
+        
+        console.log('🎵 Processed', window.songs.length, 'songs for display');
+        
+        // Hide loading and initialize
+        if (loadingContainer) {
+          loadingContainer.style.display = 'none';
+        }
+        
+        initializeSongsDownload();
+        
+      } catch (error) {
+        console.error('❌ Failed to load songs from Firebase:', error);
+        
+        // Show error message to user
+        showErrorMessage('Failed to load songs from Firebase. Please check your connection and try refreshing the page.');
+      }
+    }
+    
+    // Show error message to user
+    function showErrorMessage(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: #ff4444;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        z-index: 10000;
+        font-family: 'Montserrat', Arial, sans-serif;
+      `;
+      errorDiv.textContent = message;
+      document.body.appendChild(errorDiv);
+    }
+    
+    // Start loading songs immediately
+    loadFirebaseAndSongs();
     
     function initializeSongsDownload() {
     
@@ -680,22 +757,11 @@
         return;
       }
       
-      // Parse the lyrics structure to preserve sections, breaks, and starred lines
-      const parsedLyrics = parseLyricsForEdit(song.lyrics);
+      // Store only the song name for the edit page to look up
+      localStorage.setItem('editSongName', song.name);
       
-      // Store the song data in localStorage for lyrics-submit.html to use
-      const songData = {
-        id: song.id,
-        name: song.name,
-        genre: song.genre,
-        lyrics: song.lyrics,
-        parsedLyrics: parsedLyrics
-      };
-      
-      localStorage.setItem('editSongData', JSON.stringify(songData));
-      
-      // Navigate to lyrics-submit.html
-      window.location.href = 'lyrics-submit.html';
+      // Navigate to lyrics-edit.html
+      window.location.href = 'lyrics-edit.html';
     }
     
     // Function to parse lyrics structure for editing

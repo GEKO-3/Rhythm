@@ -1,14 +1,20 @@
-const CACHE_NAME = 'rhythm-boduberu-v2';
+const CACHE_NAME = 'rhythm-boduberu-v3';
 const CORE_FILES = [
   '/',
+  '/index.html',
   '/songlist.html',
-  '/lyrics-csv.html',
+  '/lyrics-edit.html',
+  '/songs-download.html',
+  '/engtodiv.html',
+  '/divtoeng.html',
+  '/lyrics.html',
+  '/firebase-db.js',
   '/rhythm-data-service.js',
   '/rhythm-session-manager.js',
   '/rhythm-page-transition.js',
   '/lyrics-showlist-config.js',
   '/reverse-transliteration.js',
-  '/songs.js', // Keep original filename for service worker caching
+  '/transliteration.js',
   '/Fonts/Faruma.ttf',
   '/Fonts/Montserrat-VariableFont_wght.ttf',
   '/src/Filter.png',
