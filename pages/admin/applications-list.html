@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Rhythm Boduberu - Member Applications List">
+    <title>Rhythm Boduberu - Applications</title>
+    
+    <!-- Favicon and web app manifest -->
+    <link rel="icon" href="favicons/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="manifest" href="favicons/manifest.webmanifest">
+    
+    <!-- Font loading -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Regular.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Medium.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 500;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-SemiBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 600;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Bold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 700;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-ExtraBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 800;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Light.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 300;
+            font-style: normal;
+        }
+    </style>
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #2b2b2b;
+            --bg-color: #1f1f1f;
+            --card-bg: #2a2a2a;
+            --border-color: #444444;
+            --error-color: #ff4444;
+            --success-color: #44ff44;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: var(--bg-color);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: rgba(31, 31, 31, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-title {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pending-indicator {
+            background: rgba(245, 208, 0, 0.1);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.9rem;
+            color: #f5d000;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            animation: pulse-glow 2s infinite;
+        }
+
+        .pending-icon {
+            font-size: 1rem;
+            animation: rotate 2s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { 
+                box-shadow: 0 0 0 0 rgba(245, 208, 0, 0.4);
+                background: rgba(245, 208, 0, 0.1);
+            }
+            50% { 
+                box-shadow: 0 0 0 4px rgba(245, 208, 0, 0.1);
+                background: rgba(245, 208, 0, 0.2);
+            }
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #cccccc;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Back to Home Link */
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            background: rgba(31, 31, 31, 0.9);
+            padding: 12px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            z-index: 100;
+        }
+
+        .back-link:hover {
+            background: rgba(245, 208, 0, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .back-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Loading and Error States */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(245, 208, 0, 0.3);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .error-container {
+            background: rgba(255, 68, 68, 0.1);
+            border: 2px solid var(--error-color);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .error-title {
+            color: var(--error-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Applications Grid */
+        .applications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        /* Compact mode grid adjustments */
+        .applications-grid:has(.application-tile.compact) {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .application-tile {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible;
+            cursor: pointer;
+        }
+
+        .application-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(245, 208, 0, 0.4);
+        }
+
+        /* Compact mode styles */
+        .application-tile.compact {
+            padding: 15px 20px;
+            min-height: auto;
+        }
+
+        .application-tile.compact .applications-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .tile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .application-tile.compact .tile-header {
+            margin-bottom: 0;
+        }
+
+        .compact-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .compact-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .compact-status.pending {
+            background: rgba(255, 170, 0, 0.1);
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .compact-status.approved {
+            background: rgba(68, 255, 68, 0.1);
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .compact-status.rejected {
+            background: rgba(255, 68, 68, 0.1);
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        .compact-status.pending-audition {
+            background: rgba(138, 43, 226, 0.1);
+            border-color: #8a2be2;
+            color: #8a2be2;
+        }
+
+        .compact-status.pending-exco-approval {
+            background: rgba(30, 144, 255, 0.1);
+            border-color: #1e90ff;
+            color: #1e90ff;
+        }
+
+        .compact-status.called-back {
+            background: rgba(0, 191, 255, 0.1);
+            border-color: #00bfff;
+            color: #00bfff;
+        }
+
+        .expand-indicator {
+            margin-left: 10px;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .application-tile.expanded .expand-indicator {
+            transform: rotate(180deg);
+        }
+
+        .tile-details {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .application-tile.expanded .tile-details {
+            max-height: 1000px;
+            opacity: 1;
+            margin-top: 15px;
+        }
+
+        .timestamp {
+            font-size: 0.85rem;
+            font-weight: 300;
+            font-style: italic;
+            color: #aaaaaa;
+            margin-bottom: 15px;
+        }
+
+        .full-name {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        /* Compact mode name styling */
+        .application-tile.compact .full-name {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        /* Expanded mode - hide compact status and make name larger */
+        .application-tile.expanded .compact-status {
+            display: none;
+        }
+
+        .application-tile.expanded .full-name {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .date-of-birth {
+            font-size: 1rem;
+            font-weight: 400;
+            color: #ffffff;
+            margin-bottom: 10px;
+        }
+
+        .contact-number {
+            font-size: 1rem;
+            font-weight: 400;
+            font-style: italic;
+            color: #ffffff;
+            margin-bottom: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contact-number:hover {
+            color: var(--primary-color);
+            transform: scale(1.02);
+        }
+
+        .email {
+            font-size: 0.9rem;
+            font-weight: 300;
+            font-style: italic;
+            color: #cccccc;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .location-status {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #cccccc;
+            margin-bottom: 15px;
+        }
+
+        .approval-system {
+            margin-top: 15px;
+        }
+
+        .approval-button {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(245, 208, 0, 0.1);
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .approval-button:hover {
+            background: rgba(245, 208, 0, 0.2);
+            border-color: rgba(245, 208, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .approval-button.approved {
+            background: rgba(68, 255, 68, 0.1);
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .approval-button.rejected {
+            background: rgba(255, 68, 68, 0.1);
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        .approval-button.pending {
+            background: rgba(255, 170, 0, 0.1);
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .approval-button.pending-audition {
+            background: rgba(138, 43, 226, 0.1);
+            border-color: #8a2be2;
+            color: #8a2be2;
+        }
+
+        .approval-button.pending-exco-approval {
+            background: rgba(30, 144, 255, 0.1);
+            border-color: #1e90ff;
+            color: #1e90ff;
+        }
+
+        .approval-button.called-back {
+            background: rgba(0, 191, 255, 0.1);
+            border-color: #00bfff;
+            color: #00bfff;
+        }
+
+        /* Pending update indicator */
+        .approval-button.updating {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .approval-button.updating::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(245, 208, 0, 0.3), 
+                transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .approval-button.pending-sync {
+            border-color: #f5d000;
+            box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
+            animation: pulse-border 2s infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2); }
+            50% { box-shadow: 0 0 0 4px rgba(245, 208, 0, 0.4); }
+        }
+
+        .approval-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .approval-dropdown.show {
+            display: block;
+        }
+
+        .approval-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .approval-option:hover {
+            background: rgba(245, 208, 0, 0.1);
+        }
+
+        .approval-option.approve {
+            color: var(--success-color);
+        }
+
+        .approval-option.reject {
+            color: var(--error-color);
+        }
+
+        .approval-option.pending-audition {
+            color: #8a2be2;
+        }
+
+        .approval-option.pending-exco {
+            color: #1e90ff;
+        }
+
+        .approval-option.called-back {
+            color: #00bfff;
+        }
+
+        .approval-option:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .approval-option:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        /* New Entry Tag */
+        .new-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 8px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 10;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(0.8); }
+        }
+
+        .stats-container {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .stats-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .stats-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+            min-width: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #cccccc;
+            margin-top: 4px;
+            line-height: 1.2;
+        }
+
+        /* Mobile optimizations - List style */
+        @media (max-width: 768px) {
+            .stats-container {
+                padding: 15px;
+                margin-bottom: 20px;
+                text-align: left;
+            }
+            
+            .stats-title {
+                font-size: 1.1rem;
+                margin-bottom: 15px;
+                text-align: center;
+            }
+            
+            .stats-list {
+                flex-direction: column;
+                gap: 0;
+                align-items: stretch;
+            }
+            
+            .stat-item {
+                min-width: unset;
+                width: 100%;
+                background: rgba(255, 255, 255, 0.03);
+                border-radius: 6px;
+                padding: 12px 15px;
+                border: none;
+                border-bottom: 1px solid rgba(245, 208, 0, 0.1);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                text-align: left;
+                margin-bottom: 1px;
+            }
+            
+            .stat-item:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+            }
+            
+            .stat-number {
+                font-size: 1.3rem;
+                order: 2;
+                margin-left: auto;
+            }
+            
+            .stat-label {
+                font-size: 0.85rem;
+                margin-top: 0;
+                order: 1;
+                color: #e0e0e0;
+                font-weight: 500;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-container {
+                padding: 12px;
+                border-radius: 12px;
+            }
+            
+            .stats-title {
+                font-size: 1rem;
+                margin-bottom: 12px;
+            }
+            
+            .stat-item {
+                padding: 10px 12px;
+                border-radius: 4px;
+            }
+            
+            .stat-number {
+                font-size: 1.2rem;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Filter System */
+        .filter-container {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .filter-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .filter-dropdown-container {
+            position: relative;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .filter-dropdown-button {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(245, 208, 0, 0.1);
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .filter-dropdown-button:hover {
+            background: rgba(245, 208, 0, 0.2);
+            border-color: rgba(245, 208, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .filter-dropdown-button .selected-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-dropdown-button .dropdown-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .filter-dropdown-button.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .filter-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            margin-top: 5px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .filter-dropdown-menu.show {
+            display: block;
+        }
+
+        .filter-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+
+        .filter-option:hover {
+            background: rgba(245, 208, 0, 0.1);
+        }
+
+        .filter-option.active {
+            background: rgba(245, 208, 0, 0.2);
+            color: var(--primary-color);
+        }
+
+        .filter-option.all {
+            color: var(--primary-color);
+        }
+
+        .filter-option.approved {
+            color: var(--success-color);
+        }
+
+        .filter-option.rejected {
+            color: var(--error-color);
+        }
+
+        .filter-option.pending {
+            color: #ffaa00;
+        }
+
+        .filter-option.pending-audition {
+            color: #8a2be2;
+        }
+
+        .filter-option.pending-exco-approval {
+            color: #1e90ff;
+        }
+
+        .filter-option.called-back {
+            color: #00bfff;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #666666;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        .empty-message {
+            color: #999999;
+            font-size: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .applications-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .application-tile {
+                padding: 15px;
+            }
+            
+            .application-tile.compact {
+                padding: 12px 15px;
+            }
+            
+            .full-name {
+                font-size: 1.3rem;
+            }
+            
+            .application-tile.compact .full-name {
+                font-size: 1rem;
+                margin-bottom: 5px;
+            }
+            
+            .compact-status {
+                font-size: 0.7rem !important;
+                padding: 3px 6px !important;
+            }
+            
+            .expand-indicator {
+                font-size: 0.8rem;
+            }
+            
+            .back-link {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin: 20px auto;
+                width: fit-content;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .approval-button {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+
+            .approval-dropdown {
+                font-size: 0.9rem;
+            }
+
+            .filter-dropdown-container {
+                max-width: 90%;
+                width: 90%;
+            }
+
+            .filter-dropdown-button {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+
+            .filter-option {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 30px 15px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-content {
+                padding: 20px 15px;
+            }
+            
+            .application-tile {
+                padding: 12px;
+            }
+            
+            .application-tile.compact {
+                padding: 10px 12px;
+            }
+            
+            .applications-grid {
+                gap: 10px;
+            }
+            
+            .full-name {
+                font-size: 1.2rem;
+            }
+            
+            .application-tile.compact .full-name {
+                font-size: 0.95rem;
+            }
+            
+            .compact-status {
+                font-size: 0.65rem !important;
+                padding: 2px 5px !important;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .approval-button {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+
+            .approval-option {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+
+            .filter-dropdown-container {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .filter-dropdown-button {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+
+            .filter-option {
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Home Link -->
+    <a href="admin.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Back to Admin
+    </a>
+
+    <!-- Header -->
+    <header class="header">
+        <img src="src/Logo_1.svg" alt="Rhythm Boduberu" class="logo">
+        <div class="header-title">
+            <h1>Member Applications</h1>
+            <div id="pending-indicator" class="pending-indicator" style="display: none;">
+                <span class="pending-icon">⏳</span>
+                <span id="pending-count">0</span> updates pending
+            </div>
+        </div>
+        <p>View all submitted member applications for Rhythm Boduberu</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Loading State -->
+        <div id="loading-container" class="loading-container">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading applications...</div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-container" class="error-container" style="display: none;">
+            <div class="error-title">Error Loading Applications</div>
+            <div class="error-message">Unable to fetch application data. Please check your internet connection and try again.</div>
+        </div>
+
+        <!-- Statistics -->
+        <div id="stats-container" class="stats-container" style="display: none;">
+            <div class="stats-title">Application Statistics</div>
+            <div class="stats-list">
+                <div class="stat-item">
+                    <span class="stat-number" id="total-applications">0</span>
+                    <div class="stat-label">Total Applications</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="pending-audition-count">0</span>
+                    <div class="stat-label">Pending Audition</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="called-back-count">0</span>
+                    <div class="stat-label">Called Back</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="pending-exco-count">0</span>
+                    <div class="stat-label">Pending Exco Approval</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="approved-count">0</span>
+                    <div class="stat-label">Approved</div>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="in-area-count">0</span>
+                    <div class="stat-label">In Gan/Fonadhoo</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter System -->
+        <div id="filter-container" class="filter-container" style="display: none;">
+            <div class="filter-title">Filter by Status</div>
+            <div class="filter-dropdown-container">
+                <button class="filter-dropdown-button" id="filter-dropdown-button">
+                    <div class="selected-filter">
+                        <span class="filter-icon">📋</span>
+                        <span class="filter-text">All Applications</span>
+                    </div>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="filter-dropdown-menu" id="filter-dropdown-menu">
+                    <div class="filter-option all active" data-filter="all">
+                        <span>📋</span> All Applications
+                    </div>
+                    <div class="filter-option pending" data-filter="pending">
+                        <span>⏳</span> Pending Review
+                    </div>
+                    <div class="filter-option pending-audition" data-filter="pending audition">
+                        <span>🎵</span> Pending Audition
+                    </div>
+                    <div class="filter-option pending-exco-approval" data-filter="pending exco approval">
+                        <span>📋</span> Pending Exco Approval
+                    </div>
+                    <div class="filter-option called-back" data-filter="called back">
+                        <span>📞</span> Called Back
+                    </div>
+                    <div class="filter-option approved" data-filter="approved">
+                        <span>✅</span> Approved
+                    </div>
+                    <div class="filter-option rejected" data-filter="rejected">
+                        <span>❌</span> Rejected
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Grid -->
+        <div id="applications-grid" class="applications-grid" style="display: none;"></div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <div class="empty-icon">📋</div>
+            <div class="empty-title">No Applications Yet</div>
+            <div class="empty-message">No member applications have been submitted yet.</div>
+        </div>
+    </main>
+
+    <script src="config.js"></script>
+    <script>
+        // DOM elements
+        const loadingContainer = document.getElementById('loading-container');
+        const errorContainer = document.getElementById('error-container');
+        const statsContainer = document.getElementById('stats-container');
+        const filterContainer = document.getElementById('filter-container');
+        const applicationsGrid = document.getElementById('applications-grid');
+        const emptyState = document.getElementById('empty-state');
+
+        // Statistics elements
+        const totalApplicationsEl = document.getElementById('total-applications');
+        const pendingAuditionCountEl = document.getElementById('pending-audition-count');
+        const calledBackCountEl = document.getElementById('called-back-count');
+        const pendingExcoCountEl = document.getElementById('pending-exco-count');
+        const approvedCountEl = document.getElementById('approved-count');
+        const inAreaCountEl = document.getElementById('in-area-count');
+
+        // Filter state
+        let currentFilter = 'all';
+        let allApplications = [];
+        let filteredApplications = [];
+
+        // CSV FUNCTIONALITY REMOVED - NO CSV SUPPORT
+        
+        // Store previously loaded applications and status data
+        let previousApplications = [];
+        let statusData = new Map(); // Map of UID -> status
+        let initialLoad = true;
+        
+        // Status update tracking
+        let pendingStatusUpdates = new Map(); // Map of UID -> {status, timestamp}
+        let isPollingForUpdates = false;
+        let statusPollingInterval = null;
+        let lastUpdateTimestamp = 0;
+        
+        // Function to get seen applications from localStorage
+        function getSeenApplications() {
+            try {
+                const seen = localStorage.getItem('rhythmSeenApplications');
+                return seen ? new Set(JSON.parse(seen)) : new Set();
+            } catch (e) {
+                console.error('Error reading seen applications from localStorage:', e);
+                return new Set();
+            }
+        }
+        
+        // Function to save seen applications to localStorage
+        function saveSeenApplications(seenSet) {
+            try {
+                localStorage.setItem('rhythmSeenApplications', JSON.stringify([...seenSet]));
+            } catch (e) {
+                console.error('Error saving seen applications to localStorage:', e);
+            }
+        }
+        
+        // Function to mark application as seen
+        function markApplicationAsSeen(applicationId) {
+            const seenApps = getSeenApplications();
+            seenApps.add(applicationId);
+            saveSeenApplications(seenApps);
+        }
+        
+        // Function to generate unique ID for application (must be consistent across users)
+        function generateApplicationId(application) {
+            const timestamp = application['Timestamp'] || application['timestamp'] || '';
+            const fullName = application['Full Name'] || application['Full name'] || application['Name'] || '';
+            const email = application['Email Address'] || application['Email'] || '';
+            const contact = application['Contact Number'] || application['Phone'] || application['Contact'] || '';
+            
+            // Create a unique identifier using timestamp, name, email, and contact
+            // Using a consistent hash approach
+            const dataString = timestamp + fullName + email + contact;
+            let hash = 0;
+            if (dataString.length === 0) return hash.toString();
+            for (let i = 0; i < dataString.length; i++) {
+                const char = dataString.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash).toString();
+        }
+
+        // Function to fetch status data - CSV FUNCTIONALITY REMOVED
+        async function fetchStatusData() {
+            console.log('CSV functionality removed - no status data to fetch');
+            return new Map();
+        }
+
+        // Function to submit status to form - FORM FUNCTIONALITY REMOVED
+        async function submitStatusToForm(uid, status) {
+            console.log('Form submission removed - no CSV/form integration');
+            return false;
+        }
+
+        // Function to start status polling
+        function startStatusPolling() {
+            if (isPollingForUpdates) {
+                console.log('Status polling already active');
+                return;
+            }
+            
+            if (pendingStatusUpdates.size === 0) {
+                console.log('No pending updates to poll for');
+                return;
+            }
+            
+            console.log(`Starting status polling for ${pendingStatusUpdates.size} pending updates`);
+            isPollingForUpdates = true;
+            
+            // Clear any existing interval
+            if (statusPollingInterval) {
+                clearInterval(statusPollingInterval);
+            }
+            
+            // Start polling every 5 seconds
+            statusPollingInterval = setInterval(async () => {
+                await checkForStatusUpdates();
+            }, 5000);
+            
+            // Also check immediately
+            setTimeout(checkForStatusUpdates, 1000);
+        }
+
+        // Function to stop status polling
+        function stopStatusPolling() {
+            console.log('Stopping status polling');
+            isPollingForUpdates = false;
+            
+            if (statusPollingInterval) {
+                clearInterval(statusPollingInterval);
+                statusPollingInterval = null;
+            }
+        }
+
+        // Function to check for status updates - CSV FUNCTIONALITY REMOVED
+        async function checkForStatusUpdates() {
+            console.log('Status update checking removed - no CSV functionality');
+            return;
+        }
+
+        // Function to update filter counts based on current status data
+        function updateFilterCounts() {
+            if (allApplications.length === 0) return;
+            
+            // Count applications by status
+            const statusCounts = {
+                all: allApplications.length,
+                pending: 0,
+                'pending audition': 0,
+                'pending exco approval': 0,
+                'called back': 0,
+                approved: 0,
+                rejected: 0
+            };
+            
+            allApplications.forEach(app => {
+                const appId = generateApplicationId(app);
+                const status = statusData.get(appId) || 'pending';
+                if (statusCounts.hasOwnProperty(status)) {
+                    statusCounts[status]++;
+                } else {
+                    statusCounts.pending++; // Default to pending for unknown statuses
+                }
+            });
+            
+            console.log('Updated status counts:', statusCounts);
+            
+            // Update filter options with counts (optional visual enhancement)
+            const filterOptions = document.querySelectorAll('.filter-option');
+            filterOptions.forEach(option => {
+                const filterType = option.dataset.filter;
+                if (statusCounts.hasOwnProperty(filterType)) {
+                    const currentText = option.textContent.split('(')[0].trim(); // Remove existing count
+                    const count = statusCounts[filterType];
+                    option.innerHTML = option.innerHTML.split('(')[0] + (filterType !== 'all' ? ` (${count})` : '');
+                }
+            });
+        }
+
+        // Function to show pending update visual feedback
+        function showPendingUpdate(uid) {
+            const tile = document.querySelector(`[data-uid="${uid}"]`);
+            if (tile) {
+                const button = tile.querySelector('.approval-button');
+                if (button) {
+                    button.classList.add('pending-sync');
+                }
+            }
+        }
+
+        // Function to hide pending update visual feedback
+        function hidePendingUpdate(uid) {
+            const tile = document.querySelector(`[data-uid="${uid}"]`);
+            if (tile) {
+                const button = tile.querySelector('.approval-button');
+                if (button) {
+                    button.classList.remove('pending-sync', 'updating');
+                }
+            }
+        }
+
+        // Function to show all pending updates
+        function updatePendingVisuals() {
+            // Hide all pending indicators first
+            document.querySelectorAll('.approval-button.pending-sync').forEach(button => {
+                button.classList.remove('pending-sync');
+            });
+
+            // Show indicators for currently pending updates
+            pendingStatusUpdates.forEach((data, uid) => {
+                showPendingUpdate(uid);
+            });
+
+            // Update the header pending indicator
+            updatePendingIndicator();
+        }
+
+        // Function to update the header pending indicator
+        function updatePendingIndicator() {
+            const pendingIndicator = document.getElementById('pending-indicator');
+            const pendingCount = document.getElementById('pending-count');
+            
+            if (pendingIndicator && pendingCount) {
+                const count = pendingStatusUpdates.size;
+                
+                if (count > 0) {
+                    pendingCount.textContent = count;
+                    pendingIndicator.style.display = 'flex';
+                } else {
+                    pendingIndicator.style.display = 'none';
+                }
+            }
+        }
+
+        // parseCSV function REMOVED - NO CSV FUNCTIONALITY
+
+        // Function to format date
+        function formatDate(dateString) {
+            if (!dateString) return 'Not provided';
+            
+            // Handle different date formats
+            try {
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) {
+                    // Try parsing dd/mm/yyyy format
+                    const parts = dateString.split('/');
+                    if (parts.length === 3) {
+                        const day = parts[0];
+                        const month = parts[1];
+                        const year = parts[2];
+                        const formattedDate = new Date(year, month - 1, day);
+                        return formattedDate.toLocaleDateString('en-GB', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        });
+                    }
+                    return dateString;
+                }
+                return date.toLocaleDateString('en-GB', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+            } catch (e) {
+                return dateString;
+            }
+        }
+
+        // Function to format timestamp
+        function formatTimestamp(timestampString) {
+            if (!timestampString) return 'Unknown time';
+            
+            try {
+                const date = new Date(timestampString);
+                if (isNaN(date.getTime())) return timestampString;
+                
+                return date.toLocaleDateString('en-GB', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return timestampString;
+            }
+        }
+
+        // Function to format phone number for calling
+        function formatPhoneForCall(phone) {
+            if (!phone) return '';
+            
+            // Remove all non-digit characters except +
+            const cleaned = phone.replace(/[^\d+]/g, '');
+            return cleaned;
+        }
+
+        // Function to create application tile
+        function createApplicationTile(application, isNew = false) {
+            const tile = document.createElement('div');
+            tile.className = 'application-tile compact'; // Start in compact mode
+            
+            // Store application ID for click handling
+            const appId = generateApplicationId(application);
+            tile.dataset.applicationId = appId;
+            tile.dataset.uid = appId; // For status updates
+            
+            // Map CSV headers to expected fields
+            const timestamp = application['Timestamp'] || application['timestamp'] || '';
+            const fullName = application['Full Name'] || application['Full name'] || application['Name'] || '';
+            const dateOfBirth = application['Date of Birth'] || application['Birthday'] || application['DOB'] || '';
+            const contactNumber = application['Contact Number'] || application['Phone'] || application['Contact'] || '';
+            const email = application['Email Address'] || application['Email'] || '';
+            const location = application['Are you residing in L.Gan/Fonadhoo?'] || application['Location'] || '';
+            
+            // Determine location status
+            const isInArea = location.toLowerCase().includes('yes');
+            const locationText = isInArea ? 'Residing in Gan/Fonadhoo' : 'Not residing in Gan/Fonadhoo';
+            
+            // Get current approval status
+            const currentStatus = statusData.get(appId) || 'pending';
+            const cssStatus = currentStatus.replace(/\s+/g, '-').toLowerCase();
+            
+            // Format phone number for display and calling
+            const phoneForCall = formatPhoneForCall(contactNumber);
+            const phoneDisplay = contactNumber || 'Not provided';
+            
+            tile.innerHTML = `
+                ${isNew ? '<div class="new-tag">NEW</div>' : ''}
+                
+                <!-- Tile Header (always visible) -->
+                <div class="tile-header">
+                    <div class="compact-info">
+                        <div class="full-name">${fullName || 'Name not provided'}</div>
+                        <div class="compact-status ${cssStatus}">
+                            <span class="status-icon">${getStatusIcon(currentStatus)}</span>
+                            <span class="status-text">${getStatusText(currentStatus)}</span>
+                        </div>
+                    </div>
+                    <div class="expand-indicator">▼</div>
+                </div>
+                
+                <!-- Tile Details (expandable) -->
+                <div class="tile-details">
+                    <div class="timestamp">${formatTimestamp(timestamp)}</div>
+                    <div class="date-of-birth">Born: ${formatDate(dateOfBirth)}</div>
+                    ${contactNumber ? 
+                        `<a href="tel:${phoneForCall}" class="contact-number">📞 ${phoneDisplay}</a>` : 
+                        '<div class="contact-number">📞 Not provided</div>'
+                    }
+                    <div class="email">${email || 'No email provided'}</div>
+                    <div class="location-status">${locationText}</div>
+                    <div class="approval-system" style="position: relative;">
+                        <button class="approval-button ${cssStatus}" data-uid="${appId}">
+                            <span class="status-icon">${getStatusIcon(currentStatus)}</span>
+                            <span class="status-text">${getStatusText(currentStatus)}</span>
+                        </button>
+                        <div class="approval-dropdown">
+                            <div class="approval-option approve" data-status="approved">
+                                <span>✅</span> Approve
+                            </div>
+                            <div class="approval-option reject" data-status="rejected">
+                                <span>❌</span> Reject
+                            </div>
+                            <div class="approval-option pending-audition" data-status="pending audition">
+                                <span>🎵</span> Pending Audition
+                            </div>
+                            <div class="approval-option pending-exco" data-status="pending exco approval">
+                                <span>📋</span> Pending Exco Approval
+                            </div>
+                            <div class="approval-option called-back" data-status="called back">
+                                <span>📞</span> Called Back
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add click handler for expand/collapse
+            const tileHeader = tile.querySelector('.tile-header');
+            tileHeader.addEventListener('click', function(e) {
+                // Don't expand if clicking on status in compact mode
+                if (e.target.closest('.compact-status')) {
+                    return;
+                }
+                
+                // Toggle expanded state
+                tile.classList.toggle('expanded');
+                tile.classList.toggle('compact');
+                
+                // Mark as seen when expanded
+                if (tile.classList.contains('expanded')) {
+                    markApplicationAsSeen(appId);
+                    
+                    // Remove NEW tag if present
+                    const newTag = tile.querySelector('.new-tag');
+                    if (newTag) {
+                        newTag.style.animation = 'fadeOut 0.3s ease-out forwards';
+                        setTimeout(() => newTag.remove(), 300);
+                    }
+                }
+            });
+            
+            // Prevent phone link clicks from toggling tile
+            const phoneLink = tile.querySelector('.contact-number');
+            if (phoneLink && phoneLink.tagName === 'A') {
+                phoneLink.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+            
+            // Set up approval system event listeners (only for expanded mode)
+            setupApprovalSystem(tile, appId);
+            
+            return tile;
+        }
+
+        // Function to get status icon
+        function getStatusIcon(status) {
+            switch (status) {
+                case 'approved': return '✅';
+                case 'rejected': return '❌';
+                case 'pending audition': return '🎵';
+                case 'pending exco approval': return '📋';
+                case 'called back': return '📞';
+                case 'pending':
+                default: return '⏳';
+            }
+        }
+
+        // Function to get status text
+        function getStatusText(status) {
+            switch (status) {
+                case 'approved': return 'Approved';
+                case 'rejected': return 'Rejected';
+                case 'pending audition': return 'Pending Audition';
+                case 'pending exco approval': return 'Pending Exco Approval';
+                case 'called back': return 'Called Back';
+                case 'pending':
+                default: return 'Pending Review';
+            }
+        }
+
+        // Function to update existing approval buttons with new status data
+        function updateApprovalButtons() {
+            console.log('Updating approval buttons with new status data...');
+            const tiles = document.querySelectorAll('.application-tile');
+            
+            tiles.forEach(tile => {
+                const uid = tile.dataset.applicationId;
+                const button = tile.querySelector('.approval-button');
+                
+                if (uid && button) {
+                    // Get the current status from our status data
+                    const currentStatus = statusData.get(uid) || 'pending';
+                    const cssStatus = currentStatus.replace(/\s+/g, '-').toLowerCase();
+                    
+                    // Update button appearance
+                    button.className = `approval-button ${cssStatus}`;
+                    button.querySelector('.status-icon').textContent = getStatusIcon(currentStatus);
+                    button.querySelector('.status-text').textContent = getStatusText(currentStatus);
+                    
+                    console.log(`Updated button for UID ${uid} to status: ${currentStatus}`);
+                }
+            });
+            
+            // Re-apply filter after updating buttons
+            if (allApplications.length > 0) {
+                applyFilter();
+            }
+        }
+
+        // Function to setup filter system
+        function setupFilterSystem() {
+            const dropdownButton = document.getElementById('filter-dropdown-button');
+            const dropdownMenu = document.getElementById('filter-dropdown-menu');
+            const filterOptions = document.querySelectorAll('.filter-option');
+            
+            // Toggle dropdown on button click
+            dropdownButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.classList.toggle('show');
+                dropdownButton.classList.toggle('open');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.filter-dropdown-container')) {
+                    dropdownMenu.classList.remove('show');
+                    dropdownButton.classList.remove('open');
+                }
+            });
+            
+            // Handle filter option selection
+            filterOptions.forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Remove active class from all options
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to selected option
+                    this.classList.add('active');
+                    
+                    // Update dropdown button text and icon
+                    const icon = this.querySelector('span').textContent;
+                    const text = this.textContent.trim().substring(2); // Remove emoji
+                    dropdownButton.querySelector('.filter-icon').textContent = icon;
+                    dropdownButton.querySelector('.filter-text').textContent = text;
+                    
+                    // Update current filter
+                    currentFilter = this.dataset.filter;
+                    
+                    // Close dropdown
+                    dropdownMenu.classList.remove('show');
+                    dropdownButton.classList.remove('open');
+                    
+                    // Apply filter
+                    applyFilter();
+                });
+            });
+        }
+
+        // Function to apply filter
+        function applyFilter() {
+            if (currentFilter === 'all') {
+                filteredApplications = [...allApplications];
+            } else {
+                filteredApplications = allApplications.filter(app => {
+                    const appId = generateApplicationId(app);
+                    const appStatus = statusData.get(appId) || 'pending';
+                    return appStatus.toLowerCase() === currentFilter.toLowerCase();
+                });
+            }
+            
+            // Re-render the applications grid with filtered data
+            renderApplicationsGrid(filteredApplications);
+        }
+
+        // Function to render applications grid (separated from display logic)
+        function renderApplicationsGrid(applications) {
+            // Clear existing tiles
+            applicationsGrid.innerHTML = '';
+            
+            if (applications.length === 0) {
+                applicationsGrid.style.display = 'none';
+                emptyState.style.display = 'block';
+                emptyState.querySelector('.empty-title').textContent = currentFilter === 'all' ? 'No Applications Yet' : 'No Applications Found';
+                emptyState.querySelector('.empty-message').textContent = currentFilter === 'all' ? 'No member applications have been submitted yet.' : `No applications found with the selected filter.`;
+                return;
+            }
+            
+            // Hide empty state and show grid
+            emptyState.style.display = 'none';
+            applicationsGrid.style.display = 'grid';
+            
+            // Create tiles for each application
+            applications.forEach((application, index) => {
+                const tile = createApplicationTile(application, application.isNew);
+                applicationsGrid.appendChild(tile);
+                
+                // Debug log to check if NEW tag should be shown
+                if (application.isNew) {
+                    console.log(`Application ${index} marked as NEW:`, application['Full Name']);
+                }
+            });
+        }
+        function setupApprovalSystem(tile, uid) {
+            const button = tile.querySelector('.approval-button');
+            const dropdown = tile.querySelector('.approval-dropdown');
+            const options = tile.querySelectorAll('.approval-option');
+            
+            // Toggle dropdown on button click (only in expanded mode)
+            button.addEventListener('click', function(e) {
+                e.stopPropagation();
+                
+                // Only allow interaction when tile is expanded
+                if (!tile.classList.contains('expanded')) {
+                    return;
+                }
+                
+                // Close all other dropdowns
+                document.querySelectorAll('.approval-dropdown.show').forEach(dd => {
+                    if (dd !== dropdown) dd.classList.remove('show');
+                });
+                
+                dropdown.classList.toggle('show');
+            });
+            
+            // Handle option selection
+            options.forEach(option => {
+                option.addEventListener('click', async function(e) {
+                    e.stopPropagation();
+                    
+                    const newStatus = this.dataset.status;
+                    const statusIcon = this.querySelector('span').textContent;
+                    const statusText = this.textContent.trim().substring(2); // Remove emoji
+                    
+                    // Convert status for CSS class (replace spaces with hyphens)
+                    const cssStatus = newStatus.replace(/\s+/g, '-').toLowerCase();
+                    
+                    // Show loading state on button
+                    const originalButtonContent = button.innerHTML;
+                    button.innerHTML = '<span class="status-icon">⏳</span><span class="status-text">Updating...</span>';
+                    button.disabled = true;
+                    button.style.opacity = '0.7';
+                    
+                    // Update button appearance immediately for responsiveness
+                    setTimeout(() => {
+                        button.className = `approval-button ${cssStatus}`;
+                        button.querySelector('.status-icon').textContent = statusIcon;
+                        button.querySelector('.status-text').textContent = statusText;
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                    }, 500);
+                    
+                    // Hide dropdown
+                    dropdown.classList.remove('show');
+                    
+                    // Submit to Google Form (this will start polling automatically)
+                    const success = await submitStatusToForm(uid, newStatus);
+                    
+                    if (success) {
+                        // Show success feedback
+                        button.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            button.style.transform = 'scale(1)';
+                        }, 150);
+                        
+                        console.log(`Status update submitted for UID ${uid}: ${newStatus}`);
+                        console.log('Polling system will verify the update in the CSV');
+                        
+                        // Update filter counts immediately
+                        updateFilterCounts();
+                        
+                        // Re-apply current filter to update the display
+                        applyFilter();
+                    } else {
+                        // Revert button if submission failed
+                        button.innerHTML = originalButtonContent;
+                        button.disabled = false;
+                        button.style.opacity = '1';
+                        
+                        alert('Failed to update status. Please try again.');
+                    }
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!tile.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                }
+            });
+        }
+
+        // Function to sort applications by timestamp (latest first)
+        function sortApplicationsByTimestamp(applications) {
+            return applications.sort((a, b) => {
+                // First, prioritize applications with NEW tags
+                if (a.isNew && !b.isNew) return -1;
+                if (!a.isNew && b.isNew) return 1;
+                
+                // Second, sort by status priority (pending review first, rejected last)
+                const appIdA = generateApplicationId(a);
+                const appIdB = generateApplicationId(b);
+                const statusA = (statusData.get(appIdA) || 'pending').toLowerCase();
+                const statusB = (statusData.get(appIdB) || 'pending').toLowerCase();
+                
+                // Define status priority (lower number = higher priority)
+                const getStatusPriority = (status) => {
+                    switch (status) {
+                        case 'pending': return 1; // Highest priority (top)
+                        case 'pending audition': return 2;
+                        case 'called back': return 3;
+                        case 'pending exco approval': return 4;
+                        case 'approved': return 5;
+                        case 'rejected': return 6; // Lowest priority (bottom)
+                        default: return 1; // Default to pending priority
+                    }
+                };
+                
+                const priorityA = getStatusPriority(statusA);
+                const priorityB = getStatusPriority(statusB);
+                
+                // Sort by status priority first
+                if (priorityA !== priorityB) {
+                    return priorityA - priorityB;
+                }
+                
+                // Then sort by timestamp (newest first) within the same status
+                const timestampA = a['Timestamp'] || a['timestamp'] || '';
+                const timestampB = b['Timestamp'] || b['timestamp'] || '';
+                
+                try {
+                    const dateA = new Date(timestampA);
+                    const dateB = new Date(timestampB);
+                    
+                    // If dates are valid, sort by them (newest first)
+                    if (!isNaN(dateA.getTime()) && !isNaN(dateB.getTime())) {
+                        return dateB.getTime() - dateA.getTime();
+                    }
+                    
+                    // Fallback to string comparison
+                    return timestampB.localeCompare(timestampA);
+                } catch (e) {
+                    // Fallback to string comparison
+                    return timestampB.localeCompare(timestampA);
+                }
+            });
+        }
+
+        // Function to identify new applications
+        function identifyNewApplications(currentApplications) {
+            const seenApps = getSeenApplications();
+            
+            if (initialLoad || previousApplications.length === 0) {
+                // First load - don't mark any applications as new since we have no previous state to compare against
+                const appsWithoutNewFlag = currentApplications.map(app => ({
+                    ...app,
+                    isNew: false  // No applications are "new" on first load
+                }));
+                
+                initialLoad = false;
+                return appsWithoutNewFlag;
+            }
+            
+            const previousIds = new Set(previousApplications.map(generateApplicationId));
+            let newApplicationCount = 0;
+            
+            const appsWithNewFlag = currentApplications.map(app => {
+                const appId = generateApplicationId(app);
+                const wasNotPreviouslyLoaded = !previousIds.has(appId);
+                const hasNotBeenSeen = !seenApps.has(appId);
+                const isNew = wasNotPreviouslyLoaded && hasNotBeenSeen;
+                
+                if (isNew) {
+                    newApplicationCount++;
+                }
+                
+                return {
+                    ...app,
+                    isNew: isNew
+                };
+            });
+            
+            return appsWithNewFlag;
+        }
+
+        // Function to check if an application should be hidden (rejected and older than 2 days)
+        function shouldHideApplication(application) {
+            const appId = generateApplicationId(application);
+            const appStatus = statusData.get(appId) || 'pending';
+            
+            // Only hide if status is rejected
+            if (appStatus.toLowerCase() !== 'rejected') {
+                return false;
+            }
+            
+            // Check if application is older than 2 days
+            const timestamp = application['Timestamp'] || application['timestamp'] || '';
+            if (!timestamp) {
+                return false; // Don't hide if no timestamp
+            }
+            
+            try {
+                const applicationDate = new Date(timestamp);
+                if (isNaN(applicationDate.getTime())) {
+                    return false; // Don't hide if invalid date
+                }
+                
+                const now = new Date();
+                const twoDaysAgo = new Date(now.getTime() - (2 * 24 * 60 * 60 * 1000)); // 2 days in milliseconds
+                
+                return applicationDate < twoDaysAgo;
+            } catch (e) {
+                console.error('Error checking application age:', e);
+                return false; // Don't hide if error parsing date
+            }
+        }
+
+        // Function to filter out old rejected applications
+        function filterValidApplications(applications) {
+            const filteredApps = applications.filter(app => !shouldHideApplication(app));
+            const hiddenCount = applications.length - filteredApps.length;
+            
+            if (hiddenCount > 0) {
+                console.log(`Filtered out ${hiddenCount} old rejected applications (older than 2 days)`);
+            }
+            
+            return filteredApps;
+        }
+
+        // Function to update statistics
+        function updateStatistics(allOriginalApplications, visibleApplications) {
+            // Total includes all applications (including hidden rejected ones)
+            const total = allOriginalApplications.length;
+            
+            // Count applications in Gan/Fonadhoo from visible applications only
+            const inArea = visibleApplications.filter(app => {
+                const location = app['Are you residing in L.Gan/Fonadhoo?'] || app['Location'] || '';
+                return location.toLowerCase().includes('yes');
+            }).length;
+            
+            // Count by status from visible applications only
+            let pendingAuditionCount = 0;
+            let calledBackCount = 0;
+            let pendingExcoCount = 0;
+            let approvedCount = 0;
+            
+            visibleApplications.forEach(app => {
+                const appId = generateApplicationId(app);
+                const status = (statusData.get(appId) || 'pending').toLowerCase();
+                
+                switch (status) {
+                    case 'pending audition':
+                        pendingAuditionCount++;
+                        break;
+                    case 'called back':
+                        calledBackCount++;
+                        break;
+                    case 'pending exco approval':
+                        pendingExcoCount++;
+                        break;
+                    case 'approved':
+                        approvedCount++;
+                        break;
+                }
+            });
+            
+            // Update the display
+            totalApplicationsEl.textContent = total;
+            pendingAuditionCountEl.textContent = pendingAuditionCount;
+            calledBackCountEl.textContent = calledBackCount;
+            pendingExcoCountEl.textContent = pendingExcoCount;
+            approvedCountEl.textContent = approvedCount;
+            inAreaCountEl.textContent = inArea;
+        }
+
+        // Function to display applications
+        function displayApplications(applications) {
+            loadingContainer.style.display = 'none';
+            errorContainer.style.display = 'none';
+            
+            if (applications.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            // Filter out old rejected applications (older than 2 days)
+            const validApplications = filterValidApplications(applications);
+            
+            if (validApplications.length === 0) {
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            // Sort applications by timestamp (latest first)
+            const sortedApplications = sortApplicationsByTimestamp(validApplications);
+            
+            // Identify new applications
+            const applicationsWithNewFlag = identifyNewApplications(sortedApplications);
+            
+            // Sort again after identifying new applications to prioritize NEW items
+            const finalSortedApplications = sortApplicationsByTimestamp(applicationsWithNewFlag);
+            
+            // Store all applications for filtering
+            allApplications = [...finalSortedApplications];
+            
+            // Update statistics (pass both original and filtered applications)
+            updateStatistics(applications, finalSortedApplications);
+            statsContainer.style.display = 'block';
+            
+            // Show filter container
+            filterContainer.style.display = 'block';
+            
+            // Setup filter system if not already setup
+            if (!document.getElementById('filter-dropdown-button').hasAttribute('data-setup')) {
+                setupFilterSystem();
+                document.getElementById('filter-dropdown-button').setAttribute('data-setup', 'true');
+            }
+            
+            // Apply current filter
+            applyFilter();
+            
+            // Store current applications for next comparison
+            previousApplications = [...finalSortedApplications];
+            
+            // Remove NEW tags after 10 seconds
+            setTimeout(() => {
+                const newTags = document.querySelectorAll('.new-tag');
+                newTags.forEach(tag => {
+                    tag.style.animation = 'fadeOut 0.5s ease-out forwards';
+                    setTimeout(() => tag.remove(), 500);
+                });
+            }, 10000);
+        }
+
+        // Function to show error
+        function showError() {
+            loadingContainer.style.display = 'none';
+            errorContainer.style.display = 'block';
+        }
+
+        // Function to fetch and display applications
+        async function fetchApplications() {
+            try {
+                // Fetch both applications and status data in parallel
+                const [applicationsData, statusMap] = await Promise.all([
+                    fetchApplicationsData(),
+                    fetchStatusData()
+                ]);
+                
+                // Update global status data
+                statusData = statusMap;
+                
+                if (!applicationsData || applicationsData.length === 0) {
+                    displayApplications([]);
+                    return;
+                }
+                
+                displayApplications(applicationsData);
+                
+                // Update existing approval buttons if this isn't the first load
+                if (!initialLoad) {
+                    updateApprovalButtons();
+                }
+                
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showError();
+            }
+        }
+
+        // Function to fetch applications data - CSV FUNCTIONALITY REMOVED
+        async function fetchApplicationsData() {
+            console.log('CSV functionality removed - no data to fetch');
+            return [];
+        }
+
+        // waitForConfig function REMOVED - NO CSV CONFIGURATION NEEDED
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Set up filter system
+            setupFilterSystem();
+            
+            // CSV functionality removed - no applications to fetch
+            console.log('Applications system disabled - CSV functionality removed');
+        });
+
+        // Clean up polling when page unloads
+        window.addEventListener('beforeunload', function() {
+            stopStatusPolling();
+        });
+
+        // Also clean up when page becomes hidden (mobile browsers)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                // Page is hidden, stop polling to save resources
+                if (isPollingForUpdates) {
+                    console.log('Page hidden, pausing status polling');
+                    stopStatusPolling();
+                }
+            } else {
+                // Page is visible again, resume polling if there are pending updates
+                if (pendingStatusUpdates.size > 0 && !isPollingForUpdates) {
+                    console.log('Page visible again, resuming status polling');
+                    startStatusPolling();
+                }
+            }
+        });
+
+        // Data refresh removed - no CSV functionality
+    </script>
+</body>
+</html>

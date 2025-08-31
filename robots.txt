@@ -1,24 +1,19 @@
 User-agent: *
 Allow: /
-
-# Disallow backup and development directories
 Disallow: /js-backups/
 Disallow: /pages/
 
 # Important pages for Boduberu searches
 Allow: /index.html
-Allow: /application-form.html
-Allow: /sponsor-proposal.html
 Allow: /src/
 Allow: /favicons/
 Allow: /favicon.ico
-Allow: /styles.css
-
-# Host preference
-Host: rhythmboduberu.com
 
 # Sitemap location
 Sitemap: https://rhythmboduberu.com/sitemap.xml
 
-# Crawl delay to be respectful to servers
+# Crawl delay (be nice to servers)
 Crawl-delay: 1
+
+# Host preference
+Host: rhythmboduberu.com

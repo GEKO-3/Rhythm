@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
+<link rel="manifest" href="favicons/manifest.webmanifest">
+    <title>Dhivehi Transliteration Tool</title>
+    <style>
+        /* Local font definitions */
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        /* --- Begin: Style updated to match lyrics.html --- */
+        body {
+            font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
+            background: #232323;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            background: #2b2b2b;
+            max-width: 700px;
+            margin: 40px auto 0 auto;
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+            padding: 32px 28px 28px 28px;
+        }
+        h1 {
+            color: #f5d000;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        p {
+            color: #e0e0e0;
+            margin-bottom: 28px;
+        }
+        .input-tabs {
+            display: flex;
+            margin-bottom: 18px;
+            border-bottom: 1.5px solid #444;
+        }
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 10px 22px;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #bbb;
+            border-bottom: 2.5px solid transparent;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .tab-button.active, .tab-button:hover {
+            color: #f5d000;
+            border-bottom-color: #f5d000;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .input-group {
+            margin-bottom: 18px;
+        }
+        .input-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 7px;
+            color: #f5d000;
+            text-align: left;
+        }
+        .image-preview {
+            max-width: 100%;
+            max-height: 220px;
+            margin: 12px 0;
+            border: 2px solid #444;
+            border-radius: 7px;
+            display: none;
+        }
+        .ocr-status {
+            margin: 8px 0;
+            padding: 10px;
+            border-radius: 6px;
+            display: none;
+            font-size: 1rem;
+        }
+        .ocr-status.processing {
+            background-color: #3a3a1a;
+            border: 1px solid #ffe066;
+            color: #ffe066;
+        }
+        .ocr-status.success {
+            background-color: #2e3a1a;
+            border: 1px solid #b6e36b;
+            color: #b6e36b;
+        }
+        .ocr-status.error {
+            background-color: #3a1a1a;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+        }
+        
+        .drop-zone {
+            border: 2px dashed #f5d000;
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            background: rgba(245, 208, 0, 0.05);
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .drop-zone:hover {
+            background: rgba(245, 208, 0, 0.1);
+            border-color: #f5d000;
+        }
+        
+        .drop-zone.dragover {
+            background: rgba(245, 208, 0, 0.15);
+            border-color: #f5d000;
+            border-style: solid;
+        }
+        
+        .drop-zone-content p {
+            margin: 0 0 5px 0;
+            font-size: 1.1rem;
+            color: #f5d000;
+            font-weight: 500;
+        }
+        
+        .drop-zone-content small {
+            color: #999;
+            font-size: 0.85rem;
+        }
+        
+        .cropper-container {
+            margin: 20px 0;
+            border: 1px solid #444;
+            border-radius: 8px;
+            background: #2a2a2a;
+            padding: 15px;
+        }
+        
+        .cropper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .cropper-header h4 {
+            margin: 0;
+            color: #f5d000;
+            font-size: 1.1rem;
+        }
+        
+        .cropper-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .crop-btn, .skip-crop-btn, .cancel-crop-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .crop-btn {
+            background: #f5d000;
+            color: #232323;
+        }
+        
+        .crop-btn:hover {
+            background: #e6c200;
+        }
+        
+        .skip-crop-btn {
+            background: #4a9eff;
+            color: white;
+        }
+        
+        .skip-crop-btn:hover {
+            background: #3a8eef;
+        }
+        
+        .cancel-crop-btn {
+            background: #ff6b6b;
+            color: white;
+        }
+        
+        .cancel-crop-btn:hover {
+            background: #ff5555;
+        }
+        
+        .crop-canvas {
+            max-width: 100%;
+            border: 1px solid #555;
+            border-radius: 4px;
+            cursor: crosshair;
+        }
+        
+        .input-output-container {
+            display: flex;
+            gap: 18px;
+            margin-top: 18px;
+            align-items: flex-start;
+        }
+        .input-section, .output-section {
+            flex: 1;
+            min-width: 0;
+            height: 600px;
+        }
+        .input-section textarea, .output-section textarea, .input-section #inputLines, .output-section #dhivehiLines {
+            min-height: 160px;
+            height: 550px;
+        }
+        .output-section textarea {
+            direction: rtl;
+        }
+        h3 {
+            color: #f5d000;
+            font-size: 1.1rem;
+            margin-bottom: 7px;
+            font-weight: 600;
+        }
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 13px;
+            font-size: 1.08rem;
+            border: 2px solid #444;
+            border-radius: 7px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            background: #232323;
+            color: #fff;
+            font-family: inherit;
+            transition: border 0.2s;
+        }
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #f5d000;
+        }
+        textarea[readonly] {
+            background: #232323;
+            color: #ffe066;
+        }
+        
+        /* Input text (English) - Use Montserrat */
+        #inputDisplay, #inputLines {
+            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            font-size: 0.95rem;
+        }
+        
+        /* Output text (Dhivehi) - Use Faruma */
+        #dhivehiOutput, #dhivehiLines {
+            font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
+        }
+        
+        /* Line view text elements */
+        #inputLines .line-text {
+            font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+            font-size: 0.95rem !important;
+        }
+        
+        #dhivehiLines .line-text {
+            font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
+        }
+        button {
+            background-color: #f5d000;
+            color: #232323;
+            padding: 11px 26px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 700;
+            margin-right: 8px;
+            margin-bottom: 10px;
+            transition: background 0.2s, color 0.2s;
+        }
+        button:hover {
+            background-color: #ffe066;
+            color: #232323;
+        }
+        .clear-btn {
+            background-color: #444;
+            color: #fff;
+        }
+        .clear-btn:hover {
+            background-color: #f44336;
+            color: #fff;
+        }
+        @media (max-width: 900px) {
+            .container {
+                max-width: 98vw;
+                padding: 18px 4vw 18px 4vw;
+            }
+            .input-output-container {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+        
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #333;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #f5d000;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e6c200;
+        }
+        
+        /* --- End: Style updated to match lyrics.html --- */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dhivehi Transliteration Tool</h1>
+        <p>Convert Dhivehi Latin text to Dhivehi script (Thaana)</p>
+        
+        <div class="input-tabs">
+            <button class="tab-button active" onclick="switchTab('text')">Text Input</button>
+            <button class="tab-button" onclick="switchTab('ocr')">OCR Input</button>
+        </div>
+        
+        <div id="textTab" class="tab-content active">
+            <div class="input-group">
+                <label class="input-label">Enter Dhivehi text in Latin script below in the Input Text area:</label>
+            </div>
+        </div>
+        
+        <div id="ocrTab" class="tab-content">
+            <div class="input-group">
+                <label class="input-label">Upload an image with English text or drag and drop it below:</label>
+                <div id="dropZone" class="drop-zone">
+                    <div class="drop-zone-content">
+                        <p>📁 Drop an image here or click to upload</p>
+                        <small>Supports JPG, PNG, GIF, WebP</small>
+                    </div>
+                </div>
+                <div id="cropperContainer" class="cropper-container" style="display: none;">
+                    <div class="cropper-header">
+                        <div>
+                            <h4>Crop Image (optional)</h4>
+                            <small style="color: #999; font-size: 0.85rem;">Draw a rectangle around the text you want to extract. The cropped area will maintain full resolution for better OCR accuracy.</small>
+                        </div>
+                        <div class="cropper-controls">
+                            <button id="cropBtn" class="crop-btn">✂️ Crop & OCR</button>
+                            <button id="skipCropBtn" class="skip-crop-btn">Skip Crop</button>
+                            <button id="cancelCropBtn" class="cancel-crop-btn">Cancel</button>
+                        </div>
+                    </div>
+                    <canvas id="cropCanvas" class="crop-canvas"></canvas>
+                </div>
+                <img id="imagePreview" class="image-preview" alt="Uploaded image preview" style="display: none;">
+                <div id="ocrStatus" class="ocr-status"></div>
+            </div>
+        </div>
+        
+        <button onclick="transliterate()">Transliterate</button>
+        <button class="clear-btn" onclick="clearText()">Clear</button>
+        
+        <div class="input-output-container">
+            <div class="input-section">
+                <h3 style="display: flex; align-items: center; justify-content: space-between;">
+                    Input
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button id="importEnglishBtn" type="button" title="Import to English Lyrics Editor" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #007bff; color: white; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Import</button>
+                        <button id="syncScrollBtn" type="button" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #f5d000; color: #232323; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;" title="Toggle synchronized scrolling">Sync</button>
+                        <span id="syncIndicator" style="font-size: 0.85rem; color: #f5d000; font-weight: 500;">🔗 Sync enabled</span>
+                    </div>
+                </h3>
+                <textarea id="inputDisplay" placeholder="e.g., dhivehi, raajje, assalaamu alaikum..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" style="direction: ltr; font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; display: block;"></textarea>
+                <div id="inputLines" style="display: none; height: 550px; overflow-y: auto; background: #232323; border: 2px solid #444; border-radius: 7px; padding: 13px; direction: ltr;"></div>
+            </div>
+            
+            <div class="output-section">
+                <h3 style="display: flex; align-items: center; justify-content: space-between;">
+                    Output
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button id="copyAllBtn" type="button" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #444; color: #ffe066; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Copy</button>
+                        <button id="importBtn" type="button" title="Import to Dhivehi Lyrics Editor" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #28a745; color: white; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Import</button>
+                        <button id="toggleViewBtn" type="button" style="margin: 0; padding: 6px 16px; font-size: 0.95rem; background: #f5d000; color: #232323; border-radius: 6px; border: none; font-weight: 600; cursor: pointer;">Line</button>
+                    </div>
+                </h3>
+                <textarea id="dhivehiOutput" readonly placeholder="Dhivehi text will appear here..." style="display: block;"></textarea>
+                <div id="dhivehiLines" style="display: none; height: 550px; overflow-y: auto; background: #232323; border: 2px solid #444; border-radius: 7px; padding: 13px; direction: rtl;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Tesseract.js for OCR functionality -->
+    <script src="https://unpkg.com/tesseract.js@v4.1.1/dist/tesseract.min.js"></script>
+    <script src="transliteration.js"></script>
+    <script>
+        function transliterate() {
+            const inputDisplay = document.getElementById('inputDisplay');
+            const output = document.getElementById('dhivehiOutput');
+            
+            // Get text from the main input area (used for both text and OCR)
+            let latinText = inputDisplay.value;
+            
+            if (!latinText || !latinText.trim()) {
+                alert('Please enter some text to transliterate!');
+                return;
+            }
+            
+            // Use the external transliteration function
+            const dhivehiText = transliterateText(latinText);
+            
+            output.value = dhivehiText;
+            
+            // Update line views if currently in line view mode
+            if (isLineView) {
+                updateLineView();
+                updateInputLineView();
+            }
+        }
+        
+        function clearText() {
+            document.getElementById('inputDisplay').value = '';
+            document.getElementById('dhivehiOutput').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('ocrStatus').style.display = 'none';
+            
+            // Clear saved input text from localStorage
+            clearSavedInputText();
+            
+            // Clear saved scroll positions from localStorage
+            clearSavedScrollPositions();
+            
+            // Clear OCR image data
+            localStorage.removeItem('ocrImageData');
+            currentImage = null;
+            hideCropInterface();
+            
+            // Clear line views if in line view mode
+            if (isLineView) {
+                updateLineView();
+                updateInputLineView();
+            }
+            
+            // Focus on the main input area
+            document.getElementById('inputDisplay').focus();
+        }
+        
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            if (tabName === 'text') {
+                document.getElementById('textTab').classList.add('active');
+                document.querySelector('.tab-button[onclick="switchTab(\'text\')"]').classList.add('active');
+            } else if (tabName === 'ocr') {
+                document.getElementById('ocrTab').classList.add('active');
+                document.querySelector('.tab-button[onclick="switchTab(\'ocr\')"]').classList.add('active');
+                
+                // Restore OCR image if available
+                const savedImageData = localStorage.getItem('ocrImageData');
+                if (savedImageData && typeof currentImage === 'undefined') {
+                    currentImage = savedImageData;
+                    showImagePreview(savedImageData);
+                }
+            }
+            
+            // Clear result when switching tabs
+            document.getElementById('inputDisplay').value = '';
+            document.getElementById('dhivehiOutput').value = '';
+            
+            // Clear saved input text from localStorage when switching tabs
+            clearSavedInputText();
+            
+            // Clear OCR image data when switching away from OCR tab
+            if (tabName !== 'ocr') {
+                localStorage.removeItem('ocrImageData');
+                if (typeof currentImage !== 'undefined') {
+                    currentImage = null;
+                }
+                const imagePreview = document.getElementById('imagePreview');
+                if (imagePreview) {
+                    imagePreview.style.display = 'none';
+                }
+                const cropperContainer = document.getElementById('cropperContainer');
+                if (cropperContainer) {
+                    cropperContainer.style.display = 'none';
+                }
+            }
+            
+            // Clear line views if in line view mode
+            if (isLineView) {
+                updateLineView();
+                updateInputLineView();
+            }
+        }
+        
+        // Global variables for cropping
+        let currentImage = null;
+        let cropSelection = null;
+        let isDragging = false;
+        let startX, startY;
+
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processImageFile(file);
+            }
+        }
+
+        function processImageFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImage = e.target.result;
+                showCropInterface(e.target.result);
+                
+                // Save to localStorage
+                localStorage.setItem('ocrImageData', e.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showCropInterface(imageSrc) {
+            const cropperContainer = document.getElementById('cropperContainer');
+            const canvas = document.getElementById('cropCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            const img = new Image();
+            img.onload = function() {
+                // Store original image dimensions for high-quality cropping
+                window.originalImageWidth = img.width;
+                window.originalImageHeight = img.height;
+                
+                // Calculate canvas size to fit image while maintaining aspect ratio
+                // Increased max sizes for better preview quality
+                const maxWidth = 800;
+                const maxHeight = 600;
+                let { width, height } = img;
+                
+                // Calculate display dimensions
+                window.displayWidth = width;
+                window.displayHeight = height;
+                
+                if (width > maxWidth) {
+                    height = (height * maxWidth) / width;
+                    width = maxWidth;
+                }
+                if (height > maxHeight) {
+                    width = (width * maxHeight) / height;
+                    height = maxHeight;
+                }
+                
+                // Store scale factors for accurate cropping
+                window.scaleFactorX = window.originalImageWidth / width;
+                window.scaleFactorY = window.originalImageHeight / height;
+                
+                canvas.width = width;
+                canvas.height = height;
+                
+                // Draw image on canvas
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                // Show cropper
+                cropperContainer.style.display = 'block';
+                
+                // Reset crop selection
+                cropSelection = null;
+            };
+            img.src = imageSrc;
+        }
+
+        function hideCropInterface() {
+            document.getElementById('cropperContainer').style.display = 'none';
+            cropSelection = null;
+        }
+
+        function cropImage() {
+            const canvas = document.getElementById('cropCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            if (!cropSelection) {
+                // No selection, use full image
+                performOCR(currentImage);
+                hideCropInterface();
+                return;
+            }
+            
+            // Create new canvas for cropped image at full resolution
+            const croppedCanvas = document.createElement('canvas');
+            const croppedCtx = croppedCanvas.getContext('2d');
+            
+            // Calculate actual crop dimensions using stored scale factors
+            const actualCropX = cropSelection.x * window.scaleFactorX;
+            const actualCropY = cropSelection.y * window.scaleFactorY;
+            const actualCropWidth = cropSelection.width * window.scaleFactorX;
+            const actualCropHeight = cropSelection.height * window.scaleFactorY;
+            
+            // Set canvas to actual crop size (full resolution)
+            croppedCanvas.width = actualCropWidth;
+            croppedCanvas.height = actualCropHeight;
+            
+            // Load original image and crop at full resolution
+            const img = new Image();
+            img.onload = function() {
+                // Draw cropped portion at full resolution
+                croppedCtx.drawImage(
+                    img,
+                    actualCropX,
+                    actualCropY,
+                    actualCropWidth,
+                    actualCropHeight,
+                    0, 0,
+                    actualCropWidth,
+                    actualCropHeight
+                );
+                
+                // Convert to data URL and perform OCR
+                const croppedImageData = croppedCanvas.toDataURL('image/png');
+                performOCR(croppedImageData);
+                showImagePreview(croppedImageData);
+                hideCropInterface();
+            };
+            img.src = currentImage;
+        }
+
+        function showImagePreview(imageSrc) {
+            const preview = document.getElementById('imagePreview');
+            preview.src = imageSrc;
+            preview.style.display = 'block';
+        }
+
+        // Initialize drag and drop functionality
+        function initializeDragAndDrop() {
+            const dropZone = document.getElementById('dropZone');
+            
+            // Create a hidden file input for the drop zone
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            fileInput.addEventListener('change', function(event) {
+                if (event.target.files[0]) {
+                    processImageFile(event.target.files[0]);
+                }
+            });
+            document.body.appendChild(fileInput);
+            
+            // Make drop zone clickable
+            dropZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // Drag and drop events
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            
+            dropZone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            });
+            
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    processImageFile(files[0]);
+                }
+            });
+        }
+
+        // Initialize canvas drawing for crop selection
+        function initializeCropCanvas() {
+            const canvas = document.getElementById('cropCanvas');
+            
+            canvas.addEventListener('mousedown', startCrop);
+            canvas.addEventListener('mousemove', updateCrop);
+            canvas.addEventListener('mouseup', endCrop);
+            canvas.addEventListener('mouseleave', endCrop);
+        }
+
+        function startCrop(e) {
+            const rect = e.target.getBoundingClientRect();
+            startX = e.clientX - rect.left;
+            startY = e.clientY - rect.top;
+            isDragging = true;
+            cropSelection = { x: startX, y: startY, width: 0, height: 0 };
+        }
+
+        function updateCrop(e) {
+            if (!isDragging) return;
+            
+            const canvas = e.target;
+            const rect = canvas.getBoundingClientRect();
+            const currentX = e.clientX - rect.left;
+            const currentY = e.clientY - rect.top;
+            
+            cropSelection.width = currentX - startX;
+            cropSelection.height = currentY - startY;
+            
+            // Redraw canvas with selection
+            redrawCanvasWithSelection(canvas);
+        }
+
+        function endCrop(e) {
+            isDragging = false;
+            
+            // Ensure positive width and height
+            if (cropSelection) {
+                if (cropSelection.width < 0) {
+                    cropSelection.x += cropSelection.width;
+                    cropSelection.width = Math.abs(cropSelection.width);
+                }
+                if (cropSelection.height < 0) {
+                    cropSelection.y += cropSelection.height;
+                    cropSelection.height = Math.abs(cropSelection.height);
+                }
+                
+                // Minimum selection size (in display pixels)
+                if (cropSelection.width < 20 || cropSelection.height < 10) {
+                    cropSelection = null;
+                    redrawCanvasWithSelection(e.target);
+                } else {
+                    // Show the updated selection with dimensions
+                    redrawCanvasWithSelection(e.target);
+                }
+            }
+        }
+
+        function redrawCanvasWithSelection(canvas) {
+            const ctx = canvas.getContext('2d');
+            
+            // Clear and redraw original image
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                
+                // Draw selection overlay
+                if (cropSelection && cropSelection.width > 0 && cropSelection.height > 0) {
+                    // Darken non-selected areas
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    
+                    // Top
+                    ctx.fillRect(0, 0, canvas.width, cropSelection.y);
+                    // Bottom
+                    ctx.fillRect(0, cropSelection.y + cropSelection.height, canvas.width, canvas.height - cropSelection.y - cropSelection.height);
+                    // Left
+                    ctx.fillRect(0, cropSelection.y, cropSelection.x, cropSelection.height);
+                    // Right
+                    ctx.fillRect(cropSelection.x + cropSelection.width, cropSelection.y, canvas.width - cropSelection.x - cropSelection.width, cropSelection.height);
+                    
+                    // Draw selection border
+                    ctx.strokeStyle = '#f5d000';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(cropSelection.x, cropSelection.y, cropSelection.width, cropSelection.height);
+                    
+                    // Show crop dimensions and resolution info
+                    const actualWidth = Math.round(cropSelection.width * window.scaleFactorX);
+                    const actualHeight = Math.round(cropSelection.height * window.scaleFactorY);
+                    
+                    // Draw info box
+                    ctx.fillStyle = 'rgba(245, 208, 0, 0.9)';
+                    ctx.fillRect(cropSelection.x, cropSelection.y - 25, 200, 20);
+                    ctx.fillStyle = '#232323';
+                    ctx.font = '12px Arial';
+                    ctx.fillText(`${actualWidth}x${actualHeight} pixels`, cropSelection.x + 5, cropSelection.y - 10);
+                }
+            };
+            img.src = currentImage;
+        }
+
+        // Event listeners for crop buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDragAndDrop();
+            initializeCropCanvas();
+            
+            document.getElementById('cropBtn').addEventListener('click', cropImage);
+            document.getElementById('skipCropBtn').addEventListener('click', function() {
+                performOCR(currentImage);
+                showImagePreview(currentImage);
+                hideCropInterface();
+            });
+            document.getElementById('cancelCropBtn').addEventListener('click', function() {
+                hideCropInterface();
+                currentImage = null;
+                localStorage.removeItem('ocrImageData');
+            });
+            
+            // Load saved OCR image on page load
+            const savedImageData = localStorage.getItem('ocrImageData');
+            if (savedImageData) {
+                currentImage = savedImageData;
+                showImagePreview(savedImageData);
+            }
+        });
+        
+        function performOCR(imageSrc) {
+            const status = document.getElementById('ocrStatus');
+            const inputDisplay = document.getElementById('inputDisplay');
+            
+            // Show processing status
+            status.className = 'ocr-status processing';
+            status.style.display = 'block';
+            status.textContent = '🔄 Processing image... This may take a few seconds.';
+            
+            // Perform OCR using Tesseract.js
+            Tesseract.recognize(imageSrc, 'eng', {
+                logger: m => {
+                    if (m.status === 'recognizing text') {
+                        const progress = Math.round(m.progress * 100);
+                        status.textContent = `🔄 Processing image... ${progress}%`;
+                    }
+                }
+            }).then(({ data: { text } }) => {
+                // Success
+                status.className = 'ocr-status success';
+                status.textContent = '✅ Text extracted successfully! The text has been placed in the Input Text area.';
+                inputDisplay.value = text;
+                
+                // Save extracted text to localStorage
+                saveInputText(text);
+                
+                // Auto-transliterate if text is extracted
+                if (text.trim()) {
+                    transliterate();
+                }
+            }).catch(err => {
+                // Error
+                status.className = 'ocr-status error';
+                status.textContent = '❌ Error processing image. Please try again.';
+                console.error('OCR Error:', err);
+            });
+        }
+        
+        // Track current view mode
+        let isLineView = false;
+        
+        // Sync Scroll button functionality
+        document.getElementById('syncScrollBtn').addEventListener('click', function() {
+            isScrollingSynced = !isScrollingSynced;
+            const syncIndicator = document.getElementById('syncIndicator');
+            
+            if (isScrollingSynced) {
+                this.textContent = '🔗 Sync';
+                this.style.background = '#f5d000';
+                this.style.color = '#232323';
+                this.title = 'Synchronized scrolling enabled - Click to disable';
+                syncIndicator.textContent = '🔗 Sync enabled';
+                syncIndicator.style.color = '#f5d000';
+            } else {
+                this.textContent = '🔗 Off';
+                this.style.background = '#444';
+                this.style.color = '#ffe066';
+                this.title = 'Synchronized scrolling disabled - Click to enable';
+                syncIndicator.textContent = '🔗 Sync disabled';
+                syncIndicator.style.color = '#999';
+            }
+        });
+        
+        // Copy All button functionality
+        document.getElementById('copyAllBtn').addEventListener('click', function() {
+            const output = document.getElementById('dhivehiOutput');
+            if (output.value) {
+                navigator.clipboard.writeText(output.value).then(() => {
+                    this.textContent = 'Copied!';
+                    setTimeout(() => { this.textContent = 'Copy'; }, 1200);
+                });
+            }
+        });
+        
+        // Import to Lyrics Editor functionality
+        document.getElementById('importBtn').addEventListener('click', function() {
+            const output = document.getElementById('dhivehiOutput');
+            if (!output.value.trim()) {
+                alert('No text to import! Please transliterate some text first.');
+                return;
+            }
+            
+            // Visual feedback
+            this.textContent = 'Opening...';
+            this.style.background = '#218838';
+            
+            // Get first 3 words from first line of input field for song name
+            const inputText = document.getElementById('inputDisplay').value.trim();
+            const firstLine = inputText.split('\n')[0].trim();
+            const words = firstLine.split(/\s+/).filter(word => word.length > 0);
+            
+            // Use up to 3 words, or all words if less than 3
+            const wordsToUse = words.slice(0, Math.min(3, words.length));
+            const songName = wordsToUse
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+            
+            // Prepare the text for import
+            const textToImport = encodeURIComponent(output.value);
+            
+            // Open lyrics submitter with imported text and song name
+            let url = `lyrics-submit.html?import=${textToImport}`;
+            if (songName) {
+                url += `&songName=${encodeURIComponent(songName)}`;
+            }
+            window.open(url, '_blank');
+            
+            // Reset button
+            setTimeout(() => {
+                this.textContent = 'Import';
+                this.style.background = '#28a745';
+            }, 1000);
+        });
+        
+        // Import English to English Lyrics Editor functionality
+        document.getElementById('importEnglishBtn').addEventListener('click', function() {
+            const inputText = document.getElementById('inputDisplay').value.trim();
+            if (!inputText) {
+                alert('No English text to import! Please enter some text first.');
+                return;
+            }
+            
+            // Visual feedback
+            this.textContent = 'Opening...';
+            this.style.background = '#0056b3';
+            
+            // Get first 3 words from first line of input field for song name
+            const firstLine = inputText.split('\n')[0].trim();
+            const words = firstLine.split(/\s+/).filter(word => word.length > 0);
+            
+            // Use up to 3 words, or all words if less than 3
+            const wordsToUse = words.slice(0, Math.min(3, words.length));
+            const songName = wordsToUse
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                .join(' ');
+            
+            // Prepare the text for import
+            const textToImport = encodeURIComponent(inputText);
+            
+            // Open lyrics submitter with imported text and song name
+            let url = `lyrics-submit.html?import=${textToImport}`;
+            if (songName) {
+                url += `&songName=${encodeURIComponent(songName)}`;
+            }
+            window.open(url, '_blank');
+            
+            // Reset button
+            setTimeout(() => {
+                this.textContent = 'Import';
+                this.style.background = '#007bff';
+            }, 1000);
+        });
+        
+        // Toggle View button functionality
+        document.getElementById('toggleViewBtn').addEventListener('click', function() {
+            const inputTextarea = document.getElementById('inputDisplay');
+            const outputTextarea = document.getElementById('dhivehiOutput');
+            const inputLinesDiv = document.getElementById('inputLines');
+            const outputLinesDiv = document.getElementById('dhivehiLines');
+            
+            if (isLineView) {
+                // Switch to textarea view
+                inputTextarea.style.display = 'block';
+                outputTextarea.style.display = 'block';
+                inputLinesDiv.style.display = 'none';
+                outputLinesDiv.style.display = 'none';
+                this.textContent = 'Line';
+                isLineView = false;
+            } else {
+                // Switch to line view
+                inputTextarea.style.display = 'none';
+                outputTextarea.style.display = 'none';
+                inputLinesDiv.style.display = 'block';
+                outputLinesDiv.style.display = 'block';
+                this.textContent = 'Text';
+                isLineView = true;
+                updateLineView();
+                updateInputLineView();
+            }
+        });
+        
+        // Function to update the line view with individual copy buttons
+        function updateLineView() {
+            const textarea = document.getElementById('dhivehiOutput');
+            const linesDiv = document.getElementById('dhivehiLines');
+            
+            if (!textarea.value.trim()) {
+                linesDiv.innerHTML = '<div style="color: #999; font-style: italic;">No text to display</div>';
+                return;
+            }
+            
+            const lines = textarea.value.split('\n');
+            linesDiv.innerHTML = '';
+            
+            lines.forEach((line, index) => {
+                if (line.trim() === '') {
+                    // Add empty line placeholder
+                    const emptyLineDiv = document.createElement('div');
+                    emptyLineDiv.style.height = '1.5em';
+                    emptyLineDiv.setAttribute('data-line-index', index);
+                    linesDiv.appendChild(emptyLineDiv);
+                    return;
+                }
+                
+                const lineContainer = document.createElement('div');
+                lineContainer.setAttribute('data-line-index', index);
+                lineContainer.setAttribute('data-side', 'output');
+                lineContainer.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 8px;
+                    padding: 8px;
+                    background: #2b2b2b;
+                    border-radius: 6px;
+                    border: 1px solid #444;
+                    transition: background-color 0.2s, border-color 0.2s;
+                `;
+                
+                const lineText = document.createElement('div');
+                lineText.textContent = line;
+                lineText.className = 'line-text'; // Add class for font styling
+                lineText.style.cssText = `
+                    flex: 1;
+                    font-size: 1.08rem;
+                    color: #ffe066;
+                    direction: rtl;
+                    text-align: right;
+                    margin-right: 10px;
+                    word-wrap: break-word;
+                    font-family: 'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', 'MV Boli', Tahoma, Arial, sans-serif;
+                `;
+                
+                const copyButton = document.createElement('button');
+                copyButton.textContent = 'Copy';
+                copyButton.style.cssText = `
+                    background: #444;
+                    color: #ffe066;
+                    border: none;
+                    padding: 4px 12px;
+                    border-radius: 4px;
+                    font-size: 0.85rem;
+                    cursor: pointer;
+                    font-weight: 600;
+                    min-width: 50px;
+                    margin: 0;
+                `;
+                
+                // Add hover functionality for cross-highlighting
+                lineContainer.addEventListener('mouseenter', function() {
+                    highlightCorrespondingLine(index, 'input');
+                    this.style.background = '#3a3a3a';
+                    this.style.borderColor = '#f5d000';
+                });
+                
+                lineContainer.addEventListener('mouseleave', function() {
+                    clearLineHighlights();
+                    this.style.background = '#2b2b2b';
+                    this.style.borderColor = '#444';
+                });
+                
+                copyButton.addEventListener('click', function() {
+                    navigator.clipboard.writeText(line).then(() => {
+                        this.textContent = 'Copied!';
+                        this.style.background = '#f5d000';
+                        this.style.color = '#232323';
+                        setTimeout(() => {
+                            this.textContent = 'Copy';
+                            this.style.background = '#444';
+                            this.style.color = '#ffe066';
+                        }, 1200);
+                    });
+                });
+                
+                copyButton.addEventListener('mouseover', function() {
+                    if (this.textContent === 'Copy') {
+                        this.style.background = '#555';
+                    }
+                });
+                
+                copyButton.addEventListener('mouseout', function() {
+                    if (this.textContent === 'Copy') {
+                        this.style.background = '#444';
+                    }
+                });
+                
+                lineContainer.appendChild(lineText);
+                lineContainer.appendChild(copyButton);
+                linesDiv.appendChild(lineContainer);
+            });
+        }
+        
+        // Function to update the input line view
+        function updateInputLineView() {
+            const textarea = document.getElementById('inputDisplay');
+            const linesDiv = document.getElementById('inputLines');
+            
+            if (!textarea.value.trim()) {
+                linesDiv.innerHTML = '<div style="color: #999; font-style: italic;">No text to display</div>';
+                return;
+            }
+            
+            const lines = textarea.value.split('\n');
+            linesDiv.innerHTML = '';
+            
+            lines.forEach((line, index) => {
+                if (line.trim() === '') {
+                    // Add empty line placeholder
+                    const emptyLineDiv = document.createElement('div');
+                    emptyLineDiv.style.height = '1.5em';
+                    emptyLineDiv.setAttribute('data-line-index', index);
+                    linesDiv.appendChild(emptyLineDiv);
+                    return;
+                }
+                
+                const lineContainer = document.createElement('div');
+                lineContainer.setAttribute('data-line-index', index);
+                lineContainer.setAttribute('data-side', 'input');
+                lineContainer.style.cssText = `
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 8px;
+                    padding: 8px;
+                    background: #2b2b2b;
+                    border-radius: 6px;
+                    border: 1px solid #444;
+                    transition: background-color 0.2s, border-color 0.2s;
+                `;
+                
+                const lineText = document.createElement('div');
+                lineText.textContent = line;
+                lineText.className = 'line-text'; // Add class for font styling
+                lineText.style.cssText = `
+                    flex: 1;
+                    font-size: 0.95rem;
+                    color: #fff;
+                    direction: ltr;
+                    text-align: left;
+                    margin-right: 10px;
+                    word-wrap: break-word;
+                    font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+                `;
+                
+                const copyButton = document.createElement('button');
+                copyButton.textContent = 'Copy';
+                copyButton.style.cssText = `
+                    background: #444;
+                    color: #ffe066;
+                    border: none;
+                    padding: 4px 12px;
+                    border-radius: 4px;
+                    font-size: 0.85rem;
+                    cursor: pointer;
+                    font-weight: 600;
+                    min-width: 50px;
+                    margin: 0;
+                `;
+                
+                // Add hover functionality for cross-highlighting
+                lineContainer.addEventListener('mouseenter', function() {
+                    highlightCorrespondingLine(index, 'output');
+                    this.style.background = '#3a3a3a';
+                    this.style.borderColor = '#f5d000';
+                });
+                
+                lineContainer.addEventListener('mouseleave', function() {
+                    clearLineHighlights();
+                    this.style.background = '#2b2b2b';
+                    this.style.borderColor = '#444';
+                });
+                
+                copyButton.addEventListener('click', function() {
+                    navigator.clipboard.writeText(line).then(() => {
+                        this.textContent = 'Copied!';
+                        this.style.background = '#f5d000';
+                        this.style.color = '#232323';
+                        setTimeout(() => {
+                            this.textContent = 'Copy';
+                            this.style.background = '#444';
+                            this.style.color = '#ffe066';
+                        }, 1200);
+                    });
+                });
+                
+                copyButton.addEventListener('mouseover', function() {
+                    if (this.textContent === 'Copy') {
+                        this.style.background = '#555';
+                    }
+                });
+                
+                copyButton.addEventListener('mouseout', function() {
+                    if (this.textContent === 'Copy') {
+                        this.style.background = '#444';
+                    }
+                });
+                
+                lineContainer.appendChild(lineText);
+                lineContainer.appendChild(copyButton);
+                linesDiv.appendChild(lineContainer);
+            });
+        }
+        
+        // Allow pressing Enter to transliterate
+        document.getElementById('inputDisplay').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                transliterate();
+            }
+        });
+        
+        // Real-time transliteration as user types
+        document.getElementById('inputDisplay').addEventListener('input', function() {
+            // Save input text to localStorage
+            saveInputText(this.value);
+            
+            if (this.value.trim()) {
+                transliterate();
+            } else {
+                document.getElementById('dhivehiOutput').value = '';
+                // Clear line views if in line view mode
+                if (isLineView) {
+                    updateLineView();
+                    updateInputLineView();
+                }
+            }
+        });
+        
+        // Scroll position saving event listeners
+        let scrollSaveTimeout;
+        function throttledScrollSave() {
+            clearTimeout(scrollSaveTimeout);
+            scrollSaveTimeout = setTimeout(saveScrollPositions, 500); // Save after 500ms of no scrolling
+        }
+        
+        document.getElementById('inputDisplay').addEventListener('scroll', throttledScrollSave);
+        document.getElementById('dhivehiOutput').addEventListener('scroll', throttledScrollSave);
+        document.getElementById('inputLines').addEventListener('scroll', throttledScrollSave);
+        document.getElementById('dhivehiLines').addEventListener('scroll', throttledScrollSave);
+        
+        // Synchronized scrolling functionality
+        let isScrollingSynced = true;
+        let scrollingSide = null; // Track which side is being scrolled to prevent infinite loop
+        
+        // Sync scrolling from input to output
+        document.getElementById('inputDisplay').addEventListener('scroll', function() {
+            if (!isScrollingSynced || scrollingSide === 'output') return;
+            
+            scrollingSide = 'input';
+            const inputElement = this;
+            const outputTextarea = document.getElementById('dhivehiOutput');
+            const outputLines = document.getElementById('dhivehiLines');
+            
+            // Calculate scroll percentage (handle edge case where content doesn't scroll)
+            const maxInputScroll = Math.max(1, inputElement.scrollHeight - inputElement.clientHeight);
+            const scrollPercentage = inputElement.scrollTop / maxInputScroll;
+            
+            if (isLineView) {
+                // Sync with line view
+                const maxOutputScroll = Math.max(1, outputLines.scrollHeight - outputLines.clientHeight);
+                outputLines.scrollTop = scrollPercentage * maxOutputScroll;
+            } else {
+                // Sync with textarea
+                const maxOutputScroll = Math.max(1, outputTextarea.scrollHeight - outputTextarea.clientHeight);
+                outputTextarea.scrollTop = scrollPercentage * maxOutputScroll;
+            }
+            
+            // Reset scrolling side after a brief delay
+            setTimeout(() => { scrollingSide = null; }, 50);
+        });
+        
+        // Function to sync scrolling from input line view to output
+        function syncInputLineViewScroll() {
+            const inputLines = document.getElementById('inputLines');
+            
+            inputLines.addEventListener('scroll', function() {
+                if (!isScrollingSynced || scrollingSide === 'output') return;
+                
+                scrollingSide = 'input';
+                const outputLines = document.getElementById('dhivehiLines');
+                
+                // Calculate scroll percentage (handle edge case where content doesn't scroll)
+                const maxInputScroll = Math.max(1, this.scrollHeight - this.clientHeight);
+                const scrollPercentage = this.scrollTop / maxInputScroll;
+                
+                // Sync with output line view
+                const maxOutputScroll = Math.max(1, outputLines.scrollHeight - outputLines.clientHeight);
+                outputLines.scrollTop = scrollPercentage * maxOutputScroll;
+                
+                // Reset scrolling side after a brief delay
+                setTimeout(() => { scrollingSide = null; }, 50);
+            });
+        }
+        
+        // Sync scrolling from output textarea to input
+        document.getElementById('dhivehiOutput').addEventListener('scroll', function() {
+            if (!isScrollingSynced || scrollingSide === 'input') return;
+            
+            scrollingSide = 'output';
+            const outputElement = this;
+            const inputTextarea = document.getElementById('inputDisplay');
+            
+            // Calculate scroll percentage (handle edge case where content doesn't scroll)
+            const maxOutputScroll = Math.max(1, outputElement.scrollHeight - outputElement.clientHeight);
+            const scrollPercentage = outputElement.scrollTop / maxOutputScroll;
+            
+            // Sync with input
+            const maxInputScroll = Math.max(1, inputTextarea.scrollHeight - inputTextarea.clientHeight);
+            inputTextarea.scrollTop = scrollPercentage * maxInputScroll;
+            
+            // Reset scrolling side after a brief delay
+            setTimeout(() => { scrollingSide = null; }, 50);
+        });
+        
+        // Function to sync scrolling from line view to input
+        function syncLineViewScroll() {
+            const outputLines = document.getElementById('dhivehiLines');
+            
+            outputLines.addEventListener('scroll', function() {
+                if (!isScrollingSynced || scrollingSide === 'input') return;
+                
+                scrollingSide = 'output';
+                const inputTextarea = document.getElementById('inputDisplay');
+                const inputLines = document.getElementById('inputLines');
+                
+                // Calculate scroll percentage (handle edge case where content doesn't scroll)
+                const maxOutputScroll = Math.max(1, this.scrollHeight - this.clientHeight);
+                const scrollPercentage = this.scrollTop / maxOutputScroll;
+                
+                if (isLineView) {
+                    // Sync with input line view
+                    const maxInputScroll = Math.max(1, inputLines.scrollHeight - inputLines.clientHeight);
+                    inputLines.scrollTop = scrollPercentage * maxInputScroll;
+                } else {
+                    // Sync with input textarea
+                    const maxInputScroll = Math.max(1, inputTextarea.scrollHeight - inputTextarea.clientHeight);
+                    inputTextarea.scrollTop = scrollPercentage * maxInputScroll;
+                }
+                
+                // Reset scrolling side after a brief delay
+                setTimeout(() => { scrollingSide = null; }, 50);
+            });
+        }
+        
+        // Initialize line view scroll sync
+        syncLineViewScroll();
+        syncInputLineViewScroll();
+        
+        // Helper functions for cross-highlighting
+        function highlightCorrespondingLine(lineIndex, targetSide) {
+            const targetContainer = targetSide === 'input' ? 
+                document.getElementById('inputLines') : 
+                document.getElementById('dhivehiLines');
+            
+            const targetLine = targetContainer.querySelector(`[data-line-index="${lineIndex}"]`);
+            if (targetLine && targetLine.style) {
+                targetLine.style.background = '#3a3a3a';
+                targetLine.style.borderColor = '#f5d000';
+            }
+        }
+        
+        function clearLineHighlights() {
+            // Clear highlights from both input and output sides
+            const inputLines = document.getElementById('inputLines');
+            const outputLines = document.getElementById('dhivehiLines');
+            
+            [inputLines, outputLines].forEach(container => {
+                const allLines = container.querySelectorAll('[data-line-index]');
+                allLines.forEach(line => {
+                    if (line.style) {
+                        line.style.background = '#2b2b2b';
+                        line.style.borderColor = '#444';
+                    }
+                });
+            });
+        }
+        
+        // localStorage functions for saving/loading input text
+        function saveInputText(text) {
+            try {
+                localStorage.setItem('dhivehi-transliterator-input', text);
+            } catch (e) {
+                console.warn('Could not save input text to localStorage:', e);
+            }
+        }
+        
+        function loadInputText() {
+            try {
+                return localStorage.getItem('dhivehi-transliterator-input') || '';
+            } catch (e) {
+                console.warn('Could not load input text from localStorage:', e);
+                return '';
+            }
+        }
+        
+        function clearSavedInputText() {
+            try {
+                localStorage.removeItem('dhivehi-transliterator-input');
+            } catch (e) {
+                console.warn('Could not clear saved input text from localStorage:', e);
+            }
+        }
+        
+        // Scroll position saving/loading functions
+        function saveScrollPositions() {
+            try {
+                const inputDisplay = document.getElementById('inputDisplay');
+                const dhivehiOutput = document.getElementById('dhivehiOutput');
+                const inputLines = document.getElementById('inputLines');
+                const dhivehiLines = document.getElementById('dhivehiLines');
+                
+                const scrollPositions = {
+                    inputDisplay: inputDisplay.scrollTop,
+                    dhivehiOutput: dhivehiOutput.scrollTop,
+                    inputLines: inputLines.scrollTop,
+                    dhivehiLines: dhivehiLines.scrollTop
+                };
+                
+                localStorage.setItem('dhivehi-transliterator-scroll', JSON.stringify(scrollPositions));
+            } catch (e) {
+                console.warn('Could not save scroll positions to localStorage:', e);
+            }
+        }
+        
+        function loadScrollPositions() {
+            try {
+                const saved = localStorage.getItem('dhivehi-transliterator-scroll');
+                if (saved) {
+                    const scrollPositions = JSON.parse(saved);
+                    
+                    // Use setTimeout to ensure elements are rendered before setting scroll
+                    setTimeout(() => {
+                        const inputDisplay = document.getElementById('inputDisplay');
+                        const dhivehiOutput = document.getElementById('dhivehiOutput');
+                        const inputLines = document.getElementById('inputLines');
+                        const dhivehiLines = document.getElementById('dhivehiLines');
+                        
+                        if (scrollPositions.inputDisplay) inputDisplay.scrollTop = scrollPositions.inputDisplay;
+                        if (scrollPositions.dhivehiOutput) dhivehiOutput.scrollTop = scrollPositions.dhivehiOutput;
+                        if (scrollPositions.inputLines) inputLines.scrollTop = scrollPositions.inputLines;
+                        if (scrollPositions.dhivehiLines) dhivehiLines.scrollTop = scrollPositions.dhivehiLines;
+                    }, 100);
+                }
+            } catch (e) {
+                console.warn('Could not load scroll positions from localStorage:', e);
+            }
+        }
+        
+        function clearSavedScrollPositions() {
+            try {
+                localStorage.removeItem('dhivehi-transliterator-scroll');
+            } catch (e) {
+                console.warn('Could not clear saved scroll positions from localStorage:', e);
+            }
+        }
+          // Load saved input text on page load
+        window.addEventListener('load', function() {
+            const savedText = loadInputText();
+            document.getElementById('inputDisplay').value = savedText;
+            
+            // Auto-transliterate if there is saved text
+            if (savedText.trim()) {
+                transliterate();
+            }
+            
+            // Load saved scroll positions
+            loadScrollPositions();
+        });
+        
+        // Load saved input text when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedText = loadInputText();
+            if (savedText) {
+                const inputDisplay = document.getElementById('inputDisplay');
+                inputDisplay.value = savedText;
+                // Auto-transliterate if there's saved text
+                if (savedText.trim()) {
+                    transliterate();
+                }
+            }
+            
+            // Load saved scroll positions
+            loadScrollPositions();
+        });
+    </script>
+</body>
+</html>

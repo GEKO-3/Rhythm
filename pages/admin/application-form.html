@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Rhythm Boduberu - Booking Application Form">
+    <title>Rhythm Boduberu - Join Our Team</title>
+    
+    <!-- Favicon and web app manifest -->
+    <link rel="icon" href="favicons/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+    <link rel="manifest" href="favicons/manifest.webmanifest">
+    
+    <!-- Font loading -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Regular.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Medium.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 500;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-SemiBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 600;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Bold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 700;
+            font-style: normal;
+        }
+    </style>
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #2b2b2b;
+            --bg-color: #1f1f1f;
+            --card-bg: #2a2a2a;
+            --border-color: #444444;
+            --error-color: #ff4444;
+            --success-color: #44ff44;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: var(--bg-color);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Video */
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+            opacity: 0.3;
+        }
+
+        .video-fallback {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('src/Background.webp');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -3;
+            opacity: 0.3;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(31, 31, 31, 0.473), rgba(42, 42, 42, 0.671));
+            z-index: -1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: rgba(31, 31, 31, 0);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #cccccc;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+        }
+
+        .form-container {
+            background: rgba(42, 42, 42, 0.26);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 1rem;
+            color: #ffffff;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .required {
+            color: var(--error-color);
+            margin-left: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 1rem;
+            background: rgba(31, 31, 31, 0.8);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            color: #ffffff;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.2);
+            background: rgba(31, 31, 31, 0.9);
+        }
+
+        .form-input::placeholder {
+            color: #888888;
+        }
+
+        /* Date input specific styling */
+        .date-input-wrapper {
+            position: relative;
+            width: 100%;
+            display: block;
+            height: auto;
+        }
+
+        .date-display {
+            position: relative;
+            z-index: 2;
+            background: rgba(31, 31, 31, 0.8);
+            cursor: pointer;
+            width: 100%;
+            display: block;
+            margin: 0;
+            padding-right: 50px; /* Make room for calendar button */
+        }
+
+        .date-picker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            z-index: 6;
+            cursor: pointer;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Calendar button - only show on desktop */
+        .calendar-btn {
+            position: absolute;
+            right: 12px;
+            top: 32%;
+            transform: translateY(-50%);
+            width: 28px;
+            height: 28px;
+            background: rgba(245, 208, 0, 0.1);
+            border: 1px solid var(--primary-color);
+            border-radius: 6px;
+            cursor: pointer;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            pointer-events: auto;
+        }
+
+        .calendar-btn:hover {
+            background: rgba(245, 208, 0, 0.2);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .calendar-btn:active {
+            background: rgba(245, 208, 0, 0.3);
+            transform: translateY(-50%) scale(0.95);
+        }
+
+        .calendar-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--primary-color);
+            pointer-events: none;
+        }
+
+        .form-input[type="date"] {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f5d000'%3e%3cpath d='M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            background-size: 20px;
+            padding-right: 45px;
+            position: relative;
+        }
+
+        /* Ensure date picker works on all devices */
+        .form-input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            z-index: 4;
+        }
+
+        /* Radio Button Styling */
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        /* Location specific styling */
+        .form-group:has(input[name="entry.5566778899"]) .radio-group {
+            grid-template-columns: 1fr 1fr;
+            max-width: 300px;
+        }
+
+        .radio-item {
+            position: relative;
+        }
+
+        .radio-input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(31, 31, 31, 0.8);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .radio-label:hover {
+            border-color: var(--primary-color);
+            background: rgba(245, 208, 0, 0.1);
+        }
+
+        .radio-input:checked + .radio-label {
+            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
+            color: var(--text-color);
+            border-color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .radio-custom {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .radio-input:checked + .radio-label .radio-custom {
+            border-color: var(--text-color);
+            background: var(--text-color);
+        }
+
+        .radio-custom::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .radio-input:checked + .radio-label .radio-custom::after {
+            opacity: 1;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
+            color: var(--text-color);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            font-family: 'Montserrat', Arial, sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 208, 0, 0.4);
+            background: linear-gradient(135deg, #ffed4e, var(--primary-color));
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Back to Home Link */
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            background: rgba(31, 31, 31, 0.9);
+            padding: 12px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            z-index: 100;
+        }
+
+        .back-link:hover {
+            background: rgba(245, 208, 0, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .back-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        /* Success/Error Messages */
+        .message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .message.success {
+            background: rgba(68, 255, 68, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .message.error {
+            background: rgba(255, 68, 68, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(245, 208, 0, 0.3);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Confirmation Dialog */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dialog-box {
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .dialog-overlay.show .dialog-box {
+            transform: scale(1);
+        }
+
+        .dialog-title {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .dialog-message {
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .dialog-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .dialog-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            min-width: 100px;
+        }
+
+        .dialog-btn.confirm {
+            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
+            color: var(--text-color);
+        }
+
+        .dialog-btn.confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 208, 0, 0.4);
+        }
+
+        .dialog-btn.cancel {
+            background: rgba(68, 68, 68, 0.8);
+            color: #ffffff;
+            border: 2px solid var(--border-color);
+        }
+
+        .dialog-btn.cancel:hover {
+            background: rgba(68, 68, 68, 1);
+            border-color: #666666;
+        }
+
+        /* Success Container */
+        .success-container {
+            background: rgba(42, 42, 42, 0.26);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--success-color);
+            text-align: center;
+            display: none;
+        }
+
+        .success-container.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success-color);
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 2rem;
+            color: var(--success-color);
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .success-message {
+            font-size: 1.1rem;
+            color: #ffffff;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .back-home-btn {
+            background: linear-gradient(135deg, var(--primary-color), #ffed4e);
+            color: var(--text-color);
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 208, 0, 0.4);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+                margin: 0 10px;
+            }
+            
+            .radio-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-link {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin: 20px auto;
+                width: fit-content;
+            }
+
+            /* Ensure date input has consistent height on mobile */
+            .form-input[type="date"], .date-display {
+                height: 54px; /* Match other input fields */
+                line-height: 1.4;
+                font-size: 16px; /* Prevent zoom on iOS */
+                padding-right: 15px; /* Remove extra padding on mobile */
+            }
+
+            .date-input-wrapper {
+                height: 54px;
+            }
+
+            /* Hide calendar button on mobile */
+            .calendar-btn {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 30px 15px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-content {
+                padding: 20px 10px;
+            }
+            
+            .form-container {
+                padding: 25px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Video -->
+    <div class="video-fallback"></div>
+    <video class="video-background" autoplay muted loop playsinline>
+        <source src="src/bg-video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <div class="background-overlay"></div>
+
+    <!-- Back to Home Link -->
+    <a href="index.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Back to Home
+    </a>
+
+    <!-- Header -->
+    <header class="header">
+        <img src="src/Logo_1.svg" alt="Rhythm Boduberu" class="logo">
+        <h1>Rhythm Member Application Form</h1>
+        <p>Join our community of traditional Maldivian music enthusiasts! Fill out this form to become part of the Rhythm Boduberu family.</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="form-container" id="form-container">
+            
+            <div id="message-container"></div>
+            
+            <form id="booking-form">
+                
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="email" class="form-label">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="your.email@example.com">
+                </div>
+
+                <!-- Full Name Field -->
+                <div class="form-group">
+                    <label for="name" class="form-label">Full Name<span class="required">*</span></label>
+                    <input type="text" id="name" class="form-input" placeholder="Enter your full name" required>
+                </div>
+
+                <!-- Date of Birth Field -->
+                <div class="form-group">
+                    <label for="birthday" class="form-label">Date of Birth<span class="required">*</span></label>
+                    <div class="date-input-wrapper">
+                        <input type="text" id="birthday-display" class="form-input date-display" placeholder="dd/mm/yyyy" required readonly>
+                        <input type="date" id="birthday" class="form-input date-picker" required>
+                        <div class="calendar-btn" id="calendar-btn">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Number Field -->
+                <div class="form-group">
+                    <label for="contact" class="form-label">Contact Number<span class="required">*</span></label>
+                    <input type="tel" id="contact" class="form-input" placeholder="+960 7xx xxxx or +960 9xx xxxx" value="+960 " required>
+                </div>
+
+                <!-- Location Field -->
+                <div class="form-group">
+                    <label class="form-label">Are you residing in L.Gan/Fonadhoo?<span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="location-yes" name="location" value="Yes" class="radio-input" required>
+                            <label for="location-yes" class="radio-label">
+                                <div class="radio-custom"></div>
+                                Yes
+                            </label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="location-no" name="location" value="No" class="radio-input" required>
+                            <label for="location-no" class="radio-label">
+                                <div class="radio-custom"></div>
+                                No
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">Submit Application</button>
+                
+                <!-- Loading Animation -->
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Submitting your application...</p>
+                </div>
+            </form>
+        </div>
+
+        <!-- Success Container -->
+        <div class="success-container" id="success-container">
+            <div class="success-icon">🎉</div>
+            <h2 class="success-title">Application Submitted Successfully!</h2>
+            <p class="success-message">
+                Thank you for your interest in joining Rhythm Boduberu! Your application has been received and we'll get back to you soon.<br><br>
+                <strong>Important:</strong> You have already submitted your application and cannot submit another one.
+            </p>
+            <a href="index.html" class="back-home-btn">Back to Home</a>
+        </div>
+    </main>
+
+    <!-- Confirmation Dialog -->
+    <div class="dialog-overlay" id="dialog-overlay">
+        <div class="dialog-box">
+            <h3 class="dialog-title">Confirm Submission</h3>
+            <p class="dialog-message">
+                Are you sure all the information you entered is correct?<br><br>
+                <strong>Important:</strong> You can only submit this form once. Please review your details carefully before proceeding.
+            </p>
+            <div class="dialog-buttons">
+                <button class="dialog-btn cancel" id="dialog-cancel">Cancel</button>
+                <button class="dialog-btn confirm" id="dialog-confirm">Yes, Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js" async defer></script>
+    <script>
+        // Check if form was already submitted on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('rhythmFormSubmitted') === 'true') {
+                showSuccessPage();
+            }
+        });
+
+        // Video fallback handling
+        const video = document.querySelector('.video-background');
+        const fallback = document.querySelector('.video-fallback');
+        
+        video.addEventListener('error', function() {
+            video.style.display = 'none';
+            fallback.style.display = 'block';
+        });
+        
+        video.addEventListener('loadeddata', function() {
+            fallback.style.display = 'none';
+        });
+
+        // Form handling
+        const form = document.getElementById('booking-form');
+        const submitBtn = document.querySelector('.submit-btn');
+        const loading = document.getElementById('loading');
+        const messageContainer = document.getElementById('message-container');
+        const dialogOverlay = document.getElementById('dialog-overlay');
+        const dialogCancel = document.getElementById('dialog-cancel');
+        const dialogConfirm = document.getElementById('dialog-confirm');
+        const formContainer = document.getElementById('form-container');
+        const successContainer = document.getElementById('success-container');
+        
+        let formSubmitted = false;
+
+        function showMessage(message, type) {
+            messageContainer.innerHTML = `<div class="message ${type}">${message}</div>`;
+            messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideMessage() {
+            messageContainer.innerHTML = '';
+        }
+
+        function showDialog() {
+            dialogOverlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function hideDialog() {
+            dialogOverlay.classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        function showSuccessPage() {
+            formContainer.style.display = 'none';
+            successContainer.classList.add('show');
+        }
+
+        // Dialog event listeners
+        dialogCancel.addEventListener('click', function() {
+            hideDialog();
+            loading.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Application';
+            formSubmitted = false;
+        });
+
+        dialogConfirm.addEventListener('click', function() {
+            hideDialog();
+            
+            // Get form data
+            const email = document.getElementById('email').value.trim();
+            const name = document.getElementById('name').value.trim();
+            const birthday = document.getElementById('birthday').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const location = document.querySelector('input[name="location"]:checked').value;
+            
+            // Submit to Google Form using hidden iframe method
+            submitToGoogleForm(email, name, birthday, contact, location);
+        });
+
+        // Function to submit to Google Form using hidden iframe
+        function submitToGoogleForm(email, name, birthday, contact, location) {
+            // Wait for config to load
+            if (!window.RhythmConfig) {
+                console.log('Config not loaded yet, retrying...');
+                setTimeout(() => submitToGoogleForm(email, name, birthday, contact, location), 100);
+                return;
+            }
+            
+            console.log('Config loaded, submitting form...');
+            console.log('Form URL:', window.RhythmConfig.applicationForm);
+            
+            // Get form entries
+            const entries = window.RhythmConfig.applicationEntries;
+            console.log('Form entries:', entries);
+            
+            // Create form data
+            const formData = new FormData();
+            formData.append(entries.email, email || '');
+            formData.append(entries.name, name);
+            formData.append(entries.birthday, birthday);
+            formData.append(entries.contact, contact);
+            formData.append(entries.location, location);
+            
+            console.log('Submitting with data:', {
+                [entries.email]: email || '',
+                [entries.name]: name,
+                [entries.birthday]: birthday,
+                [entries.contact]: contact,
+                [entries.location]: location
+            });
+            
+            // Submit using fetch with no-cors mode
+            fetch(window.RhythmConfig.applicationForm, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            }).then(() => {
+                console.log('Form submitted successfully via fetch');
+                handleSubmissionSuccess();
+            }).catch(error => {
+                console.error('Fetch submission failed, trying iframe method:', error);
+                // Fallback to iframe method
+                submitViaIframe(email, name, birthday, contact, location);
+            });
+        }
+        
+        function submitViaIframe(email, name, birthday, contact, location) {
+            console.log('Using iframe fallback method');
+            
+            // Create hidden iframe
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.name = 'hidden_iframe';
+            document.body.appendChild(iframe);
+
+            // Create form
+            const hiddenForm = document.createElement('form');
+            hiddenForm.action = window.RhythmConfig.applicationForm;
+            hiddenForm.method = 'POST';
+            hiddenForm.target = 'hidden_iframe';
+            hiddenForm.style.display = 'none';
+
+            // Add form fields with correct entry names based on Google Form structure
+            const entries = window.RhythmConfig.applicationEntries;
+            const fields = [
+                { name: entries.email, value: email || '' },
+                { name: entries.name, value: name },
+                { name: entries.birthday, value: birthday },
+                { name: entries.contact, value: contact },
+                { name: entries.location, value: location }
+            ];
+
+            fields.forEach(field => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = field.name;
+                input.value = field.value;
+                hiddenForm.appendChild(input);
+            });
+
+            document.body.appendChild(hiddenForm);
+
+            // Handle submission completion
+            let submitted = false;
+            
+            const handleSubmission = () => {
+                if (!submitted) {
+                    submitted = true;
+                    console.log('Iframe form submitted successfully');
+                    handleSubmissionSuccess();
+                    
+                    // Clean up
+                    setTimeout(() => {
+                        if (document.body.contains(hiddenForm)) {
+                            document.body.removeChild(hiddenForm);
+                        }
+                        if (document.body.contains(iframe)) {
+                            document.body.removeChild(iframe);
+                        }
+                    }, 1000);
+                }
+            };
+
+            // Listen for iframe load (indicates submission completion)
+            iframe.addEventListener('load', handleSubmission);
+            
+            // Add error handling
+            iframe.addEventListener('error', (error) => {
+                console.error('Iframe submission error:', error);
+                handleSubmissionError();
+            });
+
+            // Fallback timeout
+            setTimeout(() => {
+                if (!submitted) {
+                    console.log('Iframe submission timeout - assuming success');
+                    handleSubmission();
+                }
+            }, 5000);
+
+            // Submit the form
+            try {
+                console.log('Submitting iframe form to:', hiddenForm.action);
+                hiddenForm.submit();
+            } catch (error) {
+                console.error('Iframe form submission failed:', error);
+                handleSubmissionError();
+            }
+        }
+        
+        function handleSubmissionSuccess() {
+            loading.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Application';
+            
+            localStorage.setItem('rhythmFormSubmitted', 'true');
+            localStorage.setItem('rhythmFormSubmissionDate', new Date().toISOString());
+            showSuccessPage();
+            formSubmitted = false;
+        }
+        
+        function handleSubmissionError() {
+            loading.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Application';
+            formSubmitted = false;
+            showMessage('There was an error submitting the form. Please check your internet connection and try again.', 'error');
+        }
+
+        // Close dialog on overlay click
+        dialogOverlay.addEventListener('click', function(e) {
+            if (e.target === dialogOverlay) {
+                hideDialog();
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+            }
+        });
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Always prevent default first
+            
+            // Check if already submitted
+            if (localStorage.getItem('rhythmFormSubmitted') === 'true') {
+                showMessage('You have already submitted this form and cannot submit it again.', 'error');
+                return;
+            }
+            
+            hideMessage();
+            formSubmitted = true;
+            
+            // Show loading state
+            loading.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            
+            // Validate required fields
+            const name = document.getElementById('name').value.trim();
+            const birthday = document.getElementById('birthday').value.trim();
+            const birthdayDisplay = document.getElementById('birthday-display').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const location = document.querySelector('input[name="location"]:checked');
+            
+            if (!name) {
+                e.preventDefault();
+                showMessage('Please enter your full name.', 'error');
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+                return;
+            }
+            
+            if (!birthdayDisplay || !birthday) {
+                e.preventDefault();
+                showMessage('Please enter a valid date of birth in dd/mm/yyyy format.', 'error');
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+                return;
+            }
+            
+            if (!contact) {
+                e.preventDefault();
+                showMessage('Please enter your contact number.', 'error');
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+                return;
+            }
+            
+            if (!location) {
+                e.preventDefault();
+                showMessage('Please select whether you reside in L.Gan/Fonadhoo.', 'error');
+                loading.style.display = 'none';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Application';
+                formSubmitted = false;
+                return;
+            }
+            
+            // Email validation (optional field) - enhanced validation
+            const email = document.getElementById('email').value.trim();
+            if (email) {
+                // More comprehensive email validation
+                const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+                if (!emailRegex.test(email)) {
+                    e.preventDefault();
+                    showMessage('Please enter a valid email address.', 'error');
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    formSubmitted = false;
+                    return;
+                }
+                
+                // Additional checks for common email issues
+                if (email.includes('..') || email.startsWith('.') || email.endsWith('.') || 
+                    email.includes('@.') || email.includes('.@')) {
+                    e.preventDefault();
+                    showMessage('Please enter a valid email address.', 'error');
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    formSubmitted = false;
+                    return;
+                }
+            }
+            
+            // Contact number validation - ensure exactly 7 digits after country code
+            if (contact) {
+                const digitsOnly = contact.replace(/\D/g, '');
+                if (!digitsOnly.startsWith('960') || digitsOnly.length !== 10) {
+                    e.preventDefault();
+                    showMessage('Please enter a valid Maldivian phone number (+960 followed by 7 digits).', 'error');
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    formSubmitted = false;
+                    return;
+                }
+                
+                // Check if the first digit after country code is 7 or 9
+                const phoneNumber = digitsOnly.substring(3);
+                if (phoneNumber.length !== 7 || (phoneNumber[0] !== '7' && phoneNumber[0] !== '9')) {
+                    e.preventDefault();
+                    showMessage('Please enter a valid Maldivian phone number. The number must start with 7 or 9 after +960.', 'error');
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    formSubmitted = false;
+                    return;
+                }
+            }
+            
+            // All validations passed, show confirmation dialog
+            showDialog();
+        });
+
+        // Enhanced form interactions
+        const inputs = document.querySelectorAll('.form-input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                hideMessage();
+            });
+        });
+
+        // Auto-format phone number to ensure 7 digits after country code
+        const contactInput = document.getElementById('contact');
+        contactInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            
+            // Ensure +960 is always present
+            if (!value.startsWith('960')) {
+                value = '960' + value;
+            }
+            
+            // Format as +960 xxx xxxx and limit to 7 digits after country code
+            if (value.length > 3) {
+                let phoneNumber = value.substring(3, 10); // Limit to 7 digits after country code
+                
+                // Ensure the first digit after country code is 7 or 9
+                if (phoneNumber.length > 0 && phoneNumber[0] !== '7' && phoneNumber[0] !== '9') {
+                    // If first digit is not 7 or 9, remove it and let user enter correct digit
+                    phoneNumber = phoneNumber.substring(1);
+                }
+                
+                value = '+960 ' + phoneNumber;
+            } else {
+                value = '+960 ';
+            }
+            
+            e.target.value = value;
+        });
+
+        // Date formatting for dd/mm/yyyy display with calendar picker
+        const birthdayDisplay = document.getElementById('birthday-display');
+        const birthdayPicker = document.getElementById('birthday');
+        const calendarBtn = document.getElementById('calendar-btn');
+
+        // Calendar button click handler
+        calendarBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Try multiple methods to trigger the date picker
+            birthdayPicker.focus();
+            birthdayPicker.showPicker ? birthdayPicker.showPicker() : birthdayPicker.click();
+            
+            // Fallback: simulate click on the date picker
+            setTimeout(() => {
+                const clickEvent = new MouseEvent('click', {
+                    view: window,
+                    bubbles: true,
+                    cancelable: true
+                });
+                birthdayPicker.dispatchEvent(clickEvent);
+            }, 10);
+        });
+
+        // When date picker changes, update the display field
+        birthdayPicker.addEventListener('change', function(e) {
+            const dateValue = e.target.value; // This is in yyyy-mm-dd format
+            if (dateValue) {
+                const [year, month, day] = dateValue.split('-');
+                // Display in dd/mm/yyyy format
+                birthdayDisplay.value = `${day}/${month}/${year}`;
+            } else {
+                birthdayDisplay.value = '';
+            }
+        });
+
+        // When display field is clicked, trigger the date picker
+        birthdayDisplay.addEventListener('click', function() {
+            birthdayPicker.focus();
+            birthdayPicker.click();
+        });
+
+        // Allow manual entry in display field with formatting
+        birthdayDisplay.addEventListener('input', function(e) {
+            // Remove readonly to allow typing
+            e.target.removeAttribute('readonly');
+            
+            let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+            
+            // Format as dd/mm/yyyy
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            if (value.length >= 5) {
+                value = value.substring(0, 5) + '/' + value.substring(5, 9);
+            }
+            
+            e.target.value = value;
+            
+            // Convert to yyyy-mm-dd for the hidden field
+            if (value.length === 10) {
+                const parts = value.split('/');
+                if (parts.length === 3) {
+                    const day = parts[0];
+                    const month = parts[1];
+                    const year = parts[2];
+                    
+                    // Validate the date
+                    const date = new Date(year, month - 1, day);
+                    if (date.getFullYear() == year && date.getMonth() == month - 1 && date.getDate() == day) {
+                        birthdayPicker.value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+                    } else {
+                        birthdayPicker.value = '';
+                    }
+                } else {
+                    birthdayPicker.value = '';
+                }
+            } else {
+                birthdayPicker.value = '';
+            }
+        });
+
+        // When display field loses focus, make it readonly again
+        birthdayDisplay.addEventListener('blur', function(e) {
+            setTimeout(() => {
+                e.target.setAttribute('readonly', true);
+            }, 100);
+        });
+
+        // Prevent invalid characters in date field
+        birthdayDisplay.addEventListener('keypress', function(e) {
+            // Only allow digits
+            if (!/\d/.test(e.key) && !['Backspace', 'Delete', 'Tab', 'Enter', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // Limit input length
+        birthdayDisplay.addEventListener('keydown', function(e) {
+            if (e.target.value.length >= 10 && !['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // Prevent deletion of +960 prefix
+        contactInput.addEventListener('keydown', function(e) {
+            const cursorPosition = e.target.selectionStart;
+            
+            // Prevent backspace/delete if it would remove the +960 prefix
+            if ((e.key === 'Backspace' && cursorPosition <= 5) || 
+                (e.key === 'Delete' && cursorPosition < 5)) {
+                e.preventDefault();
+            }
+        });
+
+        // Set cursor position after +960 when field is focused
+        contactInput.addEventListener('focus', function(e) {
+            setTimeout(() => {
+                if (e.target.value === '+960 ') {
+                    e.target.setSelectionRange(5, 5);
+                }
+            }, 0);
+        });
+
+        // Add smooth scrolling for better UX
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add keyboard navigation for radio buttons
+        const radioGroups = document.querySelectorAll('.radio-group');
+        radioGroups.forEach(group => {
+            const radios = group.querySelectorAll('input[type="radio"]');
+            radios.forEach((radio, index) => {
+                radio.addEventListener('keydown', function(e) {
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                        e.preventDefault();
+                        const nextIndex = (index + 1) % radios.length;
+                        radios[nextIndex].checked = true;
+                        radios[nextIndex].focus();
+                    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                        e.preventDefault();
+                        const prevIndex = (index - 1 + radios.length) % radios.length;
+                        radios[prevIndex].checked = true;
+                        radios[prevIndex].focus();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

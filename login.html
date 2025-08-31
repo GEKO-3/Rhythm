@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythm Boduberu - Login</title>
+    <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #f5d000;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .logo p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="tel"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="tel"]:focus {
+            outline: none;
+            border-color: #f5d000;
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, #f5d000, #ffd700);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 208, 0, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #4caf50;
+        }
+
+        .message.error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            color: #f44336;
+        }
+
+        .admin-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .admin-link a {
+            color: rgba(245, 208, 0, 0.8);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .admin-link a:hover {
+            color: #f5d000;
+        }
+
+        .access-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(245, 208, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .access-info h3 {
+            color: #f5d000;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .access-info ul {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.85rem;
+            list-style-position: inside;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>Rhythm Boduberu</h1>
+            <p>Request Access to Songs & Lyrics</p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" required placeholder="Enter your full name">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required placeholder="+960 XXX-XXXX">
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn">
+                Request Access
+            </button>
+        </form>
+
+        <div id="message" class="message" style="display: none;"></div>
+
+        <div class="access-info">
+            <h3>✨ Normal Access Includes:</h3>
+            <ul>
+                <li>🎵 Song List with search & filters</li>
+                <li>📝 Lyrics viewing and editing</li>
+                <li>🎶 Music player functionality</li>
+            </ul>
+        </div>
+
+        <div class="admin-link">
+            <a href="login-admin.html">Admin Dashboard</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const form = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageDiv = document.getElementById('message');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!name || !phone) {
+                showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+
+            try {
+                // Check if user already has approval
+                const approvedRef = ref(database, `approvedUsers/${phone}`);
+                const approvedSnapshot = await get(approvedRef);
+
+                if (approvedSnapshot.exists()) {
+                    const userData = approvedSnapshot.val();
+                    // Store approval data
+                    localStorage.setItem('rhythmAuth_approval', JSON.stringify({
+                        approved: true,
+                        name: userData.name,
+                        phone: phone,
+                        permissions: ['songlist', 'lyrics'],
+                        approvedAt: userData.timestamp
+                    }));
+                    showMessage('Access approved! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'songlist.html';
+                    }, 1500);
+                    return;
+                }
+
+                // Check if user is rejected
+                const rejectedRef = ref(database, `rejectedLogins/${phone}`);
+                const rejectedSnapshot = await get(rejectedRef);
+
+                if (rejectedSnapshot.exists()) {
+                    showMessage('Your access request has been denied.', 'error');
+                    return;
+                }
+
+                // Check if user already has pending request
+                const requestRef = ref(database, `loginRequests/${phone}`);
+                const requestSnapshot = await get(requestRef);
+
+                if (requestSnapshot.exists()) {
+                    showMessage('Your request is already pending approval.', 'error');
+                    return;
+                }
+
+                // Submit new request
+                const requestData = {
+                    name: name,
+                    phone: phone,
+                    id: phone,
+                    requestedAt: Date.now(),
+                    approved: false,
+                    rejected: false,
+                    permissions: ['songlist', 'lyrics']
+                };
+
+                await set(requestRef, requestData);
+                showMessage('Request submitted successfully! Please wait for approval.', 'success');
+
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Failed to submit request. Please try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Request Access';
+            }
+        });
+
+        function showMessage(text, type) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

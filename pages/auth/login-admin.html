@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythm Boduberu - Admin</title>
+    <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            min-height: 100vh;
+            color: white;
+            padding: 20px;
+        }
+
+        .admin-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .header h1 {
+            color: #f5d000;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .users-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #f5d000;
+        }
+
+        .user-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .user-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            border-color: rgba(245, 208, 0, 0.4);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .user-details h3 {
+            color: white;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+
+        .status-approved {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .status-rejected {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-approve {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+        }
+
+        .btn-reject {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #da190b;
+            transform: translateY(-1px);
+        }
+
+        .btn-revoke {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-revoke:hover {
+            background: #e68900;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 40px;
+        }
+
+        .no-users {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 40px;
+        }
+
+        .timestamp {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 5px;
+        }
+
+        .access-note {
+            background: rgba(245, 208, 0, 0.1);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .access-note h3 {
+            color: #f5d000;
+            margin-bottom: 5px;
+        }
+
+        .access-note p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-container">
+        <div class="header">
+            <h1>Admin Dashboard</h1>
+            <p>Manage user access for Songs & Lyrics (NO CSV FEATURES)</p>
+        </div>
+
+        <div class="access-note">
+            <h3>🎵 Normal Access Permissions</h3>
+            <p>Approved users get access to: Song List, Lyrics Viewing & Editing, Music Player</p>
+        </div>
+
+        <div class="users-section">
+            <h2 class="section-title">User Access Requests</h2>
+            <div id="usersList">
+                <div class="loading">Loading users...</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const usersListDiv = document.getElementById('usersList');
+
+        // Load and display users from all sources
+        async function loadUsers() {
+            try {
+                const [pendingSnapshot, approvedSnapshot, rejectedSnapshot] = await Promise.all([
+                    get(ref(database, 'loginRequests')),
+                    get(ref(database, 'approvedUsers')),
+                    get(ref(database, 'rejectedLogins'))
+                ]);
+
+                displayUsers(pendingSnapshot, approvedSnapshot, rejectedSnapshot);
+            } catch (error) {
+                console.error('Error loading users:', error);
+                usersListDiv.innerHTML = '<div class="no-users">Error loading users</div>';
+            }
+        }
+
+        function displayUsers(pendingSnapshot, approvedSnapshot, rejectedSnapshot) {
+            const allUsers = [];
+
+            // Add pending requests
+            if (pendingSnapshot.exists()) {
+                const pending = pendingSnapshot.val();
+                Object.entries(pending).forEach(([key, user]) => {
+                    allUsers.push({ key, ...user, status: 'pending' });
+                });
+            }
+
+            // Add approved users
+            if (approvedSnapshot.exists()) {
+                const approved = approvedSnapshot.val();
+                Object.entries(approved).forEach(([key, user]) => {
+                    allUsers.push({ key, ...user, status: 'approved' });
+                });
+            }
+
+            // Add rejected users
+            if (rejectedSnapshot.exists()) {
+                const rejected = rejectedSnapshot.val();
+                Object.entries(rejected).forEach(([key, user]) => {
+                    allUsers.push({ key, ...user, status: 'rejected' });
+                });
+            }
+
+            if (allUsers.length === 0) {
+                usersListDiv.innerHTML = '<div class="no-users">No users found</div>';
+                return;
+            }
+
+            // Sort: pending first, then by date
+            allUsers.sort((a, b) => {
+                if (a.status === 'pending' && b.status !== 'pending') return -1;
+                if (b.status === 'pending' && a.status !== 'pending') return 1;
+                return new Date(b.requestedAt || 0) - new Date(a.requestedAt || 0);
+            });
+
+            usersListDiv.innerHTML = allUsers.map(user => `
+                <div class="user-card">
+                    <div class="user-info">
+                        <div class="user-details">
+                            <h3>${user.name}</h3>
+                            <p>${user.phone}</p>
+                            <div class="timestamp">
+                                Requested: ${new Date(user.requestedAt || Date.now()).toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="status-badge status-${user.status}">
+                            ${user.status}
+                        </div>
+                    </div>
+                    <div class="user-actions">
+                        ${getActionButtons(user)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getActionButtons(user) {
+            if (user.status === 'approved') {
+                return `<button class="btn btn-revoke" onclick="revokeAccess('${user.key}')">Revoke Access</button>`;
+            } else if (user.status === 'rejected') {
+                return `<button class="btn btn-approve" onclick="approveUser('${user.key}')">Approve</button>`;
+            } else {
+                return `
+                    <button class="btn btn-approve" onclick="approveUser('${user.key}')">Approve</button>
+                    <button class="btn btn-reject" onclick="rejectUser('${user.key}')">Reject</button>
+                `;
+            }
+        }
+
+        window.approveUser = async function(userKey) {
+            try {
+                // Get user data from pending requests
+                const requestRef = ref(database, `loginRequests/${userKey}`);
+                const snapshot = await get(requestRef);
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    
+                    // Add to approved users
+                    const approvedRef = ref(database, `approvedUsers/${userKey}`);
+                    await set(approvedRef, {
+                        ...userData,
+                        timestamp: Date.now(),
+                        approvedBy: 'admin'
+                    });
+
+                    // Remove from pending requests
+                    await remove(requestRef);
+                    
+                    // Also remove from rejected if exists
+                    const rejectedRef = ref(database, `rejectedLogins/${userKey}`);
+                    await remove(rejectedRef);
+
+                    alert(`✅ User "${userData.name}" approved for Songs & Lyrics access!`);
+                    loadUsers();
+                }
+            } catch (error) {
+                console.error('Error approving user:', error);
+                alert('Failed to approve user');
+            }
+        };
+
+        window.rejectUser = async function(userKey) {
+            try {
+                const requestRef = ref(database, `loginRequests/${userKey}`);
+                const snapshot = await get(requestRef);
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    
+                    // Add to rejected
+                    const rejectedRef = ref(database, `rejectedLogins/${userKey}`);
+                    await set(rejectedRef, {
+                        ...userData,
+                        rejectedAt: Date.now(),
+                        rejectedBy: 'admin'
+                    });
+
+                    // Remove from pending
+                    await remove(requestRef);
+
+                    alert(`❌ User "${userData.name}" access denied.`);
+                    loadUsers();
+                }
+            } catch (error) {
+                console.error('Error rejecting user:', error);
+                alert('Failed to reject user');
+            }
+        };
+
+        window.revokeAccess = async function(userKey) {
+            if (!confirm('Are you sure you want to revoke access for this user?')) {
+                return;
+            }
+
+            try {
+                const approvedRef = ref(database, `approvedUsers/${userKey}`);
+                const snapshot = await get(approvedRef);
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    
+                    // Move to rejected
+                    const rejectedRef = ref(database, `rejectedLogins/${userKey}`);
+                    await set(rejectedRef, {
+                        ...userData,
+                        rejectedAt: Date.now(),
+                        rejectedBy: 'admin',
+                        reason: 'Access revoked'
+                    });
+
+                    // Remove from approved
+                    await remove(approvedRef);
+
+                    alert(`🚫 Access revoked for "${userData.name}"`);
+                    loadUsers();
+                }
+            } catch (error) {
+                console.error('Error revoking access:', error);
+                alert('Failed to revoke access');
+            }
+        };
+
+        // Initialize
+        loadUsers();
+
+        // Set up real-time listeners
+        onValue(ref(database, 'loginRequests'), loadUsers);
+        onValue(ref(database, 'approvedUsers'), loadUsers);
+        onValue(ref(database, 'rejectedLogins'), loadUsers);
+    </script>
+</body>
+</html>

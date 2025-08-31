@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Songs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Login Authentication System -->
+  <script src="rhythm-auth.js"></script>
+  
+  <!-- Preload critical fonts -->
+  <link rel="preload" href="Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  
+  <!-- Local font definitions -->
+  <style>
+    @font-face {
+      font-family: 'Faruma';
+      src: url('Fonts/Faruma.ttf') format('truetype');
+      font-display: swap;
+      font-weight: normal;
+      font-style: normal;
+    }
+    
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      font-display: swap;
+      font-weight: 100 900;
+      font-style: normal;
+    }
+  </style>
+  <!-- Favicon and web app manifest -->
+  <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicons/favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
+  <link rel="manifest" href="favicons/songlist-manifest.webmanifest">
+  
+  <!-- Additional meta tags for better SEO and social sharing -->
+  <meta name="theme-color" content="#f5d000">
+  <meta property="og:title" content="Rhythm Boduberu - Song List">
+  <meta property="og:description" content="Browse our collection of traditional Maldivian Boduberu songs">
+  <meta property="og:image" content="https://rhythmboduberu.com/src/Logo.png">
+  <meta property="og:url" content="https://rhythmboduberu.com/songlist">
+  <meta property="og:type" content="website">
+
+  <!-- Web App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Rhythm Songs">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="Rhythm Songs">
+  <!-- Optimized CSS Variables and Base Styles -->
+  <style>
+    :root {
+      --primary-color: #f5d000;
+      --hover-color: #fced98;
+      --active-color: #E6B800;
+      --text-color: #2b2b2b;
+      --bg-color: #1f1f1f;
+      --card-bg: rgba(43, 43, 43, 0.7);
+      --border-color: #444;
+      --error-color: #ff6b6b;
+      --font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+      --border-radius: 5px;
+      --transition: all 0.2s ease;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Reset and base styles */
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      touch-action: pan-x pan-y;
+      overscroll-behavior: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    input, textarea, select, button {
+      touch-action: manipulation;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-3px); }
+      75% { transform: translateX(3px); }
+    }
+
+    body {
+      font-family: var(--font-family);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      background-color: var(--bg-color);
+      color: var(--primary-color);
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .container {
+      text-align: center;
+      position: relative;
+      max-width: 600px;
+      width: 100%; 
+      padding: 10px;
+      background: transparent;
+      transition: var(--transition);
+      animation: slideIn 0.5s ease-in-out;
+      margin-bottom: 40px;
+    }
+
+    /* Header and search styles */
+    .header-search-wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      background: transparent;
+      padding: 10px;
+      padding-top: max(10px, env(safe-area-inset-top, 0));
+      padding-left: max(10px, env(safe-area-inset-left, 0));
+      padding-right: max(10px, env(safe-area-inset-right, 0));
+    }
+    
+    .header-search-wrapper::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 20px;
+      background: transparent;
+      pointer-events: none;
+    }
+    
+    /* Offline indicator styles removed */
+
+    .search-container {
+      background: transparent;
+      max-width: 600px;
+      border-radius: var(--border-radius);
+      padding: 5px 10px;
+      margin: 0 auto;
+      width: 95%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      z-index: 101;
+      gap: 10px;
+    }
+
+    /* Search and filter components */
+    .filter-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .filter-btn {
+      background: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 10px;
+      font-size: 1.2em;
+      cursor: pointer;
+      font-family: var(--font-family);
+      transition: var(--transition);
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .filter-btn:hover {
+      background: var(--hover-color);
+      transform: scale(1.05);
+    }
+
+    .filter-content {
+      display: none;
+      position: absolute;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      z-index: 1000;
+      min-width: 200px;
+      top: 100%;
+      right: 0;
+      margin-top: 2px;
+      backdrop-filter: blur(10px);
+    }
+
+    .filter-content a {
+      color: var(--primary-color);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      cursor: pointer;
+      font-family: var(--font-family);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: var(--transition);
+    }
+
+    .filter-content a:last-child {
+      border-bottom: none;
+    }
+
+    .filter-content a:hover {
+      background: var(--hover-color);
+      color: var(--text-color);
+    }
+
+    .filter-content a.active {
+      background: var(--primary-color);
+      color: var(--text-color);
+      font-weight: 600;
+    }
+
+    .filter-content.show {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    #search-box {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: var(--border-radius);
+      border: 1px solid var(--border-color);
+      font-size: 1em;
+      background: #222;
+      color: var(--primary-color);
+      outline: none;
+      transition: var(--transition);
+      font-family: var(--font-family);
+    }
+
+    #search-box::placeholder {
+      color: #999;
+    }
+
+    #search-box:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
+    }
+
+    /* Song list styles */
+    ul#song-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      margin-top: calc(max(env(safe-area-inset-top, 0px), 0px) + 85px);
+      /* Optimize for smooth scrolling and rendering */
+      will-change: scroll-position;
+      -webkit-overflow-scrolling: touch;
+      transform: translateZ(0); /* Force hardware acceleration */
+      contain: layout style; /* Optimize reflow performance */
+    }
+
+    ul#song-list li {
+      cursor: pointer;
+      padding: 12px 16px;
+      border-radius: var(--border-radius);
+      transition: var(--transition);
+      color: var(--primary-color);
+      margin-bottom: 8px;
+      font-size: 1.1em;
+      background: var(--card-bg);
+      font-family: var(--font-family);
+      border: 1px solid transparent;
+      backdrop-filter: blur(10px);
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      /* Optimize for smooth rendering during scroll */
+      will-change: transform, background-color;
+      transform: translateZ(0); /* Force hardware acceleration */
+      contain: layout; /* Optimize reflow performance */
+    }
+
+    ul#song-list li:hover {
+      background: var(--hover-color);
+      color: var(--text-color);
+      font-weight: 600;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow);
+      border-color: var(--primary-color);
+    }
+
+    ul#song-list li:active {
+      transform: translateY(0);
+      background: var(--active-color);
+      color: var(--text-color);
+    }
+    
+    /* Ensure clicked state doesn't persist */
+    ul#song-list li:focus {
+      outline: none;
+      background: var(--card-bg);
+      color: var(--primary-color);
+      transform: none;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes spin-and-scale {
+      from { transform: rotate(0deg) scale(1); }
+      to { transform: rotate(360deg) scale(1); }
+    }
+
+    @keyframes spin-and-scale-smooth {
+      0% { transform: rotate(0deg); width: 80px; height: 80px; }
+      25% { transform: rotate(90deg); width: 200px; height: 200px; }
+      50% { transform: rotate(180deg); width: 800px; height: 800px; }
+      75% { transform: rotate(270deg); width: 2400px; height: 2400px; }
+      100% { transform: rotate(360deg); width: 4000px; height: 4000px; }
+    }
+
+    @keyframes slideLeft {
+      0% { transform: translateX(0) translateZ(0); }
+      100% { transform: translateX(-100vw) translateZ(0); }
+    }
+
+    @keyframes slideRight {
+      0% { transform: translateX(-100vw) translateZ(0); }
+      100% { transform: translateX(0) translateZ(0); }
+    }
+
+    /* Removed Loading Screen CSS - no longer needed */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #2b2b2b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      transition: opacity 0.2s ease-out;
+      opacity: 0;
+      visibility: hidden;
+    }
+    
+    .loading-screen:not(.fade-out) {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transition: none !important; /* No transition when showing */
+    }
+
+    .loading-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    .loading-logo {
+      width: 80px;
+      height: 80px;
+      animation: spin-and-scale 3s linear infinite;
+      transition: none;
+      position: relative;
+      z-index: 2;
+    }
+
+    .loading-logo.fade-out {
+      opacity: 0;
+      transition: opacity 0.4s ease-out;
+    }
+
+    .loading-screen.fade-out .loading-logo {
+      animation: spin-and-scale-smooth 1.5s ease-out infinite;
+    }
+
+    .loading-progress {
+      position: absolute;
+      bottom: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--primary-color);
+      font-family: var(--font-family);
+      font-size: 1em;
+      font-weight: 500;
+      text-align: center;
+      z-index: 3;
+      opacity: 0.8;
+      transition: opacity 0.3s ease;
+    }
+
+    .loading-progress.fade-out {
+      opacity: 0;
+    }
+
+    /* Pattern Container */
+    .pattern-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+      opacity: 0.25;
+      transition: opacity 0.6s ease-out;
+      will-change: opacity;
+      transform: translateZ(0);
+    }
+
+    .pattern-container.fade-out {
+      opacity: 0;
+    }
+
+    .pattern-line {
+      position: absolute;
+      height: 40px;
+      width: 300vw;
+      background-image: url('src/repeatp.svg');
+      background-repeat: repeat-x;
+      background-size: auto 40px;
+      left: -100vw;
+      will-change: transform;
+      transform: translateZ(0);
+    }
+
+    .pattern-line:nth-child(odd) {
+      animation: slideLeft 10s linear infinite;
+    }
+
+    .pattern-line:nth-child(even) {
+      animation: slideRight 10s linear infinite;
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(245, 208, 0, 0.3);
+      border-radius: 50%;
+      border-top-color: var(--primary-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 700px) {
+      .search-container {
+        gap: 8px;
+      }
+      
+      .filter-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1.1em;
+        padding: 8px;
+      }
+      
+      #search-box {
+        padding: 8px 10px;
+        font-size: 1em;
+      }
+      
+      ul#song-list {
+        margin-top: calc(max(env(safe-area-inset-top, 0px), 0px) + 75px);
+      }
+      
+      ul#song-list li {
+        padding: 10px 12px;
+        font-size: 1em;
+      }
+      
+      .filter-content {
+        right: 0;
+        left: auto;
+        min-width: 180px;
+        max-width: calc(100vw - 20px);
+      }
+    }
+    
+    /* Dark mode and reduced motion support */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* Print styles */
+    @media print {
+      .header-search-wrapper, .filter-dropdown {
+        display: none !important;
+      }
+      
+      ul#song-list {
+        margin-top: 0;
+      }
+      
+      ul#song-list li {
+        background: white !important;
+        color: black !important;
+        border: 1px solid #ccc !important;
+      }
+    }
+  </style>
+  <!-- Optimized JavaScript for better performance and security -->
+  <script>
+    // Performance and security optimizations
+    (function() {
+      'use strict';
+      
+      // Optimized zoom prevention with passive listeners where possible
+      const preventZoom = {
+        init() {
+          document.addEventListener('keydown', this.handleKeydown.bind(this));
+          document.addEventListener('wheel', this.handleWheel.bind(this), { passive: false });
+          document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+          document.addEventListener('gesturestart', this.preventDefault, { passive: false });
+          document.addEventListener('gesturechange', this.preventDefault, { passive: false });
+          document.addEventListener('gestureend', this.preventDefault, { passive: false });
+        },
+        
+        handleKeydown(e) {
+          if ((e.ctrlKey || e.metaKey) && ['+', '-', '=', '0'].includes(e.key)) {
+            e.preventDefault();
+          }
+        },
+        
+        handleWheel(e) {
+          if (e.ctrlKey) e.preventDefault();
+        },
+        
+        handleTouchEnd(e) {
+          const now = Date.now();
+          if (now - this.lastTouchEnd <= 350) {
+            e.preventDefault();
+          }
+          this.lastTouchEnd = now;
+        },
+        
+        preventDefault(e) {
+          e.preventDefault();
+        },
+        
+        lastTouchEnd: 0
+      };
+
+      // Initialize zoom prevention
+      preventZoom.init();
+
+      // Service Worker and offline mode removed
+      console.log('Offline mode disabled');
+      
+      // Online/offline status handling removed
+      console.log('Online/offline status tracking disabled');
+      
+      // updateOfflineStatus function removed
+    })();
+  </script>
+</head>
+<body>
+  <!-- Offline indicator removed -->
+  <div class="container">
+    <div class="header-search-wrapper">
+      <div class="search-container">
+        <input type="text" id="search-box" placeholder="Search songs..." />
+        <div class="filter-dropdown">
+          <button class="filter-btn" id="filter-btn">
+            <img src="src/Filter.png" alt="Filter" style="width: 20px; height: 20px;">
+          </button>
+          <div class="filter-content" id="filter-content">
+            <!-- Content will be generated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <ul id="song-list"></ul>
+  </div>
+  <!-- Firebase and Core Scripts - NO CSV -->
+  <script type="module" src="firebase-db.js"></script>
+  <script>
+    // Optimized Application Module using Shared Services
+    const RhythmSongList = (function() {
+      'use strict';
+      
+      // Configuration and State
+      const CONFIG = {
+
+
+        SESSION_TIMEOUT: 15 * 60 * 1000, // 15 minutes
+        SEARCH_DEBOUNCE: 300
+        // CSV ENDPOINTS REMOVED - NO CSV FUNCTIONALITY
+      };
+
+      const STATE = {
+        songs: [],
+        currentShowList: [],
+        currentGenreFilter: 'all',
+        searchDebounceTimer: null,
+        isLoadingData: false,
+        isInitialized: false,
+        searchTimeout: null,
+        isAuthenticated: true, // Use new login system
+      };
+
+      // DOM Elements Cache
+      const ELEMENTS = {};
+
+      // Utility Functions
+      const Utils = {
+        debounce(func, wait) {
+          let timeout;
+          return function executedFunction(...args) {
+            const later = () => {
+              clearTimeout(timeout);
+              func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+          };
+        },
+
+        async fetchWithRetry(url, options = {}, retries = 3) {
+          for (let i = 0; i < retries; i++) {
+            try {
+              const response = await fetch(url, options);
+              if (!response.ok) throw new Error(`HTTP ${response.status}`);
+              return response;
+            } catch (error) {
+              if (i === retries - 1) throw error;
+              await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
+            }
+          }
+        }
+
+        // parseCSV function REMOVED - NO CSV FUNCTIONALITY
+      };
+
+      // Session Management Module
+      const SessionManager = {
+        init() {
+          this.setupVisibilityTracking();
+          this.setupActivityTracking();
+        },
+
+        setupVisibilityTracking() {
+          document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+              STATE.isPageVisible = true;
+              this.updateLastActivity();
+              // Don't expire session when page becomes visible - just refresh the session
+              if (STATE.isAuthenticated) {
+                this.refreshSession();
+              }
+            } else {
+              STATE.isPageVisible = false;
+              // Only start timeout when page becomes hidden
+              if (STATE.isAuthenticated) {
+                this.startBackgroundTimeout();
+              }
+            }
+          });
+
+          window.addEventListener('focus', () => {
+            STATE.isPageVisible = true;
+            this.updateLastActivity();
+            if (STATE.isAuthenticated) {
+              this.clearSessionTimeout();
+              this.refreshSession();
+            }
+          });
+          
+          window.addEventListener('blur', () => {
+            // Don't clear session immediately on blur, only start timeout
+            if (STATE.isAuthenticated) {
+              this.startBackgroundTimeout();
+            }
+          });
+        },
+
+        setupActivityTracking() {
+          const activityEvents = ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'];
+          activityEvents.forEach(event => {
+            document.addEventListener(event, () => this.updateLastActivity(), true);
+          });
+        },
+
+        updateLastActivity() {
+          STATE.lastActivityTime = Date.now();
+          if (STATE.isAuthenticated) {
+            this.refreshSession();
+            // Clear any existing timeout since user is active
+            this.clearSessionTimeout();
+          }
+        },
+
+        refreshSession() {
+          // Update session storage to keep it fresh
+          const sessionData = {
+            timestamp: Date.now(),
+            authenticated: true,
+            sessionType: 'songlist'
+          };
+          sessionStorage.setItem('rhythmSession', JSON.stringify(sessionData));
+        },
+
+        startBackgroundTimeout() {
+          // Only start timeout when page is not visible/focused
+          this.clearSessionTimeout();
+          STATE.sessionTimer = setTimeout(() => {
+            // Only expire if page is still not visible
+            if (!STATE.isPageVisible || document.visibilityState === 'hidden') {
+              this.expireSession();
+            }
+          }, CONFIG.SESSION_TIMEOUT);
+        },
+
+        startSessionTimeout() {
+          // Legacy method - now just refreshes session if page is visible
+          if (STATE.isPageVisible && document.visibilityState === 'visible') {
+            this.refreshSession();
+          } else {
+            this.startBackgroundTimeout();
+          }
+        },
+
+        clearSessionTimeout() {
+          if (STATE.sessionTimer) {
+            clearTimeout(STATE.sessionTimer);
+            STATE.sessionTimer = null;
+          }
+        },
+
+        expireSession() {
+          // Only expire if page is actually hidden/not focused
+          if (STATE.isPageVisible && document.visibilityState === 'visible') {
+            console.log('Skipping session expiry - page is visible');
+            return;
+          }
+
+          STATE.isAuthenticated = false;
+          // Clear any remaining session data
+          this.clearSessionTimeout();
+          
+          // Redirect to login page for re-authentication
+          window.location.href = 'login.html';
+        }
+      };
+
+      // Loading Screen Module
+      const LoadingScreen = {
+        init() {
+          this.setupElements();
+          this.generatePatternLines();
+          this.setupResizeHandler();
+        },
+
+        setupElements() {
+          ELEMENTS.loadingScreen = document.getElementById('loading-screen');
+          ELEMENTS.patternContainer = document.getElementById('pattern-container');
+          ELEMENTS.loadingLogo = document.querySelector('.loading-logo');
+          ELEMENTS.loadingProgress = document.querySelector('.loading-progress');
+        },
+
+        generatePatternLines() {
+          if (!ELEMENTS.patternContainer) return;
+          
+          try {
+            const viewportHeight = window.innerHeight;
+            const lineHeight = 40;
+            const numberOfLines = Math.ceil(viewportHeight / lineHeight) + 1;
+            
+            ELEMENTS.patternContainer.innerHTML = '';
+            
+            for (let i = 0; i < numberOfLines; i++) {
+              const line = document.createElement('div');
+              line.className = 'pattern-line';
+              line.style.top = (i * lineHeight) + 'px';
+              line.style.willChange = 'transform';
+              line.style.transform = 'translateZ(0)';
+              ELEMENTS.patternContainer.appendChild(line);
+            }
+          } catch (error) {
+            console.warn('Failed to generate pattern lines:', error);
+            // Continue without pattern if it fails
+          }
+        },
+
+        setupResizeHandler() {
+          window.addEventListener('resize', () => {
+            this.generatePatternLines();
+          });
+        },
+
+        show(text = 'Loading Songs...') {
+          if (ELEMENTS.loadingScreen) {
+            // Clear any pending hide timeouts
+            this.clearHideTimeouts();
+            
+            // Set navigation mode if this is a lyrics loading request
+            if (text.includes('lyrics') || text.includes('Lyrics')) {
+              this.navigationMode = true;
+            } else {
+              this.navigationMode = false;
+            }
+            
+            ELEMENTS.loadingScreen.classList.remove('fade-out');
+            ELEMENTS.loadingScreen.style.display = 'flex';
+            ELEMENTS.loadingScreen.style.opacity = '1';
+            ELEMENTS.loadingScreen.style.visibility = 'visible';
+            ELEMENTS.loadingScreen.style.pointerEvents = 'auto';
+            ELEMENTS.loadingScreen.style.transition = 'none';
+            
+            // Reset any fade-out classes
+            if (ELEMENTS.loadingLogo) {
+              ELEMENTS.loadingLogo.classList.remove('fade-out');
+            }
+            if (ELEMENTS.loadingProgress) {
+              ELEMENTS.loadingProgress.classList.remove('fade-out');
+              ELEMENTS.loadingProgress.textContent = text;
+            }
+            if (ELEMENTS.patternContainer) {
+              ELEMENTS.patternContainer.classList.remove('fade-out');
+            }
+          }
+        },
+
+        clearHideTimeouts() {
+          if (this.hideTimeout1) {
+            clearTimeout(this.hideTimeout1);
+            this.hideTimeout1 = null;
+          }
+          if (this.hideTimeout2) {
+            clearTimeout(this.hideTimeout2);
+            this.hideTimeout2 = null;
+          }
+          if (this.hideTimeout3) {
+            clearTimeout(this.hideTimeout3);
+            this.hideTimeout3 = null;
+          }
+        },
+
+        hide() {
+          if (!ELEMENTS.loadingScreen) return;
+          
+          // Check if loading screen is in navigation mode (should not be hidden by songlist)
+          if (this.navigationMode) {
+            console.log('🛡️ Loading screen in navigation mode - ignoring hide request');
+            return;
+          }
+
+          console.log('⬇️ Hiding loading screen');
+          
+          // Clear any existing timeouts first
+          this.clearHideTimeouts();
+
+          // Start enlarging animation
+          ELEMENTS.loadingScreen.classList.add('fade-out');
+          ELEMENTS.loadingScreen.style.transition = 'none';
+          ELEMENTS.loadingScreen.style.opacity = '1';
+
+          // Start fade out immediately (reduced delay)
+          this.hideTimeout1 = setTimeout(() => {
+            ELEMENTS.loadingScreen.style.transition = 'opacity 0.3s ease-out';
+            
+            // Fade out logo and text
+            if (ELEMENTS.loadingLogo) {
+              ELEMENTS.loadingLogo.classList.add('fade-out');
+            }
+            if (ELEMENTS.loadingProgress) {
+              ELEMENTS.loadingProgress.classList.add('fade-out');
+            }
+            
+            // Fade out pattern container
+            if (ELEMENTS.patternContainer) {
+              ELEMENTS.patternContainer.classList.add('fade-out');
+            }
+            
+            // Fade out background (reduced delay)
+            this.hideTimeout2 = setTimeout(() => {
+              ELEMENTS.loadingScreen.style.opacity = '0';
+            }, 50);
+            
+            // Hide the loading screen completely (reduced delay)
+            this.hideTimeout3 = setTimeout(() => {
+              ELEMENTS.loadingScreen.style.display = 'none';
+              ELEMENTS.loadingScreen.classList.remove('fade-out');
+              if (ELEMENTS.loadingLogo) {
+                ELEMENTS.loadingLogo.classList.remove('fade-out');
+              }
+              if (ELEMENTS.loadingProgress) {
+                ELEMENTS.loadingProgress.classList.remove('fade-out');
+              }
+              if (ELEMENTS.patternContainer) {
+                ELEMENTS.patternContainer.classList.remove('fade-out');
+              }
+              
+              // Clear timeout references and navigation mode
+              this.hideTimeout1 = null;
+              this.hideTimeout2 = null;
+              this.hideTimeout3 = null;
+              this.navigationMode = false;
+            }, 400);
+          }, 50);
+        },
+        
+        forceHide() {
+          // Force hide even in navigation mode (for lyrics page completion)
+          this.navigationMode = false;
+          this.hide();
+        }
+      };
+
+      // Data Management Module
+      const DataManager = {
+        rhythmDB: null,
+        initPromise: null,
+
+        async initializeFirebase() {
+          // Return existing promise if already initializing
+          if (this.initPromise) {
+            return await this.initPromise;
+          }
+
+          // Return true if already initialized (silently)
+          if (this.rhythmDB) {
+            return true;
+          }
+
+          // Create initialization promise
+          this.initPromise = this._doInitialize();
+          const result = await this.initPromise;
+          this.initPromise = null; // Clear promise after completion
+          return result;
+        },
+
+        async _doInitialize() {
+          try {
+            console.log('🔥 Initializing Firebase...');
+            const module = await import('./firebase-db.js');
+            this.rhythmDB = new module.RhythmFirebaseDB();
+            // Make Firebase globally available for compatibility
+            window.rhythmDB = this.rhythmDB;
+            console.log('✅ Firebase initialized successfully');
+            return true;
+          } catch (error) {
+            console.error('❌ Failed to initialize Firebase:', error);
+            return false;
+          }
+        },
+
+        async getSongsFromFirebase() {
+          try {
+            // Firebase should already be initialized by app startup
+            if (!this.rhythmDB) {
+              console.warn('Firebase not ready, something went wrong with initialization');
+              return [];
+            }
+            
+            // Get optimized metadata for songlist display
+            const songsObject = await this.rhythmDB.getSongsMetadata();
+            const songs = [];
+            
+            // Convert Firebase songs metadata efficiently
+            Object.entries(songsObject).forEach(([songName, song]) => {
+              if (song?.name && song?.genre && song?.hasLyrics) {
+                songs.push({
+                  id: song.name,
+                  timestamp: song.lastModified || song.dateAdded || Date.now(),
+                  name: song.name,
+                  genre: song.genre,
+                  lyrics: 'loaded_on_demand' // Performance placeholder
+                });
+              }
+            });
+            
+            // Sort by name
+            songs.sort((a, b) => a.name.localeCompare(b.name));
+            
+            console.log(`🎵 Loaded ${songs.length} songs`);
+            return songs;
+            
+          } catch (error) {
+            console.error('Error loading from Firebase:', error);
+            throw error; // Don't fallback, just throw the error
+          }
+        },
+        async loadSongsData() {
+          if (!STATE.isAuthenticated) {
+            console.warn('PIN not authenticated - blocking song data load');
+            return;
+          }
+
+          try {
+            const [firebaseSongs] = await Promise.all([
+              this.getSongsFromFirebase(),
+              this.loadLatestShowlist()
+            ]);
+            
+            STATE.songs = firebaseSongs;
+            window.songs = firebaseSongs;
+            
+            // Initialize UI immediately
+            UI.initializeSongList();
+          } catch (error) {
+            console.error('Failed to load songs data:', error);
+            STATE.songs = [];
+            window.songs = [];
+            STATE.currentShowList = [];
+            
+            // Initialize with empty data
+            UI.initializeSongList();
+          }
+        },
+
+        async loadLatestShowlist() {
+          try {
+            if (!this.rhythmDB) {
+              STATE.currentShowList = [];
+              return;
+            }
+            
+            // Get the current showlist from Firebase
+            const showlist = await this.rhythmDB.getShowListNames();
+            
+            if (showlist && Array.isArray(showlist) && showlist.length > 0) {
+              STATE.currentShowList = showlist
+                .map(song => song.trim())
+                .filter(song => song);
+              window.currentShowList = STATE.currentShowList;
+              console.log(`📋 Loaded showlist: ${STATE.currentShowList.length} songs`);
+            } else {
+              STATE.currentShowList = [];
+              if (STATE.currentGenreFilter === 'showlist') {
+                STATE.currentGenreFilter = 'all';
+                localStorage.setItem('songListFilter', STATE.currentGenreFilter);
+              }
+            }
+            
+          } catch (error) {
+            console.error('Failed to load showlist:', error);
+            STATE.currentShowList = [];
+            if (STATE.currentGenreFilter === 'showlist') {
+              STATE.currentGenreFilter = 'all';
+              localStorage.setItem('songListFilter', STATE.currentGenreFilter);
+            }
+          }
+        }
+      };
+      // UI Management Module
+      const UI = {
+        init() {
+          this.cacheElements();
+          this.setupEventListeners();
+        },
+
+        cacheElements() {
+          ELEMENTS.songList = document.getElementById('song-list');
+          ELEMENTS.searchBox = document.getElementById('search-box');
+          ELEMENTS.filterBtn = document.getElementById('filter-btn');
+          ELEMENTS.filterDropdown = document.querySelector('.filter-dropdown');
+          ELEMENTS.filterContent = document.getElementById('filter-content');
+          
+          // Cache loading screen elements for immediate access
+          this.loadingScreenElement = document.getElementById('loading-screen');
+          this.loadingProgressElement = document.getElementById('loading-progress');
+        },
+
+        setupEventListeners() {
+          // Filter dropdown
+          ELEMENTS.filterBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            ELEMENTS.filterContent.classList.toggle('show');
+          });
+          
+          // Close dropdown when clicking outside
+          document.addEventListener('click', () => {
+            ELEMENTS.filterContent.classList.remove('show');
+          });
+          
+          // Prevent dropdown from closing when clicking inside
+          ELEMENTS.filterContent.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+          
+          // Optimized search with debouncing
+          const debouncedSearch = Utils.debounce((value) => {
+            this.renderList(value, STATE.currentGenreFilter);
+          }, CONFIG.SEARCH_DEBOUNCE);
+          
+          ELEMENTS.searchBox.addEventListener('input', (e) => {
+            debouncedSearch(e.target.value);
+          });
+          
+          // Auto-focus search box when typing
+          document.addEventListener('keydown', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.key.match(/[a-zA-Z0-9]/)) {
+              ELEMENTS.searchBox.focus();
+            }
+          });
+        },
+
+        initializeSongList() {
+          // Restore saved filter state
+          const savedFilter = localStorage.getItem('songListFilter');
+          if (savedFilter) {
+            STATE.currentGenreFilter = savedFilter;
+          }
+          
+          this.updateFilterDropdown();
+          this.renderList('', STATE.currentGenreFilter);
+          
+          // Set initial filter button state
+          const filterBtn = ELEMENTS.filterBtn;
+          if (STATE.currentGenreFilter !== 'all') {
+            filterBtn.style.background = 'var(--active-color)';
+            filterBtn.style.transform = 'scale(1.05)';
+          }
+          
+          // Restore scroll position if returning from lyrics page
+          const savedScrollPosition = localStorage.getItem('songListScrollPosition');
+          if (savedScrollPosition) {
+            setTimeout(() => {
+              window.scrollTo(0, parseInt(savedScrollPosition));
+              localStorage.removeItem('songListScrollPosition');
+            }, 100);
+          }
+        },
+
+        updateFilterDropdown() {
+          if (!STATE.songs || STATE.songs.length === 0) {
+            ELEMENTS.filterContent.innerHTML = '<a data-filter="all">All (0)</a>';
+            return;
+          }
+          
+          // Count songs by genre dynamically
+          const genreCounts = {
+            all: STATE.songs.length,
+            showlist: 0
+          };
+          
+          // Dynamically count all genres in the database
+          STATE.songs.forEach(song => {
+            if (song.genre && song.genre.trim()) {
+              if (!genreCounts.hasOwnProperty(song.genre)) {
+                genreCounts[song.genre] = 0;
+              }
+              genreCounts[song.genre]++;
+            }
+          });
+
+          // Count showlist songs
+          if (STATE.currentShowList && STATE.currentShowList.length > 0) {
+            genreCounts.showlist = STATE.currentShowList.length;
+          }
+          
+          // Build dropdown content with data attributes
+          let dropdownContent = `<a data-filter="all" ${STATE.currentGenreFilter === 'all' ? 'class="active"' : ''}>All (${genreCounts.all})</a>`;
+          
+          // Only add showlist option if there's an active showlist
+          if (STATE.currentShowList && STATE.currentShowList.length > 0) {
+            dropdownContent += `<a data-filter="showlist" ${STATE.currentGenreFilter === 'showlist' ? 'class="active"' : ''}>Show List (${genreCounts.showlist})</a>`;
+          }
+          
+          // Add all genres dynamically (excluding 'all' and 'showlist')
+          Object.keys(genreCounts)
+            .filter(genre => genre !== 'all' && genre !== 'showlist')
+            .sort() // Sort genres alphabetically
+            .forEach(genre => {
+              dropdownContent += `<a data-filter="${genre}" ${STATE.currentGenreFilter === genre ? 'class="active"' : ''}>${genre} (${genreCounts[genre]})</a>`;
+            });
+          
+          ELEMENTS.filterContent.innerHTML = dropdownContent;
+          
+          // Add click event listeners to filter options
+          ELEMENTS.filterContent.querySelectorAll('a[data-filter]').forEach(link => {
+            link.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              const filter = e.target.getAttribute('data-filter');
+              this.setFilter(filter);
+            });
+          });
+        },
+
+        renderList(searchFilter = '', genreFilter = 'all') {
+          ELEMENTS.songList.innerHTML = '';
+          
+          if (!STATE.songs || STATE.songs.length === 0) {
+            this.showMessage('No songs available', '#999');
+            return;
+          }
+          
+          // Filter songs with optimized search
+          const searchLower = searchFilter.toLowerCase();
+          const filteredSongs = STATE.songs
+            .filter(song => {
+              const matchesSearch = !searchFilter || song.name.toLowerCase().includes(searchLower);
+              let matchesGenre;
+              
+              if (genreFilter === 'showlist') {
+                matchesGenre = STATE.currentShowList && STATE.currentShowList.includes(song.name);
+              } else {
+                matchesGenre = genreFilter === 'all' || song.genre === genreFilter;
+              }
+              
+              return matchesSearch && matchesGenre;
+            })
+            .sort((a, b) => a.name.localeCompare(b.name));
+          
+          if (filteredSongs.length === 0) {
+            this.showMessage('No songs match your search', '#999');
+            return;
+          }
+
+          // Render songs with chunked rendering for smooth scrolling
+          this.renderSongsChunked(filteredSongs);
+        },
+
+        renderSongsChunked(songs) {
+          // Clear existing content
+          ELEMENTS.songList.innerHTML = '';
+          
+          // Render in chunks to prevent blocking and ensure smooth scrolling
+          const CHUNK_SIZE = 20; // Render 20 songs at a time
+          let currentIndex = 0;
+          
+          const renderChunk = () => {
+            const chunk = songs.slice(currentIndex, currentIndex + CHUNK_SIZE);
+            const fragment = document.createDocumentFragment();
+            
+            chunk.forEach(song => {
+              const li = this.createSongElement(song);
+              fragment.appendChild(li);
+            });
+            
+            ELEMENTS.songList.appendChild(fragment);
+            currentIndex += CHUNK_SIZE;
+            
+            // Continue rendering if there are more songs
+            if (currentIndex < songs.length) {
+              // Use requestAnimationFrame for smooth rendering
+              requestAnimationFrame(renderChunk);
+            }
+          };
+          
+          // Start rendering
+          renderChunk();
+        },
+
+        createSongElement(song) {
+          const li = document.createElement('li');
+          li.textContent = song.name;
+          li.style.color = '#f5d467';
+          li.style.transition = 'all 0.1s ease';
+          li.style.padding = '15px'; // Make it easier to click
+          li.style.margin = '5px 0';
+          li.style.border = '2px solid transparent';
+          li.style.cursor = 'pointer'; // Show it's clickable
+          
+          // Set data attributes for navigation
+          li.dataset.songId = song.id;
+          
+          // Add hover effect for better feedback
+          li.addEventListener('mouseenter', () => {
+            li.style.border = '2px solid #f5d467';
+            li.style.backgroundColor = 'rgba(245, 212, 103, 0.1)';
+          });
+          
+          li.addEventListener('mouseleave', () => {
+            li.style.border = '2px solid transparent';
+            li.style.backgroundColor = '';
+          });
+          
+          // Simplified click handler for debugging
+          li.addEventListener('click', (e) => {
+            console.log('🎵 CLICK EVENT FIRED! Song clicked:', song.name, 'ID:', song.id);
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Immediate visual feedback
+            li.style.backgroundColor = '#ff0000';
+            
+            // Handle the click
+            this.handleSongClick(song);
+          });
+          
+          return li;
+        },
+
+        handleSongClick(song) {
+          console.log('🎵 handleSongClick called for:', song.name, 'ID:', song.id);
+          
+          // Prevent multiple rapid clicks
+          if (this.navigating) {
+            console.log('Already navigating, ignoring click');
+            return;
+          }
+          this.navigating = true;
+          
+          // Save song selection data
+          localStorage.setItem('selectedSongId', song.id);
+          sessionStorage.setItem('navigationInProgress', 'true');
+          console.log('Saved selectedSongId:', song.id);
+          
+          // Force direct navigation (bypass page transition for now)
+          console.log('🎵 Forcing direct navigation to lyrics.html');
+          
+          try {
+            window.location.href = 'lyrics.html';
+          } catch (error) {
+            console.error('Navigation failed:', error);
+            this.navigating = false;
+          }
+        },
+        
+        clearAllActiveSongs() {
+          const allSongs = document.querySelectorAll('ul#song-list li');
+          allSongs.forEach(songElement => {
+            songElement.style.background = '';
+            songElement.style.color = '';
+            songElement.style.transform = '';
+            songElement.classList.remove('active');
+            songElement.removeAttribute('data-active');
+            songElement.removeAttribute('data-navigating');
+          });
+        },
+
+        showMessage(message, color = '#999') {
+          const li = document.createElement('li');
+          li.textContent = message;
+          li.style.color = color;
+          li.style.cursor = 'default';
+          ELEMENTS.songList.appendChild(li);
+        },
+
+        setFilter(genre) {
+          STATE.currentGenreFilter = genre;
+          localStorage.setItem('songListFilter', genre);
+          ELEMENTS.filterContent.classList.remove('show');
+          this.updateFilterDropdown(); // Update the dropdown to show active state
+          this.renderList(ELEMENTS.searchBox.value, STATE.currentGenreFilter);
+          
+          // Update filter button to show active state
+          const filterBtn = ELEMENTS.filterBtn;
+          if (genre !== 'all') {
+            filterBtn.style.background = 'var(--active-color)';
+            filterBtn.style.transform = 'scale(1.05)';
+          } else {
+            filterBtn.style.background = 'var(--primary-color)';
+            filterBtn.style.transform = 'scale(1)';
+          }
+        }
+      };
+
+      // Main Application Object
+      const App = {
+        async init() {
+          document.addEventListener('DOMContentLoaded', async () => {
+            try {
+              console.log('Starting app initialization...');
+              
+              // Initialize login authentication for songlist access (non-blocking)
+              if (window.RhythmAuth) {
+                window.rhythmAuth = new RhythmAuth();
+                console.log('RhythmAuth initialized');
+              } else {
+                console.log('RhythmAuth not available, falling back to basic auth');
+              }
+
+              // Firebase should already be initializing from immediate script execution
+              // Just ensure it's ready before proceeding
+              // Wait for Firebase initialization (silent if already initialized)
+              await DataManager.initializeFirebase();
+
+              // Initialize components without PIN
+              UI.init();
+
+              // Load the song data
+              await this.loadData();
+
+              STATE.isInitialized = true;
+              console.log('App initialization complete');
+            } catch (error) {
+              console.error('Failed to initialize app:', error);
+              console.warn('Initialization failed:', error.message);
+            }
+          });
+        },
+
+        async waitForServices() {
+          return new Promise((resolve) => {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds max wait
+            
+            const checkServices = () => {
+              attempts++;
+              
+              if (window.RhythmSession && window.RhythmData && window.RhythmPageTransition) {
+                resolve();
+              } else if (attempts >= maxAttempts) {
+                // Continue anyway for fallback functionality
+                resolve();
+              } else {
+                setTimeout(checkServices, 100);
+              }
+            };
+            checkServices();
+          });
+        },
+
+        async loadData() {
+          try {
+            console.log('Starting loadData...');
+            
+            // Check authentication from multiple sources
+            let isAuthenticated = false;
+            
+            // Method 1: Check localStorage for approval data
+            const approvalData = localStorage.getItem('rhythmAuth_approval');
+            if (approvalData) {
+              try {
+                const approval = JSON.parse(approvalData);
+                if (approval.approved && approval.permissions && approval.permissions.includes('songlist')) {
+                  isAuthenticated = true;
+                  console.log('Authentication: Approved via localStorage');
+                }
+              } catch (e) {
+                console.log('Error parsing approval data:', e);
+              }
+            }
+            
+            // Method 2: Check RhythmAuth if available
+            if (!isAuthenticated && window.RhythmAuth && window.rhythmAuth) {
+              try {
+                isAuthenticated = window.rhythmAuth.hasPermission('songlist');
+                console.log('Authentication: RhythmAuth permission result:', isAuthenticated);
+              } catch (e) {
+                console.log('RhythmAuth permission check failed:', e.message);
+              }
+            }
+            
+            // Method 3: Check default state as fallback
+            if (!isAuthenticated) {
+              isAuthenticated = STATE.isAuthenticated;
+              console.log('Authentication: Using default state:', isAuthenticated);
+            }
+            
+            // Debug: Show all auth info
+            console.log('Final authentication result:', isAuthenticated);
+            console.log('localStorage approval:', localStorage.getItem('rhythmAuth_approval'));
+            console.log('RhythmAuth available:', !!window.RhythmAuth);
+            
+            // TEMPORARY: Allow access for debugging
+            if (!isAuthenticated) {
+              console.log('Authentication failed, but allowing access for debugging');
+              console.log('You can remove this temporary override once auth is working');
+              isAuthenticated = true; // Temporary override
+            }
+            
+            if (!isAuthenticated) {
+              console.log('Not authenticated for songlist access');
+              // For now, let's show a message instead of redirecting
+              document.body.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif;">
+                  <h2>Authentication Required</h2>
+                  <p>You need to be logged in to access the songlist.</p>
+                  <a href="login.html" style="padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 5px; margin: 10px;">Go to Login</a>
+                </div>
+              `;
+              return;
+            }
+
+            // Wait for shared services
+            await this.waitForServices();
+            
+            // Update global state with authentication result
+            STATE.isAuthenticated = isAuthenticated;
+
+            // Check if this is a fresh page load
+            const isFreshLoad = !sessionStorage.getItem('navigationInProgress') && 
+                               !localStorage.getItem('songListScrollPosition');
+            
+            // Clear navigation flag if it exists
+            sessionStorage.removeItem('navigationInProgress');
+
+            // Load songs data from Firebase
+            DataManager.loadSongsData();
+          } catch (error) {
+            console.error('Failed to load songs:', error);
+            console.warn('Failed to load songs data');
+          }
+        },
+
+        setFilter(genre) {
+          UI.setFilter(genre);
+        }
+      };
+
+      // Global API for backward compatibility
+      window.setFilter = App.setFilter.bind(App);
+      window.songs = STATE.songs;
+      window.currentShowList = STATE.currentShowList;
+
+      // Initialize Firebase immediately for fastest startup
+      DataManager.initializeFirebase().catch(() => {
+        // Silent fail - app init will retry if needed
+      });
+
+      // Initialize the application
+      App.init();
+
+      return App;
+    })();
+  </script>
+</body>
+</html>
+
