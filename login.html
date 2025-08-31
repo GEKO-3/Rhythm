@@ -6,6 +6,29 @@
     <title>Rhythm Boduberu - Login</title>
     <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
     <style>
+        :root {
+          --primary-color: #f5d000;
+          --hover-color: #fced98;
+          --active-color: #E6B800;
+          --text-color: #2b2b2b;
+          --bg-color: #1f1f1f;
+          --card-bg: rgba(43, 43, 43, 0.7);
+          --border-color: #444;
+          --error-color: #ff6b6b;
+          --success-color: #4caf50;
+          --font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+          --border-radius: 5px;
+          --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        @font-face {
+          font-family: 'Montserrat';
+          src: url('assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+          font-display: swap;
+          font-weight: 100 900;
+          font-style: normal;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,22 +36,21 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
+            color: var(--primary-color);
         }
 
         .login-container {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
+            background: var(--card-bg);
+            border-radius: 10px;
             padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(245, 208, 0, 0.2);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
             max-width: 400px;
             width: 90%;
         }
@@ -39,13 +61,14 @@
         }
 
         .logo h1 {
-            color: #f5d000;
+            color: var(--primary-color);
             font-size: 2rem;
             margin-bottom: 10px;
+            font-weight: 600;
         }
 
         .logo p {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(245, 208, 0, 0.7);
             font-size: 0.9rem;
         }
 
@@ -56,48 +79,83 @@
         label {
             display: block;
             margin-bottom: 8px;
-            color: rgba(255, 255, 255, 0.8);
+            color: var(--primary-color);
             font-weight: 500;
         }
 
-        input[type="text"], input[type="tel"] {
+        input[type="text"] {
             width: 100%;
             padding: 12px 15px;
-            border: 2px solid rgba(245, 208, 0, 0.3);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: #222;
+            color: var(--primary-color);
             font-size: 1rem;
+            font-family: var(--font-family);
             transition: all 0.3s ease;
         }
 
-        input[type="text"]:focus, input[type="tel"]:focus {
+        input[type="text"]:focus {
             outline: none;
-            border-color: #f5d000;
-            background: rgba(255, 255, 255, 0.2);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
+        }
+
+        .pin-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .pin-input {
+            width: 50px !important;
+            height: 50px;
+            text-align: center;
+            font-size: 1.5rem !important;
+            font-weight: 600;
+            padding: 0 !important;
+            border: 2px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            background: #222 !important;
+            color: var(--primary-color) !important;
+            transition: all 0.3s ease;
+        }
+
+        .pin-input:focus {
+            border-color: var(--primary-color) !important;
+            box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2) !important;
+            transform: scale(1.05);
+        }
+
+        .pin-input:valid {
+            border-color: var(--primary-color);
+            background: rgba(245, 208, 0, 0.1) !important;
         }
 
         input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
+            color: #999;
         }
 
         .submit-btn {
             width: 100%;
             padding: 12px;
-            background: linear-gradient(45deg, #f5d000, #ffd700);
-            color: #1a1a2e;
+            background: var(--primary-color);
+            color: var(--text-color);
             border: none;
-            border-radius: 10px;
+            border-radius: var(--border-radius);
             font-size: 1.1rem;
             font-weight: 600;
+            font-family: var(--font-family);
             cursor: pointer;
             transition: all 0.3s ease;
             margin-top: 20px;
         }
 
         .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(245, 208, 0, 0.3);
+            background: var(--hover-color);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(245, 208, 0, 0.3);
         }
 
         .submit-btn:disabled {
@@ -108,59 +166,23 @@
 
         .message {
             margin-top: 15px;
-            padding: 10px;
-            border-radius: 8px;
+            padding: 12px;
+            border-radius: var(--border-radius);
             text-align: center;
             font-weight: 500;
+            font-family: var(--font-family);
         }
 
         .message.success {
-            background: rgba(76, 175, 80, 0.2);
+            background: rgba(76, 175, 80, 0.1);
             border: 1px solid rgba(76, 175, 80, 0.3);
-            color: #4caf50;
+            color: var(--success-color);
         }
 
         .message.error {
-            background: rgba(244, 67, 54, 0.2);
-            border: 1px solid rgba(244, 67, 54, 0.3);
-            color: #f44336;
-        }
-
-        .admin-link {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .admin-link a {
-            color: rgba(245, 208, 0, 0.8);
-            text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
-        }
-
-        .admin-link a:hover {
-            color: #f5d000;
-        }
-
-        .access-info {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(245, 208, 0, 0.1);
-            border-radius: 8px;
-            border: 1px solid rgba(245, 208, 0, 0.2);
-        }
-
-        .access-info h3 {
-            color: #f5d000;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
-
-        .access-info ul {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.85rem;
-            list-style-position: inside;
-            line-height: 1.4;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            color: var(--error-color);
         }
     </style>
 </head>
@@ -178,8 +200,13 @@
             </div>
 
             <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input type="tel" id="phone" name="phone" required placeholder="+960 XXX-XXXX">
+                <label>Rhythm Index Number</label>
+                <div class="pin-container">
+                    <input type="text" class="pin-input" id="pin1" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="pin-input" id="pin2" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="pin-input" id="pin3" maxlength="1" pattern="[0-9]" required>
+                    <input type="text" class="pin-input" id="pin4" maxlength="1" pattern="[0-9]" required>
+                </div>
             </div>
 
             <button type="submit" class="submit-btn" id="submitBtn">
@@ -188,19 +215,6 @@
         </form>
 
         <div id="message" class="message" style="display: none;"></div>
-
-        <div class="access-info">
-            <h3>✨ Normal Access Includes:</h3>
-            <ul>
-                <li>🎵 Song List with search & filters</li>
-                <li>📝 Lyrics viewing and editing</li>
-                <li>🎶 Music player functionality</li>
-            </ul>
-        </div>
-
-        <div class="admin-link">
-            <a href="login-admin.html">Admin Dashboard</a>
-        </div>
     </div>
 
     <script type="module">
@@ -219,21 +233,396 @@
         };
 
         // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+        let app, database;
+        try {
+            console.log('Initializing Firebase...');
+            app = initializeApp(firebaseConfig);
+            database = getDatabase(app);
+            console.log('Firebase initialized successfully');
+            
+            // Test database connection with a simple read
+            setTimeout(async () => {
+                try {
+                    console.log('Testing database connection...');
+                    const testRef = ref(database, 'test');
+                    await get(testRef);
+                    console.log('Database connection successful');
+                } catch (error) {
+                    console.error('Database connection test failed:', error);
+                    console.error('This might be a network or CORS issue');
+                }
+            }, 500);
+            
+        } catch (error) {
+            console.error('Firebase initialization failed:', error);
+        }
 
         const form = document.getElementById('loginForm');
         const submitBtn = document.getElementById('submitBtn');
         const messageDiv = document.getElementById('message');
 
+        // PIN input auto-advance functionality
+        const pinInputs = document.querySelectorAll('.pin-input');
+        
+        pinInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                const value = e.target.value;
+                
+                // Only allow digits
+                if (!/^\d$/.test(value)) {
+                    e.target.value = '';
+                    return;
+                }
+                
+                // Auto-advance to next input
+                if (value && index < pinInputs.length - 1) {
+                    pinInputs[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                // Handle backspace to go to previous input
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    pinInputs[index - 1].focus();
+                }
+                
+                // Handle arrow keys
+                if (e.key === 'ArrowLeft' && index > 0) {
+                    pinInputs[index - 1].focus();
+                }
+                if (e.key === 'ArrowRight' && index < pinInputs.length - 1) {
+                    pinInputs[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const paste = e.clipboardData.getData('text');
+                const digits = paste.replace(/\D/g, '').substring(0, 4);
+                
+                digits.split('').forEach((digit, i) => {
+                    if (pinInputs[i]) {
+                        pinInputs[i].value = digit;
+                    }
+                });
+                
+                // Focus the next empty input or the last one
+                const nextEmpty = Array.from(pinInputs).findIndex(input => !input.value);
+                if (nextEmpty !== -1) {
+                    pinInputs[nextEmpty].focus();
+                } else {
+                    pinInputs[pinInputs.length - 1].focus();
+                }
+            });
+        });
+
+        // Check for existing requests/approvals on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('DOM loaded, waiting for Firebase initialization...');
+            
+            // Wait for Firebase to be fully initialized
+            let attempts = 0;
+            while (!database && attempts < 10) {
+                console.log(`Waiting for Firebase... attempt ${attempts + 1}`);
+                await new Promise(resolve => setTimeout(resolve, 200));
+                attempts++;
+            }
+            
+            if (!database) {
+                console.error('Firebase failed to initialize after 2 seconds');
+                showMessage('Connection error. Please refresh the page.', 'error');
+                return;
+            }
+            
+            console.log('Firebase ready, checking status...');
+            await checkExistingStatus();
+            
+            // If no existing approval found, try to find it in the database
+            const existingApproval = localStorage.getItem('rhythmAuth_approval');
+            const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
+            
+            if (!existingApproval && !pendingRequest) {
+                console.log('No localStorage data found, searching database...');
+                await searchDatabaseForDevice();
+            }
+        });
+
+        async function checkExistingStatus() {
+            console.log('Checking existing status...');
+            const deviceId = getDeviceId();
+            console.log('Device ID:', deviceId);
+            
+            // Check if already approved
+            const existingApproval = localStorage.getItem('rhythmAuth_approval');
+            console.log('Existing approval:', existingApproval);
+            if (existingApproval) {
+                try {
+                    const approval = JSON.parse(existingApproval);
+                    if (approval.status === 'active') {
+                        // Verify approval is still valid on server
+                        console.log('Verifying approval for:', approval.accessCode);
+                        const isStillValid = await verifyApprovalStatus(approval.accessCode, deviceId);
+                        console.log('Approval still valid:', isStillValid);
+                        if (isStillValid) {
+                            showMessage('Already approved! Redirecting...', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'pages/songlist.html';
+                            }, 1500);
+                            return;
+                        } else {
+                            // Access was revoked
+                            localStorage.removeItem('rhythmAuth_approval');
+                            showMessage('Access was revoked. Please submit a new request.', 'error');
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error parsing approval:', e);
+                    localStorage.removeItem('rhythmAuth_approval');
+                }
+            }
+
+            // Check for pending request
+            const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
+            console.log('Pending request:', pendingRequest);
+            if (pendingRequest) {
+                try {
+                    const request = JSON.parse(pendingRequest);
+                    console.log('Checking request status for:', request.accessCode);
+                    // Check if request was approved since last check
+                    const approvalStatus = await checkRequestStatus(request.accessCode, deviceId);
+                    console.log('Request status:', approvalStatus);
+                    
+                    if (approvalStatus === 'approved') {
+                        // Request was approved!
+                        const approvedData = await getApprovedData(request.accessCode, deviceId);
+                        console.log('Approved data:', approvedData);
+                        if (approvedData) {
+                            localStorage.setItem('rhythmAuth_approval', JSON.stringify(approvedData));
+                            localStorage.removeItem('rhythmAuth_pendingRequest');
+                            showMessage('Your request was approved! Redirecting...', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'pages/songlist.html';
+                            }, 1500);
+                            return;
+                        }
+                    } else if (approvalStatus === 'rejected') {
+                        // Request was rejected
+                        localStorage.removeItem('rhythmAuth_pendingRequest');
+                        showMessage('Your request was rejected. You can submit a new request.', 'error');
+                    } else if (approvalStatus === 'pending') {
+                        // Still pending
+                        showMessage('Your request is still pending approval. Please wait...', 'success');
+                        disableForm();
+                    }
+                } catch (e) {
+                    console.error('Error checking pending request:', e);
+                    localStorage.removeItem('rhythmAuth_pendingRequest');
+                }
+            }
+            console.log('Status check complete');
+        }
+
+        async function searchDatabaseForDevice() {
+            // First try to restore known device
+            const deviceId = restoreKnownDevice();
+            console.log('Searching database for device:', deviceId);
+            
+            try {
+                // Search all approved users for this device ID
+                const approvedRef = ref(database, 'approvedUsers');
+                const snapshot = await get(approvedRef);
+                
+                if (snapshot.exists()) {
+                    const allUsers = snapshot.val();
+                    console.log('All approved users:', allUsers);
+                    
+                    // Find user with matching device ID
+                    for (const [accessCode, userData] of Object.entries(allUsers)) {
+                        if (userData.deviceId === deviceId && userData.status === 'active') {
+                            console.log('Found matching device for access code:', accessCode, userData);
+                            
+                            // Restore approval to localStorage
+                            const approvalData = {
+                                accessCode: accessCode,
+                                approvedAt: userData.approvedAt,
+                                approvedBy: userData.approvedBy,
+                                deviceId: deviceId,
+                                fullName: userData.fullName,
+                                lastActive: Date.now(),
+                                permissions: userData.permissions || ['songlist', 'lyrics'],
+                                role: userData.role || 'user',
+                                status: 'active'
+                            };
+                            
+                            localStorage.setItem('rhythmAuth_approval', JSON.stringify(approvalData));
+                            console.log('Restored approval data:', approvalData);
+                            
+                            showMessage('Welcome back! Your session has been restored. Redirecting...', 'success');
+                            setTimeout(() => {
+                                window.location.href = 'pages/songlist.html';
+                            }, 2000);
+                            return;
+                        }
+                    }
+                    
+                    console.log('No matching device found in approved users');
+                    showMessage('No existing approval found for this device. Please submit a new request.', 'error');
+                } else {
+                    console.log('No approved users found in database');
+                }
+            } catch (error) {
+                console.error('Error searching database:', error);
+            }
+        }
+
+        async function verifyApprovalStatus(accessCode, deviceId) {
+            console.log('Verifying approval status:', { accessCode, deviceId });
+            try {
+                if (!database) {
+                    console.error('Database not initialized');
+                    return false;
+                }
+                
+                const approvedRef = ref(database, `approvedUsers/${accessCode}`);
+                console.log('Firebase ref created:', approvedRef);
+                
+                const snapshot = await get(approvedRef);
+                console.log('Firebase snapshot received:', snapshot.exists(), snapshot.val());
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const isValid = userData.deviceId === deviceId && userData.status === 'active';
+                    console.log('Approval validation:', { userData, isValid });
+                    return isValid;
+                }
+                console.log('No approval data found');
+                return false;
+            } catch (error) {
+                console.error('Error verifying approval:', error);
+                console.error('Error details:', error.message, error.code);
+                return false;
+            }
+        }
+
+        async function checkRequestStatus(accessCode, deviceId) {
+            console.log('Checking request status:', { accessCode, deviceId });
+            try {
+                if (!database) {
+                    console.error('Database not initialized for request check');
+                    return 'error';
+                }
+
+                // Check approved users first
+                console.log('Checking approved users...');
+                const approvedRef = ref(database, `approvedUsers/${accessCode}`);
+                const approvedSnapshot = await get(approvedRef);
+                
+                if (approvedSnapshot.exists()) {
+                    const userData = approvedSnapshot.val();
+                    console.log('Found approved user data:', userData);
+                    if (userData.deviceId === deviceId) {
+                        const status = userData.status === 'active' ? 'approved' : 'revoked';
+                        console.log('User status:', status);
+                        return status;
+                    }
+                }
+
+                // Check rejected requests
+                console.log('Checking rejected requests...');
+                const rejectedRef = ref(database, `rejectedLogins/${accessCode}_${deviceId}`);
+                const rejectedSnapshot = await get(rejectedRef);
+                
+                if (rejectedSnapshot.exists()) {
+                    console.log('Request was rejected');
+                    return 'rejected';
+                }
+
+                // Check pending requests
+                console.log('Checking pending requests...');
+                const requestRef = ref(database, `loginRequests/${accessCode}_${deviceId}`);
+                const requestSnapshot = await get(requestRef);
+                
+                if (requestSnapshot.exists()) {
+                    console.log('Request is still pending');
+                    return 'pending';
+                }
+
+                console.log('No request found');
+                return 'none';
+            } catch (error) {
+                console.error('Error checking request status:', error);
+                console.error('Error details:', error.message, error.code);
+                return 'error';
+            }
+        }
+
+        async function getApprovedData(accessCode, deviceId) {
+            try {
+                const approvedRef = ref(database, `approvedUsers/${accessCode}`);
+                const snapshot = await get(approvedRef);
+                
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    if (userData.deviceId === deviceId && userData.status === 'active') {
+                        return {
+                            accessCode: accessCode,
+                            approvedAt: userData.approvedAt || Date.now(),
+                            approvedBy: userData.approvedBy || 'admin',
+                            deviceId: deviceId,
+                            fullName: userData.fullName,
+                            lastActive: Date.now(),
+                            permissions: userData.permissions || ['songlist', 'lyrics'],
+                            status: 'active'
+                        };
+                    }
+                }
+                return null;
+            } catch (error) {
+                console.error('Error getting approved data:', error);
+                return null;
+            }
+        }
+
+        function disableForm() {
+            const nameInput = document.getElementById('name');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            nameInput.disabled = true;
+            pinInputs.forEach(input => input.disabled = true);
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Request Pending...';
+        }
+
+        function enableForm() {
+            const nameInput = document.getElementById('name');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            nameInput.disabled = false;
+            pinInputs.forEach(input => input.disabled = false);
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Request Access';
+        }
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const name = document.getElementById('name').value.trim();
-            const phone = document.getElementById('phone').value.trim();
+            const accessCode = Array.from(pinInputs).map(input => input.value).join('');
 
-            if (!name || !phone) {
+            if (!name || accessCode.length !== 4) {
                 showMessage('Please fill in all fields', 'error');
+                return;
+            }
+
+            if (!/^\d{4}$/.test(accessCode)) {
+                showMessage('Access code must be exactly 4 digits', 'error');
+                return;
+            }
+
+            // Check if there's already a pending request for this device
+            const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
+            if (pendingRequest) {
+                showMessage('You already have a pending request. Please wait for approval.', 'error');
                 return;
             }
 
@@ -241,67 +630,138 @@
             submitBtn.textContent = 'Submitting...';
 
             try {
+                // Generate device ID for this browser/device
+                const deviceId = getDeviceId();
+
                 // Check if user already has approval
-                const approvedRef = ref(database, `approvedUsers/${phone}`);
+                const approvedRef = ref(database, `approvedUsers/${accessCode}`);
                 const approvedSnapshot = await get(approvedRef);
 
                 if (approvedSnapshot.exists()) {
                     const userData = approvedSnapshot.val();
-                    // Store approval data
-                    localStorage.setItem('rhythmAuth_approval', JSON.stringify({
-                        approved: true,
-                        name: userData.name,
-                        phone: phone,
-                        permissions: ['songlist', 'lyrics'],
-                        approvedAt: userData.timestamp
-                    }));
-                    showMessage('Access approved! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'songlist.html';
-                    }, 1500);
-                    return;
+                    
+                    // Check if this specific device is approved
+                    if (userData.deviceId === deviceId && userData.status === 'active') {
+                        // Store approval data in correct format
+                        const approvalData = {
+                            accessCode: accessCode,
+                            approvedAt: userData.approvedAt || Date.now(),
+                            approvedBy: userData.approvedBy || 'admin',
+                            deviceId: deviceId,
+                            fullName: userData.fullName || name,
+                            lastActive: Date.now(),
+                            permissions: userData.permissions || ['songlist', 'lyrics'],
+                            status: 'active'
+                        };
+                        localStorage.setItem('rhythmAuth_approval', JSON.stringify(approvalData));
+                        showMessage('Access approved! Redirecting...', 'success');
+                        setTimeout(() => {
+                            window.location.href = 'pages/songlist.html';
+                        }, 1500);
+                        return;
+                    } else if (userData.deviceId === deviceId && userData.status === 'revoked') {
+                        showMessage('Your access has been revoked. Contact admin for more information.', 'error');
+                        return;
+                    } else if (userData.deviceId !== deviceId) {
+                        showMessage('This access code is registered to a different device.', 'error');
+                        return;
+                    }
                 }
 
                 // Check if user is rejected
-                const rejectedRef = ref(database, `rejectedLogins/${phone}`);
+                const rejectedRef = ref(database, `rejectedLogins/${accessCode}_${deviceId}`);
                 const rejectedSnapshot = await get(rejectedRef);
 
                 if (rejectedSnapshot.exists()) {
-                    showMessage('Your access request has been denied.', 'error');
+                    showMessage('Your previous request was rejected. Contact admin for more information.', 'error');
                     return;
                 }
 
                 // Check if user already has pending request
-                const requestRef = ref(database, `loginRequests/${phone}`);
+                const requestRef = ref(database, `loginRequests/${accessCode}_${deviceId}`);
                 const requestSnapshot = await get(requestRef);
 
                 if (requestSnapshot.exists()) {
+                    // Store pending request info locally
+                    const pendingData = {
+                        accessCode: accessCode,
+                        fullName: name,
+                        deviceId: deviceId,
+                        requestedAt: Date.now(),
+                        status: 'pending'
+                    };
+                    localStorage.setItem('rhythmAuth_pendingRequest', JSON.stringify(pendingData));
                     showMessage('Your request is already pending approval.', 'error');
+                    disableForm();
                     return;
                 }
 
                 // Submit new request
                 const requestData = {
-                    name: name,
-                    phone: phone,
-                    id: phone,
+                    accessCode: accessCode,
+                    fullName: name,
+                    deviceId: deviceId,
                     requestedAt: Date.now(),
-                    approved: false,
-                    rejected: false,
-                    permissions: ['songlist', 'lyrics']
+                    status: 'pending',
+                    permissions: ['songlist', 'lyrics'],
+                    deviceInfo: navigator.userAgent.substring(0, 100) // Limit length
                 };
 
                 await set(requestRef, requestData);
+                
+                // Store pending request info locally
+                const pendingData = {
+                    accessCode: accessCode,
+                    fullName: name,
+                    deviceId: deviceId,
+                    requestedAt: Date.now(),
+                    status: 'pending'
+                };
+                localStorage.setItem('rhythmAuth_pendingRequest', JSON.stringify(pendingData));
+                
                 showMessage('Request submitted successfully! Please wait for approval.', 'success');
+                disableForm();
 
             } catch (error) {
                 console.error('Error:', error);
                 showMessage('Failed to submit request. Please try again.', 'error');
+                enableForm();
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Request Access';
+                if (submitBtn.textContent === 'Submitting...') {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Request Access';
+                }
             }
         });
+
+        // Generate a consistent device ID for this browser
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('rhythmAuth_deviceId');
+            if (!deviceId) {
+                deviceId = 'dev_' + Math.random().toString(36).substr(2, 10);
+                localStorage.setItem('rhythmAuth_deviceId', deviceId);
+            }
+            return deviceId;
+        }
+
+        // Temporary function to restore your specific device ID
+        function restoreKnownDevice() {
+            const knownDeviceId = 'dev_6ws5hd07gw4';
+            const knownAccessCode = '0023';
+            
+            console.log('Checking for known device restoration...');
+            const existingApproval = localStorage.getItem('rhythmAuth_approval');
+            
+            if (!existingApproval) {
+                console.log('No existing approval, checking if this should be restored device:', knownDeviceId);
+                // Set the known device ID
+                localStorage.setItem('rhythmAuth_deviceId', knownDeviceId);
+                console.log('Device ID set to:', knownDeviceId);
+                return knownDeviceId;
+            }
+            
+            return getDeviceId();
+        }
 
         function showMessage(text, type) {
             messageDiv.textContent = text;

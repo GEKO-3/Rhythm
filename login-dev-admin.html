@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Admin Management - Rhythm Boduberu</title>
+    <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --text-color: #2b2b2b;
+            --bg-color: #0a0a0a;
+            --card-bg: rgba(43, 43, 43, 0.9);
+            --border-color: #444;
+            --error-color: #ff6b6b;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --font-family: 'Montserrat', Arial, sans-serif;
+            --border-radius: 10px;
+            --shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-Regular.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+        }
+
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('Fonts/Montserrat-SemiBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 600;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1a1a1a 50%, var(--bg-color) 100%);
+            min-height: 100vh;
+            color: var(--primary-color);
+            padding: 20px;
+        }
+
+        .dev-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 0 0 20px rgba(245, 208, 0, 0.3);
+        }
+
+        .header .subtitle {
+            color: rgba(245, 208, 0, 0.7);
+            font-size: 1.1rem;
+        }
+
+        .dev-warning {
+            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
+            border: 2px solid #ff4444;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(204, 0, 0, 0.3);
+        }
+
+        .dev-warning h3 {
+            color: #ffffff;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .dev-warning p {
+            color: #ffcccc;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-title {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            background: #222;
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-family: var(--font-family);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(245, 208, 0, 0.3);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: var(--font-family);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--text-color);
+        }
+
+        .btn-primary:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(245, 208, 0, 0.3);
+        }
+
+        .btn-danger {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e55555;
+            transform: translateY(-2px);
+        }
+
+        .message {
+            padding: 12px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        .message.success {
+            background: rgba(76, 175, 80, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .message.error {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        .admin-list {
+            margin-top: 20px;
+        }
+
+        .admin-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-info h4 {
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .admin-info p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success-color);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .status-admin {
+            background: rgba(245, 208, 0, 0.2);
+            color: var(--primary-color);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+        }
+
+        .status-user {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+            border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+
+        .status-revoked {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning-color);
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-link a {
+            color: rgba(245, 208, 0, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .back-link a:hover {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .dev-container {
+                padding: 0 10px;
+            }
+            
+            .admin-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dev-container">
+        <div class="header">
+            <h1>🔧 Dev Admin Management</h1>
+            <p class="subtitle">Create and manage admin accounts</p>
+        </div>
+
+        <div class="dev-warning">
+            <h3>⚠️ DEVELOPER ACCESS ONLY</h3>
+            <p>This page allows creation and management of admin accounts. Only authorized developers should access this panel.</p>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Promote User to Admin</h2>
+            <form id="promoteUserForm">
+                <div class="form-group">
+                    <label for="accessCode">User's 4-digit Access Code</label>
+                    <input type="number" id="accessCode" min="1000" max="9999" placeholder="Enter user's access code" required>
+                </div>
+                
+                <div id="promoteMessage" class="message"></div>
+                
+                <button type="submit" class="btn btn-primary">Promote to Admin</button>
+                <button type="button" id="demoteBtn" class="btn btn-danger" style="margin-left: 10px;">Demote from Admin</button>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">Current Users</h2>
+            <div id="usersList">
+                <div class="loading">Loading users...</div>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="login-admin-auth.html">← Back to Admin Login</a>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const promoteUserForm = document.getElementById('promoteUserForm');
+        const promoteMessage = document.getElementById('promoteMessage');
+        const demoteBtn = document.getElementById('demoteBtn');
+        const usersList = document.getElementById('usersList');
+
+        // Load existing users
+        async function loadUsers() {
+            try {
+                const usersRef = ref(database, 'approvedUsers');
+                const snapshot = await get(usersRef);
+                
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    displayUsers(users);
+                } else {
+                    usersList.innerHTML = '<div class="no-users">No approved users found</div>';
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                usersList.innerHTML = '<div class="error">Error loading users</div>';
+            }
+        }
+
+        function displayUsers(users) {
+            let html = '';
+            
+            Object.entries(users).forEach(([accessCode, userData]) => {
+                const isAdmin = userData.role === 'admin' || userData.permissions?.includes('admin');
+                const statusClass = isAdmin ? 'status-admin' : 'status-user';
+                const statusText = isAdmin ? 'Admin' : 'User';
+                
+                html += `
+                    <div class="admin-item">
+                        <div class="admin-info">
+                            <h4>${userData.fullName}</h4>
+                            <p>Access Code: ${accessCode} • Approved: ${new Date(userData.approvedAt).toLocaleDateString()}</p>
+                            ${userData.approvedBy ? `<p>Approved by: ${userData.approvedBy}</p>` : ''}
+                            <p>Status: ${userData.status === 'active' ? 'Active' : 'Revoked'}</p>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                            ${isAdmin ? 
+                                `<button class="btn btn-danger" onclick="demoteUser('${accessCode}')">Demote</button>` :
+                                `<button class="btn btn-primary" onclick="promoteUser('${accessCode}')">Promote</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            });
+            
+            usersList.innerHTML = html;
+        }
+
+        // Promote user form submission
+        promoteUserForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const accessCode = document.getElementById('accessCode').value;
+            
+            if (accessCode.length !== 4 || !/^\d{4}$/.test(accessCode)) {
+                showMessage('Please enter a valid 4-digit access code', 'error', 'promoteMessage');
+                return;
+            }
+            
+            await promoteUser(accessCode);
+        });
+
+        // Demote button handler
+        demoteBtn.addEventListener('click', async () => {
+            const accessCode = document.getElementById('accessCode').value;
+            
+            if (accessCode.length !== 4 || !/^\d{4}$/.test(accessCode)) {
+                showMessage('Please enter a valid 4-digit access code', 'error', 'promoteMessage');
+                return;
+            }
+            
+            await demoteUser(accessCode);
+        });
+
+        // Promote user to admin
+        window.promoteUser = async function(accessCode) {
+            try {
+                const userRef = ref(database, `approvedUsers/${accessCode}`);
+                const snapshot = await get(userRef);
+                
+                if (!snapshot.exists()) {
+                    showMessage('User not found with that access code', 'error', 'promoteMessage');
+                    return;
+                }
+                
+                const userData = snapshot.val();
+                
+                if (userData.role === 'admin' || userData.permissions?.includes('admin')) {
+                    showMessage('User is already an admin', 'error', 'promoteMessage');
+                    return;
+                }
+                
+                // Update user to admin
+                const updatedData = {
+                    ...userData,
+                    role: 'admin',
+                    permissions: [...(userData.permissions || ['songlist', 'lyrics']), 'admin'],
+                    promotedAt: Date.now(),
+                    promotedBy: 'developer'
+                };
+                
+                await set(userRef, updatedData);
+                
+                showMessage(`${userData.fullName} has been promoted to admin!`, 'success', 'promoteMessage');
+                
+                // Clear form
+                document.getElementById('accessCode').value = '';
+                
+                // Reload users list
+                loadUsers();
+                
+            } catch (error) {
+                console.error('Error promoting user:', error);
+                showMessage('Failed to promote user', 'error', 'promoteMessage');
+            }
+        };
+
+        // Demote user from admin
+        window.demoteUser = async function(accessCode) {
+            if (!confirm(`Are you sure you want to remove admin privileges from this user?`)) {
+                return;
+            }
+            
+            try {
+                const userRef = ref(database, `approvedUsers/${accessCode}`);
+                const snapshot = await get(userRef);
+                
+                if (!snapshot.exists()) {
+                    showMessage('User not found with that access code', 'error', 'promoteMessage');
+                    return;
+                }
+                
+                const userData = snapshot.val();
+                
+                if (userData.role !== 'admin' && !userData.permissions?.includes('admin')) {
+                    showMessage('User is not an admin', 'error', 'promoteMessage');
+                    return;
+                }
+                
+                // Update user to regular user
+                const updatedPermissions = userData.permissions?.filter(p => p !== 'admin') || ['songlist', 'lyrics'];
+                const updatedData = {
+                    ...userData,
+                    role: 'user',
+                    permissions: updatedPermissions,
+                    demotedAt: Date.now(),
+                    demotedBy: 'developer'
+                };
+                
+                await set(userRef, updatedData);
+                
+                alert(`${userData.fullName} has been demoted to regular user`);
+                
+                // Clear form
+                document.getElementById('accessCode').value = '';
+                
+                // Reload users list
+                loadUsers();
+                
+            } catch (error) {
+                console.error('Error demoting user:', error);
+                showMessage('Failed to demote user', 'error', 'promoteMessage');
+            }
+        };
+
+        function showMessage(text, type, elementId) {
+            const messageDiv = document.getElementById(elementId);
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            if (type === 'error') {
+                setTimeout(() => {
+                    messageDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUsers();
+            
+            // Set up real-time listener for user changes
+            onValue(ref(database, 'approvedUsers'), (snapshot) => {
+                if (snapshot.exists()) {
+                    displayUsers(snapshot.val());
+                } else {
+                    usersList.innerHTML = '<div class="no-users">No approved users found</div>';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

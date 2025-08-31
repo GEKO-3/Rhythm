@@ -1,18 +1,51 @@
 <!DOCTYPE html>
-<html lang="dv">
+<html lang="dv" style="background-color: #1f1f1f !important;">
 <head>
   <meta charset="UTF-8">
   <title>Rhythm Lyrics</title>
   <!-- Disable browser zooming completely -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
-<link rel="manifest" href="favicons/manifest.webmanifest">
+  
+  <!-- 🚀 PREVENT FLASH: Immediate dark background -->
+  <style>
+    /* Critical CSS - loads immediately to prevent white flash */
+    html, body {
+      background-color: #1f1f1f !important;
+      color: #f5d000 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    
+    /* Hide content until fully styled */
+    body {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    body.loaded {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+  
+  <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicons/icons-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/favicons/icons-512.png">
+<link rel="manifest" href="../assets/favicons/manifest.webmanifest">
+  
+  <!-- 🚀 PERFORMANCE: Preload critical resources -->
+  <link rel="preload" href="../assets/Fonts/Faruma.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="../assets/Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="../js/reverse-transliteration.js" as="script">
+  
+  <!-- Import reverse transliteration for auto-generated English lyrics -->
+  <script src="../js/reverse-transliteration.js"></script>
+  
   <style>
     /* Load local fonts from Fonts folder */
     @font-face {
       font-family: 'Faruma';
-      src: url('Fonts/Faruma.ttf') format('truetype');
+      src: url('../assets/Fonts/Faruma.ttf') format('truetype');
       font-display: swap;
       font-weight: normal;
       font-style: normal;
@@ -20,7 +53,7 @@
     
     @font-face {
       font-family: 'Montserrat';
-      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      src: url('../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
       font-display: swap;
       font-weight: normal;
       font-style: normal;
@@ -30,9 +63,14 @@
       /* Allow scrolling, but prevent zoom gestures */
       touch-action: pan-x pan-y;
       overscroll-behavior: none;
+      /* 🚀 PERFORMANCE: Optimize rendering */
+      will-change: scroll-position;
+      contain: layout style;
     }
     input, textarea, select, button {
       touch-action: manipulation;
+      /* 🚀 PERFORMANCE: Optimize button interactions */
+      will-change: transform;
     }
     :root {
       --primary-color: #f5d000;
@@ -448,119 +486,11 @@
         border-radius: 5px 0 0 5px;
       }
     }
-    
-    /* PIN Entry Styles */
-    .pin-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: #1f1f1f;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-    
-    .pin-container {
-      background: rgba(43,43,43,0.9);
-      padding: 30px;
-      border-radius: 15px;
-      text-align: center;
-      border: 2px solid #444;
-      max-width: 300px;
-      width: 85%;
-    }
-    
-    .pin-title {
-      color: var(--primary-color);
-      font-size: 1.3em;
-      margin-bottom: 25px;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-      font-weight: 600;
-    }
-    
-    .pin-inputs {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    
-    .pin-digit {
-      width: 50px;
-      height: 50px;
-      padding: 0;
-      font-size: 1.5em;
-      text-align: center;
-      border: 2px solid #444;
-      border-radius: 8px;
-      background: #222;
-      color: var(--primary-color);
-      outline: none;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-      transition: all 0.3s ease;
-      caret-color: transparent;
-      /* Force numerical keyboard on mobile */
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: textfield;
-    }
-    
-    .pin-digit:focus {
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 2px rgba(245, 208, 0, 0.2);
-      transform: scale(1.05);
-    }
-    
-    .pin-digit.filled {
-      background: rgba(245, 208, 0, 0.1);
-      border-color: var(--primary-color);
-    }
-    
-    .pin-digit.error {
-      border-color: #ff6b6b;
-      animation: shake 0.5s;
-    }
-    
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-3px); }
-      75% { transform: translateX(3px); }
-    }
-    
-    .pin-error {
-      color: #ff6b6b;
-      font-size: 0.85em;
-      margin-top: 5px;
-      min-height: 18px;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-    }
-    
-    .pin-overlay.hidden {
-      display: none;
-    }
-    
-    /* Mobile responsive adjustments */
-    @media (max-width: 400px) {
-      .pin-container {
-        padding: 25px;
-        max-width: 280px;
-      }
-      
-      .pin-digit {
-        width: 45px;
-        height: 45px;
-        font-size: 1.3em;
-      }
-      
-      .pin-inputs {
-        gap: 10px;
-      }
-    }
   </style>
+  
+  <!-- Firebase Database Integration -->
+  <script type="module" src="../js/firebase-db.js"></script>
+  
   <script>
     // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
     document.addEventListener('keydown', function(e) {
@@ -593,83 +523,12 @@
       e.preventDefault();
     });
 
-    // Register service worker for offline functionality
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js')
-          .then((registration) => {
-            console.log('Service Worker registered successfully:', registration.scope);
-            
-            // Check for updates
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // New content available, activate it
-                  newWorker.postMessage({ type: 'SKIP_WAITING' });
-                }
-              });
-            });
-          })
-          .catch((error) => {
-            console.log('Service Worker registration failed:', error);
-          });
-        
-        // Listen for messages from service worker
-        navigator.serviceWorker.addEventListener('message', (event) => {
-          if (event.data && event.data.type === 'CACHE_UPDATED') {
-            console.log('Cache updated for files:', event.data.files);
-            // Optionally reload the page or update UI
-          }
-        });
-        
-        // Update cache when online
-        window.addEventListener('online', () => {
-          console.log('Back online - updating cache');
-          updateOfflineStatus();
-          if (navigator.serviceWorker.controller) {
-            navigator.serviceWorker.controller.postMessage({
-              type: 'UPDATE_CACHE',
-              files: ['/songs.js', '/songlist.html', '/lyrics.html'] // Use original filename
-            });
-          }
-        });
-        
-        // Handle offline status
-        window.addEventListener('offline', () => {
-          console.log('Gone offline');
-          updateOfflineStatus();
-        });
-        
-        // Initial offline status check
-        updateOfflineStatus();
-      });
-    }
+    // Service Worker functionality removed - will be added later
+    // Offline/online status tracking removed for now
     
-    function updateOfflineStatus() {
-      const offlineIndicator = document.getElementById('offline-indicator');
-      if (!navigator.onLine) {
-        offlineIndicator.classList.add('show');
-      } else {
-        offlineIndicator.classList.remove('show');
-      }
-    }
   </script>
 </head>
 <body>
-  <div class="pin-overlay" id="pin-overlay">
-    <div class="pin-container">
-      <h2 class="pin-title">Enter PIN</h2>
-      <div class="pin-inputs">
-        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-0" maxlength="1" autocomplete="off" />
-        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-1" maxlength="1" autocomplete="off" />
-        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-2" maxlength="1" autocomplete="off" />
-        <input type="tel" inputmode="numeric" pattern="[0-9]*" class="pin-digit" id="pin-digit-3" maxlength="1" autocomplete="off" />
-      </div>
-      <div class="pin-error" id="pin-error"></div>
-    </div>
-  </div>
-  
   <div class="offline-indicator" id="offline-indicator">
     You're offline - Using cached content
   </div>
@@ -678,15 +537,11 @@
     <h2 id="song-title"></h2>
     <div class="controls-row">
       <button class="back-button" onclick="
-        // Refresh session before navigating
-        if (pinAuthenticated) {
-          const sessionData = {
-            timestamp: Date.now(),
-            authenticated: true
-          };
-          sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
-        }
-        window.location.href='songlist'
+        // Clear navigation progress and go back to songlist
+        sessionStorage.removeItem('navigationInProgress');
+        // Save current position for return
+        sessionStorage.setItem('returnToSongId', localStorage.getItem('selectedSongId'));
+        window.location.href='songlist.html'
       ">←</button>
       <div class="language-toggle">
         <div class="toggle-switch" id="language-toggle" onclick="toggleLanguage()">
@@ -727,31 +582,95 @@
       return checksum === expectedChecksum;
     }
     
-    // Get actual PIN configuration
-    const actualPinConfig = decodePinConfig(pinAuth);
-    
-    // PIN Protection System
-    let pinAuthenticated = false;
-    let pinOverlay, pinDigits, pinError;
-    let attemptCount = 0;
-    const maxAttempts = 5;
-    const lockoutDuration = 60 * 60 * 1000; // 1 hour in milliseconds
-    let lockoutTimer = null;
-    
-    // Session timeout system
-    const sessionTimeout = 3 * 60 * 1000; // 3 minutes in milliseconds
-    let sessionTimer = null;
+    // Session management variables
     let lastActivityTime = Date.now();
     let isPageVisible = true;
     
-    // Note: Using sessionStorage instead of localStorage for PIN session
-    // This ensures users must re-enter PIN when browser/app is completely closed
+    // Note: Using unified authentication system with songlist.html
+    // This ensures seamless navigation between pages
     
-    // Initialize PIN system on page load
+    // Initialize unified authentication system on page load
     document.addEventListener('DOMContentLoaded', function() {
-      initializePinSystem();
-      initializeSessionTimeout();
+      // 🚀 PREVENT FLASH: Make page visible once DOM is ready
+      document.body.classList.add('loaded');
+      
+      initializeUnifiedAuth();
     });
+
+    // Unified authentication system (same as songlist.html)
+    async function initializeUnifiedAuth() {
+      let isAuthenticated = false;
+
+      // Check for existing approval
+      const approval = localStorage.getItem('rhythmAuth_approval');
+      if (approval) {
+        try {
+          const approvalData = JSON.parse(approval);
+          
+          // Check if user has lyrics access permission
+          if (approvalData.status === 'active' && 
+              approvalData.deviceId && 
+              approvalData.fullName &&
+              approvalData.permissions && 
+              (approvalData.permissions.includes('lyrics') || approvalData.permissions.includes('admin'))) {
+            
+            // Verify approval is still valid on server (when online)
+            if (navigator.onLine) {
+              try {
+                // Import Firebase DB for verification
+                const module = await import('../js/firebase-db.js');
+                const rhythmDB = new module.RhythmFirebaseDB();
+                const userData = await rhythmDB.getApprovedUser(approvalData.accessCode);
+                
+                if (userData && userData.deviceId === approvalData.deviceId && userData.status === 'active') {
+                  isAuthenticated = true;
+                  console.log('✅ Lyrics Authentication: Approved user -', approvalData.fullName);
+                  
+                  // Update last active timestamp
+                  approvalData.lastActive = Date.now();
+                  localStorage.setItem('rhythmAuth_approval', JSON.stringify(approvalData));
+                } else {
+                  console.log('❌ Lyrics access was revoked');
+                  localStorage.removeItem('rhythmAuth_approval');
+                  showAccessDenied();
+                  return;
+                }
+              } catch (error) {
+                console.error('Error verifying lyrics access:', error);
+                // If verification fails due to network, assume still valid
+                isAuthenticated = true;
+              }
+            } else {
+              // Offline - trust local storage
+              isAuthenticated = true;
+              console.log('✅ Lyrics Authentication: Offline mode - using cached approval');
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing approval data:', e);
+          localStorage.removeItem('rhythmAuth_approval');
+        }
+      }
+
+      if (!isAuthenticated) {
+        console.log('❌ Not authenticated for lyrics access');
+        showAccessDenied();
+        return;
+      }
+
+      // Authentication successful - load the lyrics page
+      loadSongsData();
+    }
+
+    function showAccessDenied() {
+      document.body.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: var(--font-family, Arial, sans-serif); background: var(--bg-color, #1f1f1f); color: var(--primary-color, #f5d000);">
+          <h2 style="color: var(--primary-color, #f5d000); margin-bottom: 20px;">Access Required</h2>
+          <p style="text-align: center; margin-bottom: 30px; max-width: 400px;">You need to be logged in to access lyrics. Please log in from the songlist page.</p>
+          <a href="songlist.html" style="padding: 12px 24px; background: var(--primary-color, #f5d000); color: var(--text-color, #2b2b2b); text-decoration: none; border-radius: 5px; font-weight: 600;">Go to Song List</a>
+        </div>
+      `;
+    }
     
     function initializeSessionTimeout() {
       // Track page visibility
@@ -849,414 +768,91 @@
       }, 3000);
     }
     
-    function initializePinSystem() {
-      pinOverlay = document.getElementById('pin-overlay');
-      pinDigits = [
-        document.getElementById('pin-digit-0'),
-        document.getElementById('pin-digit-1'),
-        document.getElementById('pin-digit-2'),
-        document.getElementById('pin-digit-3')
-      ];
-      pinError = document.getElementById('pin-error');
-      
-      // Check if PIN was previously entered (but still require re-entry)
-      checkPinStatus();
-      
-      // Setup event listeners for each digit input
-      pinDigits.forEach((digit, index) => {
-        digit.addEventListener('input', function(e) {
-          handleDigitInput(e, index);
-        });
-        
-        digit.addEventListener('keydown', function(e) {
-          handleDigitKeydown(e, index);
-        });
-        
-        digit.addEventListener('paste', function(e) {
-          handlePaste(e);
-        });
-        
-        // Mobile focus improvements
-        digit.addEventListener('focus', function() {
-          // Ensure keyboard opens on mobile
-          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            setTimeout(() => {
-              digit.focus();
-              digit.click();
-            }, 50);
-          }
-        });
-        
-        // Additional mobile keyboard trigger
-        digit.addEventListener('touchstart', function(e) {
-          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            setTimeout(() => {
-              digit.focus();
-            }, 50);
-          }
-        });
-      });
-      
-      // Auto-focus first digit with delay for mobile
-      setTimeout(() => {
-        if (pinOverlay && !pinOverlay.classList.contains('hidden')) {
-          pinDigits[0].focus();
-          
-          // Force keyboard to open on mobile devices
-          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            // Multiple attempts to ensure keyboard opens
-            pinDigits[0].click();
-            setTimeout(() => {
-              pinDigits[0].focus();
-              pinDigits[0].click();
-            }, 100);
-            setTimeout(() => {
-              pinDigits[0].focus();
-            }, 200);
-          }
+    async function loadSongsData() {
+      try {
+        // Get the selected song ID from localStorage
+        const selectedSongId = localStorage.getItem('selectedSongId');
+        if (!selectedSongId) {
+          throw new Error('No song selected');
         }
-      }, 500); // Increased delay to ensure DOM is ready
-    }
-    
-    function handleDigitInput(e, index) {
-      // Check if locked out
-      if (e.target.disabled) return;
-      
-      const value = e.target.value;
-      
-      // Only allow single digit numbers
-      if (!/^\d$/.test(value)) {
-        e.target.value = '';
-        return;
-      }
-      
-      // Clear any previous errors
-      clearPinError();
-      
-      // Mark as filled
-      e.target.classList.add('filled');
-      
-      // Move to next digit
-      if (index < 3) {
-        pinDigits[index + 1].focus();
-      } else {
-        // All digits filled, verify PIN
-        setTimeout(() => verifyPin(), 100);
-      }
-    }
-    
-    function handleDigitKeydown(e, index) {
-      // Check if locked out
-      if (e.target.disabled) return;
-      
-      // Handle backspace
-      if (e.key === 'Backspace') {
-        if (e.target.value === '' && index > 0) {
-          // Move to previous digit if current is empty
-          pinDigits[index - 1].focus();
-          pinDigits[index - 1].value = '';
-          pinDigits[index - 1].classList.remove('filled');
-        } else {
-          // Clear current digit
-          e.target.value = '';
-          e.target.classList.remove('filled');
-        }
-      }
-      
-      // Handle Enter key
-      if (e.key === 'Enter') {
-        verifyPin();
-      }
-      
-      // Handle arrow keys
-      if (e.key === 'ArrowLeft' && index > 0) {
-        pinDigits[index - 1].focus();
-      }
-      if (e.key === 'ArrowRight' && index < 3) {
-        pinDigits[index + 1].focus();
-      }
-    }
-    
-    function handlePaste(e) {
-      e.preventDefault();
-      const pasteData = e.clipboardData.getData('text');
-      
-      // Check if pasted data is 4 digits
-      if (/^\d{4}$/.test(pasteData)) {
-        const digits = pasteData.split('');
-        pinDigits.forEach((digit, index) => {
-          digit.value = digits[index];
-          digit.classList.add('filled');
-        });
-        setTimeout(() => verifyPin(), 100);
-      }
-    }
-    
-    function checkPinStatus() {
-      // Check if currently locked out
-      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
-      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
-        startLockoutTimer(parseInt(lockoutEnd));
-        return;
-      }
-      
-      // Clear any expired lockout
-      if (lockoutEnd && Date.now() >= parseInt(lockoutEnd)) {
-        localStorage.removeItem('pinLockoutEnd');
-        localStorage.removeItem('pinAttemptCount');
-        attemptCount = 0;
-      }
-      
-      // Restore attempt count if not locked out
-      const savedAttempts = localStorage.getItem('pinAttemptCount');
-      if (savedAttempts) {
-        attemptCount = parseInt(savedAttempts);
-      }
-      
-      // Check for existing valid session from songlist.html
-      const sessionData = sessionStorage.getItem('pinSession');
-      if (sessionData) {
-        try {
-          const session = JSON.parse(sessionData);
-          const sessionAge = Date.now() - session.timestamp;
-          
-          // Session is valid if authenticated and less than 3 minutes old (with 10 second buffer for navigation)
-          if (session.authenticated && sessionAge < (sessionTimeout + 10000)) {
-            // Valid session found - skip PIN entry and refresh session timestamp
-            pinAuthenticated = true;
-            // Refresh session timestamp to extend it
-            const refreshedSession = {
-              timestamp: Date.now(),
-              authenticated: true
-            };
-            sessionStorage.setItem('pinSession', JSON.stringify(refreshedSession));
-            updateLastActivity();
-            hidePinOverlay();
-            loadSongsData();
-            return;
-          } else {
-            // Session expired, remove it
-            sessionStorage.removeItem('pinSession');
-          }
-        } catch (e) {
-          // Invalid session data, remove it
-          sessionStorage.removeItem('pinSession');
-        }
-      }
-      
-      // No valid session - show PIN overlay
-      pinOverlay.classList.remove('hidden');
-      
-      // Ensure keyboard opens when PIN overlay is shown
-      setTimeout(() => {
-        if (pinDigits[0]) {
-          pinDigits[0].focus();
-          
-          // Force keyboard to open on mobile devices
-          if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-            pinDigits[0].click();
-            setTimeout(() => {
-              pinDigits[0].focus();
-            }, 100);
-          }
-        }
-      }, 300);
-    }
-    
-    function startLockout() {
-      const lockoutEnd = Date.now() + lockoutDuration;
-      localStorage.setItem('pinLockoutEnd', lockoutEnd.toString());
-      localStorage.setItem('pinAttemptCount', attemptCount.toString());
-      
-      // Disable all inputs
-      pinDigits.forEach(digit => digit.disabled = true);
-      
-      startLockoutTimer(lockoutEnd);
-    }
-    
-    function startLockoutTimer(lockoutEnd) {
-      function updateLockoutDisplay() {
-        const now = Date.now();
-        const remaining = lockoutEnd - now;
+
+        console.log(`🎵 Loading specific song: ${selectedSongId}`);
+
+        // 🚀 SPEED OPTIMIZATION: Check for prefetched data first
+        const prefetchedDataStr = localStorage.getItem('prefetchedSongData');
+        let songData = null;
         
-        if (remaining <= 0) {
-          // Lockout expired
-          clearInterval(lockoutTimer);
-          localStorage.removeItem('pinLockoutEnd');
-          localStorage.removeItem('pinAttemptCount');
-          attemptCount = 0;
-          
-          // Re-enable inputs
-          pinDigits.forEach(digit => digit.disabled = false);
-          clearPinInputs();
-          pinError.textContent = 'Lockout expired. You may try again.';
-          
-          setTimeout(() => {
-            clearPinError();
-            pinDigits[0].focus();
+        if (prefetchedDataStr) {
+          try {
+            const prefetchedData = JSON.parse(prefetchedDataStr);
+            // Check if data is fresh (less than 30 seconds old) and for correct song
+            const isDataFresh = (Date.now() - prefetchedData.timestamp) < 30000;
+            const isCorrectSong = prefetchedData.songId === selectedSongId;
             
-            // Force keyboard to open on mobile devices
-            if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-              pinDigits[0].click();
-              setTimeout(() => {
-                pinDigits[0].focus();
-              }, 100);
+            if (isDataFresh && isCorrectSong) {
+              songData = prefetchedData.data;
+              console.log('🚀 Using prefetched song data - INSTANT LOAD!');
+              // Clean up prefetched data
+              localStorage.removeItem('prefetchedSongData');
             }
-          }, 2000);
+          } catch (e) {
+            console.log('⚠️ Invalid prefetched data, will load from Firebase');
+            localStorage.removeItem('prefetchedSongData');
+          }
+        }
+
+        // If no valid prefetched data, load from Firebase
+        if (!songData) {
+          console.log('📡 Loading song from Firebase...');
+          // Import and initialize Firebase database
+          const module = await import(`../js/firebase-db.js?t=${Date.now()}`);
+          const firebaseDB = new module.RhythmFirebaseDB();
           
-          return;
+          // Make it globally available
+          window.rhythmDB = firebaseDB;
+
+          // Load the selected song from Firebase
+          songData = await firebaseDB.getSong(selectedSongId);
         }
         
-        // Calculate time remaining
-        const minutes = Math.floor(remaining / (1000 * 60));
-        const seconds = Math.floor((remaining % (1000 * 60)) / 1000);
-        
-        showPinError(`Locked out. Try again in ${minutes}m ${seconds}s`);
-      }
-      
-      // Update immediately and then every second
-      updateLockoutDisplay();
-      lockoutTimer = setInterval(updateLockoutDisplay, 1000);
-    }
-    
-    function verifyPin() {
-      const enteredPin = pinDigits.map(digit => digit.value).join('');
-      
-      if (enteredPin.length !== 4) {
-        showPinError('Please enter all 4 digits');
-        return;
-      }
-      
-      // Check if currently locked out
-      const lockoutEnd = localStorage.getItem('pinLockoutEnd');
-      if (lockoutEnd && Date.now() < parseInt(lockoutEnd)) {
-        showPinError('Account is locked. Please wait.');
-        return;
-      }
-      
-      // Convert entered PIN to array for comparison
-      const enteredPinArray = enteredPin.split('').map(Number);
-      
-      // Multi-layer validation
-      const basicMatch = enteredPinArray.every((digit, index) => 
-        digit === actualPinConfig[index]
-      );
-      
-      const structureValid = validatePinStructure(enteredPinArray);
-      
-      if (basicMatch && structureValid) {
-        // Successful authentication
-        pinAuthenticated = true;
-        // Store session with timestamp for cross-page access
-        const sessionData = {
-          timestamp: Date.now(),
-          authenticated: true
-        };
-        sessionStorage.setItem('pinSession', JSON.stringify(sessionData));
-        
-        // Clear lockout data on success
-        localStorage.removeItem('pinLockoutEnd');
-        localStorage.removeItem('pinAttemptCount');
-        attemptCount = 0;
-        
-        if (lockoutTimer) {
-          clearInterval(lockoutTimer);
-          lockoutTimer = null;
-        }
-        
-        // Update activity time and start session monitoring
-        updateLastActivity();
-        
-        hidePinOverlay();
-        loadSongsData();
-      } else {
-        // Failed authentication
-        attemptCount++;
-        localStorage.setItem('pinAttemptCount', attemptCount.toString());
-        
-        if (attemptCount >= maxAttempts) {
-          // Start lockout
-          startLockout();
+        if (songData) {
+          // Create songs array with just the selected song
+          window.songs = [{
+            id: selectedSongId,
+            ...songData
+          }];
+          console.log(`🎵 Loaded song: ${songData.title || 'Unknown Title'}`);
         } else {
-          // Show remaining attempts
-          const remainingAttempts = maxAttempts - attemptCount;
-          showPinError(`Invalid PIN. ${remainingAttempts} attempts remaining.`);
-          clearPinInputs();
-          setTimeout(() => {
-            pinDigits[0].focus();
-            
-            // Force keyboard to open on mobile devices
-            if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-              pinDigits[0].click();
-              setTimeout(() => {
-                pinDigits[0].focus();
-              }, 100);
-            }
-          }, 500);
+          console.warn('Selected song not found in Firebase');
+          window.songs = [];
         }
+
+        // We don't need showlist for lyrics display
+        window.showList = [];
+
+        // 🎯 AUTO-GENERATE ENGLISH LYRICS using reverse transliteration
+        if (window.songs && window.songs.length > 0) {
+          generateEnglishLyrics();
+        }
+
+        // Initialize lyrics display
+        initializeLyrics();
+        
+      } catch (error) {
+        console.error('Failed to load song data from Firebase:', error);
+        // Show error message to user
+        showSongNotFoundError(error.message);
       }
     }
-    
-    function showPinError(message) {
-      pinError.textContent = message;
-      pinDigits.forEach(digit => {
-        digit.classList.add('error');
-      });
-      setTimeout(() => {
-        pinDigits.forEach(digit => {
-          digit.classList.remove('error');
-        });
-      }, 500);
-    }
-    
-    function clearPinError() {
-      pinError.textContent = '';
-      pinDigits.forEach(digit => {
-        digit.classList.remove('error');
-      });
-    }
-    
-    function clearPinInputs() {
-      pinDigits.forEach(digit => {
-        digit.value = '';
-        digit.classList.remove('filled');
-      });
-    }
-    
-    function hidePinOverlay() {
-      pinOverlay.classList.add('hidden');
-    }
-    
-    function loadSongsData() {
-      // Only load songs after PIN is verified
-      if (!pinAuthenticated) {
-        console.log('PIN not authenticated - blocking song data load');
-        return;
-      }
-      
-      // Load songs.js first, then showlist.js
-      fetch('/songs.js') // Use original filename for proper caching
-        .then(response => response.text())
-        .then(scriptContent => {
-          // Replace const with window assignment to make it global
-          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
-          eval(modifiedScript);
-          
-          // Now load showlist.js
-          return fetch('/showlist.js');
-        })
-        .then(response => response.text())
-        .then(showlistContent => {
-          // Replace const with window assignment to make it global
-          const modifiedShowlist = showlistContent.replace('const showList =', 'window.showList =');
-          eval(modifiedShowlist);
-          
-          // Initialize after both files are loaded
-          initializeLyrics();
-        })
-        .catch(error => {
-          console.error('Failed to load songs data:', error);
-        });
+
+    function showSongNotFoundError(message) {
+      document.body.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: var(--font-family, Arial, sans-serif); background: var(--bg-color, #1f1f1f); color: var(--primary-color, #f5d000);">
+          <h2 style="color: var(--primary-color, #f5d000); margin-bottom: 20px;">Song Not Found</h2>
+          <p style="text-align: center; margin-bottom: 30px; max-width: 400px;">${message}</p>
+          <a href="songlist.html" style="padding: 12px 24px; background: var(--primary-color, #f5d000); color: var(--text-color, #2b2b2b); text-decoration: none; border-radius: 5px; font-weight: 600;">Back to Song List</a>
+        </div>
+      `;
     }
     
     // Dynamic script loader to hide from sources
@@ -1368,26 +964,32 @@
         btn.onclick = function() {
           const sectionElem = document.getElementById(section.id);
           if (sectionElem) {
-            // Calculate the position 20px from top
-            const elementPosition = sectionElem.getBoundingClientRect().top + window.pageYOffset;
-            const offsetPosition = elementPosition - 80;
-            
-            window.scrollTo({
-              top: offsetPosition,
-              behavior: 'smooth'
+            // 🚀 PERFORMANCE: Use requestAnimationFrame for smooth animation
+            requestAnimationFrame(() => {
+              // Calculate the position 20px from top
+              const elementPosition = sectionElem.getBoundingClientRect().top + window.pageYOffset;
+              const offsetPosition = elementPosition - 80;
+              
+              window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+              });
+              
+              // Flash effect
+              sectionElem.classList.add('flash');
+              btn.classList.add('flash');
             });
             
-            // Flash effect
-            sectionElem.classList.add('flash');
-            btn.classList.add('flash');
             setTimeout(() => {
               sectionElem.classList.remove('flash');
               btn.classList.remove('flash');
             }, 350);
           }
           // Remove active from all buttons of the same type
-          window.sectionNavBar.querySelectorAll('.' + btn.className).forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
+          requestAnimationFrame(() => {
+            window.sectionNavBar.querySelectorAll('.' + btn.className).forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+          });
         };
         window.sectionNavBar.appendChild(btn);
       });
@@ -1415,13 +1017,97 @@
       });
     }
     
+    // 🔤 CAPITALIZE first letter of each line function
+    function capitalizeFirstLetterOfEachLine(text) {
+      if (!text || typeof text !== 'string') {
+        return text;
+      }
+      
+      // Split by line breaks (handle different line ending types)
+      const lines = text.split(/\r?\n/);
+      
+      // Process each line
+      const capitalizedLines = lines.map(line => {
+        // Trim whitespace to find the first actual character
+        const trimmed = line.trim();
+        if (!trimmed) {
+          return line; // Keep empty lines as-is
+        }
+        
+        // Find the first letter in the line (skip non-letter characters)
+        let firstLetterIndex = 0;
+        while (firstLetterIndex < line.length && !/[a-zA-Z]/.test(line[firstLetterIndex])) {
+          firstLetterIndex++;
+        }
+        
+        // If we found a letter, capitalize it
+        if (firstLetterIndex < line.length) {
+          return line.substring(0, firstLetterIndex) + 
+                 line[firstLetterIndex].toUpperCase() + 
+                 line.substring(firstLetterIndex + 1);
+        }
+        
+        return line; // No letters found, return as-is
+      });
+      
+      return capitalizedLines.join('\n');
+    }
+    
+    // 🎯 AUTO-GENERATE ENGLISH LYRICS Function
+    function generateEnglishLyrics() {
+      console.log('🔤 Auto-generating English lyrics using reverse transliteration...');
+      
+      window.songs.forEach(song => {
+        // Skip if song already has English lyrics
+        if (song.englishLyrics && song.englishLyrics.trim()) {
+          console.log(`✅ Song "${song.name}" already has English lyrics, skipping auto-generation`);
+          return;
+        }
+        
+        // Skip if no Dhivehi lyrics to transliterate
+        if (!song.lyrics || !song.lyrics.trim()) {
+          console.log(`⚠️ Song "${song.name}" has no Dhivehi lyrics to transliterate`);
+          return;
+        }
+        
+        try {
+          // Use the reverse transliteration function
+          let englishLyrics = window.reverseTransliterate(song.lyrics);
+          
+          // 🔤 CAPITALIZE first letter of every line
+          englishLyrics = capitalizeFirstLetterOfEachLine(englishLyrics);
+          
+          // Add the generated English lyrics to the song object
+          song.englishLyrics = englishLyrics;
+          
+          console.log(`🎉 Auto-generated English lyrics for "${song.name}"`);
+          console.log(`Original (first 100 chars): ${song.lyrics.substring(0, 100)}...`);
+          console.log(`Generated (first 100 chars): ${englishLyrics.substring(0, 100)}...`);
+          
+        } catch (error) {
+          console.error(`❌ Failed to generate English lyrics for "${song.name}":`, error);
+        }
+      });
+      
+      // Enable English toggle now that we have generated lyrics
+      window.englishAvailable = true;
+      console.log('🌐 English lyrics auto-generation complete! Toggle is now available.');
+    }
+    
     function initializeLyrics() {
-    const songTitle = document.getElementById('song-title');
-    const songLyrics = document.getElementById('song-lyrics');
-    const lyricsTemplate = document.getElementById('lyrics-template');
-    const sectionNavBar = document.getElementById('section-nav-bar');
-    const languageToggle = document.getElementById('language-toggle');
-    const toggleSlider = document.getElementById('toggle-slider');
+    // 🚀 PERFORMANCE: Cache DOM elements to avoid repeated queries
+    if (!window.LYRICS_ELEMENTS) {
+      window.LYRICS_ELEMENTS = {
+        songTitle: document.getElementById('song-title'),
+        songLyrics: document.getElementById('song-lyrics'),
+        lyricsTemplate: document.getElementById('lyrics-template'),
+        sectionNavBar: document.getElementById('section-nav-bar'),
+        languageToggle: document.getElementById('language-toggle'),
+        toggleSlider: document.getElementById('toggle-slider')
+      };
+    }
+
+    const { songTitle, songLyrics, lyricsTemplate, sectionNavBar, languageToggle, toggleSlider } = window.LYRICS_ELEMENTS;
     const selectedId = localStorage.getItem('selectedSongId');
     const song = window.songs.find(s => String(s.id) === String(selectedId));
     
@@ -1465,22 +1151,22 @@
       window.songLyrics.innerHTML = html;
       
       // Update text direction and font
-      const lyricsContainer = document.getElementById('lyrics-template');
       if (language === 'english') {
-        lyricsContainer.style.direction = 'ltr';
-        lyricsContainer.style.textAlign = 'left';
-        lyricsContainer.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
+        window.lyricsTemplate.style.direction = 'ltr';
+        window.lyricsTemplate.style.textAlign = 'left';
+        window.lyricsTemplate.style.fontFamily = "'Montserrat', 'SF-Pro', Arial, sans-serif";
       } else {
-        lyricsContainer.style.direction = 'rtl';
-        lyricsContainer.style.textAlign = 'right';
-        lyricsContainer.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
+        window.lyricsTemplate.style.direction = 'rtl';
+        window.lyricsTemplate.style.textAlign = 'right';
+        window.lyricsTemplate.style.fontFamily = "'Faruma', 'MV Elaaf Normal', 'Faruma Regular', 'Faruma Medium', 'Noto Sans Thaana', 'Thaana Unicode', Arial, sans-serif";
       }
       
       // Update navigation buttons
       renderSectionButtons(orderedSections);
       
       // Create section overlays
-      setTimeout(() => createSectionOverlays(orderedSections), 100);
+      // 🚀 PERFORMANCE: Use requestAnimationFrame to avoid blocking main thread
+      requestAnimationFrame(() => createSectionOverlays(orderedSections));
     }
     
     // Make switchLanguage global

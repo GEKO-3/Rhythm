@@ -126,7 +126,33 @@
 - ✅ Legacy files archived in `/archive/`
 - ✅ CSV functionality completely removed
 - ✅ Firebase integration maintained
-- 🔄 **Next**: Fix file paths and references after reorganization
+- ✅ **Songlist & Lyrics Updated**: Fixed file paths, Firebase integration, navigation
+- 🔄 **Next**: Update authentication system in lyrics.html, test songlist→lyrics flow
+
+---
+
+## 🎯 Current Focus: Songlist + Lyrics Integration
+
+### ✅ **Songlist.html Updates:**
+- Fixed all asset paths (fonts, favicons, scripts)
+- Firebase script import path corrected
+- Lyrics navigation path ready
+- CSV references confirmed removed
+- Data loading uses Firebase exclusively
+
+### ✅ **Lyrics.html Updates:**  
+- Fixed all asset paths (fonts, favicons, scripts)
+- Added Firebase script import
+- Replaced old song loading with Firebase data
+- Fixed back navigation to songlist.html
+- Service worker paths corrected
+- No CSV references found
+
+### 🔄 **Next Steps:**
+1. Update lyrics.html authentication to use new Firebase auth system
+2. Test songlist→lyrics navigation flow
+3. Verify Firebase data compatibility with lyrics display
+4. Test back navigation from lyrics→songlist
 
 ---
 
