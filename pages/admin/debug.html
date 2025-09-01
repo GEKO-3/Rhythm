@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1f1f1f;
+            color: #f5d000;
+        }
+        .info-box {
+            background: #2b2b2b;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .url-info {
+            background: #333;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+        button {
+            background: #f5d000;
+            color: #1f1f1f;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <h1>Login Redirect Debug</h1>
+    
+    <div class="info-box">
+        <h3>Current URL Information:</h3>
+        <div class="url-info" id="url-info"></div>
+    </div>
+
+    <div class="info-box">
+        <h3>Authentication Status:</h3>
+        <div id="auth-info"></div>
+    </div>
+
+    <div class="info-box">
+        <h3>Test Actions:</h3>
+        <button onclick="testAdminRedirect()">Test Admin Redirect</button>
+        <button onclick="testLoginFlow()">Test Login Flow</button>
+        <button onclick="clearAuth()">Clear Authentication</button>
+        <button onclick="makeAdmin()">Promote Current User to Admin</button>
+    </div>
+
+    <script>
+        // Display URL information
+        function displayUrlInfo() {
+            const info = document.getElementById('url-info');
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            info.innerHTML = `
+                <strong>Full URL:</strong> ${window.location.href}<br>
+                <strong>Pathname:</strong> ${window.location.pathname}<br>
+                <strong>Search:</strong> ${window.location.search}<br>
+                <strong>Return URL Param:</strong> ${urlParams.get('returnUrl') || 'None'}<br>
+                <strong>Decoded Return URL:</strong> ${urlParams.get('returnUrl') ? decodeURIComponent(urlParams.get('returnUrl')) : 'None'}
+            `;
+        }
+
+        // Display authentication information
+        function displayAuthInfo() {
+            const info = document.getElementById('auth-info');
+            const approval = localStorage.getItem('rhythmAuth_approval');
+            
+            if (approval) {
+                try {
+                    const userData = JSON.parse(approval);
+                    const isAdmin = userData.isAdmin === true || 
+                                   userData.role === 'admin' ||
+                                   (userData.permissions && (
+                                       userData.permissions.includes('admin_access') ||
+                                       userData.permissions.includes('admin_panel_access')
+                                   ));
+                    
+                    info.innerHTML = `
+                        <strong>Status:</strong> Logged In<br>
+                        <strong>Name:</strong> ${userData.name || userData.user_name || 'Unknown'}<br>
+                        <strong>Email:</strong> ${userData.email || userData.user_email || 'Unknown'}<br>
+                        <strong>Is Admin:</strong> ${isAdmin ? 'YES' : 'NO'}<br>
+                        <strong>Role:</strong> ${userData.role || 'user'}<br>
+                        <strong>Permissions:</strong> ${userData.permissions ? userData.permissions.join(', ') : 'None'}
+                    `;
+                } catch (e) {
+                    info.innerHTML = '<strong>Status:</strong> Error parsing authentication data';
+                }
+            } else {
+                info.innerHTML = '<strong>Status:</strong> Not Logged In';
+            }
+        }
+
+        // Test admin redirect
+        function testAdminRedirect() {
+            window.location.href = 'admin.html';
+        }
+
+        // Test login flow with return URL
+        function testLoginFlow() {
+            const returnUrl = encodeURIComponent('/pages/admin/admin.html');
+            window.location.href = `../../login.html?returnUrl=${returnUrl}`;
+        }
+
+        // Clear authentication
+        function clearAuth() {
+            localStorage.removeItem('rhythmAuth_approval');
+            sessionStorage.removeItem('adminSession');
+            displayAuthInfo();
+            alert('Authentication cleared');
+        }
+
+        // Promote current user to admin
+        function makeAdmin() {
+            const approval = localStorage.getItem('rhythmAuth_approval');
+            if (approval) {
+                try {
+                    const userData = JSON.parse(approval);
+                    userData.isAdmin = true;
+                    userData.role = 'admin';
+                    if (!userData.permissions) userData.permissions = [];
+                    if (!userData.permissions.includes('admin_access')) {
+                        userData.permissions.push('admin_access', 'admin_panel_access');
+                    }
+                    localStorage.setItem('rhythmAuth_approval', JSON.stringify(userData));
+                    displayAuthInfo();
+                    alert('User promoted to admin!');
+                } catch (e) {
+                    alert('Error promoting user: ' + e.message);
+                }
+            } else {
+                alert('No user logged in to promote');
+            }
+        }
+
+        // Initialize
+        displayUrlInfo();
+        displayAuthInfo();
+
+        // Refresh auth info every 2 seconds
+        setInterval(displayAuthInfo, 2000);
+    </script>
+</body>
+</html>

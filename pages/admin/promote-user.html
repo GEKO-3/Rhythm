@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin User Promotion - Rhythm Boduberu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1f1f1f;
+            color: #f5d000;
+        }
+        .promotion-container {
+            background: #2b2b2b;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #f5d000;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #1f1f1f;
+            color: #f5d000;
+            font-size: 16px;
+        }
+        button {
+            background: #f5d000;
+            color: #1f1f1f;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #ffd700;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #4caf50;
+            color: white;
+        }
+        .error {
+            background: #f44336;
+            color: white;
+        }
+        .current-users {
+            background: #333;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .user-list {
+            list-style: none;
+            padding: 0;
+        }
+        .user-item {
+            background: #1f1f1f;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-info {
+            flex-grow: 1;
+        }
+        .user-name {
+            font-weight: bold;
+            color: #f5d000;
+        }
+        .user-email {
+            color: #ccc;
+            font-size: 0.9em;
+        }
+        .user-status {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .status-admin {
+            background: #f5d000;
+            color: #1f1f1f;
+        }
+        .status-user {
+            background: #666;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="promotion-container">
+        <h1>Admin User Promotion</h1>
+        <p>Use this tool to promote existing logged-in users to administrators.</p>
+        
+        <div class="current-users">
+            <h3>Current Users</h3>
+            <div id="user-list">
+                <p>Loading users...</p>
+            </div>
+        </div>
+
+        <form id="promotion-form" style="margin-top: 30px;">
+            <div class="form-group">
+                <label for="user-email">User Email to Promote:</label>
+                <input type="email" id="user-email" required placeholder="user@example.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="promotion-method">Promotion Method:</label>
+                <select id="promotion-method">
+                    <option value="current">Promote Current Session (if logged in)</option>
+                    <option value="database">Add to Firebase Database</option>
+                    <option value="both">Both (Recommended)</option>
+                </select>
+            </div>
+            
+            <button type="submit">Promote to Admin</button>
+            <button type="button" onclick="refreshUserList()">Refresh User List</button>
+        </form>
+
+        <div id="message" class="message"></div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #444;">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>User must be logged in through the main authentication system first</li>
+                <li>Enter their email address</li>
+                <li>Choose promotion method (Both is recommended)</li>
+                <li>Click "Promote to Admin"</li>
+                <li>User will have admin access on next page visit or refresh</li>
+            </ol>
+        </div>
+    </div>
+
+    <script type="module">
+        import AdminUserSetup from '../js/admin-setup.js';
+
+        const setup = new AdminUserSetup();
+        const messageDiv = document.getElementById('message');
+
+        function showMessage(text, isError = false) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${isError ? 'error' : 'success'}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Check for stored user sessions
+        function loadUserSessions() {
+            const userListDiv = document.getElementById('user-list');
+            const sessions = [];
+            
+            // Check localStorage for rhythm auth
+            try {
+                const rhythmAuth = localStorage.getItem('rhythmAuth_approval');
+                if (rhythmAuth) {
+                    const userData = JSON.parse(rhythmAuth);
+                    if (userData.approved) {
+                        sessions.push({
+                            email: userData.email || userData.user_email,
+                            name: userData.name || userData.user_name || 'Unknown',
+                            isAdmin: userData.isAdmin || userData.role === 'admin',
+                            source: 'rhythm_auth'
+                        });
+                    }
+                }
+            } catch (e) {
+                console.log('No RhythmAuth session found');
+            }
+
+            if (sessions.length === 0) {
+                userListDiv.innerHTML = '<p>No active user sessions found. Users need to log in first.</p>';
+                return;
+            }
+
+            userListDiv.innerHTML = `
+                <ul class="user-list">
+                    ${sessions.map(user => `
+                        <li class="user-item">
+                            <div class="user-info">
+                                <div class="user-name">${user.name}</div>
+                                <div class="user-email">${user.email || 'No email'}</div>
+                            </div>
+                            <span class="user-status ${user.isAdmin ? 'status-admin' : 'status-user'}">
+                                ${user.isAdmin ? 'Admin' : 'User'}
+                            </span>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        }
+
+        document.getElementById('promotion-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('user-email').value.trim().toLowerCase();
+            const method = document.getElementById('promotion-method').value;
+
+            if (!email) {
+                showMessage('Please enter an email address', true);
+                return;
+            }
+
+            let success = false;
+
+            try {
+                // Method 1: Update current session if user is logged in
+                if (method === 'current' || method === 'both') {
+                    const rhythmAuth = localStorage.getItem('rhythmAuth_approval');
+                    if (rhythmAuth) {
+                        const userData = JSON.parse(rhythmAuth);
+                        const userEmail = (userData.email || userData.user_email || '').toLowerCase();
+                        
+                        if (userData.approved && userEmail === email) {
+                            userData.isAdmin = true;
+                            userData.role = 'admin';
+                            if (!userData.permissions) userData.permissions = [];
+                            if (!userData.permissions.includes('admin_access')) {
+                                userData.permissions.push('admin_access', 'admin_panel_access');
+                            }
+                            localStorage.setItem('rhythmAuth_approval', JSON.stringify(userData));
+                            success = true;
+                            showMessage(`✅ Promoted ${email} in current session!`);
+                        } else if (userEmail !== email) {
+                            showMessage(`Current logged in user (${userEmail}) doesn't match target email (${email})`, true);
+                        } else {
+                            showMessage('No matching user session found', true);
+                        }
+                    }
+                }
+
+                // Method 2: Add to Firebase Database
+                if (method === 'database' || method === 'both') {
+                    // Generate a user ID based on email
+                    const userId = 'user_' + email.replace(/[@.]/g, '_');
+                    const dbSuccess = await setup.createAdminUser(userId, { 
+                        email: email,
+                        name: email.split('@')[0], // Use part before @ as name
+                        promotedAt: Date.now()
+                    });
+                    
+                    if (dbSuccess) {
+                        success = true;
+                        showMessage(`✅ Added ${email} to Firebase Database as admin!`);
+                    }
+                }
+
+                if (success) {
+                    document.getElementById('promotion-form').reset();
+                    setTimeout(loadUserSessions, 1000); // Refresh user list
+                } else {
+                    showMessage('Failed to promote user. Check console for details.', true);
+                }
+
+            } catch (error) {
+                console.error('Promotion error:', error);
+                showMessage('Error promoting user: ' + error.message, true);
+            }
+        });
+
+        // Make refresh function global
+        window.refreshUserList = loadUserSessions;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserSessions();
+        });
+    </script>
+</body>
+</html>

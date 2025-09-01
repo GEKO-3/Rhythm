@@ -218,48 +218,54 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import RhythmUnifiedAuth from './js/rhythm-unified-auth.js';
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
-            authDomain: "rhythm-ea7a1.firebaseapp.com",
-            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
-            projectId: "rhythm-ea7a1",
-            storageBucket: "rhythm-ea7a1.firebasestorage.app",
-            messagingSenderId: "776053739080",
-            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
-        };
-
-        // Initialize Firebase
-        let app, database;
-        try {
-            console.log('Initializing Firebase...');
-            app = initializeApp(firebaseConfig);
-            database = getDatabase(app);
-            console.log('Firebase initialized successfully');
+        // Wait for unified auth to initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Login page loaded, initializing unified auth...');
             
-            // Test database connection with a simple read
-            setTimeout(async () => {
-                try {
-                    console.log('Testing database connection...');
-                    const testRef = ref(database, 'test');
-                    await get(testRef);
-                    console.log('Database connection successful');
-                } catch (error) {
-                    console.error('Database connection test failed:', error);
-                    console.error('This might be a network or CORS issue');
+            // Wait for auth system to initialize
+            let attempts = 0;
+            while (!window.rhythmAuth?.isInitialized && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.rhythmAuth?.isInitialized) {
+                console.error('Unified auth failed to initialize');
+                showMessage('System initialization failed. Please refresh the page.', 'error');
+                return;
+            }
+            
+            // Check if user is already authenticated
+            const authResult = await window.rhythmAuth.checkAuthentication();
+            if (authResult.isAuthenticated) {
+                console.log('User already authenticated, redirecting...');
+                showMessage('Already logged in! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.rhythmAuth.redirectAfterLogin();
+                }, 1000);
+                return;
+            }
+            
+            // Try to restore admin session automatically (for specific case)
+            console.log('🔄 Attempting automatic admin session restoration...');
+            try {
+                const restored = await window.rhythmAuth.restoreUserSession('0023');
+                if (restored) {
+                    showMessage('Admin session restored! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.rhythmAuth.redirectAfterLogin();
+                    }, 1500);
+                    return;
                 }
-            }, 500);
+            } catch (error) {
+                console.log('No admin session to restore, continuing with normal login');
+            }
             
-        } catch (error) {
-            console.error('Firebase initialization failed:', error);
-        }
-
-        const form = document.getElementById('loginForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const messageDiv = document.getElementById('message');
+            // Check for pending request
+            await checkPendingRequest();
+        });
 
         // PIN input auto-advance functionality
         const pinInputs = document.querySelectorAll('.pin-input');
@@ -316,270 +322,97 @@
             });
         });
 
-        // Check for existing requests/approvals on page load
-        document.addEventListener('DOMContentLoaded', async () => {
-            console.log('DOM loaded, waiting for Firebase initialization...');
+        // Handle form submission
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            // Wait for Firebase to be fully initialized
-            let attempts = 0;
-            while (!database && attempts < 10) {
-                console.log(`Waiting for Firebase... attempt ${attempts + 1}`);
-                await new Promise(resolve => setTimeout(resolve, 200));
-                attempts++;
-            }
+            const fullName = document.getElementById('name').value.trim();
+            const accessCode = Array.from(pinInputs).map(input => input.value).join('');
             
-            if (!database) {
-                console.error('Firebase failed to initialize after 2 seconds');
-                showMessage('Connection error. Please refresh the page.', 'error');
+            if (!fullName) {
+                showMessage('Please enter your full name.', 'error');
                 return;
             }
             
-            console.log('Firebase ready, checking status...');
-            await checkExistingStatus();
+            if (accessCode.length !== 4 || !/^\d{4}$/.test(accessCode)) {
+                showMessage('Please enter a valid 4-digit access code.', 'error');
+                return;
+            }
             
-            // If no existing approval found, try to find it in the database
-            const existingApproval = localStorage.getItem('rhythmAuth_approval');
-            const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
+            const submitBtn = document.getElementById('submitBtn');
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
             
-            if (!existingApproval && !pendingRequest) {
-                console.log('No localStorage data found, searching database...');
-                await searchDatabaseForDevice();
+            try {
+                const result = await window.rhythmAuth.submitLoginRequest(accessCode, fullName);
+                
+                if (result.success) {
+                    if (result.action === 'auto_login') {
+                        showMessage('Access approved! Redirecting...', 'success');
+                        setTimeout(() => {
+                            window.rhythmAuth.redirectAfterLogin();
+                        }, 1000);
+                    } else if (result.action === 'request_submitted') {
+                        showMessage('Request submitted successfully! Please wait for admin approval.', 'success');
+                        disableForm();
+                    }
+                } else {
+                    if (result.action === 'request_pending') {
+                        showMessage('You already have a pending request. Please wait for approval.', 'info');
+                        disableForm();
+                    } else {
+                        showMessage(result.message || 'Request failed. Please try again.', 'error');
+                    }
+                }
+            } catch (error) {
+                console.error('Error submitting request:', error);
+                showMessage('Error submitting request. Please try again.', 'error');
+            } finally {
+                if (submitBtn.textContent === 'Submitting...') {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }
             }
         });
 
-        async function checkExistingStatus() {
-            console.log('Checking existing status...');
-            const deviceId = getDeviceId();
-            console.log('Device ID:', deviceId);
-            
-            // Check if already approved
-            const existingApproval = localStorage.getItem('rhythmAuth_approval');
-            console.log('Existing approval:', existingApproval);
-            if (existingApproval) {
-                try {
-                    const approval = JSON.parse(existingApproval);
-                    if (approval.status === 'active') {
-                        // Verify approval is still valid on server
-                        console.log('Verifying approval for:', approval.accessCode);
-                        const isStillValid = await verifyApprovalStatus(approval.accessCode, deviceId);
-                        console.log('Approval still valid:', isStillValid);
-                        if (isStillValid) {
-                            showMessage('Already approved! Redirecting...', 'success');
-                            setTimeout(() => {
-                                window.location.href = 'pages/songlist.html';
-                            }, 1500);
-                            return;
-                        } else {
-                            // Access was revoked
-                            localStorage.removeItem('rhythmAuth_approval');
-                            showMessage('Access was revoked. Please submit a new request.', 'error');
-                        }
-                    }
-                } catch (e) {
-                    console.error('Error parsing approval:', e);
-                    localStorage.removeItem('rhythmAuth_approval');
-                }
-            }
-
-            // Check for pending request
+        // Check pending request status
+        async function checkPendingRequest() {
             const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
-            console.log('Pending request:', pendingRequest);
             if (pendingRequest) {
                 try {
-                    const request = JSON.parse(pendingRequest);
-                    console.log('Checking request status for:', request.accessCode);
-                    // Check if request was approved since last check
-                    const approvalStatus = await checkRequestStatus(request.accessCode, deviceId);
-                    console.log('Request status:', approvalStatus);
+                    const requestData = JSON.parse(pendingRequest);
+                    const status = await window.rhythmAuth.checkRequestStatus(requestData.accessCode, requestData.deviceId);
                     
-                    if (approvalStatus === 'approved') {
-                        // Request was approved!
-                        const approvedData = await getApprovedData(request.accessCode, deviceId);
-                        console.log('Approved data:', approvedData);
-                        if (approvedData) {
-                            localStorage.setItem('rhythmAuth_approval', JSON.stringify(approvedData));
+                    if (status === 'approved') {
+                        // Trigger authentication check which will handle login
+                        const authResult = await window.rhythmAuth.checkAuthentication();
+                        if (authResult.isAuthenticated) {
                             localStorage.removeItem('rhythmAuth_pendingRequest');
+                            console.log('✅ Request approved! Redirecting...');
                             showMessage('Your request was approved! Redirecting...', 'success');
                             setTimeout(() => {
-                                window.location.href = 'pages/songlist.html';
-                            }, 1500);
+                                window.rhythmAuth.redirectAfterLogin();
+                            }, 1000);
                             return;
                         }
-                    } else if (approvalStatus === 'rejected') {
-                        // Request was rejected
+                    } else if (status === 'rejected') {
                         localStorage.removeItem('rhythmAuth_pendingRequest');
-                        showMessage('Your request was rejected. You can submit a new request.', 'error');
-                    } else if (approvalStatus === 'pending') {
-                        // Still pending
-                        showMessage('Your request is still pending approval. Please wait...', 'success');
+                        showMessage('Your access request has been rejected.', 'error');
+                    } else if (status === 'pending') {
+                        showMessage('Your request is still pending approval. Please wait for admin review.', 'info');
                         disableForm();
+                    } else if (status === 'revoked') {
+                        localStorage.removeItem('rhythmAuth_pendingRequest');
+                        showMessage('Your access has been revoked.', 'error');
+                    } else if (status === 'none') {
+                        localStorage.removeItem('rhythmAuth_pendingRequest');
+                        showMessage('Your request was not found. Please submit a new request.', 'warning');
                     }
                 } catch (e) {
-                    console.error('Error checking pending request:', e);
+                    console.log('Error checking request status:', e);
                     localStorage.removeItem('rhythmAuth_pendingRequest');
                 }
-            }
-            console.log('Status check complete');
-        }
-
-        async function searchDatabaseForDevice() {
-            // First try to restore known device
-            const deviceId = restoreKnownDevice();
-            console.log('Searching database for device:', deviceId);
-            
-            try {
-                // Search all approved users for this device ID
-                const approvedRef = ref(database, 'approvedUsers');
-                const snapshot = await get(approvedRef);
-                
-                if (snapshot.exists()) {
-                    const allUsers = snapshot.val();
-                    console.log('All approved users:', allUsers);
-                    
-                    // Find user with matching device ID
-                    for (const [accessCode, userData] of Object.entries(allUsers)) {
-                        if (userData.deviceId === deviceId && userData.status === 'active') {
-                            console.log('Found matching device for access code:', accessCode, userData);
-                            
-                            // Restore approval to localStorage
-                            const approvalData = {
-                                accessCode: accessCode,
-                                approvedAt: userData.approvedAt,
-                                approvedBy: userData.approvedBy,
-                                deviceId: deviceId,
-                                fullName: userData.fullName,
-                                lastActive: Date.now(),
-                                permissions: userData.permissions || ['songlist', 'lyrics'],
-                                role: userData.role || 'user',
-                                status: 'active'
-                            };
-                            
-                            localStorage.setItem('rhythmAuth_approval', JSON.stringify(approvalData));
-                            console.log('Restored approval data:', approvalData);
-                            
-                            showMessage('Welcome back! Your session has been restored. Redirecting...', 'success');
-                            setTimeout(() => {
-                                window.location.href = 'pages/songlist.html';
-                            }, 2000);
-                            return;
-                        }
-                    }
-                    
-                    console.log('No matching device found in approved users');
-                    showMessage('No existing approval found for this device. Please submit a new request.', 'error');
-                } else {
-                    console.log('No approved users found in database');
-                }
-            } catch (error) {
-                console.error('Error searching database:', error);
-            }
-        }
-
-        async function verifyApprovalStatus(accessCode, deviceId) {
-            console.log('Verifying approval status:', { accessCode, deviceId });
-            try {
-                if (!database) {
-                    console.error('Database not initialized');
-                    return false;
-                }
-                
-                const approvedRef = ref(database, `approvedUsers/${accessCode}`);
-                console.log('Firebase ref created:', approvedRef);
-                
-                const snapshot = await get(approvedRef);
-                console.log('Firebase snapshot received:', snapshot.exists(), snapshot.val());
-                
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    const isValid = userData.deviceId === deviceId && userData.status === 'active';
-                    console.log('Approval validation:', { userData, isValid });
-                    return isValid;
-                }
-                console.log('No approval data found');
-                return false;
-            } catch (error) {
-                console.error('Error verifying approval:', error);
-                console.error('Error details:', error.message, error.code);
-                return false;
-            }
-        }
-
-        async function checkRequestStatus(accessCode, deviceId) {
-            console.log('Checking request status:', { accessCode, deviceId });
-            try {
-                if (!database) {
-                    console.error('Database not initialized for request check');
-                    return 'error';
-                }
-
-                // Check approved users first
-                console.log('Checking approved users...');
-                const approvedRef = ref(database, `approvedUsers/${accessCode}`);
-                const approvedSnapshot = await get(approvedRef);
-                
-                if (approvedSnapshot.exists()) {
-                    const userData = approvedSnapshot.val();
-                    console.log('Found approved user data:', userData);
-                    if (userData.deviceId === deviceId) {
-                        const status = userData.status === 'active' ? 'approved' : 'revoked';
-                        console.log('User status:', status);
-                        return status;
-                    }
-                }
-
-                // Check rejected requests
-                console.log('Checking rejected requests...');
-                const rejectedRef = ref(database, `rejectedLogins/${accessCode}_${deviceId}`);
-                const rejectedSnapshot = await get(rejectedRef);
-                
-                if (rejectedSnapshot.exists()) {
-                    console.log('Request was rejected');
-                    return 'rejected';
-                }
-
-                // Check pending requests
-                console.log('Checking pending requests...');
-                const requestRef = ref(database, `loginRequests/${accessCode}_${deviceId}`);
-                const requestSnapshot = await get(requestRef);
-                
-                if (requestSnapshot.exists()) {
-                    console.log('Request is still pending');
-                    return 'pending';
-                }
-
-                console.log('No request found');
-                return 'none';
-            } catch (error) {
-                console.error('Error checking request status:', error);
-                console.error('Error details:', error.message, error.code);
-                return 'error';
-            }
-        }
-
-        async function getApprovedData(accessCode, deviceId) {
-            try {
-                const approvedRef = ref(database, `approvedUsers/${accessCode}`);
-                const snapshot = await get(approvedRef);
-                
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    if (userData.deviceId === deviceId && userData.status === 'active') {
-                        return {
-                            accessCode: accessCode,
-                            approvedAt: userData.approvedAt || Date.now(),
-                            approvedBy: userData.approvedBy || 'admin',
-                            deviceId: deviceId,
-                            fullName: userData.fullName,
-                            lastActive: Date.now(),
-                            permissions: userData.permissions || ['songlist', 'lyrics'],
-                            status: 'active'
-                        };
-                    }
-                }
-                return null;
-            } catch (error) {
-                console.error('Error getting approved data:', error);
-                return null;
             }
         }
 
@@ -593,180 +426,29 @@
             submitBtn.textContent = 'Request Pending...';
         }
 
-        function enableForm() {
-            const nameInput = document.getElementById('name');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            nameInput.disabled = false;
-            pinInputs.forEach(input => input.disabled = false);
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Request Access';
-        }
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value.trim();
-            const accessCode = Array.from(pinInputs).map(input => input.value).join('');
-
-            if (!name || accessCode.length !== 4) {
-                showMessage('Please fill in all fields', 'error');
-                return;
-            }
-
-            if (!/^\d{4}$/.test(accessCode)) {
-                showMessage('Access code must be exactly 4 digits', 'error');
-                return;
-            }
-
-            // Check if there's already a pending request for this device
-            const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
-            if (pendingRequest) {
-                showMessage('You already have a pending request. Please wait for approval.', 'error');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
-
-            try {
-                // Generate device ID for this browser/device
-                const deviceId = getDeviceId();
-
-                // Check if user already has approval
-                const approvedRef = ref(database, `approvedUsers/${accessCode}`);
-                const approvedSnapshot = await get(approvedRef);
-
-                if (approvedSnapshot.exists()) {
-                    const userData = approvedSnapshot.val();
-                    
-                    // Check if this specific device is approved
-                    if (userData.deviceId === deviceId && userData.status === 'active') {
-                        // Store approval data in correct format
-                        const approvalData = {
-                            accessCode: accessCode,
-                            approvedAt: userData.approvedAt || Date.now(),
-                            approvedBy: userData.approvedBy || 'admin',
-                            deviceId: deviceId,
-                            fullName: userData.fullName || name,
-                            lastActive: Date.now(),
-                            permissions: userData.permissions || ['songlist', 'lyrics'],
-                            status: 'active'
-                        };
-                        localStorage.setItem('rhythmAuth_approval', JSON.stringify(approvalData));
-                        showMessage('Access approved! Redirecting...', 'success');
-                        setTimeout(() => {
-                            window.location.href = 'pages/songlist.html';
-                        }, 1500);
-                        return;
-                    } else if (userData.deviceId === deviceId && userData.status === 'revoked') {
-                        showMessage('Your access has been revoked. Contact admin for more information.', 'error');
-                        return;
-                    } else if (userData.deviceId !== deviceId) {
-                        showMessage('This access code is registered to a different device.', 'error');
-                        return;
-                    }
-                }
-
-                // Check if user is rejected
-                const rejectedRef = ref(database, `rejectedLogins/${accessCode}_${deviceId}`);
-                const rejectedSnapshot = await get(rejectedRef);
-
-                if (rejectedSnapshot.exists()) {
-                    showMessage('Your previous request was rejected. Contact admin for more information.', 'error');
-                    return;
-                }
-
-                // Check if user already has pending request
-                const requestRef = ref(database, `loginRequests/${accessCode}_${deviceId}`);
-                const requestSnapshot = await get(requestRef);
-
-                if (requestSnapshot.exists()) {
-                    // Store pending request info locally
-                    const pendingData = {
-                        accessCode: accessCode,
-                        fullName: name,
-                        deviceId: deviceId,
-                        requestedAt: Date.now(),
-                        status: 'pending'
-                    };
-                    localStorage.setItem('rhythmAuth_pendingRequest', JSON.stringify(pendingData));
-                    showMessage('Your request is already pending approval.', 'error');
-                    disableForm();
-                    return;
-                }
-
-                // Submit new request
-                const requestData = {
-                    accessCode: accessCode,
-                    fullName: name,
-                    deviceId: deviceId,
-                    requestedAt: Date.now(),
-                    status: 'pending',
-                    permissions: ['songlist', 'lyrics'],
-                    deviceInfo: navigator.userAgent.substring(0, 100) // Limit length
-                };
-
-                await set(requestRef, requestData);
-                
-                // Store pending request info locally
-                const pendingData = {
-                    accessCode: accessCode,
-                    fullName: name,
-                    deviceId: deviceId,
-                    requestedAt: Date.now(),
-                    status: 'pending'
-                };
-                localStorage.setItem('rhythmAuth_pendingRequest', JSON.stringify(pendingData));
-                
-                showMessage('Request submitted successfully! Please wait for approval.', 'success');
-                disableForm();
-
-            } catch (error) {
-                console.error('Error:', error);
-                showMessage('Failed to submit request. Please try again.', 'error');
-                enableForm();
-            } finally {
-                if (submitBtn.textContent === 'Submitting...') {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Request Access';
-                }
-            }
-        });
-
-        // Generate a consistent device ID for this browser
-        function getDeviceId() {
-            let deviceId = localStorage.getItem('rhythmAuth_deviceId');
-            if (!deviceId) {
-                deviceId = 'dev_' + Math.random().toString(36).substr(2, 10);
-                localStorage.setItem('rhythmAuth_deviceId', deviceId);
-            }
-            return deviceId;
-        }
-
-        // Temporary function to restore your specific device ID
-        function restoreKnownDevice() {
-            const knownDeviceId = 'dev_6ws5hd07gw4';
-            const knownAccessCode = '0023';
-            
-            console.log('Checking for known device restoration...');
-            const existingApproval = localStorage.getItem('rhythmAuth_approval');
-            
-            if (!existingApproval) {
-                console.log('No existing approval, checking if this should be restored device:', knownDeviceId);
-                // Set the known device ID
-                localStorage.setItem('rhythmAuth_deviceId', knownDeviceId);
-                console.log('Device ID set to:', knownDeviceId);
-                return knownDeviceId;
-            }
-            
-            return getDeviceId();
-        }
-
-        function showMessage(text, type) {
-            messageDiv.textContent = text;
+        function showMessage(message, type = 'info') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
             messageDiv.className = `message ${type}`;
             messageDiv.style.display = 'block';
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 10000);
+        }
+    </script>
+    </script>
+
+    <!-- Global navigation functions for admin choice buttons -->
+    <script>
+        // Navigation functions (global scope for onclick handlers)
+        function goToSonglist() {
+            window.location.href = 'pages/songlist.html';
+        }
+
+        function goToAdmin() {
+            window.location.href = 'pages/admin/admin.html';
         }
     </script>
 </body>

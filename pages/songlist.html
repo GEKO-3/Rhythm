@@ -5,8 +5,8 @@
   <title>Songs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
-  <!-- Login Authentication System -->
-  <script src="../js/rhythm-auth.js"></script>
+  <!-- Unified Authentication System -->
+  <script type="module" src="../js/rhythm-unified-auth.js"></script>
   
   <!-- Preload critical fonts -->
   <link rel="preload" href="../assets/Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
@@ -1245,71 +1245,44 @@
           try {
             console.log('🔄 loadData started');
             
-            // Check Firebase-based approval authentication
-            let isAuthenticated = false;
-            let approvalData = null;
-            
-            // Check localStorage for Firebase approval data
-            const storedApproval = localStorage.getItem('rhythmAuth_approval');
-            if (storedApproval) {
-              try {
-                approvalData = JSON.parse(storedApproval);
-                if (approvalData.status === 'active' && 
-                    approvalData.permissions && 
-                    approvalData.permissions.includes('songlist')) {
-                  
-                  // Verify approval is still valid on server (when online)
-                  if (navigator.onLine) {
-                    const isStillValid = await this.verifyApprovalStatus(approvalData);
-                    if (isStillValid) {
-                      isAuthenticated = true;
-                      console.log('✅ Authentication: Approved user -', approvalData.fullName);
-                      
-                      // Show welcome message
-                      this.showWelcomeMessage(approvalData.fullName);
-                      
-                      // Update last active timestamp
-                      approvalData.lastActive = Date.now();
-                      localStorage.setItem('rhythmAuth_approval', JSON.stringify(approvalData));
-                      
-                      // Start periodic access verification
-                      this.startAccessVerification(approvalData);
-                    } else {
-                      // Access was revoked
-                      console.log('❌ Access was revoked');
-                      localStorage.removeItem('rhythmAuth_approval');
-                      this.showAccessRevokedMessage();
-                      return;
-                    }
-                  } else {
-                    // Offline - trust local storage but warn user
-                    isAuthenticated = true;
-                    console.log('✅ Authentication: Offline mode - using cached approval');
-                    
-                    // Show welcome message for offline mode too
-                    this.showWelcomeMessage(approvalData.fullName);
-                  }
-                }
-              } catch (e) {
-                console.error('Error parsing approval data:', e);
-                localStorage.removeItem('rhythmAuth_approval'); // Clear corrupted data
-              }
+            // Wait for unified auth to initialize
+            let attempts = 0;
+            while (!window.rhythmAuth?.isInitialized && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
             }
             
-            console.log('🔄 Authentication complete, proceeding with data load');
-            
-            if (!isAuthenticated) {
-              console.log('❌ Not authenticated for songlist access');
-              // Redirect to login page (in root directory)
-              window.location.href = '../login.html';
-              return;
+            if (!window.rhythmAuth?.isInitialized) {
+                console.error('Unified auth failed to initialize');
+                window.location.href = '../login.html';
+                return;
             }
-
-            // Bypass waitForServices for speed - direct data loading
-            console.log('🔄 About to call loadSongsData');
             
-            // Update global state with authentication result
-            STATE.isAuthenticated = isAuthenticated;
+            // Use unified authentication check
+            const authResult = await window.rhythmAuth.checkAuthentication();
+            
+            if (!authResult.isAuthenticated) {
+                console.log('❌ User not authenticated, redirecting to login');
+                window.location.href = '../login.html?returnUrl=' + encodeURIComponent(window.location.pathname);
+                return;
+            }
+            
+            // Check if user has songlist permission
+            if (!window.rhythmAuth.hasPermission('songlist')) {
+                console.log('❌ User does not have songlist permission');
+                alert('You do not have permission to access the song list.');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            const user = authResult.user;
+            console.log('✅ Authentication successful for:', user.fullName);
+            
+            // Show welcome message
+            this.showWelcomeMessage(user.fullName);
+            
+            // Update global state
+            STATE.isAuthenticated = true;
 
             // Check if this is a fresh page load
             const isFreshLoad = !sessionStorage.getItem('navigationInProgress') && 
@@ -1324,6 +1297,8 @@
             console.log('🔄 DataManager.loadSongsData completed');
           } catch (error) {
             console.error('Failed to load songs:', error);
+            // On any error, redirect to login
+            window.location.href = '../login.html';
           }
         },
 
@@ -1333,11 +1308,12 @@
               await DataManager.initializeFirebase();
             }
             
-            // Check if approval still exists and is active
+            // Check if approval still exists and is valid
             const userData = await DataManager.rhythmDB.getApprovedUser(approvalData.accessCode);
             
             if (userData) {
-              return userData.deviceId === approvalData.deviceId && userData.status === 'active';
+              // User exists and device matches and is not revoked
+              return userData.deviceId === approvalData.deviceId && userData.status !== 'revoked';
             }
             return false;
           } catch (error) {

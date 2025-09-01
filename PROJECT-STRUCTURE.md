@@ -48,7 +48,7 @@
 ### 💻 `/js/` - JavaScript Modules
 **Core System:**
 - `firebase-db.js` - Firebase database interface (CSV-free)
-- `rhythm-auth.js` - Authentication system
+- `rhythm-unified-auth.js` - Unified authentication system
 - `config.js` - Main configuration
 
 **UI & Features:**

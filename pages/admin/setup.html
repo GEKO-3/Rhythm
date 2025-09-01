@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Setup - Rhythm Boduberu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1f1f1f;
+            color: #f5d000;
+        }
+        .setup-container {
+            background: #2b2b2b;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #f5d000;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #1f1f1f;
+            color: #f5d000;
+            font-size: 16px;
+        }
+        button {
+            background: #f5d000;
+            color: #1f1f1f;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #ffd700;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background: #4caf50;
+            color: white;
+        }
+        .error {
+            background: #f44336;
+            color: white;
+        }
+        .instructions {
+            background: #333;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            margin-top: 0;
+            color: #f5d000;
+        }
+        .instructions ol {
+            margin-left: 20px;
+        }
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        .instructions code {
+            background: #1f1f1f;
+            padding: 2px 6px;
+            border-radius: 3px;
+            color: #f5d000;
+        }
+    </style>
+</head>
+<body>
+    <div class="setup-container">
+        <h1>Admin User Setup</h1>
+        
+        <div class="instructions">
+            <h3>Setup Instructions:</h3>
+            <ol>
+                <li>First, create Firebase Authentication users in the <a href="https://console.firebase.google.com" target="_blank">Firebase Console</a></li>
+                <li>Go to Authentication → Users → Add User</li>
+                <li>Create users with email and password</li>
+                <li>Copy the User UID from Firebase Console</li>
+                <li>Use this form to set up admin permissions in the database</li>
+            </ol>
+            <p><strong>Note:</strong> Users must be created in Firebase Authentication first, then configured as admin here.</p>
+        </div>
+
+        <form id="admin-setup-form">
+            <div class="form-group">
+                <label for="user-uid">Firebase User UID:</label>
+                <input type="text" id="user-uid" required placeholder="Copy from Firebase Console Authentication > Users">
+            </div>
+            
+            <div class="form-group">
+                <label for="user-email">Email:</label>
+                <input type="email" id="user-email" required placeholder="admin@rhythmboduberu.com">
+            </div>
+            
+            <div class="form-group">
+                <label for="user-name">Full Name:</label>
+                <input type="text" id="user-name" required placeholder="System Administrator">
+            </div>
+            
+            <button type="submit">Create Admin User</button>
+            <button type="button" onclick="setupDefaults()">Setup Default Admins</button>
+        </form>
+
+        <div id="message" class="message"></div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #444;">
+            <h3>Default Admin Emails (if you choose to set up defaults):</h3>
+            <ul>
+                <li><code>admin@rhythmboduberu.com</code></li>
+                <li><code>manager@rhythmboduberu.com</code></li>
+            </ul>
+            <p><strong>Important:</strong> You must create these users in Firebase Authentication first!</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import AdminUserSetup from '../js/admin-setup.js';
+
+        const setup = new AdminUserSetup();
+        const messageDiv = document.getElementById('message');
+
+        function showMessage(text, isError = false) {
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${isError ? 'error' : 'success'}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        document.getElementById('admin-setup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const uid = document.getElementById('user-uid').value.trim();
+            const email = document.getElementById('user-email').value.trim();
+            const name = document.getElementById('user-name').value.trim();
+
+            if (!uid || !email || !name) {
+                showMessage('Please fill in all fields', true);
+                return;
+            }
+
+            try {
+                const success = await setup.createAdminUser(uid, { email, name });
+                if (success) {
+                    showMessage(`Admin user ${email} created successfully!`);
+                    document.getElementById('admin-setup-form').reset();
+                } else {
+                    showMessage('Failed to create admin user. Check console for details.', true);
+                }
+            } catch (error) {
+                console.error('Setup error:', error);
+                showMessage('Error creating admin user: ' + error.message, true);
+            }
+        });
+
+        window.setupDefaults = async () => {
+            try {
+                showMessage('Setting up default admins... Make sure they exist in Firebase Auth first!');
+                await setup.setupDefaultAdmins();
+                showMessage('Default admin users setup completed!');
+            } catch (error) {
+                console.error('Default setup error:', error);
+                showMessage('Error setting up default admins: ' + error.message, true);
+            }
+        };
+    </script>
+</body>
+</html>
