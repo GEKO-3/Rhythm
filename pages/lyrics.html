@@ -592,7 +592,12 @@
         
         if (!authResult.isAuthenticated) {
             console.log('❌ [Lyrics] User not authenticated:', authResult.reason);
-            showAccessDenied('You need to be logged in to access lyrics');
+            
+            if (authResult.reason === 'device_mismatch') {
+                showAccessDenied('Device Mismatch: This account is registered to a different device. Each user can only access from one device. Please log in from your registered device or contact admin');
+            } else {
+                showAccessDenied('You need to be logged in to access lyrics');
+            }
             return;
         }
         

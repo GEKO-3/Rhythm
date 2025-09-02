@@ -1262,7 +1262,15 @@
             const authResult = await window.rhythmAuth.checkAuthentication();
             
             if (!authResult.isAuthenticated) {
-                console.log('❌ User not authenticated, redirecting to login');
+                console.log('❌ User not authenticated:', authResult.reason);
+                
+                if (authResult.reason === 'device_mismatch') {
+                    alert('❌ Device Mismatch: This account is registered to a different device. Each user can only access from one device. Please log in from your registered device or contact admin.');
+                    localStorage.removeItem('rhythmAuth_approval'); // Clear invalid session
+                } else {
+                    console.log('❌ User not authenticated, redirecting to login');
+                }
+                
                 window.location.href = '../login.html?returnUrl=' + encodeURIComponent(window.location.pathname);
                 return;
             }

@@ -361,6 +361,10 @@
                     if (result.action === 'request_pending') {
                         showMessage('You already have a pending request. Please wait for approval.', 'info');
                         disableForm();
+                    } else if (result.action === 'device_mismatch') {
+                        showMessage('❌ Device Mismatch: This account is registered to a different device. Each user can only access from one device. Please contact admin if you need to change devices.', 'error');
+                    } else if (result.action === 'access_revoked') {
+                        showMessage('Your access has been revoked. Please contact an administrator.', 'error');
                     } else {
                         showMessage(result.message || 'Request failed. Please try again.', 'error');
                     }

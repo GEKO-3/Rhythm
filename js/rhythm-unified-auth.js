@@ -77,27 +77,20 @@ class RhythmUnifiedAuth {
                     return { isAuthenticated: false, user: null, reason: 'access_revoked' };
                 }
 
-                // Check device match - but be flexible for admin users and active users
-                const isDeviceMismatch = dbUser.deviceId && userData.deviceId && dbUser.deviceId !== userData.deviceId;
-                const isAdminUser = dbUser.role === 'admin' || (dbUser.permissions && dbUser.permissions.includes('admin'));
+                // Check device match - STRICT enforcement for all users
+                const currentDeviceId = this.generateDeviceId();
+                console.log('🔍 [Device Debug] Current device ID:', currentDeviceId);
+                console.log('🔍 [Device Debug] DB user device ID:', dbUser.deviceId);
                 
-                if (isDeviceMismatch && !isAdminUser) {
-                    console.log('❌ [UnifiedAuth] Device mismatch for non-admin user');
+                const isDeviceMismatch = dbUser.deviceId && currentDeviceId !== dbUser.deviceId;
+                
+                if (isDeviceMismatch) {
+                    console.log('❌ [UnifiedAuth] Device mismatch detected');
+                    console.log('   Database device ID:', dbUser.deviceId);
+                    console.log('   Current device ID:', currentDeviceId);
+                    console.log('   User:', dbUser.fullName || dbUser.name);
                     localStorage.removeItem('rhythmAuth_approval');
                     return { isAuthenticated: false, user: null, reason: 'device_mismatch' };
-                }
-                
-                // If device mismatch for admin, update the device ID
-                if (isDeviceMismatch && isAdminUser) {
-                    console.log('🔄 [UnifiedAuth] Admin user device change detected, updating device ID');
-                    try {
-                        await this.updateUser(userData.accessCode, { 
-                            deviceId: userData.deviceId || this.generateDeviceId(),
-                            lastActive: Date.now()
-                        });
-                    } catch (error) {
-                        console.warn('⚠️ [UnifiedAuth] Could not update device ID, but allowing admin login');
-                    }
                 }
 
                 // Update stored data with latest from database
@@ -211,6 +204,53 @@ class RhythmUnifiedAuth {
     }
 
     /**
+     * Get device information for debugging
+     */
+    getDeviceInfo() {
+        const deviceId = this.generateDeviceId();
+        const userAgent = navigator.userAgent;
+        const platform = navigator.platform;
+        
+        return {
+            deviceId,
+            userAgent,
+            platform,
+            isMobile: /iPhone|iPad|iPod|Android/i.test(userAgent),
+            timestamp: new Date().toISOString()
+        };
+    }
+
+    /**
+     * Clear device data (for testing/debugging only)
+     */
+    clearDeviceData() {
+        localStorage.removeItem('rhythm_device_id');
+        console.log('🗑️ [UnifiedAuth] Device data cleared');
+    }
+
+    /**
+     * Debug function to show current authentication state
+     */
+    showAuthDebugInfo() {
+        const deviceInfo = this.getDeviceInfo();
+        const currentUser = this.getCurrentUser();
+        
+        console.group('🔍 Authentication Debug Info');
+        console.log('Device ID:', deviceInfo.deviceId);
+        console.log('User Agent:', deviceInfo.userAgent);
+        console.log('Platform:', deviceInfo.platform);
+        console.log('Is Mobile:', deviceInfo.isMobile);
+        console.log('Current User:', currentUser ? currentUser.fullName : 'None');
+        console.log('User Status:', currentUser ? currentUser.status : 'N/A');
+        console.log('User Device ID:', currentUser ? currentUser.deviceId : 'N/A');
+        console.log('Device Match:', currentUser ? (currentUser.deviceId === deviceInfo.deviceId) : 'N/A');
+        console.log('Permissions:', currentUser ? currentUser.permissions : 'None');
+        console.groupEnd();
+        
+        return { deviceInfo, currentUser };
+    }
+
+    /**
      * Login user (store auth data)
      */
     loginUser(userData) {
@@ -237,9 +277,20 @@ class RhythmUnifiedAuth {
     generateDeviceId() {
         let deviceId = localStorage.getItem('rhythm_device_id');
         if (!deviceId) {
-            deviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
+            // Create a more unique device ID using timestamp + random + browser info
+            const timestamp = Date.now().toString(36);
+            const random = Math.random().toString(36).substr(2, 9);
+            const userAgent = navigator.userAgent.substring(0, 50).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
+            deviceId = `dev_${timestamp}_${random}_${userAgent}`;
             localStorage.setItem('rhythm_device_id', deviceId);
+            console.log('🆔 [Device] Generated NEW unique device ID:', deviceId);
+        } else {
+            console.log('🆔 [Device] Using existing device ID:', deviceId);
         }
+        console.log('🔍 [Device] Full device info:');
+        console.log('   UserAgent:', navigator.userAgent);
+        console.log('   Platform:', navigator.platform);
+        console.log('   Language:', navigator.language);
         return deviceId;
     }
 
@@ -259,21 +310,27 @@ class RhythmUnifiedAuth {
                 return false;
             }
 
-            // Update device ID to current device
+            // STRICT device check: user must restore from their registered device
             const currentDeviceId = this.generateDeviceId();
-            try {
-                await this.updateUser(accessCode, { 
-                    deviceId: currentDeviceId,
-                    lastActive: Date.now()
-                });
-            } catch (error) {
-                console.warn('⚠️ [UnifiedAuth] Could not update device ID in database');
+            
+            if (dbUser.deviceId && dbUser.deviceId !== currentDeviceId) {
+                console.log('❌ [UnifiedAuth] Cannot restore session - device mismatch');
+                console.log('   Registered device:', dbUser.deviceId);
+                console.log('   Current device:', currentDeviceId);
+                return false;
+            }
+            
+            // If no device ID is set, restoration is not allowed
+            if (!dbUser.deviceId) {
+                console.log('❌ [UnifiedAuth] Cannot restore session - no device binding');
+                return false;
             }
 
             // Create normalized user data and store it
             const restoredUser = this.normalizeUserData({
                 ...dbUser,
-                deviceId: currentDeviceId
+                deviceId: currentDeviceId,
+                lastActive: Date.now()
             });
 
             localStorage.setItem('rhythmAuth_approval', JSON.stringify(restoredUser));
@@ -304,27 +361,46 @@ class RhythmUnifiedAuth {
         if (existingUser) {
             console.log('🔍 [UnifiedAuth] Found existing user:', existingUser);
             
-            // If user is approved and active, log them in regardless of device ID
+            // If user is approved and active, check device binding
             if (existingUser.status === 'active' || existingUser.status !== 'revoked') {
-                console.log('✅ [UnifiedAuth] User is approved, logging in...');
+                console.log('🔍 [UnifiedAuth] User is approved, checking device binding...');
                 
-                // Update the stored device ID to match the current device
-                const updatedUser = {
-                    ...existingUser,
-                    deviceId: deviceId, // Update to current device
-                    lastActive: Date.now()
-                };
-                
-                // Update database with current device ID
-                try {
-                    const userRef = { users: { [accessCode]: updatedUser } };
-                    await this.updateUser(accessCode, { deviceId: deviceId, lastActive: Date.now() });
-                    console.log('🔄 [UnifiedAuth] Updated device ID in database');
-                } catch (error) {
-                    console.warn('⚠️ [UnifiedAuth] Could not update device ID, but proceeding with login');
+                // STRICT device check: user must be on their registered device
+                if (existingUser.deviceId && existingUser.deviceId !== deviceId) {
+                    console.log('❌ [UnifiedAuth] Device mismatch during login attempt');
+                    console.log('   Registered device:', existingUser.deviceId);
+                    console.log('   Current device:', deviceId);
+                    return { 
+                        success: false, 
+                        action: 'device_mismatch', 
+                        message: 'This account is registered to a different device. Each user can only access from one device.' 
+                    };
                 }
                 
-                const loginData = this.loginUser(updatedUser);
+                // If no device ID is set, user needs admin to bind their device
+                if (!existingUser.deviceId) {
+                    console.log('❌ [UnifiedAuth] User has no device binding - admin action required');
+                    return { 
+                        success: false, 
+                        action: 'no_device_binding', 
+                        message: 'Your account needs device binding setup. Please contact an administrator.' 
+                    };
+                }
+                
+                // Device matches or was just set - proceed with login
+                console.log('✅ [UnifiedAuth] Device verified, logging in...');
+                const loginData = this.loginUser({
+                    ...existingUser,
+                    lastActive: Date.now()
+                });
+                
+                // Update last active time in database
+                try {
+                    await this.updateUser(accessCode, { lastActive: Date.now() });
+                } catch (error) {
+                    console.warn('⚠️ [UnifiedAuth] Could not update last active time');
+                }
+                
                 return { success: true, action: 'auto_login', user: loginData };
             }
             
@@ -511,6 +587,67 @@ class RhythmUnifiedAuth {
 
     goToAdmin() {
         window.location.href = 'pages/admin/admin.html';
+    }
+
+    /**
+     * Clear device binding (for testing only)
+     */
+    clearDeviceBinding() {
+        localStorage.removeItem('rhythm_device_id');
+        localStorage.removeItem('rhythmAuth_approval');
+        console.log('🧹 [Device] Cleared device binding and auth data');
+        return this.generateDeviceId();
+    }
+
+    /**
+     * ADMIN ONLY: Bind user to specific device
+     */
+    async bindUserToDevice(accessCode, targetDeviceId = null) {
+        if (!this.database) {
+            throw new Error('Database not initialized');
+        }
+
+        // If no target device specified, use current device
+        const deviceId = targetDeviceId || this.generateDeviceId();
+        
+        try {
+            await this.updateUser(accessCode, { 
+                deviceId: deviceId,
+                lastActive: Date.now(),
+                deviceBoundAt: Date.now(),
+                deviceBoundBy: this.currentUser?.accessCode || 'system'
+            });
+            
+            console.log(`✅ [Admin] User ${accessCode} bound to device ${deviceId}`);
+            return { success: true, deviceId: deviceId };
+        } catch (error) {
+            console.error('❌ [Admin] Failed to bind user to device:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * ADMIN ONLY: Unbind user from device (allows new device binding)
+     */
+    async unbindUserDevice(accessCode) {
+        if (!this.database) {
+            throw new Error('Database not initialized');
+        }
+
+        try {
+            await this.updateUser(accessCode, { 
+                deviceId: null,
+                lastActive: Date.now(),
+                deviceUnboundAt: Date.now(),
+                deviceUnboundBy: this.currentUser?.accessCode || 'system'
+            });
+            
+            console.log(`✅ [Admin] User ${accessCode} unbound from device`);
+            return { success: true };
+        } catch (error) {
+            console.error('❌ [Admin] Failed to unbind user from device:', error);
+            return { success: false, error: error.message };
+        }
     }
 }
 
