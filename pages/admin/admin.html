@@ -418,12 +418,82 @@
       if (pageTitle) pageTitle.style.display = 'block';
       if (menuContainer) menuContainer.style.display = 'flex';
       
-      // Update page title with user name if possible
-      if (pageTitle) {
-        pageTitle.textContent = `Admin - Welcome ${user.fullName}!`;
-      }
+      // Show welcome popup message like songlist page
+      showWelcomeMessage(user.fullName);
       
       console.log('✅ Admin dashboard shown for:', user.fullName);
+    }
+
+    function showWelcomeMessage(userName) {
+      // Only show welcome message on fresh session (not if app was already open)
+      if (sessionStorage.getItem('rhythmApp_adminWelcomeShown')) {
+        return; // Don't show if already shown this session
+      }
+
+      // Mark welcome as shown for this session
+      sessionStorage.setItem('rhythmApp_adminWelcomeShown', 'true');
+
+      // Create toast notification
+      const toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #2c3e50, #34495e);
+        color: #f5d467;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        z-index: 10000;
+        border-left: 4px solid #f5d467;
+        max-width: 300px;
+        font-family: inherit;
+        animation: slideIn 0.3s ease-out, fadeOut 0.3s ease-in 2.7s;
+        opacity: 1;
+      `;
+
+      toast.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 20px;">🛠️</span>
+          <div>
+            <div style="font-weight: 600; font-size: 14px; margin-bottom: 2px;">Welcome Admin!</div>
+            <div style="font-size: 13px; color: #ecf0f1; opacity: 0.9;">${userName}</div>
+          </div>
+        </div>
+      `;
+
+      // Add CSS animations if not already present
+      if (!document.getElementById('toastStyles')) {
+        const style = document.createElement('style');
+        style.id = 'toastStyles';
+        style.textContent = `
+          @keyframes slideIn {
+            0% { transform: translateX(100%); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+          }
+          @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      document.body.appendChild(toast);
+
+      // Remove toast after animation
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 3000);
+
+      // Optional: Click to dismiss early
+      toast.addEventListener('click', () => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      });
     }
 
     function showAccessDenied(message = 'Access denied. Admin permissions required.') {
@@ -462,6 +532,16 @@
 
   <!-- Global navigation functions -->
   <script>
+    // Navigation function for admin buttons
+    function navigateToPage(url) {
+      console.log('🔄 Navigating to:', url);
+      console.log('🔄 Current location:', window.location.href);
+      console.log('🔄 Resolved URL:', new URL(url, window.location.href).href);
+      
+      // Simple navigation - just redirect to the page
+      window.location.href = url;
+    }
+
     // Navigate to songlist (global scope for onclick handlers)
     function goToSonglist() {
       window.location.href = '../songlist.html';

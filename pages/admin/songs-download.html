@@ -9,7 +9,7 @@
   <style>
     @font-face {
       font-family: 'Faruma';
-      src: url('Fonts/Faruma.ttf') format('truetype');
+      src: url('../../assets/Fonts/Faruma.ttf') format('truetype');
       font-display: swap;
       font-weight: normal;
       font-style: normal;
@@ -17,16 +17,16 @@
     
     @font-face {
       font-family: 'Montserrat';
-      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      src: url('../../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
       font-display: swap;
       font-weight: normal;
       font-style: normal;
     }
   </style>
   
-  <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
-  <link rel="manifest" href="favicons/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/favicons/icons-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="../../assets/favicons/icons-512.png">
+  <link rel="manifest" href="../../assets/favicons/admin-manifest.webmanifest">
   
   <style>
     html, body {
@@ -154,11 +154,6 @@
       margin-bottom: 8px;
     }
     
-    .song-id {
-      color: #888;
-      font-size: 0.8em;
-    }
-    
     .download-buttons {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -230,15 +225,6 @@
       cursor: wait;
     }
     
-    .download-btn.copy-btn {
-      background: #9C27B0;
-      color: white;
-    }
-    
-    .download-btn.copy-btn:hover {
-      background: #7B1FA2;
-    }
-    
     .search-container {
       background: #1f1f1f;
       max-width: 600px;
@@ -265,31 +251,6 @@
     
     .search-input:focus {
       outline: none;
-      border-color: var(--primary-color);
-    }
-    
-    .toggle-btn {
-      background: rgba(43, 43, 43, 0.8);
-      color: var(--primary-color);
-      border: 2px solid #444;
-      border-radius: 5px;
-      padding: 12px 16px;
-      font-size: 0.9em;
-      cursor: pointer;
-      font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
-      transition: all 0.3s;
-      white-space: nowrap;
-      min-width: 140px;
-    }
-    
-    .toggle-btn:hover {
-      border-color: var(--primary-color);
-      background: rgba(245, 208, 0, 0.1);
-    }
-    
-    .toggle-btn.active {
-      background: var(--primary-color);
-      color: var(--text-color);
       border-color: var(--primary-color);
     }
     
@@ -399,9 +360,6 @@
     
     <div class="search-container">
       <input type="text" class="search-input" id="searchInput" placeholder="Search songs...">
-      <button class="toggle-btn" id="noEnglishToggle" onclick="toggleNoEnglish()">
-        <span id="toggleText">Show Only ދިވެހި</span>
-      </button>
       <div class="filter-dropdown">
         <button class="filter-btn" onclick="toggleFilter()">🎵</button>
         <div class="filter-content" id="filterContent">
@@ -428,59 +386,404 @@
   <!-- Hidden canvas for image generation -->
   <canvas id="lyrics-canvas"></canvas>
 
+  <!-- Firebase Scripts -->
+  <script type="module" src="../../js/firebase-db.js"></script>
+  <script type="module" src="../../js/rhythm-unified-auth.js"></script>
+  <script src="../../js/reverse-transliteration.js"></script>
+
   <script>
-    // Dynamic script loader to hide from sources
-    (function(){
-      // Load script via fetch to hide from sources
-      fetch('/songs.js') // Use original filename for proper caching
-        .then(response => response.text())
-        .then(scriptContent => {
-          // Replace const with window assignment to make it global
-          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
-          eval(modifiedScript);
-          // Initialize after songs.js is loaded
-          initializeSongsDownload();
-        })
-        .catch(error => {
-          console.error('Failed to load songs data:', error);
-        });
-    })();
+    console.log('🔥🔥🔥 SONGS DOWNLOAD PAGE SCRIPT LOADING 🔥🔥🔥');
+    console.log('📍 Script location: pages/admin/songs-download.html');
+    console.log('🕐 Current time:', new Date().toISOString());
     
-    function initializeSongsDownload() {
+    // Check if reverse transliteration is loaded
+    console.log('🔍 Checking reverse transliteration availability...');
+    console.log('🔍 typeof reverseTransliterate:', typeof reverseTransliterate);
+    console.log('🔍 typeof reverseTransliterationMap:', typeof reverseTransliterationMap);
     
-    // Initialize the page immediately or when DOM is ready
-    function initPage() {
-      filteredSongs = [...window.songs].sort((a, b) => a.name.localeCompare(b.name));
-      
-      // Restore toggle state from localStorage
-      const savedToggleState = localStorage.getItem('showOnlyNoEnglish');
-      if (savedToggleState === 'true') {
-        showOnlyNoEnglish = true;
-        const toggleBtn = document.getElementById('noEnglishToggle');
-        const toggleText = document.getElementById('toggleText');
-        toggleBtn.classList.add('active');
-        toggleText.textContent = 'ދިވެހި Only: ON';
+    // Initialize Firebase and load songs
+    let rhythmDB = null;
+    let currentUser = null;
+    
+    // Add immediate test logging
+    console.log('🧪 Testing basic JavaScript functionality...');
+    console.log('🧪 typeof window:', typeof window);
+    console.log('🧪 typeof document:', typeof document);
+    console.log('🧪 document ready state:', document.readyState);
+
+    async function initializeFirebase() {
+      try {
+        console.log('🔄 Starting Firebase initialization...');
+        console.log('🔗 Attempting to import firebase-db.js...');
+        
+        const module = await import(`../../js/firebase-db.js?t=${Date.now()}`);
+        console.log('✅ Firebase module loaded successfully:', module);
+        console.log('🔍 Module exports:', Object.keys(module));
+        console.log('🔍 RhythmFirebaseDB class:', module.RhythmFirebaseDB);
+        
+        console.log('🏗️ Creating RhythmFirebaseDB instance...');
+        rhythmDB = new module.RhythmFirebaseDB();
+        console.log('✅ RhythmFirebaseDB instance created:', rhythmDB);
+        console.log('🔍 rhythmDB methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(rhythmDB)));
+        console.log('🔍 rhythmDB.isInitialized:', rhythmDB.isInitialized);
+        
+        window.rhythmDB = rhythmDB;
+        console.log('✅ Firebase initialization complete - rhythmDB assigned to window');
+        console.log('🔍 window.rhythmDB:', window.rhythmDB);
+        return true;
+      } catch (error) {
+        console.error('❌ Failed to initialize Firebase:', error);
+        console.error('❌ Error type:', error.constructor.name);
+        console.error('❌ Error message:', error.message);
+        console.error('❌ Error stack:', error.stack);
+        return false;
+      }
+    }
+
+    async function loadSongsFromFirebase() {
+      try {
+        console.log('🔄 Starting loadSongsFromFirebase...');
+        console.log('🔍 rhythmDB exists:', !!rhythmDB);
+        console.log('🔍 window.rhythmDB exists:', !!window.rhythmDB);
+        
+        if (!rhythmDB) {
+          console.error('❌ rhythmDB is null or undefined');
+          console.log('🔍 Trying to use window.rhythmDB as fallback...');
+          rhythmDB = window.rhythmDB;
+          
+          if (!rhythmDB) {
+            console.error('❌ window.rhythmDB is also null or undefined');
+            return [];
+          }
+        }
+        
+        console.log('✅ rhythmDB instance found:', rhythmDB);
+        console.log('🔍 rhythmDB.isInitialized:', rhythmDB.isInitialized);
+        console.log('🔍 rhythmDB methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(rhythmDB)));
+        
+        if (!rhythmDB.isInitialized) {
+          console.error('❌ rhythmDB is not initialized');
+          return [];
+        }
+        
+        console.log('🔄 Calling rhythmDB.getSongsMetadata()...');
+        const songsMetadata = await rhythmDB.getSongsMetadata();
+        console.log('✅ getSongsMetadata returned:', songsMetadata);
+        console.log('📊 Songs metadata count:', songsMetadata ? songsMetadata.length : 'null/undefined');
+        console.log('📋 First 3 metadata samples:', songsMetadata ? songsMetadata.slice(0, 3) : 'none');
+        
+        if (!songsMetadata || songsMetadata.length === 0) {
+          console.warn('⚠️ No songs metadata returned from Firebase');
+          console.log('🔄 Trying to call getSongsMetadata again after 1 second...');
+          
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const retryMetadata = await rhythmDB.getSongsMetadata();
+          console.log('🔄 Retry getSongsMetadata result:', retryMetadata);
+          
+          if (!retryMetadata || retryMetadata.length === 0) {
+            console.error('❌ Still no songs after retry');
+            return [];
+          } else {
+            console.log('✅ Retry successful, got', retryMetadata.length, 'songs');
+            // Continue with retryMetadata
+            songsMetadata = retryMetadata;
+          }
+        }
+        
+        const songs = [];
+        console.log('🔄 Processing songs metadata (name and genre only)...');
+        console.log('📊 About to process', songsMetadata.length, 'songs');
+        
+        // Convert to song list format - ONLY get name and genre, NOT full lyrics
+        for (let i = 0; i < songsMetadata.length; i++) {
+          const song = songsMetadata[i];
+          
+          if (!song) {
+            console.warn(`⚠️ Song ${i + 1} is null or undefined:`, song);
+            continue;
+          }
+          
+          if (!song.name) {
+            console.warn(`⚠️ Song ${i + 1} has no name:`, song);
+            continue;
+          }
+          
+          console.log(`🔄 Processing song ${i + 1}/${songsMetadata.length}: "${song.name}" (genre: "${song.genre || 'undefined'}")`, song);
+          
+          const songEntry = {
+            id: song.id || song.name, // Fallback to name if no ID
+            timestamp: Date.now(),
+            name: song.name,
+            genre: song.genre || 'General', // Fallback to 'General' if no genre
+            lyrics: 'loaded_on_demand', // Placeholder - will load when needed
+            englishLyrics: null // Will be determined when lyrics are loaded
+          };
+          
+          songs.push(songEntry);
+          
+          // Log every 10th song to avoid console spam
+          if ((i + 1) % 10 === 0 || i === songsMetadata.length - 1) {
+            console.log(`✅ Processed ${i + 1}/${songsMetadata.length} songs so far`);
+          }
+        }
+        
+        console.log('✅ Final songs array (metadata only):', songs.length, 'songs');
+        console.log('📋 Sample songs:', songs.slice(0, 3));
+        console.log('🔍 All song names:', songs.map(s => s.name));
+        console.log('🚀 Songs loaded super fast - no lyrics fetched yet!');
+        return songs;
+        
+      } catch (error) {
+        console.error('❌ Error in loadSongsFromFirebase:', error);
+        console.error('❌ Error stack:', error.stack);
+        return [];
+      }
+    }
+
+    // Global flag to prevent multiple initializations
+    let isInitializing = false;
+    let isInitialized = false;
+    
+    async function initializePage() {
+      // Prevent multiple simultaneous initializations
+      if (isInitializing || isInitialized) {
+        console.log('🛑 Skipping initializePage - already initializing:', isInitializing, 'or initialized:', isInitialized);
+        return;
       }
       
-      // Apply filters which will render songs and update stats
-      applyFilters();
+      isInitializing = true;
+      console.log('🚀 Starting initializePage...');
+      console.log('🔍 Document ready state:', document.readyState);
+      console.log('🔍 Current URL:', window.location.href);
       
-      // Restore scroll position after rendering
-      restoreScrollPosition();
+      // Update loading message
+      const stats = document.getElementById('stats');
+      if (stats) {
+        stats.textContent = 'Initializing...';
+        console.log('✅ Stats element found and updated');
+      } else {
+        console.error('❌ Stats element not found');
+      }
+
+      // Check authentication first
+      console.log('🔒 Checking authentication...');
+      console.log('🔍 window.rhythmAuth exists:', !!window.rhythmAuth);
       
-      // Add search functionality
-      const searchInput = document.getElementById('searchInput');
-      searchInput.addEventListener('input', function(e) {
-        applyFilters();
-      });
+      if (window.rhythmAuth) {
+        try {
+          console.log('🔄 Calling rhythmAuth.checkAuthentication()...');
+          const authResult = await window.rhythmAuth.checkAuthentication();
+          console.log('✅ Authentication result:', authResult);
+          
+          if (!authResult.isAuthenticated) {
+            console.error('❌ Authentication failed:', authResult);
+            alert('Authentication failed. Please log in again.');
+            window.location.href = '../../login.html';
+            return;
+          }
+          
+          if (!authResult.user.permissions?.includes('songlist')) {
+            console.error('❌ No songlist permissions:', authResult.user.permissions);
+            alert('Access denied. Song list permissions required.');
+            window.location.href = '../../login.html';
+            return;
+          }
+          
+          currentUser = authResult.user;
+          console.log('✅ Authenticated as:', currentUser.fullName);
+        } catch (authError) {
+          console.error('❌ Authentication error:', authError);
+          console.error('❌ Auth error stack:', authError.stack);
+          // Continue anyway for debugging
+          console.log('⚠️ Continuing without authentication for debugging...');
+        }
+      } else {
+        console.warn('⚠️ No authentication system found - proceeding without auth check');
+      }
+
+      console.log('🔥 About to initialize Firebase...');
+      // Update loading message
+      if (stats) {
+        stats.textContent = 'Connecting to Firebase...';
+      }
+
+      // Initialize Firebase and load songs
+      console.log('🔥 Calling initializeFirebase()...');
+      const firebaseReady = await initializeFirebase();
+      console.log('🔥 Firebase ready result:', firebaseReady);
+      
+      if (!firebaseReady) {
+        console.error('❌ Firebase initialization failed');
+        if (stats) {
+          stats.textContent = 'Failed to initialize Firebase. Please refresh the page.';
+        }
+        // Don't return - continue for debugging
+        console.log('⚠️ Continuing despite Firebase failure for debugging...');
+      }
+
+      console.log('📚 About to load songs from Firebase...');
+      // Update loading message
+      if (stats) {
+        stats.textContent = 'Loading songs from database...';
+      }
+
+      // Load songs from Firebase
+      console.log('📚 Calling loadSongsFromFirebase()...');
+      try {
+        const songs = await loadSongsFromFirebase();
+        console.log('📚 Songs loaded result:', songs);
+        console.log('📊 Songs count:', songs ? songs.length : 'null/undefined');
+        console.log('📋 First 3 songs sample:', songs ? songs.slice(0, 3) : 'none');
+      
+        if (!songs || songs.length === 0) {
+          console.warn('⚠️ No songs loaded - songs:', songs);
+          if (stats) {
+            stats.textContent = 'No songs found. Please check your connection and refresh.';
+          }
+          
+          // For debugging, create fake data
+          console.log('⚠️ Creating fake data for debugging...');
+          const fakeSongs = [
+            { id: 1, name: 'Test Song 1', genre: 'Taki', lyrics: 'Test lyrics 1' },
+            { id: 2, name: 'Test Song 2', genre: 'Kaasi', lyrics: 'Test lyrics 2' }
+          ];
+          window.songs = fakeSongs;
+          console.log('🧪 Using fake songs for debugging:', window.songs);
+        } else {
+          console.log('🌍 Setting window.songs to:', songs.length, 'songs');
+          window.songs = songs; // Make globally available for compatibility
+        }
+      } catch (loadError) {
+        console.error('💥 Error loading songs from Firebase:', loadError);
+        console.error('💥 Load error stack:', loadError.stack);
+        if (stats) {
+          stats.textContent = 'Error loading songs. Using test data...';
+        }
+        
+        // Create fake data for debugging
+        console.log('🧪 Creating fake data due to load error...');
+        const fakeSongs = [
+          { id: 1, name: 'Test Song 1', genre: 'Taki', lyrics: 'Test lyrics 1' },
+          { id: 2, name: 'Test Song 2', genre: 'Kaasi', lyrics: 'Test lyrics 2' }
+        ];
+        window.songs = fakeSongs;
+        console.log('🧪 Using fake songs due to error:', window.songs);
+      }
+      
+      // Initialize the download page
+      console.log('🎵 Calling initializeSongsDownload()...');
+      console.log('🔍 window.songs before initializeSongsDownload:', window.songs ? window.songs.length : 'undefined');
+      initializeSongsDownload();
+      console.log('✅ Page initialization complete!');
+      
+      // Mark as initialized
+      isInitializing = false;
+      isInitialized = true;
     }
     
-    // Call initPage immediately if DOM is ready, otherwise wait for it
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initPage);
-    } else {
+    // Force immediate call for debugging - COMMENTED OUT TO PREVENT LOOPS
+    // console.log('🚀 FORCING initializePage() call for debugging...');
+    // initializePage().catch(error => {
+    //   console.error('💥 Error in forced initializePage call:', error);
+    //   isInitializing = false; // Reset flag on error
+    // });
+    
+    function initializeSongsDownload() {
+      console.log('🎵 initializeSongsDownload called');
+      console.log('🔍 window.songs exists:', !!window.songs);
+      console.log('🔍 window.songs length:', window.songs ? window.songs.length : 'undefined');
+      console.log('🔍 window.songs content:', window.songs);
+
+      // Initialize the page immediately or when DOM is ready
+      function initPage() {
+        console.log('🔄 initPage called inside initializeSongsDownload');
+        console.log('🔍 window.songs in initPage:', window.songs);
+        
+        if (!window.songs) {
+          console.error('❌ window.songs is not available in initPage');
+          return;
+        }
+        
+        filteredSongs = [...window.songs].sort((a, b) => a.name.localeCompare(b.name));
+        console.log('✅ filteredSongs created:', filteredSongs.length, 'songs');
+        
+        // Apply filters which will render songs and update stats
+        console.log('🔄 Calling applyFilters from initPage');
+        applyFilters();
+        
+        console.log('🔄 Restoring scroll position');
+        // Restore scroll position after rendering
+        restoreScrollPosition();
+        
+        console.log('🔄 Adding search event listener');
+        // Add search functionality
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', function(e) {
+          console.log('🔍 Search input changed:', e.target.value);
+          applyFilters();
+        });
+        
+        console.log('✅ initPage completed successfully');
+      }
+      
+      // Actually call initPage to display the songs!
+      console.log('🚀 Calling initPage from initializeSongsDownload');
       initPage();
     }
+    
+    // Global variables for the functions
+    let filteredSongs = [];
+    let currentGenreFilter = 'All';
+    
+    // Add error listener to catch any unhandled errors
+    window.addEventListener('error', (e) => {
+      console.error('💥 Global error caught:', e.error);
+      console.error('💥 Error message:', e.message);
+      console.error('💥 Error filename:', e.filename);
+      console.error('💥 Error line:', e.lineno);
+    });
+    
+    console.log('✅ Event listeners set up complete');
+    
+    // Add DOM initialization trigger
+    console.log('🔄 Setting up DOM initialization...');
+    console.log('🔍 document.readyState:', document.readyState);
+    
+    if (document.readyState === 'loading') {
+      console.log('🔄 Document still loading - adding DOMContentLoaded listener');
+      document.addEventListener('DOMContentLoaded', () => {
+        console.log('🎯 DOMContentLoaded fired - calling initializePage');
+        if (!isInitializing && !isInitialized) {
+          initializePage();
+        }
+      });
+    } else {
+      console.log('🔄 Document already ready - calling initializePage immediately');
+      setTimeout(() => {
+        console.log('🔄 Timeout-based initializePage call');
+        if (!isInitializing && !isInitialized) {
+          initializePage();
+        }
+      }, 100);
+    }
+    
+    // Also add window load listener as backup
+    window.addEventListener('load', () => {
+      console.log('🎯 Window load event fired');
+      if (!isInitialized) {
+        console.log('🔄 Backup: calling initializePage from window load');
+        initializePage();
+      }
+    });
+    
+    // Add a timeout-based backup initialization
+    setTimeout(() => {
+      console.log('⏰ Timeout backup check - isInitialized:', isInitialized);
+      if (!isInitialized) {
+        console.log('🔄 Timeout backup: calling initializePage');
+        initializePage();
+      }
+    }, 2000);
     
     // Save scroll position before page unloads
     function saveScrollPosition() {
@@ -508,7 +811,16 @@
     window.addEventListener('pagehide', saveScrollPosition);
     
     function applyFilters() {
+      console.log('🔍 applyFilters called');
+      console.log('🔍 window.songs in applyFilters:', window.songs);
+      
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      console.log('🔍 Search term:', searchTerm);
+      
+      if (!window.songs) {
+        console.error('❌ window.songs not available in applyFilters');
+        return;
+      }
       
       // Start with all songs
       filteredSongs = window.songs.filter(song => {
@@ -517,44 +829,42 @@
         
         const matchesGenre = currentGenreFilter === 'All' || song.genre === currentGenreFilter;
         
-        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
-        const matchesEnglishFilter = !showOnlyNoEnglish || !hasEnglish;
-        
-        return matchesSearch && matchesGenre && matchesEnglishFilter;
+        return matchesSearch && matchesGenre;
       }).sort((a, b) => a.name.localeCompare(b.name));
+      
+      console.log('🔍 Filtered songs result:', filteredSongs);
+      console.log('📊 Filtered songs count:', filteredSongs.length);
       
       renderSongs();
       updateStats();
     }
     
-    function toggleNoEnglish() {
-      showOnlyNoEnglish = !showOnlyNoEnglish;
-      const toggleBtn = document.getElementById('noEnglishToggle');
-      const toggleText = document.getElementById('toggleText');
+    function renderSongs() {
+      console.log('🎨 renderSongs called');
+      console.log('🔍 filteredSongs:', filteredSongs);
+      console.log('📊 filteredSongs length:', filteredSongs ? filteredSongs.length : 'undefined');
       
-      if (showOnlyNoEnglish) {
-        toggleBtn.classList.add('active');
-        toggleText.textContent = 'ދިވެހި Only: ON';
-      } else {
-        toggleBtn.classList.remove('active');
-        toggleText.textContent = 'Show Only ދިވެހި';
+      const songsList = document.getElementById('songsList');
+      if (!songsList) {
+        console.error('❌ songsList element not found');
+        return;
       }
       
-      // Save toggle state to localStorage
-      localStorage.setItem('showOnlyNoEnglish', showOnlyNoEnglish.toString());
-      
-      applyFilters();
-    }
-    
-    function renderSongs() {
-      const songsList = document.getElementById('songsList');
+      console.log('✅ songsList element found, clearing content');
       songsList.innerHTML = '';
       
-      filteredSongs.forEach(song => {
+      if (!filteredSongs || filteredSongs.length === 0) {
+        console.warn('⚠️ No filtered songs to render');
+        songsList.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No songs found</div>';
+        return;
+      }
+      
+      console.log('🔄 Starting to render', filteredSongs.length, 'songs');
+      filteredSongs.forEach((song, index) => {
+        console.log(`🎵 Rendering song ${index + 1}: ${song.name} (ID: ${song.id})`);
+        
         const songItem = document.createElement('div');
         songItem.className = 'song-item';
-        
-        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
         
         // Determine if song name is in Dhivehi or English
         const isDhivehi = /[\u0780-\u07BF]/.test(song.name);
@@ -566,31 +876,40 @@
           <div class="song-info">
             <div class="song-name" style="font-family: ${songNameFont};">${song.name}</div>
             <div class="song-genre">${song.genre}</div>
-            <div class="song-id" onclick="copySongId(${song.id})" style="cursor: pointer;" title="Click to copy ID">ID: ${song.id}</div>
           </div>
           <div class="download-buttons">
-            <button class="download-btn view-btn" onclick="viewSong(${song.id})">
+            <button class="download-btn view-btn" data-song-id="${song.id}" data-action="view">
               View
             </button>
-            <button class="download-btn edit-btn" onclick="editSong(${song.id})">
+            <button class="download-btn edit-btn" data-song-id="${song.id}" data-action="edit">
               Edit
             </button>
-            <button class="download-btn" onclick="downloadLyrics(${song.id}, 'dhivehi')">
+            <button class="download-btn" data-song-id="${song.id}" data-action="download" data-language="dhivehi">
               DL ދިވެހި
             </button>
-            <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'dhivehi')">
-              Copy ދިވެހި
+            <button class="download-btn english" data-song-id="${song.id}" data-action="download" data-language="english">
+              DL English
             </button>
-            ${hasEnglish ? `
-              <button class="download-btn english" onclick="downloadLyrics(${song.id}, 'english')">
-                DL English
-              </button>
-              <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'english')">
-                Copy English
-              </button>
-            ` : ''}
           </div>
         `;
+        
+        // Add event listeners for the buttons
+        songItem.addEventListener('click', function(e) {
+          const button = e.target;
+          if (button.tagName === 'BUTTON') {
+            const songId = button.dataset.songId;
+            const action = button.dataset.action;
+            const language = button.dataset.language;
+            
+            if (action === 'view') {
+              viewSong(songId);
+            } else if (action === 'edit') {
+              editSong(songId);
+            } else if (action === 'download') {
+              downloadLyrics(songId, language);
+            }
+          }
+        });
         
         songsList.appendChild(songItem);
       });
@@ -599,17 +918,8 @@
     function updateStats() {
       const stats = document.getElementById('stats');
       const totalSongs = filteredSongs.length;
-      const songsWithEnglish = filteredSongs.filter(song => song.englishLyrics && song.englishLyrics.trim().length > 0).length;
-      const songsWithoutEnglish = totalSongs - songsWithEnglish;
       
-      let statsText = `Showing ${totalSongs} songs`;
-      if (showOnlyNoEnglish) {
-        statsText += ` (ދިވެހި only)`;
-      } else {
-        statsText += ` (${songsWithEnglish} with English, ${songsWithoutEnglish} ދިވެހި only)`;
-      }
-      
-      stats.textContent = statsText;
+      stats.textContent = `Showing ${totalSongs} songs`;
     }
     
     function toggleFilter() {
@@ -637,65 +947,55 @@
       // Set the song ID in localStorage for lyrics.html to read
       localStorage.setItem('selectedSongId', songId);
       // Navigate to lyrics.html
-      window.location.href = 'lyrics';
-    }
-    } // Close initializeSongsDownload function
-    
-    // Global variables for the functions
-    let filteredSongs = [];
-    let currentGenreFilter = 'All';
-    let showOnlyNoEnglish = false;
-    
-    // Global functions that need to be accessible from onclick handlers
-    function copySongId(songId) {
-      const idText = `id: ${songId},`;
-      
-      if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(idText).then(() => {
-          // Show a brief visual feedback
-          const idElement = event.target;
-          const originalText = idElement.textContent;
-          const originalColor = idElement.style.color;
-          
-          idElement.textContent = 'Copied!';
-          idElement.style.color = '#4CAF50';
-          
-          setTimeout(() => {
-            idElement.textContent = originalText;
-            idElement.style.color = originalColor;
-          }, 1500);
-        }).catch(err => {
-          console.error('Failed to copy ID: ', err);
-          fallbackCopyIdToClipboard(idText);
-        });
-      } else {
-        fallbackCopyIdToClipboard(idText);
-      }
+      window.location.href = '../lyrics.html';
     }
 
-    function editSong(songId) {
+    async function editSong(songId) {
+      console.log('📝 editSong called for ID:', songId);
+      
       const song = window.songs.find(s => s.id === songId);
       if (!song) {
         alert('Song not found');
         return;
       }
       
-      // Parse the lyrics structure to preserve sections, breaks, and starred lines
-      const parsedLyrics = parseLyricsForEdit(song.lyrics);
+      console.log('📝 Found song:', song.name);
       
-      // Store the song data in localStorage for lyrics-submit.html to use
+      // Check if we need to load lyrics on-demand
+      let lyricsData = song.lyrics;
+      if (lyricsData === 'loaded_on_demand') {
+        console.log('📝 Loading lyrics on-demand for editing...');
+        
+        try {
+          const fullSongData = await rhythmDB.getSong(song.id);
+          lyricsData = fullSongData.lyrics || 'No lyrics available';
+          console.log('✅ Lyrics loaded for editing');
+          
+          // Update the song in our array for future use
+          song.lyrics = lyricsData;
+        } catch (error) {
+          console.error('❌ Error loading lyrics for editing:', error);
+          alert('Failed to load song lyrics. Please try again.');
+          return;
+        }
+      }
+      
+      // Parse the lyrics structure to preserve sections, breaks, and starred lines
+      const parsedLyrics = parseLyricsForEdit(lyricsData);
+      
+      // Store the song data in localStorage for lyrics-edit.html to use
       const songData = {
         id: song.id,
         name: song.name,
         genre: song.genre,
-        lyrics: song.lyrics,
+        lyrics: lyricsData,
         parsedLyrics: parsedLyrics
       };
       
       localStorage.setItem('editSongData', JSON.stringify(songData));
       
-      // Navigate to lyrics-submit.html
-      window.location.href = 'lyrics-submit.html';
+      // Navigate to lyrics-edit.html
+      window.location.href = 'lyrics-edit.html';
     }
     
     // Function to parse lyrics structure for editing
@@ -756,175 +1056,44 @@
       return sections;
     }
     
-    function fallbackCopyIdToClipboard(text) {
-      const textArea = document.createElement('textarea');
-      textArea.value = text;
-      textArea.style.position = 'fixed';
-      textArea.style.top = 0;
-      textArea.style.left = 0;
-      textArea.style.width = '2em';
-      textArea.style.height = '2em';
-      textArea.style.padding = 0;
-      textArea.style.border = 'none';
-      textArea.style.outline = 'none';
-      textArea.style.boxShadow = 'none';
-      textArea.style.background = 'transparent';
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
-      try {
-        document.execCommand('copy');
-        // Show success feedback
-        const idElement = event.target;
-        const originalText = idElement.textContent;
-        const originalColor = idElement.style.color;
-        
-        idElement.textContent = 'Copied!';
-        idElement.style.color = '#4CAF50';
-        
-        setTimeout(() => {
-          idElement.textContent = originalText;
-          idElement.style.color = originalColor;
-        }, 1500);
-      } catch (err) {
-        console.error('Fallback copy failed: ', err);
-      }
-      
-      document.body.removeChild(textArea);
-    }
-    
-    function copyLyrics(songId, language) {
-      const song = window.songs.find(s => s.id === songId);
-      if (!song) return;
-      
-      const button = event.target;
-      const originalText = button.textContent;
-      button.textContent = 'Copying...';
-      button.disabled = true;
-      
-      try {
-        const lyrics = language === 'dhivehi' ? song.lyrics : song.englishLyrics;
-        
-        if (!lyrics || lyrics.trim() === '') {
-          alert('No lyrics available for this language.');
-          return;
-        }
-        
-        // Clean the lyrics text
-        const cleanLyrics = cleanLyricsText(lyrics);
-        
-        // Copy to clipboard
-        navigator.clipboard.writeText(cleanLyrics).then(() => {
-          button.textContent = 'Copied!';
-          button.style.background = '#4CAF50';
-          setTimeout(() => {
-            button.textContent = originalText;
-            button.style.background = '#9C27B0';
-          }, 2000);
-        }).catch(err => {
-          console.error('Failed to copy: ', err);
-          alert('Failed to copy lyrics. Please try again.');
-        });
-        
-      } catch (error) {
-        console.error('Error copying lyrics:', error);
-        alert('Error copying lyrics. Please try again.');
-      } finally {
-        button.disabled = false;
-      }
-    }
-    
-    function cleanLyricsText(lyrics) {
-      const lines = lyrics.split('\n');
-      let result = [];
-      let currentSection = [];
-      let sections = [];
-      
-      lines.forEach(line => {
-        // Detect section headers that start with # or $ (both are metadata)
-        if (line.startsWith('#') || line.startsWith('$')) {
-          // If we have content in current section, save it
-          if (currentSection.length > 0) {
-            sections.push([...currentSection]);
-            currentSection = [];
-          }
-          return;
-        }
-        
-        // Keep break lines (lines starting with -)
-        if (line.startsWith('-')) {
-          currentSection.push(line);
-          return;
-        }
-        
-        // Clean the line by removing asterisks and other formatting
-        let cleanLine = line
-          .replace(/^\*+/, '') // Remove asterisks at the beginning
-          .replace(/&/g, '') // Remove & symbols
-          .trim();
-        
-        // Add the cleaned line to current section
-        currentSection.push(cleanLine);
-      });
-      
-      // Add the last section if it has content
-      if (currentSection.length > 0) {
-        sections.push(currentSection);
-      }
-      
-      // Process each section to remove excessive empty lines
-      let processedSections = sections.map(section => {
-        let finalSection = [];
-        let previousLineEmpty = false;
-        
-        section.forEach(line => {
-          if (line === '') {
-            if (!previousLineEmpty) {
-              finalSection.push(line);
-            }
-            previousLineEmpty = true;
-          } else {
-            finalSection.push(line);
-            previousLineEmpty = false;
-          }
-        });
-        
-        // Remove leading and trailing empty lines from section
-        while (finalSection.length > 0 && finalSection[0] === '') {
-          finalSection.shift();
-        }
-        while (finalSection.length > 0 && finalSection[finalSection.length - 1] === '') {
-          finalSection.pop();
-        }
-        
-        return finalSection;
-      });
-      
-      // Join sections with exactly one empty line between them
-      let finalResult = [];
-      processedSections.forEach((section, index) => {
-        finalResult.push(...section);
-        // Add empty line after each section except the last one
-        if (index < processedSections.length - 1 && section.length > 0) {
-          finalResult.push('');
-        }
-      });
-      
-      return finalResult.join('\n');
-    }
-    
     async function downloadLyrics(songId, language) {
+      console.log('⬇️ downloadLyrics called for ID:', songId, 'language:', language);
+      
       const song = window.songs.find(s => s.id === songId);
-      if (!song) return;
+      if (!song) {
+        console.error('❌ Song not found for download:', songId);
+        return;
+      }
       
       const button = event.target;
       const originalText = button.textContent;
-      button.textContent = 'Generating...';
+      button.textContent = 'Loading...';
       button.classList.add('downloading');
       button.disabled = true;
       
       try {
+        // Check if we need to load lyrics on-demand
+        let lyricsData = song.lyrics;
+        if (lyricsData === 'loaded_on_demand') {
+          console.log('⬇️ Loading lyrics on-demand for download...');
+          button.textContent = 'Loading lyrics...';
+          
+          try {
+            const fullSongData = await rhythmDB.getSong(song.id);
+            lyricsData = fullSongData.lyrics || 'No lyrics available';
+            console.log('✅ Lyrics loaded for download');
+            
+            // Update the song in our array for future use
+            song.lyrics = lyricsData;
+          } catch (error) {
+            console.error('❌ Error loading lyrics for download:', error);
+            alert('Failed to load song lyrics. Please try again.');
+            return;
+          }
+        }
+        
+        button.textContent = 'Generating...';
+        
         // Ensure fonts are loaded before proceeding
         if (language === 'dhivehi') {
           try {
@@ -935,7 +1104,44 @@
           }
         }
         
-        const lyrics = language === 'dhivehi' ? song.lyrics : song.englishLyrics;
+        // Get lyrics text based on language
+        let lyrics;
+        if (language === 'dhivehi') {
+          lyrics = lyricsData;
+        } else {
+          // For English, use reverse transliteration on Dhivehi lyrics
+          console.log('🔄 Converting Dhivehi lyrics to English using reverse transliteration...');
+          button.textContent = 'Converting...';
+          
+          // Check if reverse transliteration is available
+          if (typeof reverseTransliterate !== 'function') {
+            console.error('❌ Reverse transliteration function not available');
+            console.log('🔄 Attempting to wait for script to load...');
+            
+            // Try to wait for the function to be available
+            let attempts = 0;
+            const maxAttempts = 10;
+            const checkInterval = 100; // ms
+            
+            while (attempts < maxAttempts && typeof reverseTransliterate !== 'function') {
+              await new Promise(resolve => setTimeout(resolve, checkInterval));
+              attempts++;
+              console.log(`🔄 Attempt ${attempts}: typeof reverseTransliterate =`, typeof reverseTransliterate);
+            }
+            
+            if (typeof reverseTransliterate !== 'function') {
+              console.error('❌ Reverse transliteration function still not available after waiting');
+              alert('Reverse transliteration not available. Please refresh the page.');
+              return;
+            } else {
+              console.log('✅ Reverse transliteration function now available!');
+            }
+          }
+          
+          lyrics = reverseTransliterate(lyricsData);
+          console.log('✅ Lyrics converted to English');
+        }
+        
         const { sections } = parseSections(lyrics);
         
         // Create image from lyrics
@@ -1094,7 +1300,168 @@
           return lines;
         }
         
-        // Draw lyrics
+        // Function to process text with highlighting like lyrics.html
+        function processLineForCanvas(line, ctx, yPos, isHighlighted = false) {
+          // Clean the line text
+          let cleanText = line;
+          if (line.startsWith('*')) {
+            cleanText = line.slice(1).trim();
+            isHighlighted = true;
+          }
+          
+          // Handle &...& highlighting by processing the entire line as one unit
+          // but changing colors for different parts
+          const parts = cleanText.split(/(&[^&]+&)/);
+          let fullLineText = '';
+          
+          // First pass: construct the full text without & symbols
+          parts.forEach(part => {
+            if (part.startsWith('&') && part.endsWith('&')) {
+              fullLineText += part.slice(1, -1); // Remove & symbols
+            } else {
+              fullLineText += part;
+            }
+          });
+          
+          // Wrap the full line normally
+          const wrappedLines = wrapText(fullLineText.trim(), maxTextWidth);
+          
+          // For each wrapped line, we need to figure out which parts are highlighted
+          wrappedLines.forEach(wrappedLine => {
+            // For simplicity, if the line contains highlighted parts, 
+            // we'll render it with mixed colors by drawing character by character
+            if (cleanText.includes('&')) {
+              drawMixedColorLine(cleanText, wrappedLine, ctx, yPos, isHighlighted);
+            } else {
+              // Simple case - single color line
+              ctx.fillStyle = isHighlighted ? '#f5d000' : '#FFFFFF';
+              ctx.fillText(wrappedLine, canvas.width / 2, yPos);
+            }
+            yPos += lineHeight;
+          });
+          
+          return yPos;
+        }
+        
+        // Function to draw a line with mixed colors for &...& parts
+        function drawMixedColorLine(originalText, wrappedLine, ctx, yPos, isHighlighted) {
+          // Check if this is Dhivehi text (contains Thaana characters)
+          const isDhivehi = /[\u0780-\u07BF]/.test(wrappedLine);
+          
+          // Check if the original text has any &...& highlighting
+          const hasHighlighting = originalText.includes('&');
+          
+          if (!hasHighlighting) {
+            // No highlighting needed, just draw with base color
+            ctx.fillStyle = isHighlighted ? '#f5d000' : '#FFFFFF';
+            ctx.fillText(wrappedLine, canvas.width / 2, yPos);
+            return;
+          }
+          
+          if (isDhivehi) {
+            // For Dhivehi text with highlighting, we need a different approach
+            // Parse the original text to create segments
+            const parts = originalText.split(/(&[^&]+&)/);
+            let processedParts = [];
+            
+            parts.forEach(part => {
+              if (part.startsWith('&') && part.endsWith('&')) {
+                // Highlighted part - remove & symbols
+                const text = part.slice(1, -1);
+                processedParts.push({
+                  text: text,
+                  color: isHighlighted ? '#FFFFFF' : '#f5d000'
+                });
+              } else if (part.trim()) {
+                // Regular part
+                processedParts.push({
+                  text: part,
+                  color: isHighlighted ? '#f5d000' : '#FFFFFF'
+                });
+              }
+            });
+            
+            // For Dhivehi, draw each part separately but in proper RTL order
+            // Calculate total width first
+            let totalWidth = 0;
+            processedParts.forEach(part => {
+              totalWidth += ctx.measureText(part.text).width;
+            });
+            
+            // Start from the right side for RTL
+            let currentX = (canvas.width + totalWidth) / 2;
+            
+            // Draw parts from right to left
+            for (let i = processedParts.length - 1; i >= 0; i--) {
+              const part = processedParts[i];
+              const partWidth = ctx.measureText(part.text).width;
+              currentX -= partWidth;
+              
+              ctx.fillStyle = part.color;
+              ctx.textAlign = 'left';
+              ctx.fillText(part.text, currentX, yPos);
+            }
+            
+            // Reset text alignment
+            ctx.textAlign = 'center';
+            return;
+          }
+          
+          // For English text, use the original character-by-character approach
+          const parts = originalText.split(/(&[^&]+&)/);
+          let reconstructedText = '';
+          let colorMap = [];
+          
+          // Build a map of which characters should be what color
+          parts.forEach(part => {
+            if (part.startsWith('&') && part.endsWith('&')) {
+              const text = part.slice(1, -1);
+              for (let i = 0; i < text.length; i++) {
+                colorMap.push(isHighlighted ? '#FFFFFF' : '#f5d000');
+                reconstructedText += text[i];
+              }
+            } else {
+              for (let i = 0; i < part.length; i++) {
+                colorMap.push(isHighlighted ? '#f5d000' : '#FFFFFF');
+                reconstructedText += part[i];
+              }
+            }
+          });
+          
+          // Find where our wrapped line appears in the reconstructed text
+          const lineStart = reconstructedText.indexOf(wrappedLine);
+          if (lineStart === -1) {
+            // Fallback: just draw with default color
+            ctx.fillStyle = isHighlighted ? '#f5d000' : '#FFFFFF';
+            ctx.fillText(wrappedLine, canvas.width / 2, yPos);
+            return;
+          }
+          
+          // Calculate starting position for centered text
+          const totalWidth = ctx.measureText(wrappedLine).width;
+          let currentX = (canvas.width - totalWidth) / 2;
+          
+          // Draw each character with its appropriate color
+          for (let i = 0; i < wrappedLine.length; i++) {
+            const char = wrappedLine[i];
+            const colorIndex = lineStart + i;
+            
+            if (colorIndex < colorMap.length) {
+              ctx.fillStyle = colorMap[colorIndex];
+            } else {
+              ctx.fillStyle = isHighlighted ? '#f5d000' : '#FFFFFF';
+            }
+            
+            ctx.textAlign = 'left';
+            ctx.fillText(char, currentX, yPos);
+            currentX += ctx.measureText(char).width;
+          }
+          
+          // Reset text alignment
+          ctx.textAlign = 'center';
+        }
+        
+        // Draw lyrics with proper styling
         let yPosition = 180;
         
         sections.forEach(section => {
@@ -1137,29 +1504,11 @@
             } else if (line.trim() === '') {
               // Empty line - add spacing
               yPosition += lineHeight * 0.5; // Half line height for empty lines
-            } else if (line.startsWith('*')) {
-              // Chorus or repeated line
-              ctx.fillStyle = '#f5d000';
-              ctx.font = textFont;
-              ctx.textAlign = 'center';
-              const text = line.replace(/^\*+/, '').trim();
-              if (text) {
-                const wrappedLines = wrapText(text, maxTextWidth);
-                wrappedLines.forEach(wrappedLine => {
-                  ctx.fillText(wrappedLine, canvas.width / 2, yPosition);
-                  yPosition += lineHeight;
-                });
-              }
             } else if (line.trim() !== '') {
-              // Regular line
-              ctx.fillStyle = '#FFFFFF';
+              // Process line with proper highlighting
               ctx.font = textFont;
               ctx.textAlign = 'center';
-              const wrappedLines = wrapText(line.trim(), maxTextWidth);
-              wrappedLines.forEach(wrappedLine => {
-                ctx.fillText(wrappedLine, canvas.width / 2, yPosition);
-                yPosition += lineHeight;
-              });
+              yPosition = processLineForCanvas(line, ctx, yPosition);
             }
           });
           
@@ -1188,269 +1537,51 @@
       }
     }
     
-    // Parse sections function (enhanced version for image generation)
+    // Parse sections function - simplified to preserve exact database order
     function parseSections(lyrics) {
       const lines = lyrics.split('\n');
       let sections = [];
-      let currentSection = null;
-      let sectionName = null;
-      let currentLines = [];
+      let currentSection = {
+        name: 'lyrics',
+        lines: []
+      };
       
-      function pushSection() {
-        if (currentSection !== null) {
+      // Process each line in exact order from database
+      lines.forEach((line, idx) => {
+        if (line.startsWith('#') || line.startsWith('$')) {
+          // Section headers are metadata - skip them in rendering but preserve structure
+          // Don't add them as separate sections, they're just markers
+          return;
+        } else if (line.startsWith('-')) {
+          // Break lines - add as special break section
+          if (currentSection.lines.length > 0) {
+            sections.push(currentSection);
+            currentSection = { name: 'lyrics', lines: [] };
+          }
           sections.push({
-            name: sectionName,
-            lines: [...currentLines]
+            name: 'break',
+            lines: [line]
           });
+        } else {
+          // Regular content line (including empty lines)
+          currentSection.lines.push(line);
         }
+      });
+      
+      // Add final section if it has content
+      if (currentSection.lines.length > 0) {
+        sections.push(currentSection);
       }
       
-      lines.forEach((line, idx) => {
-        if (line.startsWith('#')) {
-          pushSection();
-          sectionName = line.replace(/^#+/, '').trim();
-          currentLines = [];
-          currentSection = 'section';
-        } else if (line.startsWith('$')) {
-          pushSection();
-          sectionName = line.replace(/^\$+/, '').trim();
-          currentLines = [];
-          currentSection = 'section';
-        } else if (line.startsWith('-')) {
-          if (currentSection !== null) {
-            // Just add the break line, spacing will be handled in rendering
-            currentLines.push(line);
-          } else {
-            // If no current section, push previous section and handle break separately
-            pushSection();
-            
-            // Add break to sections as a separate item with proper spacing
-            const breakLines = [];
-            
-            // Only add the actual break line, no empty lines
-            breakLines.push(line);
-            
-            sections.push({
-              name: 'break',
-              lines: breakLines
-            });
-          }
-        } else {
-          if (currentSection === null) {
-            // If lyrics start without a section, wrap in a default section
-            sectionName = 'Lyrics';
-            currentLines = [];
-            currentSection = 'default';
-          }
-          if (line.trim() !== '') {
-            currentLines.push(line);
-          } else {
-            // Keep empty lines as they are
-            currentLines.push(line);
-          }
-        }
-      });
-      
-      pushSection();
-      
-      // Also return HTML for compatibility
-      let htmlSections = [];
-      sections.forEach(section => {
-        const sectionHtml = section.lines.map(line => {
-          if (line.startsWith('-')) {
-            return '<div class="break-line"></div>';
-          }
-          return line;
-        }).join('<br>');
-        htmlSections.push(`<div class="section-block">${sectionHtml}</div>`);
-      });
+      // Filter out empty sections
+      sections = sections.filter(section => section.lines.length > 0);
       
       return {
-        html: htmlSections.join(''),
         sections: sections,
-        orderedSections: sections.map((section, idx) => ({
-          name: section.name,
-          id: `section-${idx}`
-        }))
+        // Keep compatibility with existing code
+        html: '',
+        orderedSections: []
       };
-    }
-    function applyFilters() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      
-      // Start with all songs
-      filteredSongs = window.songs.filter(song => {
-        const matchesSearch = song.name.toLowerCase().includes(searchTerm) ||
-                             song.genre.toLowerCase().includes(searchTerm);
-        
-        const matchesGenre = currentGenreFilter === 'All' || song.genre === currentGenreFilter;
-        
-        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
-        const matchesEnglishFilter = !showOnlyNoEnglish || !hasEnglish;
-        
-        return matchesSearch && matchesGenre && matchesEnglishFilter;
-      });
-      
-      // Sort alphabetically
-      filteredSongs.sort((a, b) => a.name.localeCompare(b.name));
-      
-      renderSongs();
-    }
-    
-    function renderSongs() {
-      const songsContainer = document.getElementById('songs-container');
-      if (!songsContainer) return;
-      
-      songsContainer.innerHTML = '';
-      
-      filteredSongs.forEach(song => {
-        const songDiv = document.createElement('div');
-        songDiv.className = 'song-item';
-        
-        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
-        
-        songDiv.innerHTML = `
-          <div class="song-header">
-            <h3>${song.name}</h3>
-            <span class="genre-badge">${song.genre}</span>
-          </div>
-          <div class="song-actions">
-            <button class="download-btn view-btn" onclick="viewSong(${song.id})">
-              👁️ View
-            </button>
-            <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'dhivehi')">
-              📋 Copy Dhivehi
-            </button>
-            <button class="download-btn download-btn-dhivehi" onclick="downloadLyrics(${song.id}, 'dhivehi')">
-              ⬇️ Download Dhivehi
-            </button>
-            ${hasEnglish ? `
-              <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'english')">
-                📋 Copy English
-              </button>
-              <button class="download-btn download-btn-english" onclick="downloadLyrics(${song.id}, 'english')">
-                ⬇️ Download English
-              </button>
-            ` : ''}
-          </div>
-        `;
-        
-        songsContainer.appendChild(songDiv);
-      });
-      
-      // Update stats
-      const totalSongs = filteredSongs.length;
-      const songsWithEnglish = filteredSongs.filter(song => song.englishLyrics && song.englishLyrics.trim().length > 0).length;
-      const songsWithoutEnglish = totalSongs - songsWithEnglish;
-      
-      const totalSongsEl = document.getElementById('totalSongs');
-      const songsWithEnglishEl = document.getElementById('songsWithEnglish');
-      const songsWithoutEnglishEl = document.getElementById('songsWithoutEnglish');
-      
-      if (totalSongsEl) totalSongsEl.textContent = totalSongs;
-      if (songsWithEnglishEl) songsWithEnglishEl.textContent = songsWithEnglish;
-      if (songsWithoutEnglishEl) songsWithoutEnglishEl.textContent = songsWithoutEnglish;
-    }
-    
-    function toggleNoEnglish() {
-      showOnlyNoEnglish = !showOnlyNoEnglish;
-      const toggleBtn = document.getElementById('noEnglishToggle');
-      toggleBtn.textContent = showOnlyNoEnglish ? 'Show All' : 'No English Only';
-      toggleBtn.style.backgroundColor = showOnlyNoEnglish ? '#4CAF50' : '#f44336';
-      
-      // Save state to localStorage
-      localStorage.setItem('showOnlyNoEnglish', showOnlyNoEnglish);
-      
-      applyFilters();
-    }
-    
-    function toggleFilter() {
-      const filterDropdown = document.getElementById('filterDropdown');
-      filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
-    }
-    
-    function filterByGenre(genre) {
-      currentGenreFilter = genre;
-      document.getElementById('filterDropdown').style.display = 'none';
-      applyFilters();
-    }
-    
-    function viewSong(songId) {
-      localStorage.setItem('selectedSongId', songId);
-      window.location.href = 'lyrics.html';
-    }
-    
-    function applyFilters() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-      
-      // Start with all songs
-      filteredSongs = window.songs.filter(song => {
-        const matchesSearch = song.name.toLowerCase().includes(searchTerm) ||
-                             song.genre.toLowerCase().includes(searchTerm);
-        
-        const matchesGenre = currentGenreFilter === 'All' || song.genre === currentGenreFilter;
-        
-        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
-        const matchesEnglish = !showOnlyNoEnglish || !hasEnglish;
-        
-        return matchesSearch && matchesGenre && matchesEnglish;
-      });
-      
-      // Sort alphabetically
-      filteredSongs.sort((a, b) => a.name.localeCompare(b.name));
-      
-      renderSongs();
-    }
-    
-    function renderSongs() {
-      const songsContainer = document.getElementById('songs-container');
-      songsContainer.innerHTML = '';
-      
-      filteredSongs.forEach(song => {
-        const songDiv = document.createElement('div');
-        songDiv.className = 'song-item';
-        
-        const hasEnglish = song.englishLyrics && song.englishLyrics.trim().length > 0;
-        
-        songDiv.innerHTML = `
-          <div class="song-header">
-            <h3>${song.name}</h3>
-            <span class="genre-badge">${song.genre}</span>
-          </div>
-          <div class="song-actions">
-            <button class="download-btn view-btn" onclick="viewSong(${song.id})">
-              👁️ View
-            </button>
-            <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'dhivehi')">
-              📋 Copy Dhivehi
-            </button>
-            <button class="download-btn download-btn-dhivehi" onclick="downloadLyrics(${song.id}, 'dhivehi')">
-              ⬇️ Download Dhivehi
-            </button>
-            ${hasEnglish ? `
-              <button class="download-btn copy-btn" onclick="copyLyrics(${song.id}, 'english')">
-                📋 Copy English
-              </button>
-              <button class="download-btn download-btn-english" onclick="downloadLyrics(${song.id}, 'english')">
-                ⬇️ Download English
-              </button>
-            ` : ''}
-          </div>
-        `;
-        
-        songsContainer.appendChild(songDiv);
-      });
-      
-      // Update stats
-      const totalSongs = filteredSongs.length;
-      const songsWithEnglish = filteredSongs.filter(song => song.englishLyrics && song.englishLyrics.trim().length > 0).length;
-      const songsWithoutEnglish = totalSongs - songsWithEnglish;
-      
-      document.getElementById('totalSongs').textContent = totalSongs;
-      document.getElementById('songsWithEnglish').textContent = songsWithEnglish;
-      document.getElementById('songsWithoutEnglish').textContent = songsWithoutEnglish;
-      
-      // Save scroll position
-      saveScrollPosition();
     }
   </script>
 </body>

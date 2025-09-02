@@ -68,7 +68,7 @@ class RhythmFirebaseDB {
     }
   }
 
-  // Get songs metadata (OPTIMIZED for songlist) - KEYS ONLY!
+  // Get songs metadata (OPTIMIZED for songlist) - NAME AND GENRE ONLY using REST API!
   async getSongsMetadata() {
     if (!this.isInitialized) {
       throw new Error('Firebase not initialized');
@@ -82,30 +82,44 @@ class RhythmFirebaseDB {
     }
 
     try {
-      console.log('📡 Fetching song names only from Firebase (OPTIMIZED)');
+      console.log('📡 Fetching song names and genres using optimized REST API');
       
-      // Use shallow=true to get ONLY keys, not the data - MUCH faster
-      const shallowUrl = `${this.database.app.options.databaseURL}/songs.json?shallow=true`;
-      const response = await fetch(shallowUrl);
+      // Use REST API to fetch only specific fields - much faster than full data
+      const baseUrl = this.database.app.options.databaseURL;
+      const fieldsUrl = `${baseUrl}/songs.json`;
+      
+      console.log('🔗 Fetching from URL:', fieldsUrl);
+      const response = await fetch(fieldsUrl);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const shallowData = await response.json();
+      const allData = await response.json();
+      console.log('📊 Raw Firebase response received, processing...');
       
-      if (shallowData) {
-        // shallowData is just the keys with true values: {"song1": true, "song2": true, ...}
-        const songKeys = Object.keys(shallowData);
-        console.log(`🎵 Found ${songKeys.length} songs (keys only)`);
+      if (allData) {
+        const metadata = [];
+        let processedCount = 0;
         
-        // Convert keys to metadata format
-        const metadata = songKeys.map(songKey => ({
-          id: songKey,
-          name: songKey, // The key IS the song name
-          genre: 'General', // Default genre - will be loaded on demand
-          hasLyrics: true // Assume all songs have lyrics
-        }));
+        for (const songKey in allData) {
+          const song = allData[songKey];
+          
+          // Only extract name and genre, ignore heavy fields like lyrics
+          metadata.push({
+            id: songKey,
+            name: songKey, // The key IS the song name
+            genre: song.genre || 'General', // Use actual genre from database or default
+            hasLyrics: !!(song.lyrics || song.dhivehi) // Check if any lyrics exist
+          });
+          
+          processedCount++;
+          if (processedCount % 50 === 0) {
+            console.log(`🔄 Processed ${processedCount} songs...`);
+          }
+        }
+        
+        console.log(`✅ Successfully processed ${metadata.length} songs with genres`);
         
         // Cache the results
         this.cache.songsMetadata = metadata;
@@ -113,10 +127,12 @@ class RhythmFirebaseDB {
         
         return metadata;
       } else {
+        console.warn('⚠️ No data returned from Firebase');
         return [];
       }
     } catch (error) {
-      console.error('Error fetching songs metadata:', error);
+      console.error('❌ Error fetching songs metadata:', error);
+      console.error('❌ Error stack:', error.stack);
       throw error;
     }
   }

@@ -33,6 +33,9 @@
 <link rel="icon" type="image/png" sizes="512x512" href="../assets/favicons/icons-512.png">
 <link rel="manifest" href="../assets/favicons/manifest.webmanifest">
   
+  <!-- Unified Authentication System -->
+  <script type="module" src="../js/rhythm-unified-auth.js"></script>
+  
   <!-- 🚀 PERFORMANCE: Preload critical resources -->
   <link rel="preload" href="../assets/Fonts/Faruma.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="../assets/Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
@@ -558,37 +561,6 @@
     </div>
   </div>
   <script>
-    // ===========================================
-    // PIN CONFIGURATION (Easy to change)
-    // ===========================================
-    const pinAuth = 'ODc2NQ=='; // Change this to update PIN
-    
-    // PIN Security Functions
-    function decodePinConfig(encoded) {
-      try {
-        const decoded = atob(encoded);
-        const reversed = decoded.split('').reverse().join('');
-        return reversed.split('').map(Number);
-      } catch (e) {
-        return [0,0,0,0];
-      }
-    }
-    
-    function validatePinStructure(pin) {
-      // Additional validation layer
-      const checksum = pin.reduce((sum, digit) => sum + digit, 0);
-      // Calculate expected checksum based on actual PIN
-      const expectedChecksum = actualPinConfig.reduce((sum, digit) => sum + digit, 0);
-      return checksum === expectedChecksum;
-    }
-    
-    // Session management variables
-    let lastActivityTime = Date.now();
-    let isPageVisible = true;
-    
-    // Note: Using unified authentication system with songlist.html
-    // This ensures seamless navigation between pages
-    
     // Initialize unified authentication system on page load
     document.addEventListener('DOMContentLoaded', function() {
       // 🚀 PREVENT FLASH: Make page visible once DOM is ready
@@ -597,175 +569,60 @@
       initializeUnifiedAuth();
     });
 
-    // Unified authentication system (same as songlist.html)
+    // Unified authentication system using RhythmUnifiedAuth
     async function initializeUnifiedAuth() {
-      let isAuthenticated = false;
-
-      // Check for existing approval
-      const approval = localStorage.getItem('rhythmAuth_approval');
-      if (approval) {
-        try {
-          const approvalData = JSON.parse(approval);
-          
-          // Check if user has lyrics access permission
-          if (approvalData.status === 'active' && 
-              approvalData.deviceId && 
-              approvalData.fullName &&
-              approvalData.permissions && 
-              (approvalData.permissions.includes('lyrics') || approvalData.permissions.includes('admin'))) {
-            
-            // Verify approval is still valid on server (when online)
-            if (navigator.onLine) {
-              try {
-                // Import Firebase DB for verification
-                const module = await import('../js/firebase-db.js');
-                const rhythmDB = new module.RhythmFirebaseDB();
-                const userData = await rhythmDB.getApprovedUser(approvalData.accessCode);
-                
-                if (userData && userData.deviceId === approvalData.deviceId && userData.status === 'active') {
-                  isAuthenticated = true;
-                  console.log('✅ Lyrics Authentication: Approved user -', approvalData.fullName);
-                  
-                  // Update last active timestamp
-                  approvalData.lastActive = Date.now();
-                  localStorage.setItem('rhythmAuth_approval', JSON.stringify(approvalData));
-                } else {
-                  console.log('❌ Lyrics access was revoked');
-                  localStorage.removeItem('rhythmAuth_approval');
-                  showAccessDenied();
-                  return;
-                }
-              } catch (error) {
-                console.error('Error verifying lyrics access:', error);
-                // If verification fails due to network, assume still valid
-                isAuthenticated = true;
-              }
-            } else {
-              // Offline - trust local storage
-              isAuthenticated = true;
-              console.log('✅ Lyrics Authentication: Offline mode - using cached approval');
-            }
-          }
-        } catch (e) {
-          console.error('Error parsing approval data:', e);
-          localStorage.removeItem('rhythmAuth_approval');
+      try {
+        console.log('🔍 [Lyrics] Starting unified authentication...');
+        
+        // Wait for unified auth to initialize
+        let attempts = 0;
+        while (!window.rhythmAuth?.isInitialized && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
         }
+        
+        if (!window.rhythmAuth?.isInitialized) {
+            console.error('❌ [Lyrics] Unified auth failed to initialize');
+            showAccessDenied('Authentication system failed to initialize');
+            return;
+        }
+        
+        // Use unified authentication check
+        const authResult = await window.rhythmAuth.checkAuthentication();
+        
+        if (!authResult.isAuthenticated) {
+            console.log('❌ [Lyrics] User not authenticated:', authResult.reason);
+            showAccessDenied('You need to be logged in to access lyrics');
+            return;
+        }
+        
+        // Check if user has lyrics permission
+        if (!window.rhythmAuth.hasPermission('lyrics')) {
+            console.log('❌ [Lyrics] User does not have lyrics permission');
+            showAccessDenied('You do not have permission to access lyrics');
+            return;
+        }
+        
+        const user = authResult.user;
+        console.log('✅ [Lyrics] Authentication successful for:', user.fullName);
+        
+        // Authentication successful - load the lyrics page
+        await loadSongsData();
+        
+      } catch (error) {
+        console.error('❌ [Lyrics] Authentication failed:', error);
+        showAccessDenied('Authentication error occurred');
       }
-
-      if (!isAuthenticated) {
-        console.log('❌ Not authenticated for lyrics access');
-        showAccessDenied();
-        return;
-      }
-
-      // Authentication successful - load the lyrics page
-      loadSongsData();
     }
 
-    function showAccessDenied() {
+    function showAccessDenied(message = 'You need to be logged in to access lyrics') {
       document.body.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: var(--font-family, Arial, sans-serif); background: var(--bg-color, #1f1f1f); color: var(--primary-color, #f5d000);">
           <h2 style="color: var(--primary-color, #f5d000); margin-bottom: 20px;">Access Required</h2>
-          <p style="text-align: center; margin-bottom: 30px; max-width: 400px;">You need to be logged in to access lyrics. Please log in from the songlist page.</p>
+          <p style="text-align: center; margin-bottom: 30px; max-width: 400px;">${message}. Please log in from the songlist page.</p>
           <a href="songlist.html" style="padding: 12px 24px; background: var(--primary-color, #f5d000); color: var(--text-color, #2b2b2b); text-decoration: none; border-radius: 5px; font-weight: 600;">Go to Song List</a>
         </div>
       `;
-    }
-    
-    function initializeSessionTimeout() {
-      // Track page visibility
-      document.addEventListener('visibilitychange', function() {
-        if (document.hidden) {
-          isPageVisible = false;
-          // Start session timeout when page goes out of focus
-          if (pinAuthenticated) {
-            startSessionTimeout();
-          }
-        } else {
-          isPageVisible = true;
-          // Clear session timeout when page comes back into focus
-          clearSessionTimeout();
-          updateLastActivity();
-        }
-      });
-      
-      // Track user activity to reset session timer
-      const activityEvents = ['click', 'keydown', 'scroll', 'touchstart', 'mousemove'];
-      activityEvents.forEach(event => {
-        document.addEventListener(event, updateLastActivity, true);
-      });
-      
-      // For mobile apps, also track window focus/blur
-      window.addEventListener('focus', function() {
-        isPageVisible = true;
-        clearSessionTimeout();
-        updateLastActivity();
-      });
-      
-      window.addEventListener('blur', function() {
-        isPageVisible = false;
-        if (pinAuthenticated) {
-          startSessionTimeout();
-        }
-      });
-    }
-    
-    function updateLastActivity() {
-      lastActivityTime = Date.now();
-      if (pinAuthenticated && !isPageVisible) {
-        // Reset session timeout if user becomes active while page is hidden
-        clearSessionTimeout();
-        startSessionTimeout();
-      }
-    }
-    
-    function startSessionTimeout() {
-      clearSessionTimeout(); // Clear any existing timeout
-      
-      sessionTimer = setTimeout(() => {
-        if (pinAuthenticated && !isPageVisible) {
-          // Session expired - require PIN re-entry
-          expireSession();
-        }
-      }, sessionTimeout);
-    }
-    
-    function clearSessionTimeout() {
-      if (sessionTimer) {
-        clearTimeout(sessionTimer);
-        sessionTimer = null;
-      }
-    }
-    
-    function expireSession() {
-      pinAuthenticated = false;
-      sessionStorage.removeItem('pinSession');
-      
-      // Clear session timeout
-      clearSessionTimeout();
-      
-      // Show PIN overlay again
-      pinOverlay.classList.remove('hidden');
-      clearPinInputs();
-      
-      // Focus on first digit when user returns
-      setTimeout(() => {
-        pinDigits[0].focus();
-        
-        // Force keyboard to open on mobile devices
-        if (window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-          pinDigits[0].click();
-          setTimeout(() => {
-            pinDigits[0].focus();
-          }, 100);
-        }
-      }, 300);
-      
-      // Show session expired message
-      showPinError('Session expired. Please enter PIN again.');
-      setTimeout(() => {
-        clearPinError();
-      }, 3000);
     }
     
     async function loadSongsData() {
