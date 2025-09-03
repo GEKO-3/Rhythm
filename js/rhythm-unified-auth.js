@@ -55,6 +55,24 @@ class RhythmUnifiedAuth {
             const storedAuth = localStorage.getItem('rhythmAuth_approval');
             if (!storedAuth) {
                 console.log('❌ [UnifiedAuth] No stored auth data');
+                
+                // Try automatic login with stored device credentials
+                const storedCredentials = this.getStoredCredentials();
+                if (storedCredentials) {
+                    console.log('🔄 [UnifiedAuth] Attempting automatic login with stored credentials...');
+                    console.log('📱 [UnifiedAuth] Using stored credentials:', storedCredentials.accessCode, storedCredentials.fullName);
+                    const loginResult = await this.submitLoginRequest(
+                        storedCredentials.accessCode, 
+                        storedCredentials.fullName
+                    );
+                    if (loginResult.success && loginResult.action === 'auto_login') {
+                        console.log('✅ [UnifiedAuth] Automatic login successful');
+                        return { isAuthenticated: true, user: loginResult.user, reason: 'auto_login' };
+                    } else {
+                        console.log('❌ [UnifiedAuth] Automatic login failed:', loginResult);
+                    }
+                }
+                
                 return { isAuthenticated: false, user: null, reason: 'no_stored_auth' };
             }
 
@@ -97,6 +115,12 @@ class RhythmUnifiedAuth {
                 const updatedUser = this.normalizeUserData(dbUser);
                 localStorage.setItem('rhythmAuth_approval', JSON.stringify(updatedUser));
                 this.currentUser = updatedUser;
+                
+                // Store device credentials for future use
+                this.storeDeviceCredentials(
+                    dbUser.fullName || dbUser.name || 'User', 
+                    userData.accessCode
+                );
             } else {
                 // No database connection or access code, use stored data
                 this.currentUser = this.normalizeUserData(userData);
@@ -234,20 +258,20 @@ class RhythmUnifiedAuth {
     showAuthDebugInfo() {
         const deviceInfo = this.getDeviceInfo();
         const currentUser = this.getCurrentUser();
+        const storedAuth = localStorage.getItem('rhythmAuth_approval');
         
         console.group('🔍 Authentication Debug Info');
-        console.log('Device ID:', deviceInfo.deviceId);
+        console.log('Current Device ID:', deviceInfo.currentDeviceId);
         console.log('User Agent:', deviceInfo.userAgent);
         console.log('Platform:', deviceInfo.platform);
-        console.log('Is Mobile:', deviceInfo.isMobile);
-        console.log('Current User:', currentUser ? currentUser.fullName : 'None');
-        console.log('User Status:', currentUser ? currentUser.status : 'N/A');
-        console.log('User Device ID:', currentUser ? currentUser.deviceId : 'N/A');
-        console.log('Device Match:', currentUser ? (currentUser.deviceId === deviceInfo.deviceId) : 'N/A');
-        console.log('Permissions:', currentUser ? currentUser.permissions : 'None');
+        console.log('Has Stored Auth:', deviceInfo.hasStoredAuth);
+        console.log('Stored User:', deviceInfo.storedUser);
+        console.log('Stored Device ID:', deviceInfo.storedDeviceId);
+        console.log('Current User Object:', currentUser);
+        console.log('Raw localStorage Data:', storedAuth);
         console.groupEnd();
         
-        return { deviceInfo, currentUser };
+        return { deviceInfo, currentUser, rawStorage: storedAuth };
     }
 
     /**
@@ -272,26 +296,78 @@ class RhythmUnifiedAuth {
     }
 
     /**
-     * Generate device ID
+     * Generate and store device ID persistently
      */
     generateDeviceId() {
         let deviceId = localStorage.getItem('rhythm_device_id');
         if (!deviceId) {
-            // Create a more unique device ID using timestamp + random + browser info
-            const timestamp = Date.now().toString(36);
+            // Create a unique device ID using random + browser fingerprint
             const random = Math.random().toString(36).substr(2, 9);
             const userAgent = navigator.userAgent.substring(0, 50).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
-            deviceId = `dev_${timestamp}_${random}_${userAgent}`;
+            const platform = navigator.platform.replace(/[^a-zA-Z0-9]/g, '').substring(0, 5);
+            deviceId = `dev_${random}_${userAgent}_${platform}`;
             localStorage.setItem('rhythm_device_id', deviceId);
-            console.log('🆔 [Device] Generated NEW unique device ID:', deviceId);
+            console.log('🆔 [Device] Generated NEW persistent device ID:', deviceId);
         } else {
-            console.log('🆔 [Device] Using existing device ID:', deviceId);
+            console.log('🆔 [Device] Using stored device ID:', deviceId);
         }
-        console.log('🔍 [Device] Full device info:');
-        console.log('   UserAgent:', navigator.userAgent);
-        console.log('   Platform:', navigator.platform);
-        console.log('   Language:', navigator.language);
         return deviceId;
+    }
+
+    /**
+     * Store user credentials on this device
+     */
+    storeDeviceCredentials(fullName, accessCode) {
+        const deviceData = {
+            fullName: fullName,
+            accessCode: accessCode,
+            deviceId: this.generateDeviceId(),
+            storedAt: Date.now()
+        };
+        localStorage.setItem('rhythm_device_credentials', JSON.stringify(deviceData));
+        console.log('💾 [Device] Stored credentials for:', fullName);
+    }
+
+    /**
+     * Get stored device credentials
+     */
+    getStoredCredentials() {
+        const stored = localStorage.getItem('rhythm_device_credentials');
+        if (stored) {
+            try {
+                const credentials = JSON.parse(stored);
+                console.log('📱 [Device] Found stored credentials:', credentials.fullName, credentials.accessCode);
+                return credentials;
+            } catch (error) {
+                console.error('❌ [Device] Invalid stored credentials, clearing...');
+                localStorage.removeItem('rhythm_device_credentials');
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Clear device credentials
+     */
+    clearDeviceCredentials() {
+        localStorage.removeItem('rhythm_device_credentials');
+        localStorage.removeItem('rhythm_device_id');
+        localStorage.removeItem('rhythmAuth_approval');
+        console.log('🧹 [Device] Cleared all device data');
+    }
+
+    /**
+     * Debug: Show current device info
+     */
+    showDeviceInfo() {
+        const deviceId = this.generateDeviceId();
+        const credentials = this.getStoredCredentials();
+        console.log('📱 [Device Debug] Current device info:');
+        console.log('   Device ID:', deviceId);
+        console.log('   Stored credentials:', credentials);
+        console.log('   User Agent:', navigator.userAgent.substring(0, 100));
+        console.log('   Platform:', navigator.platform);
+        return { deviceId, credentials };
     }
 
     /**
@@ -354,37 +430,58 @@ class RhythmUnifiedAuth {
         }
 
         const deviceId = this.generateDeviceId();
-        console.log('🔍 [UnifiedAuth] Checking login for access code:', accessCode, 'device:', deviceId);
+        console.log('🔍 [UnifiedAuth] Login attempt details:');
+        console.log('   Access Code:', accessCode);
+        console.log('   Full Name:', fullName);
+        console.log('   Current Device ID:', deviceId);
 
         // Check if user already exists and is approved
         const existingUser = await this.getUser(accessCode);
         if (existingUser) {
-            console.log('🔍 [UnifiedAuth] Found existing user:', existingUser);
+            console.log('🔍 [UnifiedAuth] Found existing user in database:');
+            console.log('   User Access Code:', existingUser.accessCode || accessCode);
+            console.log('   User Full Name:', existingUser.fullName || existingUser.name);
+            console.log('   User Device ID:', existingUser.deviceId);
+            console.log('   User Status:', existingUser.status);
             
             // If user is approved and active, check device binding
             if (existingUser.status === 'active' || existingUser.status !== 'revoked') {
                 console.log('🔍 [UnifiedAuth] User is approved, checking device binding...');
+                console.log('   Expected Device:', existingUser.deviceId);
+                console.log('   Current Device:', deviceId);
+                console.log('   Device Match:', existingUser.deviceId === deviceId);
                 
                 // STRICT device check: user must be on their registered device
                 if (existingUser.deviceId && existingUser.deviceId !== deviceId) {
                     console.log('❌ [UnifiedAuth] Device mismatch during login attempt');
-                    console.log('   Registered device:', existingUser.deviceId);
-                    console.log('   Current device:', deviceId);
+                    console.log('   This account is bound to a different device!');
+                    console.log('   If you have multiple accounts, try a different access code.');
                     return { 
                         success: false, 
                         action: 'device_mismatch', 
-                        message: 'This account is registered to a different device. Each user can only access from one device.' 
+                        message: 'This account is registered to a different device. If you have multiple accounts with the same name, try using the access code for the account registered to this device.' 
                     };
                 }
                 
-                // If no device ID is set, user needs admin to bind their device
+                // If no device ID is set, bind to current device (first login)
                 if (!existingUser.deviceId) {
-                    console.log('❌ [UnifiedAuth] User has no device binding - admin action required');
-                    return { 
-                        success: false, 
-                        action: 'no_device_binding', 
-                        message: 'Your account needs device binding setup. Please contact an administrator.' 
-                    };
+                    console.log('🔄 [UnifiedAuth] First login - binding user to current device');
+                    try {
+                        await this.updateUser(accessCode, { 
+                            deviceId: deviceId, 
+                            lastActive: Date.now(),
+                            firstDeviceBinding: Date.now()
+                        });
+                        existingUser.deviceId = deviceId;
+                        console.log('✅ [UnifiedAuth] User bound to device:', deviceId);
+                    } catch (error) {
+                        console.error('❌ [UnifiedAuth] Failed to bind user to device:', error);
+                        return { 
+                            success: false, 
+                            action: 'binding_failed', 
+                            message: 'Failed to bind account to device. Please try again.' 
+                        };
+                    }
                 }
                 
                 // Device matches or was just set - proceed with login
@@ -400,6 +497,9 @@ class RhythmUnifiedAuth {
                 } catch (error) {
                     console.warn('⚠️ [UnifiedAuth] Could not update last active time');
                 }
+                
+                // Store device credentials for future automatic login
+                this.storeDeviceCredentials(fullName, accessCode);
                 
                 return { success: true, action: 'auto_login', user: loginData };
             }
@@ -626,9 +726,8 @@ class RhythmUnifiedAuth {
         }
     }
 
-    /**
-     * ADMIN ONLY: Unbind user from device (allows new device binding)
-     */
+    // Admin function to unbind a user from their device
+    // Admin function to unbind a user from their device
     async unbindUserDevice(accessCode) {
         if (!this.database) {
             throw new Error('Database not initialized');

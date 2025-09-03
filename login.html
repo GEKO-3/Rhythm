@@ -248,21 +248,6 @@
                 return;
             }
             
-            // Try to restore admin session automatically (for specific case)
-            console.log('🔄 Attempting automatic admin session restoration...');
-            try {
-                const restored = await window.rhythmAuth.restoreUserSession('0023');
-                if (restored) {
-                    showMessage('Admin session restored! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.rhythmAuth.redirectAfterLogin();
-                    }, 1500);
-                    return;
-                }
-            } catch (error) {
-                console.log('No admin session to restore, continuing with normal login');
-            }
-            
             // Check for pending request
             await checkPendingRequest();
         });
