@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Rhythm Boduberu - Sponsor Requests Management">
+    <title>Rhythm Boduberu - Sponsors Management</title>
+    
+    <!-- Favicon and web app manifest -->
+    <link rel="icon" href="../../assets/favicons/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="../../assets/favicons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="../../assets/favicons/apple-touch-icon.png">
+    <link rel="manifest" href="../../assets/favicons/manifest.webmanifest">
+    
+    <!-- Font loading -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('../../assets/Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../assets/Fonts/Montserrat-Regular.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 400;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../assets/Fonts/Montserrat-Medium.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 500;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../assets/Fonts/Montserrat-SemiBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 600;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../assets/Fonts/Montserrat-Bold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 700;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../assets/Fonts/Montserrat-ExtraBold.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 800;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../assets/Fonts/Montserrat-Light.ttf') format('truetype');
+            font-display: swap;
+            font-weight: 300;
+            font-style: normal;
+        }
+    </style>
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --hover-color: #fced98;
+            --active-color: #E6B800;
+            --text-color: #2b2b2b;
+            --bg-color: #1f1f1f;
+            --card-bg: #2a2a2a;
+            --border-color: #444444;
+            --error-color: #ff4444;
+            --success-color: #44ff44;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: var(--bg-color);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 20px;
+            background: rgba(31, 31, 31, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #cccccc;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Back to Home Link */
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            background: rgba(31, 31, 31, 0.9);
+            padding: 12px 16px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            z-index: 100;
+        }
+
+        .back-link:hover {
+            background: rgba(245, 208, 0, 0.1);
+            transform: translateX(-5px);
+        }
+
+        .back-link svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Loading and Error States */
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(245, 208, 0, 0.3);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .error-container {
+            background: rgba(255, 68, 68, 0.1);
+            border: 2px solid var(--error-color);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .error-title {
+            color: var(--error-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            color: #ffffff;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Statistics */
+        .stats-container {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .stats-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .stats-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .stat-item {
+            text-align: center;
+            min-width: 80px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .stat-number {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: block;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #cccccc;
+            margin-top: 4px;
+            line-height: 1.2;
+        }
+
+        /* Filter System */
+        .filter-container {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .filter-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .filter-dropdown-container {
+            position: relative;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .filter-dropdown-button {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(245, 208, 0, 0.1);
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .filter-dropdown-button:hover {
+            background: rgba(245, 208, 0, 0.2);
+            border-color: rgba(245, 208, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .filter-dropdown-button .selected-filter {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-dropdown-button .dropdown-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .filter-dropdown-button.open .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .filter-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            margin-top: 5px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .filter-dropdown-menu.show {
+            display: block;
+        }
+
+        .filter-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .filter-option:last-child {
+            border-bottom: none;
+        }
+
+        .filter-option:hover {
+            background: rgba(245, 208, 0, 0.1);
+        }
+
+        .filter-option.active {
+            background: rgba(245, 208, 0, 0.2);
+            color: var(--primary-color);
+        }
+
+        /* Sponsors Grid */
+        .sponsors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .sponsor-tile {
+            background: rgba(42, 42, 42, 0.8);
+            backdrop-filter: blur(15px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: visible;
+            cursor: pointer;
+        }
+
+        .sponsor-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(245, 208, 0, 0.4);
+        }
+
+        .sponsor-tile.compact {
+            padding: 15px 20px;
+            min-height: auto;
+        }
+
+        .tile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .sponsor-tile.compact .tile-header {
+            margin-bottom: 0;
+        }
+
+        .compact-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .compact-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            border: 1px solid;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .compact-status.pending {
+            background: rgba(255, 170, 0, 0.1);
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .compact-status.contacted {
+            background: rgba(68, 255, 68, 0.1);
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .compact-status.declined {
+            background: rgba(255, 68, 68, 0.1);
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        .compact-status.signed {
+            background: rgba(138, 43, 226, 0.1);
+            border-color: #8a2be2;
+            color: #8a2be2;
+        }
+
+        .expand-indicator {
+            margin-left: 10px;
+            color: var(--primary-color);
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .sponsor-tile.expanded .expand-indicator {
+            transform: rotate(180deg);
+        }
+
+        .tile-details {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .sponsor-tile.expanded .tile-details {
+            max-height: 1000px;
+            opacity: 1;
+            margin-top: 15px;
+        }
+
+        .timestamp {
+            font-size: 0.85rem;
+            font-weight: 300;
+            font-style: italic;
+            color: #aaaaaa;
+            margin-bottom: 15px;
+        }
+
+        .full-name {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            line-height: 1.2;
+        }
+
+        .sponsor-tile.compact .full-name {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+
+        .sponsor-tile.expanded .compact-status {
+            display: none;
+        }
+
+        .sponsor-tile.expanded .full-name {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .contact-number {
+            font-size: 1rem;
+            font-weight: 400;
+            font-style: italic;
+            color: #ffffff;
+            margin-bottom: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contact-number:hover {
+            color: var(--primary-color);
+            transform: scale(1.02);
+        }
+
+        .company {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #cccccc;
+            margin-bottom: 12px;
+        }
+
+        .interest {
+            font-size: 0.9rem;
+            font-weight: 300;
+            font-style: italic;
+            color: #aaaaaa;
+            margin-bottom: 15px;
+        }
+
+        .status-system {
+            margin-top: 15px;
+        }
+
+        .status-button {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            background: rgba(245, 208, 0, 0.1);
+            color: var(--primary-color);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .status-button:hover {
+            background: rgba(245, 208, 0, 0.2);
+            border-color: rgba(245, 208, 0, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .status-button.contacted {
+            background: rgba(68, 255, 68, 0.1);
+            border-color: var(--success-color);
+            color: var(--success-color);
+        }
+
+        .status-button.declined {
+            background: rgba(255, 68, 68, 0.1);
+            border-color: var(--error-color);
+            color: var(--error-color);
+        }
+
+        .status-button.pending {
+            background: rgba(255, 170, 0, 0.1);
+            border-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .status-button.signed {
+            background: rgba(138, 43, 226, 0.1);
+            border-color: #8a2be2;
+            color: #8a2be2;
+        }
+
+        .status-button.updating {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-button.updating::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent, 
+                rgba(245, 208, 0, 0.2), 
+                transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .status-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(42, 42, 42, 0.95);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            margin-bottom: 5px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-dropdown.show {
+            display: block;
+        }
+
+        .status-option {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-option:hover {
+            background: rgba(245, 208, 0, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            color: #666666;
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            color: #cccccc;
+            margin-bottom: 10px;
+        }
+
+        .empty-message {
+            color: #999999;
+            font-size: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .sponsors-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .sponsor-tile {
+                padding: 20px 15px;
+            }
+            
+            .sponsor-tile.compact {
+                padding: 12px 15px;
+            }
+            
+            .full-name {
+                font-size: 1.4rem;
+            }
+            
+            .sponsor-tile.compact .full-name {
+                font-size: 1rem;
+            }
+            
+            .compact-status {
+                font-size: 0.7rem;
+                padding: 3px 6px;
+            }
+            
+            .expand-indicator {
+                font-size: 0.8rem;
+            }
+            
+            .back-link {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+
+            .status-button {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+            }
+
+            .filter-dropdown-container {
+                max-width: 100%;
+            }
+
+            .filter-dropdown-button {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+
+            .filter-option {
+                font-size: 0.9rem;
+                padding: 10px 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 30px 15px 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-content {
+                padding: 30px 15px;
+            }
+            
+            .sponsor-tile {
+                padding: 15px 12px;
+            }
+            
+            .sponsor-tile.compact {
+                padding: 10px 12px;
+            }
+            
+            .sponsors-grid {
+                gap: 12px;
+            }
+            
+            .full-name {
+                font-size: 1.2rem;
+            }
+            
+            .sponsor-tile.compact .full-name {
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Back to Home Link -->
+    <a href="/pages/admin/admin.html" class="back-link">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+        </svg>
+        Back to Admin
+    </a>
+
+    <!-- Header -->
+    <header class="header">
+        <img src="../../src/Logo_1.svg" alt="Rhythm Boduberu" class="logo">
+        <h1>Sponsor Requests</h1>
+        <p>View and manage all sponsor inquiry submissions for Rhythm Boduberu</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Loading State -->
+        <div id="loading-container" class="loading-container">
+            <div class="spinner"></div>
+            <div class="loading-text">Loading sponsor requests...</div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-container" class="error-container" style="display: none;">
+            <div class="error-title">Error Loading Sponsor Requests</div>
+            <div class="error-message">Unable to fetch sponsor data. Please check your internet connection and try again.</div>
+        </div>
+
+        <!-- Statistics -->
+        <div id="stats-container" class="stats-container" style="display: none;">
+            <div class="stats-title">Sponsor Request Statistics</div>
+            <div class="stats-list">
+                <div class="stat-item">
+                    <span id="total-count" class="stat-number">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span id="pending-count" class="stat-number">0</span>
+                    <span class="stat-label">Pending</span>
+                </div>
+                <div class="stat-item">
+                    <span id="contacted-count" class="stat-number">0</span>
+                    <span class="stat-label">Contacted</span>
+                </div>
+                <div class="stat-item">
+                    <span id="signed-count" class="stat-number">0</span>
+                    <span class="stat-label">Signed</span>
+                </div>
+                <div class="stat-item">
+                    <span id="declined-count" class="stat-number">0</span>
+                    <span class="stat-label">Declined</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter System -->
+        <div id="filter-container" class="filter-container" style="display: none;">
+            <div class="filter-title">Filter by Status</div>
+            <div class="filter-dropdown-container">
+                <button class="filter-dropdown-button" id="filter-dropdown-button">
+                    <span class="selected-filter">
+                        <span>📋</span>
+                        <span>All Requests</span>
+                    </span>
+                    <span class="dropdown-arrow">▼</span>
+                </button>
+                <div class="filter-dropdown-menu" id="filter-dropdown-menu">
+                    <div class="filter-option active" data-filter="all">
+                        <span>📋</span>
+                        <span>All Requests</span>
+                    </div>
+                    <div class="filter-option" data-filter="pending">
+                        <span>⏳</span>
+                        <span>Pending</span>
+                    </div>
+                    <div class="filter-option" data-filter="contacted">
+                        <span>✅</span>
+                        <span>Contacted</span>
+                    </div>
+                    <div class="filter-option" data-filter="signed">
+                        <span>🤝</span>
+                        <span>Signed</span>
+                    </div>
+                    <div class="filter-option" data-filter="declined">
+                        <span>❌</span>
+                        <span>Declined</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sponsors Grid -->
+        <div id="sponsors-grid" class="sponsors-grid" style="display: none;"></div>
+
+        <!-- Empty State -->
+        <div id="empty-state" class="empty-state" style="display: none;">
+            <div class="empty-icon">🤝</div>
+            <div class="empty-title">No Sponsor Requests Found</div>
+            <div class="empty-message">No sponsor requests match the current filter.</div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { RhythmFirebaseDB } from '../../js/firebase-db-optimized.js';
+        import RhythmUnifiedAuth from '../../js/rhythm-unified-auth.js';
+        
+        // Initialize Firebase DB and Auth
+        let firebaseDB = null;
+        let rhythmAuth = null;
+        
+        // DOM elements
+        const loadingContainer = document.getElementById('loading-container');
+        const errorContainer = document.getElementById('error-container');
+        const statsContainer = document.getElementById('stats-container');
+        const filterContainer = document.getElementById('filter-container');
+        const sponsorsGrid = document.getElementById('sponsors-grid');
+        const emptyState = document.getElementById('empty-state');
+
+        // Filter state
+        let currentFilter = 'all';
+        let allSponsors = [];
+        let filteredSponsors = [];
+        
+        // Real-time listener
+        let unsubscribeSponsors = null;
+        
+        // Function to initialize Firebase and load sponsors
+        async function initializeSystem() {
+            try {
+                console.log('🔐 Checking admin authentication...');
+                
+                // Initialize auth system
+                rhythmAuth = new RhythmUnifiedAuth();
+                
+                // Wait for auth to initialize
+                let attempts = 0;
+                const maxAttempts = 50;
+                while (!rhythmAuth.isInitialized && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                if (!rhythmAuth.isInitialized) {
+                    throw new Error('Authentication system failed to initialize');
+                }
+                
+                // Check authentication
+                const authResult = await rhythmAuth.checkAuthentication();
+                console.log('🔍 Auth check result:', authResult);
+                
+                if (!authResult.isAuthenticated) {
+                    console.log('❌ User not authenticated, redirecting to login...');
+                    window.location.href = '../../login.html?returnUrl=' + encodeURIComponent(window.location.href);
+                    return;
+                }
+                
+                // Check admin permissions
+                if (!rhythmAuth.isAdmin()) {
+                    console.log('❌ User does not have admin privileges');
+                    showUnauthorizedError();
+                    return;
+                }
+                
+                console.log('✅ Admin authentication verified');
+                console.log('👤 Admin user:', authResult.user.fullName);
+                
+                console.log('🔥 Initializing Firebase...');
+                firebaseDB = new RhythmFirebaseDB();
+                
+                // Wait a moment for Firebase to initialize
+                if (!firebaseDB.isInitialized) {
+                    throw new Error('Firebase failed to initialize');
+                }
+                
+                console.log('✅ Firebase initialized successfully');
+                setupSponsorListeners();
+            } catch (error) {
+                console.error('❌ Failed to initialize system:', error);
+                showError();
+            }
+        }
+        
+        // Function to setup real-time sponsor listeners
+        function setupSponsorListeners() {
+            try {
+                console.log('📋 Setting up real-time sponsor listeners...');
+                
+                unsubscribeSponsors = firebaseDB.listenToSponsors((sponsors) => {
+                    console.log('🔄 Real-time sponsor update received:', sponsors);
+                    
+                    if (sponsors && sponsors.length > 0) {
+                        allSponsors = sponsors;
+                        setupUI();
+                        displaySponsors();
+                    } else {
+                        showEmptyState();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('❌ Failed to setup sponsor listeners:', error);
+                showError();
+            }
+        }
+        
+        // Function to setup UI components
+        function setupUI() {
+            // Hide loading, show other components
+            loadingContainer.style.display = 'none';
+            statsContainer.style.display = 'block';
+            filterContainer.style.display = 'block';
+            sponsorsGrid.style.display = 'grid';
+            
+            setupFilterSystem();
+            updateStatistics();
+        }
+        
+        // Function to setup filter system
+        function setupFilterSystem() {
+            // Setup filter dropdown functionality
+            const dropdownButton = document.getElementById('filter-dropdown-button');
+            const dropdownMenu = document.getElementById('filter-dropdown-menu');
+            const filterOptions = document.querySelectorAll('.filter-option');
+            
+            dropdownButton.addEventListener('click', () => {
+                dropdownMenu.classList.toggle('show');
+                dropdownButton.classList.toggle('open');
+            });
+            
+            filterOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const filterValue = option.dataset.filter;
+                    const filterText = option.textContent.trim();
+                    const filterIcon = option.querySelector('span').textContent;
+                    
+                    // Update current filter
+                    currentFilter = filterValue;
+                    
+                    // Update button display
+                    dropdownButton.querySelector('.selected-filter').innerHTML = `
+                        <span>${filterIcon}</span>
+                        <span>${filterText}</span>
+                    `;
+                    
+                    // Update active state
+                    filterOptions.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                    
+                    // Close dropdown
+                    dropdownMenu.classList.remove('show');
+                    dropdownButton.classList.remove('open');
+                    
+                    // Apply filter
+                    displaySponsors();
+                });
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.classList.remove('show');
+                    dropdownButton.classList.remove('open');
+                }
+            });
+        }
+        
+        // Function to display sponsors
+        function displaySponsors() {
+            // First apply current filter
+            if (currentFilter === 'all') {
+                filteredSponsors = [...allSponsors];
+            } else {
+                filteredSponsors = allSponsors.filter(sponsor => sponsor.status === currentFilter);
+            }
+            
+            updateStatistics();
+            renderSponsorsGrid();
+        }
+        
+        // Function to update statistics
+        function updateStatistics() {
+            const totalCount = allSponsors.length;
+            const pendingCount = allSponsors.filter(s => s.status === 'pending').length;
+            const contactedCount = allSponsors.filter(s => s.status === 'contacted').length;
+            const signedCount = allSponsors.filter(s => s.status === 'signed').length;
+            const declinedCount = allSponsors.filter(s => s.status === 'declined').length;
+            
+            document.getElementById('total-count').textContent = totalCount;
+            document.getElementById('pending-count').textContent = pendingCount;
+            document.getElementById('contacted-count').textContent = contactedCount;
+            document.getElementById('signed-count').textContent = signedCount;
+            document.getElementById('declined-count').textContent = declinedCount;
+        }
+        
+        // Function to render sponsors grid
+        function renderSponsorsGrid() {
+            const grid = document.getElementById('sponsors-grid');
+            
+            if (filteredSponsors.length === 0) {
+                showEmptyState();
+                return;
+            }
+            
+            // Hide empty state
+            emptyState.style.display = 'none';
+            grid.style.display = 'grid';
+            
+            // Sort sponsors by submission date (newest first)
+            const sortedSponsors = [...filteredSponsors].sort((a, b) => {
+                const dateA = new Date(a.submittedAt || a.timestamp || 0);
+                const dateB = new Date(b.submittedAt || b.timestamp || 0);
+                return dateB - dateA;
+            });
+            
+            grid.innerHTML = sortedSponsors.map(sponsor => createSponsorTile(sponsor)).join('');
+            
+            // Setup tile interactions
+            setupTileInteractions();
+        }
+        
+        // Function to create sponsor tile HTML
+        function createSponsorTile(sponsor) {
+            const submissionDate = sponsor.submittedAt ? new Date(sponsor.submittedAt) : new Date(sponsor.timestamp || Date.now());
+            const formattedDate = formatDate(submissionDate.toISOString());
+            const formattedPhone = formatPhoneNumber(sponsor.phone || '');
+            const phoneCallLink = formatPhoneForCall(sponsor.phone || '');
+            
+            const statusDisplay = getStatusDisplay(sponsor.status || 'pending');
+            const statusIcon = getStatusIcon(sponsor.status || 'pending');
+            
+            return `
+                <div class="sponsor-tile compact" data-sponsor-id="${sponsor.id}">
+                    <div class="tile-header">
+                        <div class="compact-info">
+                            <div class="full-name">${sponsor.name || 'Unknown'}</div>
+                            <div class="compact-status ${(sponsor.status || 'pending').toLowerCase()}">
+                                <span>${statusIcon}</span>
+                                <span>${statusDisplay}</span>
+                            </div>
+                        </div>
+                        <div class="expand-indicator">▼</div>
+                    </div>
+                    
+                    <div class="tile-details">
+                        <div class="timestamp">Submitted: ${formattedDate}</div>
+                        
+                        <div class="full-name">${sponsor.name || 'Unknown'}</div>
+                        
+                        <a href="${phoneCallLink}" class="contact-number">${formattedPhone}</a>
+                        
+                        ${sponsor.company ? `<div class="company">Company: ${sponsor.company}</div>` : ''}
+                        
+                        ${sponsor.sponsorshipInterest ? `<div class="interest">Interest: ${sponsor.sponsorshipInterest}</div>` : ''}
+                        
+                        <div class="status-system">
+                            <div style="position: relative;">
+                                <button class="status-button ${(sponsor.status || 'pending').toLowerCase()}" 
+                                        data-sponsor-id="${sponsor.id}" 
+                                        data-status="${sponsor.status || 'pending'}">
+                                    <span>${statusIcon}</span>
+                                    <span>${statusDisplay}</span>
+                                </button>
+                                
+                                <div class="status-dropdown">
+                                    <div class="status-option" data-status="pending">
+                                        <span>⏳</span>
+                                        <span>Pending</span>
+                                    </div>
+                                    <div class="status-option" data-status="contacted">
+                                        <span>✅</span>
+                                        <span>Contacted</span>
+                                    </div>
+                                    <div class="status-option" data-status="signed">
+                                        <span>🤝</span>
+                                        <span>Signed</span>
+                                    </div>
+                                    <div class="status-option" data-status="declined">
+                                        <span>❌</span>
+                                        <span>Declined</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Function to format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return 'Unknown date';
+            
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        // Function to format phone number
+        function formatPhoneNumber(phone) {
+            if (!phone) return 'No phone provided';
+            
+            // Remove any non-digit characters for processing
+            const cleanPhone = phone.replace(/\D/g, '');
+            
+            // Return formatted phone with proper spacing
+            if (cleanPhone.length === 7) {
+                return `${cleanPhone.slice(0, 3)}-${cleanPhone.slice(3)}`;
+            } else if (cleanPhone.length === 8) {
+                return `${cleanPhone.slice(0, 3)}-${cleanPhone.slice(3, 7)}`;
+            } else if (cleanPhone.length > 8) {
+                return `+${cleanPhone.slice(0, 3)} ${cleanPhone.slice(3, 6)}-${cleanPhone.slice(6)}`;
+            }
+            
+            return phone; // Return original if format doesn't match expected patterns
+        }
+        
+        // Function to format phone for calling
+        function formatPhoneForCall(phone) {
+            if (!phone) return '#';
+            
+            // Remove any non-digit characters
+            const cleanPhone = phone.replace(/\D/g, '');
+            
+            // If it's a local Maldivian number (7 digits), add country code
+            if (cleanPhone.length === 7) {
+                return `tel:+960${cleanPhone}`;
+            }
+            
+            // If it already has country code or is in different format
+            return `tel:+${cleanPhone}`;
+        }
+        
+        // Function to get status display text
+        function getStatusDisplay(status) {
+            const statusMap = {
+                'pending': 'Pending',
+                'contacted': 'Contacted', 
+                'signed': 'Signed',
+                'declined': 'Declined'
+            };
+            return statusMap[status] || 'Pending';
+        }
+        
+        // Function to get status icon
+        function getStatusIcon(status) {
+            const iconMap = {
+                'pending': '⏳',
+                'contacted': '✅',
+                'signed': '🤝', 
+                'declined': '❌'
+            };
+            return iconMap[status] || '⏳';
+        }
+        
+        // Function to setup tile interactions
+        function setupTileInteractions() {
+            // Tile expand/collapse
+            document.querySelectorAll('.sponsor-tile').forEach(tile => {
+                const header = tile.querySelector('.tile-header');
+                header.addEventListener('click', (e) => {
+                    // Don't expand if clicking on status button or dropdown
+                    if (e.target.closest('.status-system')) return;
+                    
+                    tile.classList.toggle('expanded');
+                });
+            });
+            
+            // Status button clicks
+            document.querySelectorAll('.status-button').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    const dropdown = button.nextElementSibling;
+                    
+                    // Close all other dropdowns
+                    document.querySelectorAll('.status-dropdown').forEach(d => {
+                        if (d !== dropdown) d.classList.remove('show');
+                    });
+                    
+                    // Toggle current dropdown
+                    dropdown.classList.toggle('show');
+                });
+            });
+            
+            // Status option clicks
+            document.querySelectorAll('.status-option').forEach(option => {
+                option.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    
+                    const sponsorId = option.closest('.sponsor-tile').dataset.sponsorId;
+                    const newStatus = option.dataset.status;
+                    const button = option.closest('.status-system').querySelector('.status-button');
+                    const dropdown = option.closest('.status-dropdown');
+                    
+                    await updateSponsorStatus(sponsorId, newStatus, button, dropdown);
+                });
+            });
+            
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.status-system')) {
+                    document.querySelectorAll('.status-dropdown').forEach(dropdown => {
+                        dropdown.classList.remove('show');
+                    });
+                }
+            });
+        }
+        
+        // Function to update sponsor status
+        async function updateSponsorStatus(sponsorId, newStatus, button, dropdown) {
+            try {
+                console.log(`Updating sponsor ${sponsorId} to status: ${newStatus}`);
+                
+                // Show loading state
+                button.classList.add('updating');
+                button.disabled = true;
+                
+                // Update in Firebase
+                await firebaseDB.updateSponsorStatus(sponsorId, newStatus);
+                
+                // Update local data - this will be handled by real-time listener
+                // Just close the dropdown and remove loading state
+                const statusClass = newStatus.toLowerCase();
+                const statusDisplay = getStatusDisplay(newStatus);
+                const statusIcon = getStatusIcon(newStatus);
+                
+                button.className = `status-button ${statusClass}`;
+                button.innerHTML = `<span>${statusIcon}</span><span>${statusDisplay}</span>`;
+                button.dataset.status = newStatus;
+                
+                // Update compact status badge
+                const tile = button.closest('.sponsor-tile');
+                const compactStatus = tile.querySelector('.compact-status');
+                compactStatus.className = `compact-status ${statusClass}`;
+                compactStatus.innerHTML = `<span>${statusIcon}</span><span>${statusDisplay}</span>`;
+                
+                // Close dropdown
+                dropdown.classList.remove('show');
+                
+                // Remove loading state
+                button.classList.remove('updating');
+                button.disabled = false;
+                
+                console.log(`✅ Sponsor ${sponsorId} status updated to: ${newStatus}`);
+                
+            } catch (error) {
+                console.error('❌ Failed to update sponsor status:', error);
+                
+                // Remove loading state
+                button.classList.remove('updating');
+                button.disabled = false;
+                
+                // Close dropdown
+                dropdown.classList.remove('show');
+                
+                alert('Failed to update status. Please try again.');
+            }
+        }
+        
+        // Function to show error
+        function showError() {
+            loadingContainer.style.display = 'none';
+            errorContainer.style.display = 'block';
+        }
+        
+        // Function to show empty state
+        function showEmptyState() {
+            loadingContainer.style.display = 'none';
+            emptyState.style.display = 'block';
+            sponsorsGrid.style.display = 'none';
+        }
+        
+        // Function to show unauthorized error
+        function showUnauthorizedError() {
+            loadingContainer.style.display = 'none';
+            errorContainer.style.display = 'block';
+            
+            // Update error message for unauthorized access
+            const errorTitle = errorContainer.querySelector('.error-title');
+            const errorMessage = errorContainer.querySelector('.error-message');
+            
+            if (errorTitle) {
+                errorTitle.textContent = 'Access Denied';
+            }
+            if (errorMessage) {
+                errorMessage.innerHTML = `
+                    You do not have administrator privileges to access this page.<br>
+                    <br>
+                    <a href="../../index.html" style="color: var(--primary-color); text-decoration: none;">
+                        ← Return to Home
+                    </a> | 
+                    <a href="../../login.html" style="color: var(--primary-color); text-decoration: none;">
+                        Login as Admin
+                    </a>
+                `;
+            }
+        }
+        
+        // Initialize the system when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Starting sponsors admin system...');
+            initializeSystem();
+        });
+        
+        // Cleanup listeners when page unloads
+        window.addEventListener('beforeunload', function() {
+            if (unsubscribeSponsors) {
+                console.log('🧹 Cleaning up real-time listeners...');
+                firebaseDB.stopListeningToSponsors(unsubscribeSponsors);
+                unsubscribeSponsors = null;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1403,6 +1403,32 @@
     </div>
 
     <script src="js/config.js" async defer></script>
+    <script type="module">
+        import { RhythmFirebaseDB } from './js/firebase-db-optimized.js';
+        
+        // Initialize Firebase DB and make it globally accessible
+        window.firebaseDB = null;
+        
+        // Initialize Firebase when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🔥 Initializing Firebase for sponsor form...');
+            window.firebaseDB = new RhythmFirebaseDB();
+            
+            // Wait for Firebase to initialize
+            let attempts = 0;
+            const maxAttempts = 50;
+            while (!window.firebaseDB.isInitialized && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+            
+            if (!window.firebaseDB.isInitialized) {
+                console.error('❌ Firebase failed to initialize');
+            } else {
+                console.log('✅ Firebase initialized for sponsor form');
+            }
+        });
+    </script>
     <script>
         // Info Modal Data
         const infoData = {
@@ -1612,135 +1638,45 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Submitting...';
             
-            // Submit to Google Form using hidden iframe method
-            submitToGoogleForm(name, phone, company, interest, submitBtn, originalText);
+            // Submit to Firebase instead of Google Forms
+            submitToFirebase(name, phone, company, interest, submitBtn, originalText);
         });
         
-        // Function to submit to Google Form using hidden iframe
-        function submitToGoogleForm(name, phone, company, interest, submitBtn, originalText) {
-            // Wait for config to load
-            if (!window.RhythmConfig) {
-                console.log('Config not loaded yet, retrying...');
-                setTimeout(() => submitToGoogleForm(name, phone, company, interest, submitBtn, originalText), 100);
-                return;
-            }
-            
-            console.log('Config loaded, submitting form...');
-            console.log('Form URL:', window.RhythmConfig.sponsorProposalForm);
-            
-            // Get form entries
-            const entries = window.RhythmConfig.sponsorProposalEntries;
-            console.log('Form entries:', entries);
-            
-            // Create form data
-            const formData = new FormData();
-            formData.append(entries.name, name);
-            formData.append(entries.phone, phone);
-            formData.append(entries.company, company);
-            formData.append(entries.interest, interest);
-            
-            console.log('Submitting with data:', {
-                [entries.name]: name,
-                [entries.phone]: phone,
-                [entries.company]: company,
-                [entries.interest]: interest
-            });
-            
-            // Submit using fetch with no-cors mode
-            fetch(window.RhythmConfig.sponsorProposalForm, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            }).then(() => {
-                console.log('Form submitted successfully via fetch');
-                handleSponsorSubmissionSuccess(name, submitBtn, originalText);
-            }).catch(error => {
-                console.error('Fetch submission failed, trying iframe method:', error);
-                // Fallback to iframe method
-                submitSponsorViaIframe(name, phone, company, interest, submitBtn, originalText);
-            });
-        }
         
-        function submitSponsorViaIframe(name, phone, company, interest, submitBtn, originalText) {
-            console.log('Using iframe fallback method');
-            
-            // Create hidden iframe
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.name = 'hidden_iframe';
-            document.body.appendChild(iframe);
-
-            // Create form
-            const hiddenForm = document.createElement('form');
-            hiddenForm.action = window.RhythmConfig.sponsorProposalForm;
-            hiddenForm.method = 'POST';
-            hiddenForm.target = 'hidden_iframe';
-            hiddenForm.style.display = 'none';
-
-            // Add form fields with correct entry names based on Google Form structure
-            const entries = window.RhythmConfig.sponsorProposalEntries;
-            const fields = [
-                { name: entries.name, value: name },         // Full Name
-                { name: entries.phone, value: phone },        // Phone Number  
-                { name: entries.company, value: company },      // Company/Organization
-                { name: entries.interest, value: interest }      // Sponsorship Interest
-            ];
-
-            fields.forEach(field => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = field.name;
-                input.value = field.value;
-                hiddenForm.appendChild(input);
-            });
-
-            document.body.appendChild(hiddenForm);
-
-            // Handle submission completion
-            let submitted = false;
-            
-            const handleSubmission = () => {
-                if (!submitted) {
-                    submitted = true;
-                    console.log('Iframe form submitted successfully');
-                    handleSponsorSubmissionSuccess(name, submitBtn, originalText);
-                    
-                    // Clean up
-                    setTimeout(() => {
-                        if (document.body.contains(hiddenForm)) {
-                            document.body.removeChild(hiddenForm);
-                        }
-                        if (document.body.contains(iframe)) {
-                            document.body.removeChild(iframe);
-                        }
-                    }, 1000);
-                }
-            };
-
-            // Listen for iframe load (indicates submission completion)
-            iframe.addEventListener('load', handleSubmission);
-            
-            // Add error handling
-            iframe.addEventListener('error', (error) => {
-                console.error('Iframe submission error:', error);
-                handleSponsorSubmissionError(submitBtn, originalText);
-            });
-
-            // Fallback timeout
-            setTimeout(() => {
-                if (!submitted) {
-                    console.log('Iframe submission timeout - assuming success');
-                    handleSubmission();
-                }
-            }, 5000);
-
-            // Submit the form
+        // Function to submit to Firebase
+        async function submitToFirebase(name, phone, company, interest, submitBtn, originalText) {
             try {
-                console.log('Submitting iframe form to:', hiddenForm.action);
-                hiddenForm.submit();
+                // Check if Firebase is initialized
+                if (!window.firebaseDB || !window.firebaseDB.isInitialized) {
+                    console.error('❌ Firebase not initialized');
+                    handleSponsorSubmissionError(submitBtn, originalText, 'Firebase not initialized. Please refresh the page and try again.');
+                    return;
+                }
+                
+                console.log('📝 Submitting sponsor to Firebase...');
+                
+                // Prepare sponsor data
+                const sponsorData = {
+                    name: name,
+                    phone: phone,
+                    company: company,
+                    interest: interest
+                };
+                
+                // Submit to Firebase
+                const result = await window.firebaseDB.submitSponsor(sponsorData);
+                
+                if (result.success) {
+                    console.log('✅ Sponsor submitted successfully:', result.id);
+                    handleSponsorSubmissionSuccess(name, submitBtn, originalText);
+                } else {
+                    console.error('❌ Sponsor submission failed');
+                    handleSponsorSubmissionError(submitBtn, originalText, 'Submission failed. Please try again.');
+                }
+                
             } catch (error) {
-                console.error('Iframe form submission failed:', error);
-                handleSponsorSubmissionError(submitBtn, originalText);
+                console.error('❌ Error submitting sponsor to Firebase:', error);
+                handleSponsorSubmissionError(submitBtn, originalText, 'Network error. Please check your connection and try again.');
             }
         }
         
@@ -1754,10 +1690,12 @@
             }, 1500);
         }
         
-        function handleSponsorSubmissionError(submitBtn, originalText) {
+        function handleSponsorSubmissionError(submitBtn, originalText, message = null) {
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
-            alert('There was an error submitting the form. Please check your internet connection and try again.');
+            
+            const errorMessage = message || 'There was an error submitting the form. Please check your internet connection and try again.';
+            alert(errorMessage);
         }
         
         // Smooth scrolling for better UX

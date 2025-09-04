@@ -465,6 +465,162 @@ class RhythmFirebaseDB {
       throw error;
     }
   }
+
+  // Sponsor submission methods
+  async submitSponsor(sponsorData) {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      console.log('📝 Submitting sponsor to Firebase:', sponsorData);
+      
+      // Generate a unique ID for the sponsor
+      const sponsorRef = push(ref(this.database, 'sponsors'));
+      const sponsorId = sponsorRef.key;
+      
+      // Prepare sponsor data with additional metadata
+      const submissionData = {
+        id: sponsorId,
+        name: sponsorData.name,
+        phone: sponsorData.phone,
+        company: sponsorData.company || '',
+        sponsorshipInterest: sponsorData.interest || '',
+        status: 'pending',
+        submittedAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
+        timestamp: Date.now(),
+        userAgent: navigator.userAgent
+      };
+      
+      // Submit to Firebase
+      await set(sponsorRef, submissionData);
+      
+      console.log('✅ Sponsor submitted successfully with ID:', sponsorId);
+      return { success: true, id: sponsorId, data: submissionData };
+      
+    } catch (error) {
+      console.error('❌ Error submitting sponsor:', error);
+      throw error;
+    }
+  }
+
+  async getSponsors() {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      console.log('📋 Fetching sponsors from Firebase...');
+      const sponsorsRef = ref(this.database, 'sponsors');
+      const snapshot = await get(sponsorsRef);
+      
+      if (snapshot.exists()) {
+        const sponsorsData = snapshot.val();
+        // Convert to array format
+        const sponsorsArray = Object.keys(sponsorsData).map(key => ({
+          id: key,
+          ...sponsorsData[key]
+        }));
+        
+        console.log('✅ Fetched sponsors:', sponsorsArray.length);
+        return sponsorsArray;
+      } else {
+        console.log('📭 No sponsors found');
+        return [];
+      }
+    } catch (error) {
+      console.error('❌ Error fetching sponsors:', error);
+      throw error;
+    }
+  }
+
+  async updateSponsorStatus(sponsorId, status) {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      console.log(`🔄 Updating sponsor ${sponsorId} status to: ${status}`);
+      
+      const sponsorRef = ref(this.database, `sponsors/${sponsorId}`);
+      const updates = {
+        status: status,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      await update(sponsorRef, updates);
+      console.log('✅ Sponsor status updated successfully');
+      return true;
+      
+    } catch (error) {
+      console.error('❌ Error updating sponsor status:', error);
+      throw error;
+    }
+  }
+
+  async getSponsor(sponsorId) {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      const sponsorRef = ref(this.database, `sponsors/${sponsorId}`);
+      const snapshot = await get(sponsorRef);
+      
+      if (snapshot.exists()) {
+        return { id: sponsorId, ...snapshot.val() };
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching sponsor:', error);
+      throw error;
+    }
+  }
+
+  // Real-time listeners for sponsors
+  listenToSponsors(callback) {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      console.log('👂 Setting up real-time sponsor listener...');
+      const sponsorsRef = ref(this.database, 'sponsors');
+      
+      const unsubscribe = onValue(sponsorsRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const sponsorsData = snapshot.val();
+          const sponsorsArray = Object.keys(sponsorsData).map(key => ({
+            id: key,
+            ...sponsorsData[key]
+          }));
+          
+          console.log('🔄 Real-time sponsor update:', sponsorsArray.length, 'sponsors');
+          callback(sponsorsArray);
+        } else {
+          console.log('📭 No sponsors in real-time update');
+          callback([]);
+        }
+      }, (error) => {
+        console.error('❌ Real-time sponsor listener error:', error);
+        callback(null, error);
+      });
+
+      return unsubscribe;
+    } catch (error) {
+      console.error('❌ Error setting up sponsor listener:', error);
+      throw error;
+    }
+  }
+
+  stopListeningToSponsors(unsubscribe) {
+    if (unsubscribe) {
+      console.log('🔇 Stopping sponsor real-time listener...');
+      off(ref(this.database, 'sponsors'), 'value', unsubscribe);
+    }
+  }
 }
 
 // Make it available globally and as module export
