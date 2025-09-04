@@ -821,11 +821,11 @@
 </head>
 <body>
     <!-- Back to Home Link -->
-    <a href="../../index.html" class="back-link">
+    <a href="/pages/admin/admin.html" class="back-link">
         <svg viewBox="0 0 24 24" fill="currentColor">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
         </svg>
-        Back to Home
+        Back to Admin
     </a>
 
     <!-- Header -->
@@ -874,9 +874,11 @@
 
     <script type="module">
         import { RhythmFirebaseDB } from '../../js/firebase-db-optimized.js';
+        import RhythmUnifiedAuth from '../../js/rhythm-unified-auth.js';
         
-        // Initialize Firebase DB
+        // Initialize Firebase DB and Auth
         let firebaseDB = null;
+        let rhythmAuth = null;
         
         // DOM elements
         const loadingContainer = document.getElementById('loading-container');
@@ -897,7 +899,44 @@
         // Function to initialize Firebase and load applications
         async function initializeSystem() {
             try {
-                console.log('🔥 Initializing Firebase...');
+                console.log('� Checking admin authentication...');
+                
+                // Initialize auth system
+                rhythmAuth = new RhythmUnifiedAuth();
+                
+                // Wait for auth to initialize
+                let attempts = 0;
+                const maxAttempts = 50;
+                while (!rhythmAuth.isInitialized && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                if (!rhythmAuth.isInitialized) {
+                    throw new Error('Authentication system failed to initialize');
+                }
+                
+                // Check authentication
+                const authResult = await rhythmAuth.checkAuthentication();
+                console.log('🔍 Auth check result:', authResult);
+                
+                if (!authResult.isAuthenticated) {
+                    console.log('❌ User not authenticated, redirecting to login...');
+                    window.location.href = '../../login.html?returnUrl=' + encodeURIComponent(window.location.href);
+                    return;
+                }
+                
+                // Check admin permissions
+                if (!rhythmAuth.isAdmin()) {
+                    console.log('❌ User does not have admin privileges');
+                    showUnauthorizedError();
+                    return;
+                }
+                
+                console.log('✅ Admin authentication verified');
+                console.log('👤 Admin user:', authResult.user.fullName);
+                
+                console.log('�🔥 Initializing Firebase...');
                 firebaseDB = new RhythmFirebaseDB();
                 
                 // Wait a moment for Firebase to initialize
@@ -1400,6 +1439,32 @@
         function showEmptyState() {
             loadingContainer.style.display = 'none';
             emptyState.style.display = 'block';
+        }
+        
+        // Function to show unauthorized error
+        function showUnauthorizedError() {
+            loadingContainer.style.display = 'none';
+            errorContainer.style.display = 'block';
+            
+            // Update error message for unauthorized access
+            const errorTitle = errorContainer.querySelector('.error-title');
+            const errorMessage = errorContainer.querySelector('.error-message');
+            
+            if (errorTitle) {
+                errorTitle.textContent = 'Access Denied';
+            }
+            if (errorMessage) {
+                errorMessage.innerHTML = `
+                    You do not have administrator privileges to access this page.<br>
+                    <br>
+                    <a href="../../index.html" style="color: var(--primary-color); text-decoration: none;">
+                        ← Return to Home
+                    </a> | 
+                    <a href="../../login.html" style="color: var(--primary-color); text-decoration: none;">
+                        Login as Admin
+                    </a>
+                `;
+            }
         }
         
         // Initialize the system when DOM is loaded

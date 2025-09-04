@@ -60,7 +60,22 @@ class RhythmUnifiedAuth {
                 const storedCredentials = this.getStoredCredentials();
                 if (storedCredentials) {
                     console.log('🔄 [UnifiedAuth] Attempting automatic login with stored credentials...');
-                    console.log('📱 [UnifiedAuth] Using stored credentials:', storedCredentials.accessCode, storedCredentials.fullName);
+                    console.log('📱 [UnifiedAuth] Stored credentials:', {
+                        fullName: storedCredentials.fullName,
+                        accessCode: storedCredentials.accessCode,
+                        deviceId: storedCredentials.deviceId
+                    });
+                    
+                    // Verify the stored device ID matches current device ID
+                    const currentDeviceId = this.generateDeviceId();
+                    if (storedCredentials.deviceId !== currentDeviceId) {
+                        console.log('❌ [UnifiedAuth] Device ID mismatch in stored credentials');
+                        console.log('   Stored device ID:', storedCredentials.deviceId);
+                        console.log('   Current device ID:', currentDeviceId);
+                        this.clearDeviceCredentials();
+                        return { isAuthenticated: false, user: null, reason: 'device_credentials_mismatch' };
+                    }
+                    
                     const loginResult = await this.submitLoginRequest(
                         storedCredentials.accessCode, 
                         storedCredentials.fullName
@@ -70,6 +85,8 @@ class RhythmUnifiedAuth {
                         return { isAuthenticated: true, user: loginResult.user, reason: 'auto_login' };
                     } else {
                         console.log('❌ [UnifiedAuth] Automatic login failed:', loginResult);
+                        // Clear invalid credentials
+                        this.clearDeviceCredentials();
                     }
                 }
                 
@@ -301,11 +318,14 @@ class RhythmUnifiedAuth {
     generateDeviceId() {
         let deviceId = localStorage.getItem('rhythm_device_id');
         if (!deviceId) {
-            // Create a unique device ID using random + browser fingerprint
-            const random = Math.random().toString(36).substr(2, 9);
-            const userAgent = navigator.userAgent.substring(0, 50).replace(/[^a-zA-Z0-9]/g, '').substring(0, 10);
-            const platform = navigator.platform.replace(/[^a-zA-Z0-9]/g, '').substring(0, 5);
-            deviceId = `dev_${random}_${userAgent}_${platform}`;
+            // Create a truly unique device ID using timestamp + random + browser fingerprint
+            const timestamp = Date.now().toString(36);
+            const random1 = Math.random().toString(36).substr(2, 6);
+            const random2 = Math.random().toString(36).substr(2, 6);
+            const userAgent = navigator.userAgent.substring(0, 30).replace(/[^a-zA-Z0-9]/g, '').substring(0, 8);
+            const platform = navigator.platform.replace(/[^a-zA-Z0-9]/g, '').substring(0, 4);
+            
+            deviceId = `${timestamp}_${random1}_${random2}_${userAgent}_${platform}`;
             localStorage.setItem('rhythm_device_id', deviceId);
             console.log('🆔 [Device] Generated NEW persistent device ID:', deviceId);
         } else {
@@ -318,14 +338,18 @@ class RhythmUnifiedAuth {
      * Store user credentials on this device
      */
     storeDeviceCredentials(fullName, accessCode) {
+        // Get current device ID (don't generate a new one)
+        const deviceId = this.generateDeviceId();
+        
         const deviceData = {
             fullName: fullName,
             accessCode: accessCode,
-            deviceId: this.generateDeviceId(),
+            deviceId: deviceId,
             storedAt: Date.now()
         };
         localStorage.setItem('rhythm_device_credentials', JSON.stringify(deviceData));
-        console.log('💾 [Device] Stored credentials for:', fullName);
+        console.log('💾 [Device] Stored credentials for:', fullName, 'with device ID:', deviceId);
+        console.log('💾 [Device] Full credentials stored:', deviceData);
     }
 
     /**
@@ -362,12 +386,70 @@ class RhythmUnifiedAuth {
     showDeviceInfo() {
         const deviceId = this.generateDeviceId();
         const credentials = this.getStoredCredentials();
-        console.log('📱 [Device Debug] Current device info:');
-        console.log('   Device ID:', deviceId);
-        console.log('   Stored credentials:', credentials);
-        console.log('   User Agent:', navigator.userAgent.substring(0, 100));
-        console.log('   Platform:', navigator.platform);
-        return { deviceId, credentials };
+        const currentUser = this.getCurrentUser();
+        
+        console.group('📱 [Device Debug] Complete device information:');
+        console.log('Current Device ID:', deviceId);
+        console.log('Stored Credentials:', credentials);
+        console.log('Current User:', currentUser);
+        console.log('User Agent:', navigator.userAgent.substring(0, 100));
+        console.log('Platform:', navigator.platform);
+        console.log('localStorage Keys:', Object.keys(localStorage).filter(key => key.startsWith('rhythm')));
+        console.groupEnd();
+        
+        return { 
+            deviceId, 
+            credentials, 
+            currentUser,
+            storageKeys: Object.keys(localStorage).filter(key => key.startsWith('rhythm'))
+        };
+    }
+    
+    /**
+     * Test function: Validate current device credentials against database
+     */
+    async testDeviceCredentials() {
+        const credentials = this.getStoredCredentials();
+        if (!credentials) {
+            console.log('❌ [Test] No stored credentials found');
+            return { valid: false, reason: 'no_credentials' };
+        }
+        
+        console.log('🧪 [Test] Testing device credentials...');
+        console.log('   Full Name:', credentials.fullName);
+        console.log('   Access Code:', credentials.accessCode);
+        console.log('   Device ID:', credentials.deviceId);
+        
+        try {
+            const dbUser = await this.getUser(credentials.accessCode);
+            if (!dbUser) {
+                console.log('❌ [Test] User not found in database');
+                return { valid: false, reason: 'user_not_found' };
+            }
+            
+            const nameMatch = (dbUser.fullName || dbUser.name || '').toLowerCase().trim() === 
+                             credentials.fullName.toLowerCase().trim();
+            const deviceMatch = dbUser.deviceId === credentials.deviceId;
+            
+            console.log('🧪 [Test] Validation results:');
+            console.log('   Name Match:', nameMatch);
+            console.log('   Device Match:', deviceMatch);
+            console.log('   DB Name:', dbUser.fullName || dbUser.name);
+            console.log('   DB Device:', dbUser.deviceId);
+            console.log('   Status:', dbUser.status);
+            
+            return {
+                valid: nameMatch && deviceMatch && dbUser.status !== 'revoked',
+                nameMatch,
+                deviceMatch,
+                userStatus: dbUser.status,
+                dbUser
+            };
+            
+        } catch (error) {
+            console.error('❌ [Test] Error testing credentials:', error);
+            return { valid: false, reason: 'test_error', error };
+        }
     }
 
     /**
@@ -446,10 +528,27 @@ class RhythmUnifiedAuth {
             
             // If user is approved and active, check device binding
             if (existingUser.status === 'active' || existingUser.status !== 'revoked') {
-                console.log('🔍 [UnifiedAuth] User is approved, checking device binding...');
+                console.log('🔍 [UnifiedAuth] User is approved, checking 3-tuple validation...');
                 console.log('   Expected Device:', existingUser.deviceId);
                 console.log('   Current Device:', deviceId);
-                console.log('   Device Match:', existingUser.deviceId === deviceId);
+                console.log('   Expected Name:', existingUser.fullName || existingUser.name);
+                console.log('   Provided Name:', fullName);
+                console.log('   Expected Code:', existingUser.accessCode || accessCode);
+                console.log('   Provided Code:', accessCode);
+                
+                // Validate name match (case-insensitive)
+                const expectedName = (existingUser.fullName || existingUser.name || '').toLowerCase().trim();
+                const providedName = fullName.toLowerCase().trim();
+                if (expectedName !== providedName) {
+                    console.log('❌ [UnifiedAuth] Name mismatch during login attempt');
+                    console.log('   Expected name:', expectedName);
+                    console.log('   Provided name:', providedName);
+                    return { 
+                        success: false, 
+                        action: 'name_mismatch', 
+                        message: 'The name provided does not match the registered name for this access code.' 
+                    };
+                }
                 
                 // STRICT device check: user must be on their registered device
                 if (existingUser.deviceId && existingUser.deviceId !== deviceId) {
