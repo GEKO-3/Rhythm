@@ -6,6 +6,9 @@
     <title>User Management - Rhythm Boduberu</title>
     <link rel="icon" type="image/svg+xml" href="../../assets/favicons/favicon.svg">
     
+    <!-- Unified Authentication System -->
+    <script type="module" src="../../js/rhythm-unified-auth.js"></script>
+    
     <style>
         :root {
             --primary-color: #f5d000;
@@ -907,7 +910,40 @@
         };
 
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check authentication first
+            if (!window.rhythmAuth?.isInitialized) {
+                console.error('❌ [User Management] Unified auth failed to initialize');
+                alert('Authentication system failed to initialize. Please refresh the page.');
+                window.location.href = '../../login.html';
+                return;
+            }
+            
+            // Use unified authentication check
+            const authResult = await window.rhythmAuth.checkAuthentication();
+            
+            if (!authResult.isAuthenticated) {
+                console.log('❌ [User Management] User not authenticated:', authResult.reason);
+                window.location.href = '../../login.html';
+                return;
+            }
+            
+            // Check admin permission
+            if (!window.rhythmAuth.isAdmin()) {
+                console.log('❌ [User Management] User authenticated but not admin');
+                const user = authResult.user;
+                console.log('🔍 User Details:', {
+                    name: user.fullName,
+                    role: user.role,
+                    permissions: user.permissions,
+                    isAdmin: user.isAdmin
+                });
+                alert(`Hi ${user.fullName}, you don't have admin permissions to access user management.`);
+                window.location.href = '../songlist.html';
+                return;
+            }
+            
+            console.log('✅ [User Management] Admin access granted');
             loadAllUsers();
             
             // Set up real-time listeners for user changes

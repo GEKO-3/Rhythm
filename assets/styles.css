@@ -173,7 +173,7 @@
     position: absolute;
     height: 40px;
     width: 300vw;
-    background-image: url('src/repeatp.svg');
+    background-image: url('../src/repeatp.svg');
     background-repeat: repeat-x;
     background-size: auto 40px;
     left: -100vw;
@@ -233,7 +233,7 @@ body::-webkit-scrollbar {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: url('src/Background.webp');
+    background-image: url('../src/Background.webp');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -408,7 +408,7 @@ footer a:hover {
     width: 100%;
     max-width: 100vw;
     overflow-x: hidden;
-    background-image: url('src/s2bg.jpg');
+    background-image: url('../src/s2bg.jpg');
     background-size: calc(100% + 6px) calc(100% + 6px);
     background-position: -3px -3px;
     background-repeat: no-repeat;
@@ -804,7 +804,7 @@ footer a:hover {
     overflow-x: hidden;
     background-image: 
         linear-gradient(to left, rgba(83, 83, 83, 0.767) 0%, rgba(128, 128, 128, 0) 100%),
-        url('src/s3bg.jpg');
+        url('../src/s3bg.jpg');
     background-size: 
         100% 100%,
         calc(100% + 6px) calc(100% + 6px);
@@ -903,7 +903,7 @@ footer a:hover {
     background-image: 
         linear-gradient(to right, rgba(0, 0, 0, 0.418) 0%, rgba(0, 0, 0, 0) 100%),
         linear-gradient(rgba(0, 0, 0, 0.459), rgba(0, 0, 0, 0.521)),
-        url('src/spscin.png');
+        url('../src/spscin.png');
     background-size: 
         100% 100%,
         100% 100%,

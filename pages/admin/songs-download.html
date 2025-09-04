@@ -582,10 +582,11 @@
             return;
           }
           
-          if (!authResult.user.permissions?.includes('songlist')) {
-            console.error('❌ No songlist permissions:', authResult.user.permissions);
-            alert('Access denied. Song list permissions required.');
-            window.location.href = '../../login.html';
+          // Check admin permission
+          if (!window.rhythmAuth.isAdmin()) {
+            console.error('❌ No admin permissions:', authResult.user);
+            alert(`Access denied. Admin permissions required for song downloads.`);
+            window.location.href = '../songlist.html';
             return;
           }
           

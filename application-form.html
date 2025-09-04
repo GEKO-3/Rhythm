@@ -7,16 +7,16 @@
     <title>Rhythm Boduberu - Join Our Team</title>
     
     <!-- Favicon and web app manifest -->
-    <link rel="icon" href="favicons/favicon.ico" type="image/x-icon">
-    <link rel="shortcut icon" href="favicons/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="180x180" href="favicons/apple-touch-icon.png">
-    <link rel="manifest" href="favicons/manifest.webmanifest">
+    <link rel="icon" href="assets/favicons/favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="assets/favicons/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-touch-icon.png">
+    <link rel="manifest" href="assets/favicons/manifest.webmanifest">
     
     <!-- Font loading -->
     <style>
         @font-face {
             font-family: 'Faruma';
-            src: url('Fonts/Faruma.ttf') format('truetype');
+            src: url('assets/Fonts/Faruma.ttf') format('truetype');
             font-display: swap;
             font-weight: normal;
             font-style: normal;
@@ -24,7 +24,7 @@
         
         @font-face {
             font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-Regular.ttf') format('truetype');
+            src: url('assets/Fonts/Montserrat-Regular.ttf') format('truetype');
             font-display: swap;
             font-weight: 400;
             font-style: normal;
@@ -32,7 +32,7 @@
         
         @font-face {
             font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-Medium.ttf') format('truetype');
+            src: url('assets/Fonts/Montserrat-Medium.ttf') format('truetype');
             font-display: swap;
             font-weight: 500;
             font-style: normal;
@@ -40,7 +40,7 @@
         
         @font-face {
             font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-SemiBold.ttf') format('truetype');
+            src: url('assets/Fonts/Montserrat-SemiBold.ttf') format('truetype');
             font-display: swap;
             font-weight: 600;
             font-style: normal;
@@ -48,7 +48,7 @@
         
         @font-face {
             font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-Bold.ttf') format('truetype');
+            src: url('assets/Fonts/Montserrat-Bold.ttf') format('truetype');
             font-display: swap;
             font-weight: 700;
             font-style: normal;
@@ -833,13 +833,37 @@
         </div>
     </div>
 
-    <script src="config.js" async defer></script>
-    <script>
-        // Check if form was already submitted on page load
-        document.addEventListener('DOMContentLoaded', function() {
+    <script type="module">
+        import { RhythmFirebaseDB } from './js/firebase-db-optimized.js';
+        
+        // Initialize Firebase DB
+        let firebaseDB = null;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                console.log('🔥 Initializing Firebase for applications...');
+                firebaseDB = new RhythmFirebaseDB();
+                
+                // Wait a moment for Firebase to initialize
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                if (firebaseDB.isInitialized) {
+                    console.log('✅ Firebase initialized successfully for applications');
+                } else {
+                    console.error('❌ Firebase failed to initialize');
+                }
+            } catch (error) {
+                console.error('❌ Firebase initialization error:', error);
+            }
+            
+            // Check if form was already submitted on page load
             if (localStorage.getItem('rhythmFormSubmitted') === 'true') {
                 showSuccessPage();
+                return;
             }
+            
+            // Generate form HTML
+            generateFormHTML();
         });
 
         // Video fallback handling
@@ -911,137 +935,39 @@
             const contact = document.getElementById('contact').value.trim();
             const location = document.querySelector('input[name="location"]:checked').value;
             
-            // Submit to Google Form using hidden iframe method
-            submitToGoogleForm(email, name, birthday, contact, location);
+            // Submit to Firebase Database
+            submitToFirebase(email, name, birthday, contact, location);
         });
 
-        // Function to submit to Google Form using hidden iframe
-        function submitToGoogleForm(email, name, birthday, contact, location) {
-            // Wait for config to load
-            if (!window.RhythmConfig) {
-                console.log('Config not loaded yet, retrying...');
-                setTimeout(() => submitToGoogleForm(email, name, birthday, contact, location), 100);
-                return;
-            }
-            
-            console.log('Config loaded, submitting form...');
-            console.log('Form URL:', window.RhythmConfig.applicationForm);
-            
-            // Get form entries
-            const entries = window.RhythmConfig.applicationEntries;
-            console.log('Form entries:', entries);
-            
-            // Create form data
-            const formData = new FormData();
-            formData.append(entries.email, email || '');
-            formData.append(entries.name, name);
-            formData.append(entries.birthday, birthday);
-            formData.append(entries.contact, contact);
-            formData.append(entries.location, location);
-            
-            console.log('Submitting with data:', {
-                [entries.email]: email || '',
-                [entries.name]: name,
-                [entries.birthday]: birthday,
-                [entries.contact]: contact,
-                [entries.location]: location
-            });
-            
-            // Submit using fetch with no-cors mode
-            fetch(window.RhythmConfig.applicationForm, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            }).then(() => {
-                console.log('Form submitted successfully via fetch');
-                handleSubmissionSuccess();
-            }).catch(error => {
-                console.error('Fetch submission failed, trying iframe method:', error);
-                // Fallback to iframe method
-                submitViaIframe(email, name, birthday, contact, location);
-            });
-        }
-        
-        function submitViaIframe(email, name, birthday, contact, location) {
-            console.log('Using iframe fallback method');
-            
-            // Create hidden iframe
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.name = 'hidden_iframe';
-            document.body.appendChild(iframe);
-
-            // Create form
-            const hiddenForm = document.createElement('form');
-            hiddenForm.action = window.RhythmConfig.applicationForm;
-            hiddenForm.method = 'POST';
-            hiddenForm.target = 'hidden_iframe';
-            hiddenForm.style.display = 'none';
-
-            // Add form fields with correct entry names based on Google Form structure
-            const entries = window.RhythmConfig.applicationEntries;
-            const fields = [
-                { name: entries.email, value: email || '' },
-                { name: entries.name, value: name },
-                { name: entries.birthday, value: birthday },
-                { name: entries.contact, value: contact },
-                { name: entries.location, value: location }
-            ];
-
-            fields.forEach(field => {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.name = field.name;
-                input.value = field.value;
-                hiddenForm.appendChild(input);
-            });
-
-            document.body.appendChild(hiddenForm);
-
-            // Handle submission completion
-            let submitted = false;
-            
-            const handleSubmission = () => {
-                if (!submitted) {
-                    submitted = true;
-                    console.log('Iframe form submitted successfully');
-                    handleSubmissionSuccess();
-                    
-                    // Clean up
-                    setTimeout(() => {
-                        if (document.body.contains(hiddenForm)) {
-                            document.body.removeChild(hiddenForm);
-                        }
-                        if (document.body.contains(iframe)) {
-                            document.body.removeChild(iframe);
-                        }
-                    }, 1000);
-                }
-            };
-
-            // Listen for iframe load (indicates submission completion)
-            iframe.addEventListener('load', handleSubmission);
-            
-            // Add error handling
-            iframe.addEventListener('error', (error) => {
-                console.error('Iframe submission error:', error);
-                handleSubmissionError();
-            });
-
-            // Fallback timeout
-            setTimeout(() => {
-                if (!submitted) {
-                    console.log('Iframe submission timeout - assuming success');
-                    handleSubmission();
-                }
-            }, 5000);
-
-            // Submit the form
+        // Function to submit to Firebase Database
+        async function submitToFirebase(email, name, birthday, contact, location) {
             try {
-                console.log('Submitting iframe form to:', hiddenForm.action);
-                hiddenForm.submit();
+                if (!firebaseDB || !firebaseDB.isInitialized) {
+                    throw new Error('Firebase database not initialized');
+                }
+                
+                console.log('🔥 Submitting application to Firebase...');
+                
+                // Prepare application data in the exact format used in the database
+                const applicationData = {
+                    contactNumber: contact || '',
+                    dateOfBirth: birthday || '',
+                    email: email || '',
+                    fullName: name || '',
+                    location: location || '',
+                    recaptchaToken: '' // You can add reCAPTCHA if needed
+                };
+                
+                console.log('📋 Application data:', applicationData);
+                
+                // Submit to Firebase
+                const applicationId = await firebaseDB.submitApplication(applicationData);
+                console.log('✅ Application submitted successfully with ID:', applicationId);
+                
+                handleSubmissionSuccess();
+                
             } catch (error) {
-                console.error('Iframe form submission failed:', error);
+                console.error('❌ Firebase submission failed:', error);
                 handleSubmissionError();
             }
         }

@@ -891,47 +891,37 @@
         let allApplications = [];
         let filteredApplications = [];
         
-        // Real-time listener
-        let unsubscribeApplications = null;
-        
         // Function to initialize Firebase and load applications
         async function initializeSystem() {
             try {
                 console.log('🔥 Initializing Firebase...');
                 firebaseDB = new RhythmFirebaseDB();
-                
-                // Wait a moment for Firebase to initialize
-                if (!firebaseDB.isInitialized) {
-                    throw new Error('Firebase failed to initialize');
-                }
-                
+                await firebaseDB.initialize();
                 console.log('✅ Firebase initialized successfully');
-                setupApplicationListeners();
+                
+                await loadApplications();
             } catch (error) {
                 console.error('❌ Failed to initialize system:', error);
                 showError();
             }
         }
         
-        // Function to setup real-time application listeners
-        function setupApplicationListeners() {
+        // Function to load applications from Firebase
+        async function loadApplications() {
             try {
-                console.log('📋 Setting up real-time application listeners...');
+                console.log('📋 Loading applications from Firebase...');
+                const applications = await firebaseDB.getApplications();
+                console.log('✅ Loaded applications:', applications);
                 
-                unsubscribeApplications = firebaseDB.listenToApplications((applications) => {
-                    console.log('🔄 Real-time update received:', applications);
-                    
-                    if (applications && applications.length > 0) {
-                        allApplications = applications;
-                        setupUI();
-                        displayApplications();
-                    } else {
-                        showEmptyState();
-                    }
-                });
-                
+                if (applications && applications.length > 0) {
+                    allApplications = applications;
+                    setupUI();
+                    displayApplications();
+                } else {
+                    showEmptyState();
+                }
             } catch (error) {
-                console.error('❌ Failed to setup application listeners:', error);
+                console.error('❌ Failed to load applications:', error);
                 showError();
             }
         }
@@ -1067,45 +1057,12 @@
             });
         }
         
-        // Function to check if a rejected application should be hidden (older than 24 hours)
-        function shouldHideRejectedApplication(application) {
-            const status = (application.status || 'pending').toLowerCase();
-            
-            // Only hide if status is rejected
-            if (status !== 'rejected') {
-                return false;
-            }
-            
-            // Check if application is older than 24 hours
-            const now = new Date();
-            const twentyFourHoursAgo = new Date(now.getTime() - (24 * 60 * 60 * 1000));
-            
-            // Try to get the timestamp from various fields
-            let applicationDate;
-            
-            if (application.timestamp) {
-                applicationDate = new Date(application.timestamp);
-            } else if (application.submittedAt) {
-                applicationDate = new Date(application.submittedAt);
-            } else if (application.lastUpdated) {
-                applicationDate = new Date(application.lastUpdated);
-            } else {
-                // If no date available, don't hide it
-                return false;
-            }
-            
-            return applicationDate < twentyFourHoursAgo;
-        }
-        
         // Function to display applications
         function displayApplications() {
-            // First filter out old rejected applications
-            const visibleApplications = allApplications.filter(app => !shouldHideRejectedApplication(app));
-            
             if (currentFilter === 'all') {
-                filteredApplications = [...visibleApplications];
+                filteredApplications = [...allApplications];
             } else {
-                filteredApplications = visibleApplications.filter(app => 
+                filteredApplications = allApplications.filter(app => 
                     (app.status || 'pending').toLowerCase() === currentFilter.toLowerCase()
                 );
             }
@@ -1116,11 +1073,8 @@
         
         // Function to update statistics
         function updateStatistics() {
-            // Filter out old rejected applications for statistics
-            const visibleApplications = allApplications.filter(app => !shouldHideRejectedApplication(app));
-            
             const stats = {
-                total: visibleApplications.length,
+                total: allApplications.length,
                 pending: 0,
                 'pending audition': 0,
                 'pending exco approval': 0,
@@ -1130,7 +1084,7 @@
                 inArea: 0
             };
             
-            visibleApplications.forEach(app => {
+            allApplications.forEach(app => {
                 const status = (app.status || 'pending').toLowerCase();
                 stats[status] = (stats[status] || 0) + 1;
                 
@@ -1367,14 +1321,38 @@
                 // Update in Firebase
                 await firebaseDB.updateApplicationStatus(applicationId, newStatus);
                 
-                console.log('✅ Status updated successfully - real-time listeners will handle UI updates');
+                // Update local data
+                const appIndex = allApplications.findIndex(app => app.id === applicationId);
+                if (appIndex !== -1) {
+                    allApplications[appIndex].status = newStatus;
+                    allApplications[appIndex].lastUpdated = new Date().toISOString();
+                }
+                
+                // Update UI
+                const statusClass = newStatus.toLowerCase().replace(/\s+/g, '-');
+                const statusDisplay = getStatusDisplay(newStatus);
+                const statusIcon = getStatusIcon(newStatus);
+                
+                button.className = `approval-button ${statusClass}`;
+                button.innerHTML = `<span>${statusIcon}</span><span>${statusDisplay}</span>`;
+                button.dataset.status = newStatus;
+                
+                // Update compact status badge
+                const tile = button.closest('.application-tile');
+                const compactStatus = tile.querySelector('.compact-status');
+                compactStatus.className = `compact-status ${statusClass}`;
+                compactStatus.innerHTML = `<span>${statusIcon}</span><span>${statusDisplay}</span>`;
+                
+                // Close dropdown
+                dropdown.classList.remove('show');
                 
                 // Remove loading state
                 button.classList.remove('updating');
                 button.disabled = false;
                 
-                // Close dropdown immediately for better UX
-                dropdown.classList.remove('show');
+                // Update statistics and apply current filter
+                updateStatistics();
+                displayApplications();
                 
                 console.log('✅ Status updated successfully');
                 
@@ -1406,15 +1384,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Starting applications admin system...');
             initializeSystem();
-        });
-        
-        // Cleanup listeners when page unloads
-        window.addEventListener('beforeunload', function() {
-            if (unsubscribeApplications) {
-                console.log('🧹 Cleaning up real-time listeners...');
-                firebaseDB.stopListeningToApplications(unsubscribeApplications);
-                unsubscribeApplications = null;
-            }
         });
     </script>
 </body>

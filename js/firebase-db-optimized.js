@@ -1,6 +1,6 @@
 // Firebase Database Module - OPTIMIZED VERSION
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, get, set, push, child } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getDatabase, ref, get, set, push, child, update, onValue, off } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 class RhythmFirebaseDB {
   constructor() {
@@ -311,6 +311,157 @@ class RhythmFirebaseDB {
       return true;
     } catch (error) {
       console.error('Error setting lyrics:', error);
+      throw error;
+    }
+  }
+
+  // MEMBER APPLICATION METHODS
+
+  // Submit a new member application
+  async submitApplication(applicationData) {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      const applicationsRef = ref(this.database, 'applications');
+      const newApplicationRef = push(applicationsRef);
+      
+      const now = new Date();
+      const applicationRecord = {
+        contactNumber: applicationData.contactNumber || '',
+        dateOfBirth: applicationData.dateOfBirth || '',
+        email: applicationData.email || '',
+        fullName: applicationData.fullName || '',
+        id: newApplicationRef.key,
+        lastUpdated: now.toISOString(),
+        location: applicationData.location || '',
+        recaptchaToken: applicationData.recaptchaToken || '',
+        status: 'pending',
+        submittedAt: now.toISOString(),
+        timestamp: Date.now(),
+        userAgent: navigator.userAgent || 'Unknown'
+      };
+      
+      await set(newApplicationRef, applicationRecord);
+      console.log('Application submitted successfully with ID:', newApplicationRef.key);
+      return newApplicationRef.key;
+    } catch (error) {
+      console.error('Error submitting application:', error);
+      throw error;
+    }
+  }
+
+  // Get all member applications
+  async getApplications() {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      const applicationsRef = ref(this.database, 'applications');
+      const snapshot = await get(applicationsRef);
+      
+      if (snapshot.exists()) {
+        const applications = snapshot.val();
+        // Convert to array with IDs
+        return Object.keys(applications).map(id => ({
+          id,
+          ...applications[id]
+        }));
+      } else {
+        console.log('No applications found');
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching applications:', error);
+      throw error;
+    }
+  }
+
+  // Listen for real-time applications updates
+  listenToApplications(callback) {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      const applicationsRef = ref(this.database, 'applications');
+      
+      const unsubscribe = onValue(applicationsRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const applications = snapshot.val();
+          // Convert to array with IDs
+          const applicationsArray = Object.keys(applications).map(id => ({
+            id,
+            ...applications[id]
+          }));
+          console.log('🔄 Real-time applications update received:', applicationsArray.length, 'applications');
+          callback(applicationsArray);
+        } else {
+          console.log('🔄 Real-time update: No applications found');
+          callback([]);
+        }
+      }, (error) => {
+        console.error('❌ Real-time listener error:', error);
+        // Fallback to empty array on error
+        callback([]);
+      });
+
+      return unsubscribe;
+    } catch (error) {
+      console.error('Error setting up applications listener:', error);
+      throw error;
+    }
+  }
+
+  // Stop listening to applications updates
+  stopListeningToApplications(applicationsRef) {
+    if (applicationsRef) {
+      off(applicationsRef);
+      console.log('🔇 Stopped listening to applications updates');
+    }
+  }
+
+  // Update application status
+  async updateApplicationStatus(applicationId, status) {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      const applicationRef = ref(this.database, `applications/${applicationId}`);
+      const updates = {
+        status: status,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      await update(applicationRef, updates);
+      console.log(`Application ${applicationId} status updated to: ${status}`);
+      return true;
+    } catch (error) {
+      console.error('Error updating application status:', error);
+      throw error;
+    }
+  }
+
+  // Get application by ID
+  async getApplication(applicationId) {
+    if (!this.isInitialized) {
+      throw new Error('Firebase not initialized');
+    }
+
+    try {
+      const applicationRef = ref(this.database, `applications/${applicationId}`);
+      const snapshot = await get(applicationRef);
+      
+      if (snapshot.exists()) {
+        return { id: applicationId, ...snapshot.val() };
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching application:', error);
       throw error;
     }
   }
