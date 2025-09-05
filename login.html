@@ -300,6 +300,12 @@
                              window.navigator.standalone === true ||
                              document.referrer.includes('android-app://');
                 
+                if (isPWA) {
+                    // For PWA users, start preloading immediately
+                    console.log('🚀 PWA mode - starting background data preload...');
+                    startPWAPreloading();
+                }
+                
                 if (isPWA || localStorage.getItem('rhythm_silent_redirect') === 'true') {
                     // Silent redirect for PWA users
                     console.log('PWA mode detected - silent redirect');
@@ -459,6 +465,7 @@
                     
                     if (result.action === 'auto_login') {
                         showMessage('Access approved! Redirecting...', 'success');
+                        startPWAPreloading(); // Start preloading for PWA
                         setTimeout(() => {
                             window.rhythmAuth.redirectAfterLogin();
                         }, 1000);
@@ -475,6 +482,7 @@
                             // onApproved callback
                             (userData) => {
                                 console.log('✅ [RealTime] Request approved! Auto-logging in...');
+                                startPWAPreloading(); // Start preloading for PWA
                                 showMessage('Your request was approved! Redirecting...', 'success');
                                 setTimeout(() => {
                                     window.rhythmAuth.redirectAfterLogin();
@@ -508,6 +516,7 @@
                             // onApproved callback
                             (userData) => {
                                 console.log('✅ [RealTime] Request approved! Auto-logging in...');
+                                startPWAPreloading(); // Start preloading for PWA
                                 showMessage('Your request was approved! Redirecting...', 'success');
                                 setTimeout(() => {
                                     window.rhythmAuth.redirectAfterLogin();
@@ -591,6 +600,7 @@
                             // onApproved callback
                             (userData) => {
                                 console.log('✅ [RealTime] Request approved! Auto-logging in...');
+                                startPWAPreloading(); // Start preloading for PWA
                                 showMessage('Your request was approved! Redirecting...', 'success');
                                 setTimeout(() => {
                                     window.rhythmAuth.redirectAfterLogin();
@@ -647,6 +657,20 @@
             setTimeout(() => {
                 messageDiv.style.display = 'none';
             }, 10000);
+        }
+
+        // Helper function to start preloading for PWA users
+        function startPWAPreloading() {
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                         window.navigator.standalone === true ||
+                         document.referrer.includes('android-app://');
+            
+            if (isPWA && window.rhythmAuth) {
+                console.log('🚀 Starting PWA background preload...');
+                window.rhythmAuth.preloadSonglistData().catch(err => {
+                    console.log('Background preload failed (non-critical):', err.message);
+                });
+            }
         }
 
         // Cleanup listeners when page is unloaded

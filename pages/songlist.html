@@ -818,6 +818,13 @@
 
         async getSongsFromFirebase() {
           try {
+            // Check if we have preloaded data from PWA startup
+            const preloadedData = window.rhythmAuth?.getPreloadedSonglistData();
+            if (preloadedData && preloadedData.songs) {
+              console.log('🚀 [FastLoad] Using preloaded songlist data:', preloadedData.songs.length, 'songs');
+              return preloadedData.songs;
+            }
+            
             // Firebase should already be initialized by app startup
             if (!this.rhythmDB) {
               console.warn('Firebase not ready, something went wrong with initialization');
@@ -867,6 +874,12 @@
             // Initialize UI immediately
             UI.initializeSongList();
             console.log('🔄 UI.initializeSongList completed');
+            
+            // If we used preloaded data, clear it to save memory
+            if (window.rhythmAuth && window.rhythmAuth.getPreloadedSonglistData()) {
+              console.log('🧹 Clearing preloaded data to save memory');
+              window.rhythmAuth.clearPreloadedData();
+            }
 
           } catch (error) {
             console.error('Failed to load songs data:', error);

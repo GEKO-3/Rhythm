@@ -15,6 +15,8 @@ class RhythmUnifiedAuth {
         this.activeListeners = new Map(); // Track active Firebase listeners
         this.pendingRequestListener = null;
         this.userStatusListener = null;
+        this.preloadedData = null; // Cache for preloaded songlist data
+        this.preloadPromise = null; // Track preload operations
         this.init();
     }
 
@@ -147,6 +149,19 @@ class RhythmUnifiedAuth {
             }
 
             console.log('✅ [UnifiedAuth] Authentication successful');
+            
+            // Start preloading songlist data in background for PWA users
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                         window.navigator.standalone === true ||
+                         document.referrer.includes('android-app://');
+            
+            if (isPWA && this.hasPermission('songlist')) {
+                // Start preloading in background (don't await)
+                this.preloadSonglistData().catch(err => {
+                    console.log('Background preload failed (non-critical):', err.message);
+                });
+            }
+            
             return { isAuthenticated: true, user: this.currentUser, reason: 'authenticated' };
 
         } catch (error) {
@@ -991,6 +1006,118 @@ class RhythmUnifiedAuth {
      */
     getAdminPreference() {
         return localStorage.getItem('rhythm_admin_preference');
+    }
+
+    /**
+     * Preload songlist data in background for faster navigation
+     */
+    async preloadSonglistData() {
+        // Only preload if user is authenticated and has songlist permission
+        if (!this.isAuthenticated() || !this.hasPermission('songlist')) {
+            return null;
+        }
+
+        // Return existing preload if already in progress
+        if (this.preloadPromise) {
+            return await this.preloadPromise;
+        }
+
+        // Check if we have recent cached data
+        const cachedData = this.getCachedSonglistData();
+        if (cachedData) {
+            console.log('🚀 [Preload] Using cached songlist data');
+            this.preloadedData = cachedData;
+            return cachedData;
+        }
+
+        console.log('🚀 [Preload] Starting background songlist data load...');
+        
+        this.preloadPromise = this._doPreloadSonglist();
+        const result = await this.preloadPromise;
+        this.preloadPromise = null;
+        
+        return result;
+    }
+
+    async _doPreloadSonglist() {
+        try {
+            // Import Firebase module
+            const module = await import('../js/firebase-db.js');
+            const rhythmDB = new module.RhythmFirebaseDB();
+
+            // Get songs metadata (fast)
+            const songsMetadata = await rhythmDB.getSongsMetadata();
+            const songs = [];
+            
+            // Convert to song list format
+            songsMetadata.forEach(song => {
+                songs.push({
+                    id: song.id,
+                    timestamp: Date.now(),
+                    name: song.name,
+                    genre: song.genre,
+                    lyrics: 'loaded_on_demand'
+                });
+            });
+
+            // Cache the data with timestamp
+            const cacheData = {
+                songs: songs,
+                timestamp: Date.now(),
+                userId: this.currentUser?.accessCode
+            };
+            
+            localStorage.setItem('rhythm_preloaded_songs', JSON.stringify(cacheData));
+            this.preloadedData = cacheData;
+            
+            console.log('✅ [Preload] Songlist data preloaded successfully:', songs.length, 'songs');
+            return cacheData;
+            
+        } catch (error) {
+            console.warn('⚠️ [Preload] Background songlist load failed:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get cached songlist data if it's recent and valid
+     */
+    getCachedSonglistData() {
+        try {
+            const cached = localStorage.getItem('rhythm_preloaded_songs');
+            if (!cached) return null;
+
+            const cacheData = JSON.parse(cached);
+            const maxAge = 10 * 60 * 1000; // 10 minutes
+            const isRecent = (Date.now() - cacheData.timestamp) < maxAge;
+            const isCurrentUser = cacheData.userId === this.currentUser?.accessCode;
+
+            if (isRecent && isCurrentUser) {
+                return cacheData;
+            } else {
+                // Clear stale cache
+                localStorage.removeItem('rhythm_preloaded_songs');
+                return null;
+            }
+        } catch (error) {
+            localStorage.removeItem('rhythm_preloaded_songs');
+            return null;
+        }
+    }
+
+    /**
+     * Get preloaded songlist data for instant navigation
+     */
+    getPreloadedSonglistData() {
+        return this.preloadedData || this.getCachedSonglistData();
+    }
+
+    /**
+     * Clear preloaded data cache
+     */
+    clearPreloadedData() {
+        this.preloadedData = null;
+        localStorage.removeItem('rhythm_preloaded_songs');
     }
 
     /**
