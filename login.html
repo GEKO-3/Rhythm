@@ -256,6 +256,9 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Login page loaded, initializing unified auth...');
             
+            // Auto-fill stored login data
+            loadStoredLoginData();
+            
             // Wait for auth system to initialize
             let attempts = 0;
             while (!window.rhythmAuth?.isInitialized && attempts < 50) {
@@ -280,8 +283,8 @@
                 return;
             }
             
-            // Check for pending request
-            await checkPendingRequest();
+            // Check for pending request and setup real-time listener
+            await checkPendingRequestWithRealtime();
         });
 
         // PIN input auto-advance functionality
@@ -365,14 +368,21 @@
                 const result = await window.rhythmAuth.submitLoginRequest(accessCode, fullName);
                 
                 if (result.success) {
+                    // Save login data for auto-fill on next visit
+                    saveLoginData(fullName, accessCode);
+                    
                     if (result.action === 'auto_login') {
                         showMessage('Access approved! Redirecting...', 'success');
                         setTimeout(() => {
                             window.rhythmAuth.redirectAfterLogin();
                         }, 1000);
                     } else if (result.action === 'request_submitted') {
-                        showMessage('Request submitted successfully! Please wait for admin approval.', 'success');
+                        showMessage('Request submitted successfully! You will be notified instantly when approved.', 'success');
                         disableForm();
+                        
+                        // Setup real-time listener for the new request
+                        const deviceId = localStorage.getItem('rhythmAuth_deviceId') || 'unknown';
+                        setupRealtimeApprovalListener(accessCode, deviceId);
                     }
                 } else {
                     if (result.action === 'request_pending') {
@@ -435,6 +445,164 @@
                     localStorage.removeItem('rhythmAuth_pendingRequest');
                 }
             }
+        }
+
+        // Load stored login data from localStorage
+        function loadStoredLoginData() {
+            try {
+                const storedData = localStorage.getItem('rhythmAuth_loginData');
+                if (storedData) {
+                    const loginData = JSON.parse(storedData);
+                    
+                    // Fill name field
+                    if (loginData.fullName) {
+                        document.getElementById('name').value = loginData.fullName;
+                    }
+                    
+                    // Fill PIN fields
+                    if (loginData.accessCode && loginData.accessCode.length === 4) {
+                        const pinInputs = document.querySelectorAll('.pin-input');
+                        for (let i = 0; i < 4; i++) {
+                            pinInputs[i].value = loginData.accessCode[i];
+                        }
+                    }
+                    
+                    console.log('✅ Auto-filled login data from storage');
+                }
+            } catch (error) {
+                console.log('No stored login data found or error loading:', error);
+            }
+        }
+
+        // Save login data to localStorage
+        function saveLoginData(fullName, accessCode) {
+            try {
+                const loginData = {
+                    fullName: fullName,
+                    accessCode: accessCode,
+                    lastUsed: Date.now()
+                };
+                localStorage.setItem('rhythmAuth_loginData', JSON.stringify(loginData));
+                console.log('✅ Login data saved for future auto-fill');
+            } catch (error) {
+                console.log('Error saving login data:', error);
+            }
+        }
+
+        // Enhanced pending request check with real-time Firebase listener
+        async function checkPendingRequestWithRealtime() {
+            const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
+            if (pendingRequest) {
+                try {
+                    const requestData = JSON.parse(pendingRequest);
+                    const status = await window.rhythmAuth.checkRequestStatus(requestData.accessCode, requestData.deviceId);
+                    
+                    if (status === 'approved') {
+                        // Trigger authentication check which will handle login
+                        const authResult = await window.rhythmAuth.checkAuthentication();
+                        if (authResult.isAuthenticated) {
+                            localStorage.removeItem('rhythmAuth_pendingRequest');
+                            console.log('✅ Request approved! Redirecting...');
+                            showMessage('Your request was approved! Redirecting...', 'success');
+                            setTimeout(() => {
+                                window.rhythmAuth.redirectAfterLogin();
+                            }, 1000);
+                            return;
+                        }
+                    } else if (status === 'rejected') {
+                        localStorage.removeItem('rhythmAuth_pendingRequest');
+                        showMessage('Your access request has been rejected.', 'error');
+                        return;
+                    } else if (status === 'pending') {
+                        showMessage('Your request is still pending approval. Please wait for admin review.', 'info');
+                        disableForm();
+                        
+                        // Setup real-time listener for approval
+                        setupRealtimeApprovalListener(requestData.accessCode, requestData.deviceId);
+                        return;
+                    } else if (status === 'revoked') {
+                        localStorage.removeItem('rhythmAuth_pendingRequest');
+                        showMessage('Your access has been revoked.', 'error');
+                        return;
+                    } else if (status === 'none') {
+                        localStorage.removeItem('rhythmAuth_pendingRequest');
+                        showMessage('Your request was not found. Please submit a new request.', 'warning');
+                        return;
+                    }
+                } catch (e) {
+                    console.log('Error checking request status:', e);
+                    localStorage.removeItem('rhythmAuth_pendingRequest');
+                }
+            }
+        }
+
+        // Setup real-time listener for request approval
+        function setupRealtimeApprovalListener(accessCode, deviceId) {
+            if (!window.rhythmAuth || !window.rhythmAuth.setupRealtimeListener) {
+                console.log('Real-time listener not available');
+                return;
+            }
+
+            console.log('🔄 Setting up real-time approval listener...');
+            
+            const unsubscribe = window.rhythmAuth.setupRealtimeListener(accessCode, deviceId, async (status) => {
+                console.log(`🔔 Real-time status update: ${status}`);
+                
+                if (status === 'approved') {
+                    // Request approved - authenticate immediately
+                    localStorage.removeItem('rhythmAuth_pendingRequest');
+                    showMessage('🎉 Your request was approved! Authenticating...', 'success');
+                    
+                    // Wait a moment then check authentication
+                    setTimeout(async () => {
+                        const authResult = await window.rhythmAuth.checkAuthentication();
+                        if (authResult.isAuthenticated) {
+                            showMessage('✅ Successfully authenticated! Redirecting...', 'success');
+                            setTimeout(() => {
+                                window.rhythmAuth.redirectAfterLogin();
+                            }, 1000);
+                        } else {
+                            showMessage('Authentication check failed. Please refresh and try again.', 'error');
+                        }
+                    }, 1000);
+                    
+                    // Cleanup listener
+                    if (unsubscribe) unsubscribe();
+                    
+                } else if (status === 'rejected') {
+                    localStorage.removeItem('rhythmAuth_pendingRequest');
+                    showMessage('❌ Your request was rejected by the administrator.', 'error');
+                    
+                    // Re-enable form
+                    enableForm();
+                    
+                    // Cleanup listener
+                    if (unsubscribe) unsubscribe();
+                    
+                } else if (status === 'revoked') {
+                    localStorage.removeItem('rhythmAuth_pendingRequest');
+                    showMessage('🚫 Your access has been revoked.', 'error');
+                    
+                    // Cleanup listener
+                    if (unsubscribe) unsubscribe();
+                }
+            });
+
+            // Store unsubscribe function for cleanup on page unload
+            window.addEventListener('beforeunload', () => {
+                if (unsubscribe) unsubscribe();
+            });
+        }
+
+        // Enable form (opposite of disableForm)
+        function enableForm() {
+            const nameInput = document.getElementById('name');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            nameInput.disabled = false;
+            pinInputs.forEach(input => input.disabled = false);
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Request Access';
         }
 
         function disableForm() {
