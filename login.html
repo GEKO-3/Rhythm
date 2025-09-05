@@ -263,6 +263,20 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Login page loaded, initializing unified auth...');
             
+            // Check if this is PWA mode and user might be already logged in
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                         window.navigator.standalone === true ||
+                         document.referrer.includes('android-app://');
+            
+            if (isPWA && localStorage.getItem('rhythmAuth_approval')) {
+                // Hide login form immediately for PWA users who likely are already logged in
+                const loginContainer = document.querySelector('.login-container');
+                if (loginContainer) {
+                    loginContainer.style.opacity = '0.5';
+                    loginContainer.style.pointerEvents = 'none';
+                }
+            }
+            
             // Wait for auth system to initialize
             let attempts = 0;
             while (!window.rhythmAuth?.isInitialized && attempts < 50) {
@@ -279,12 +293,33 @@
             // Check if user is already authenticated
             const authResult = await window.rhythmAuth.checkAuthentication();
             if (authResult.isAuthenticated) {
-                console.log('User already authenticated, redirecting...');
-                showMessage('Already logged in! Redirecting...', 'success');
-                setTimeout(() => {
+                console.log('User already authenticated, checking redirect preference...');
+                
+                // Check if this is PWA mode or user preference for silent redirect
+                const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                             window.navigator.standalone === true ||
+                             document.referrer.includes('android-app://');
+                
+                if (isPWA || localStorage.getItem('rhythm_silent_redirect') === 'true') {
+                    // Silent redirect for PWA users
+                    console.log('PWA mode detected - silent redirect');
                     window.rhythmAuth.redirectAfterLogin();
-                }, 1000);
-                return;
+                    return;
+                } else {
+                    // Show message for web users (optional notification)
+                    showMessage('Already logged in! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.rhythmAuth.redirectAfterLogin();
+                    }, 1000);
+                    return;
+                }
+            } else {
+                // User not authenticated - restore form if it was hidden
+                const loginContainer = document.querySelector('.login-container');
+                if (loginContainer) {
+                    loginContainer.style.opacity = '1';
+                    loginContainer.style.pointerEvents = 'auto';
+                }
             }
             
             // Check for pending request
@@ -430,11 +465,67 @@
                     } else if (result.action === 'request_submitted') {
                         showMessage('Request submitted successfully! Please wait for admin approval.', 'success');
                         disableForm();
+                        
+                        // Start real-time monitoring for the new request
+                        const deviceId = window.rhythmAuth.generateDeviceId();
+                        console.log('🔄 Starting real-time monitoring for new request...');
+                        window.rhythmAuth.startRequestMonitoring(
+                            accessCode,
+                            deviceId,
+                            // onApproved callback
+                            (userData) => {
+                                console.log('✅ [RealTime] Request approved! Auto-logging in...');
+                                showMessage('Your request was approved! Redirecting...', 'success');
+                                setTimeout(() => {
+                                    window.rhythmAuth.redirectAfterLogin();
+                                }, 1000);
+                            },
+                            // onRejected callback
+                            () => {
+                                console.log('❌ [RealTime] Request rejected');
+                                showMessage('Your access request has been rejected.', 'error');
+                                enableForm();
+                            },
+                            // onRevoked callback
+                            () => {
+                                console.log('❌ [RealTime] Access revoked');
+                                showMessage('Your access has been revoked.', 'error');
+                                enableForm();
+                            }
+                        );
                     }
                 } else {
                     if (result.action === 'request_pending') {
                         showMessage('You already have a pending request. Please wait for approval.', 'info');
                         disableForm();
+                        
+                        // Start real-time monitoring for existing pending request
+                        const deviceId = window.rhythmAuth.generateDeviceId();
+                        console.log('🔄 Starting real-time monitoring for existing pending request...');
+                        window.rhythmAuth.startRequestMonitoring(
+                            accessCode,
+                            deviceId,
+                            // onApproved callback
+                            (userData) => {
+                                console.log('✅ [RealTime] Request approved! Auto-logging in...');
+                                showMessage('Your request was approved! Redirecting...', 'success');
+                                setTimeout(() => {
+                                    window.rhythmAuth.redirectAfterLogin();
+                                }, 1000);
+                            },
+                            // onRejected callback
+                            () => {
+                                console.log('❌ [RealTime] Request rejected');
+                                showMessage('Your access request has been rejected.', 'error');
+                                enableForm();
+                            },
+                            // onRevoked callback
+                            () => {
+                                console.log('❌ [RealTime] Access revoked');
+                                showMessage('Your access has been revoked.', 'error');
+                                enableForm();
+                            }
+                        );
                     } else if (result.action === 'device_mismatch') {
                         showMessage('❌ Device Mismatch: This account is registered to a different device. Each user can only access from one device. Please contact admin if you need to change devices.', 'error');
                     } else if (result.action === 'access_revoked') {
@@ -454,12 +545,14 @@
             }
         });
 
-        // Check pending request status
+        // Check pending request status with real-time monitoring
         async function checkPendingRequest() {
             const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
             if (pendingRequest) {
                 try {
                     const requestData = JSON.parse(pendingRequest);
+                    
+                    // First do an immediate status check
                     const status = await window.rhythmAuth.checkRequestStatus(requestData.accessCode, requestData.deviceId);
                     
                     if (status === 'approved') {
@@ -477,15 +570,45 @@
                     } else if (status === 'rejected') {
                         localStorage.removeItem('rhythmAuth_pendingRequest');
                         showMessage('Your access request has been rejected.', 'error');
-                    } else if (status === 'pending') {
-                        showMessage('Your request is still pending approval. Please wait for admin review.', 'info');
-                        disableForm();
+                        return;
                     } else if (status === 'revoked') {
                         localStorage.removeItem('rhythmAuth_pendingRequest');
                         showMessage('Your access has been revoked.', 'error');
+                        return;
                     } else if (status === 'none') {
                         localStorage.removeItem('rhythmAuth_pendingRequest');
                         showMessage('Your request was not found. Please submit a new request.', 'warning');
+                        return;
+                    } else if (status === 'pending') {
+                        showMessage('Your request is still pending approval. Please wait for admin review.', 'info');
+                        disableForm();
+                        
+                        // Start real-time monitoring for approval
+                        console.log('🔄 Starting real-time monitoring for request approval...');
+                        window.rhythmAuth.startRequestMonitoring(
+                            requestData.accessCode,
+                            requestData.deviceId,
+                            // onApproved callback
+                            (userData) => {
+                                console.log('✅ [RealTime] Request approved! Auto-logging in...');
+                                showMessage('Your request was approved! Redirecting...', 'success');
+                                setTimeout(() => {
+                                    window.rhythmAuth.redirectAfterLogin();
+                                }, 1000);
+                            },
+                            // onRejected callback
+                            () => {
+                                console.log('❌ [RealTime] Request rejected');
+                                showMessage('Your access request has been rejected.', 'error');
+                                enableForm();
+                            },
+                            // onRevoked callback
+                            () => {
+                                console.log('❌ [RealTime] Access revoked');
+                                showMessage('Your access has been revoked.', 'error');
+                                enableForm();
+                            }
+                        );
                     }
                 } catch (e) {
                     console.log('Error checking request status:', e);
@@ -504,6 +627,16 @@
             submitBtn.textContent = 'Request Pending...';
         }
 
+        function enableForm() {
+            const nameInput = document.getElementById('name');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            nameInput.disabled = false;
+            pinInputs.forEach(input => input.disabled = false);
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Login';
+        }
+
         function showMessage(message, type = 'info') {
             const messageDiv = document.getElementById('message');
             messageDiv.textContent = message;
@@ -515,6 +648,21 @@
                 messageDiv.style.display = 'none';
             }, 10000);
         }
+
+        // Cleanup listeners when page is unloaded
+        window.addEventListener('beforeunload', () => {
+            if (window.rhythmAuth) {
+                window.rhythmAuth.stopRequestMonitoring();
+            }
+        });
+
+        // Debug function: Reset PWA preferences (available in console)
+        window.resetPWAPrefs = () => {
+            if (window.rhythmAuth) {
+                window.rhythmAuth.resetPWAPreferences();
+                console.log('PWA preferences reset. Refresh to see login choice again.');
+            }
+        };
     </script>
     </script>
 

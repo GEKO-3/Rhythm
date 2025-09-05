@@ -5,13 +5,16 @@
  */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, get, set } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getDatabase, ref, get, set, onValue, off } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 class RhythmUnifiedAuth {
     constructor() {
         this.database = null;
         this.currentUser = null;
         this.isInitialized = false;
+        this.activeListeners = new Map(); // Track active Firebase listeners
+        this.pendingRequestListener = null;
+        this.userStatusListener = null;
         this.init();
     }
 
@@ -309,6 +312,11 @@ class RhythmUnifiedAuth {
         localStorage.removeItem('rhythmAuth_approval');
         localStorage.removeItem('rhythmAuth_pendingRequest');
         this.currentUser = null;
+        
+        // Clean up all listeners
+        this.stopRequestMonitoring();
+        this.stopUserStatusMonitoring();
+        
         console.log('👋 [UnifiedAuth] User logged out');
     }
 
@@ -699,6 +707,133 @@ class RhythmUnifiedAuth {
     }
 
     /**
+     * Start monitoring for real-time approval of pending request
+     */
+    startRequestMonitoring(accessCode, deviceId, onApproved, onRejected, onRevoked) {
+        if (!this.database) {
+            console.error('❌ [RealTime] Database not initialized');
+            return;
+        }
+
+        console.log('🔄 [RealTime] Starting request monitoring for:', accessCode);
+
+        // Stop any existing listeners
+        this.stopRequestMonitoring();
+
+        const requestKey = `${accessCode}_${deviceId}`;
+
+        // Monitor the users collection for approval
+        const userRef = ref(this.database, `users/${accessCode}`);
+        this.userStatusListener = onValue(userRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                console.log('🔄 [RealTime] User data updated:', userData.fullName, userData.status);
+                
+                // Check if this is the right device and user is approved
+                if (userData.deviceId === deviceId && userData.status === 'active') {
+                    console.log('✅ [RealTime] Request approved! Auto-logging in...');
+                    this.stopRequestMonitoring();
+                    
+                    // Immediately log the user in
+                    const loginData = this.loginUser(userData);
+                    
+                    // Store device credentials
+                    this.storeDeviceCredentials(userData.fullName || userData.name, accessCode);
+                    
+                    // Remove pending request
+                    localStorage.removeItem('rhythmAuth_pendingRequest');
+                    
+                    if (onApproved) {
+                        onApproved(loginData);
+                    }
+                    return;
+                }
+                
+                // Check if user was revoked
+                if (userData.status === 'revoked') {
+                    console.log('❌ [RealTime] User access revoked');
+                    this.stopRequestMonitoring();
+                    localStorage.removeItem('rhythmAuth_pendingRequest');
+                    if (onRevoked) onRevoked();
+                    return;
+                }
+            }
+        });
+
+        // Monitor the rejected collection
+        const rejectedRef = ref(this.database, `rejectedLogins/${requestKey}`);
+        this.rejectedStatusListener = onValue(rejectedRef, (snapshot) => {
+            if (snapshot.exists()) {
+                console.log('❌ [RealTime] Request rejected');
+                this.stopRequestMonitoring();
+                localStorage.removeItem('rhythmAuth_pendingRequest');
+                if (onRejected) onRejected();
+            }
+        });
+
+        // Store listener references
+        this.activeListeners.set('userStatus', this.userStatusListener);
+        this.activeListeners.set('rejectedStatus', this.rejectedStatusListener);
+
+        console.log('👂 [RealTime] Listeners started for real-time monitoring');
+    }
+
+    /**
+     * Stop all request monitoring listeners
+     */
+    stopRequestMonitoring() {
+        if (this.userStatusListener) {
+            off(ref(this.database, `users`), 'value', this.userStatusListener);
+            this.userStatusListener = null;
+        }
+        
+        if (this.rejectedStatusListener) {
+            off(ref(this.database, `rejectedLogins`), 'value', this.rejectedStatusListener);
+            this.rejectedStatusListener = null;
+        }
+
+        // Clear all active listeners
+        this.activeListeners.clear();
+        console.log('🔇 [RealTime] Request monitoring stopped');
+    }
+
+    /**
+     * Start monitoring current user status for revocation
+     */
+    startUserStatusMonitoring(accessCode, onRevoked) {
+        if (!this.database || !accessCode) return;
+
+        console.log('👂 [RealTime] Starting user status monitoring for:', accessCode);
+
+        const userRef = ref(this.database, `users/${accessCode}`);
+        this.pendingRequestListener = onValue(userRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                if (userData.status === 'revoked') {
+                    console.log('❌ [RealTime] User access was revoked');
+                    this.logout();
+                    if (onRevoked) onRevoked();
+                }
+            } else {
+                // User was deleted
+                console.log('❌ [RealTime] User account was deleted');
+                this.logout();
+                if (onRevoked) onRevoked();
+            }
+        });
+    }
+
+    /**
+     * Stop user status monitoring
+     */
+    stopUserStatusMonitoring() {
+        if (this.pendingRequestListener) {
+            off(ref(this.database, `users`), 'value', this.pendingRequestListener);
+            this.pendingRequestListener = null;
+        }
+    }
+
+    /**
      * Check request status
      */
     async checkRequestStatus(accessCode, deviceId) {
@@ -741,8 +876,27 @@ class RhythmUnifiedAuth {
             return;
         }
 
+        // Check if this is PWA mode
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                     window.navigator.standalone === true ||
+                     document.referrer.includes('android-app://');
+
         if (this.isAdmin()) {
-            this.showDestinationChoice();
+            // Check user preference for admin destination
+            const adminPreference = localStorage.getItem('rhythm_admin_preference');
+            
+            if (isPWA && adminPreference) {
+                // PWA mode with saved preference - direct redirect
+                if (adminPreference === 'admin') {
+                    window.location.href = 'pages/admin/admin.html';
+                } else {
+                    window.location.href = 'pages/songlist.html';
+                }
+                return;
+            }
+            
+            // Show choice (either first time or web mode)
+            this.showDestinationChoice(isPWA);
         } else {
             window.location.href = 'pages/songlist.html';
         }
@@ -751,7 +905,7 @@ class RhythmUnifiedAuth {
     /**
      * Show admin destination choice
      */
-    showDestinationChoice() {
+    showDestinationChoice(isPWA = false) {
         // Remove any existing choice containers
         document.querySelectorAll('.auth-choice-container').forEach(el => el.remove());
         
@@ -762,30 +916,81 @@ class RhythmUnifiedAuth {
         // Create choice container
         const choiceContainer = document.createElement('div');
         choiceContainer.className = 'login-container auth-choice-container';
+        
+        const rememberOption = isPWA ? `
+            <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                <label style="display: flex; align-items: center; gap: 10px; color: #ccc; cursor: pointer;">
+                    <input type="checkbox" id="rememberChoice" style="margin: 0;">
+                    <span>Remember my choice for PWA</span>
+                </label>
+                <small style="color: #888; display: block; margin-top: 5px;">
+                    Skip this choice screen in the future
+                </small>
+            </div>
+        ` : '';
+        
         choiceContainer.innerHTML = `
             <h2>Welcome, Admin!</h2>
             <p style="text-align: center; margin-bottom: 30px; color: #ccc;">
                 Choose your destination:
             </p>
             <div style="display: flex; flex-direction: column; gap: 15px;">
-                <button onclick="rhythmAuth.goToSonglist()" class="submit-btn" style="background: var(--primary-color);">
+                <button onclick="rhythmAuth.goToSonglist(${isPWA})" class="submit-btn" style="background: var(--primary-color);">
                     Song List
                 </button>
-                <button onclick="rhythmAuth.goToAdmin()" class="submit-btn" style="background: #ff6b6b;">
+                <button onclick="rhythmAuth.goToAdmin(${isPWA})" class="submit-btn" style="background: #ff6b6b;">
                     Admin Panel
                 </button>
             </div>
+            ${rememberOption}
         `;
         
         document.body.appendChild(choiceContainer);
     }
 
-    goToSonglist() {
+    goToSonglist(rememberForPWA = false) {
+        if (rememberForPWA) {
+            const rememberCheckbox = document.getElementById('rememberChoice');
+            if (rememberCheckbox && rememberCheckbox.checked) {
+                localStorage.setItem('rhythm_admin_preference', 'songlist');
+                localStorage.setItem('rhythm_silent_redirect', 'true');
+            }
+        }
         window.location.href = 'pages/songlist.html';
     }
 
-    goToAdmin() {
+    goToAdmin(rememberForPWA = false) {
+        if (rememberForPWA) {
+            const rememberCheckbox = document.getElementById('rememberChoice');
+            if (rememberCheckbox && rememberCheckbox.checked) {
+                localStorage.setItem('rhythm_admin_preference', 'admin');
+                localStorage.setItem('rhythm_silent_redirect', 'true');
+            }
+        }
         window.location.href = 'pages/admin/admin.html';
+    }
+
+    /**
+     * Reset PWA preferences (useful for testing or user preference changes)
+     */
+    resetPWAPreferences() {
+        localStorage.removeItem('rhythm_admin_preference');
+        localStorage.removeItem('rhythm_silent_redirect');
+        console.log('🔄 PWA preferences reset');
+    }
+
+    /**
+     * Check if user has PWA silent redirect enabled
+     */
+    hasSilentRedirect() {
+        return localStorage.getItem('rhythm_silent_redirect') === 'true';
+    }
+
+    /**
+     * Get admin preference for PWA
+     */
+    getAdminPreference() {
+        return localStorage.getItem('rhythm_admin_preference');
     }
 
     /**
