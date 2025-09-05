@@ -1467,30 +1467,10 @@
                 }
             });
 
-            // Detect DevTools by checking window dimensions
-            let devtools = {
-                open: false,
-                orientation: null
-            };
-            
-            const threshold = 160;
-            
-            setInterval(function() {
-                if (window.outerHeight - window.innerHeight > threshold || 
-                    window.outerWidth - window.innerWidth > threshold) {
-                    if (!devtools.open) {
-                        devtools.open = true;
-                        // Redirect or take action when devtools detected
-                        document.body.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Arial;font-size:24px;z-index:999999;">Access Denied</div>';
-                    }
-                }
-            }, 500);
-
             // Additional console detection
             let element = new Image();
             Object.defineProperty(element, 'id', {
                 get: function() {
-                    devtools.open = true;
                     document.body.innerHTML = '<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-family:Arial;font-size:24px;z-index:999999;">Access Denied</div>';
                 }
             });
