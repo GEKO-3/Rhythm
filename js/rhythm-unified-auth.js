@@ -12,8 +12,6 @@ class RhythmUnifiedAuth {
         this.database = null;
         this.currentUser = null;
         this.isInitialized = false;
-        this.requestListener = null; // For real-time request monitoring
-        this.userListener = null; // For real-time user status monitoring
         this.init();
     }
 
@@ -506,147 +504,6 @@ class RhythmUnifiedAuth {
     }
 
     /**
-     * Start real-time monitoring for login request approval
-     */
-    async startRequestMonitoring(accessCode, deviceId, callbacks = {}) {
-        if (!this.database) {
-            console.error('❌ [RealTime] Database not initialized');
-            return;
-        }
-
-        try {
-            const { ref, onValue, off } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js');
-            
-            // Stop any existing listeners first
-            this.stopRequestMonitoring();
-            
-            console.log('🔄 [RealTime] Starting request monitoring for:', accessCode);
-            
-            // Monitor user approval in the users collection
-            const userRef = ref(this.database, `users/${accessCode}`);
-            this.userListener = onValue(userRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    console.log('🔄 [RealTime] User data changed:', userData);
-                    
-                    // Check if this user was just approved for this device
-                    if (userData.deviceId === deviceId && userData.status === 'active') {
-                        console.log('✅ [RealTime] Request approved! Auto-logging in...');
-                        
-                        // Clear pending request
-                        localStorage.removeItem('rhythmAuth_pendingRequest');
-                        
-                        // Login the user
-                        const loginData = this.loginUser(userData);
-                        
-                        // Call success callback
-                        if (callbacks.onApproved) {
-                            callbacks.onApproved(loginData);
-                        } else {
-                            // Default behavior - redirect
-                            this.redirectAfterLogin();
-                        }
-                        
-                        // Stop monitoring
-                        this.stopRequestMonitoring();
-                    }
-                    
-                    if (userData.status === 'revoked') {
-                        console.log('❌ [RealTime] Access revoked');
-                        if (callbacks.onRevoked) {
-                            callbacks.onRevoked();
-                        }
-                    }
-                }
-            });
-            
-            // Monitor rejections in rejectedLogins collection
-            const requestKey = `${accessCode}_${deviceId}`;
-            const rejectedRef = ref(this.database, `rejectedLogins/${requestKey}`);
-            this.requestListener = onValue(rejectedRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    console.log('❌ [RealTime] Request rejected');
-                    
-                    // Clear pending request
-                    localStorage.removeItem('rhythmAuth_pendingRequest');
-                    
-                    // Call rejection callback
-                    if (callbacks.onRejected) {
-                        callbacks.onRejected(snapshot.val());
-                    }
-                    
-                    // Stop monitoring
-                    this.stopRequestMonitoring();
-                }
-            });
-            
-            console.log('✅ [RealTime] Request monitoring started');
-            
-        } catch (error) {
-            console.error('❌ [RealTime] Error starting request monitoring:', error);
-        }
-    }
-
-    /**
-     * Stop real-time monitoring
-     */
-    stopRequestMonitoring() {
-        if (this.userListener) {
-            this.userListener();
-            this.userListener = null;
-            console.log('🛑 [RealTime] Stopped user monitoring');
-        }
-        
-        if (this.requestListener) {
-            this.requestListener();
-            this.requestListener = null;
-            console.log('🛑 [RealTime] Stopped request monitoring');
-        }
-    }
-
-    /**
-     * Get stored device credentials for auto-fill
-     */
-    getStoredCredentialsForAutofill() {
-        const stored = localStorage.getItem('rhythm_device_credentials');
-        if (stored) {
-            try {
-                const credentials = JSON.parse(stored);
-                console.log('📱 [AutoFill] Found stored credentials for auto-fill');
-                return {
-                    fullName: credentials.fullName,
-                    accessCode: credentials.accessCode
-                };
-            } catch (error) {
-                console.error('❌ [AutoFill] Invalid stored credentials');
-                localStorage.removeItem('rhythm_device_credentials');
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Check if there's a pending request and start monitoring if needed
-     */
-    async resumePendingRequestMonitoring(callbacks = {}) {
-        const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
-        if (!pendingRequest) return false;
-        
-        try {
-            const request = JSON.parse(pendingRequest);
-            console.log('🔄 [RealTime] Resuming monitoring for pending request:', request.accessCode);
-            
-            // Start monitoring for this request
-            await this.startRequestMonitoring(request.accessCode, request.deviceId, callbacks);
-            return true;
-        } catch (error) {
-            console.error('❌ [RealTime] Error resuming pending request monitoring:', error);
-            localStorage.removeItem('rhythmAuth_pendingRequest');
-            return false;
-        }
-    }
-
-    /**
      * Submit login request
      */
     async submitLoginRequest(accessCode, fullName) {
@@ -786,9 +643,6 @@ class RhythmUnifiedAuth {
                 requestedAt: Date.now(),
                 status: 'pending'
             }));
-            
-            // Start real-time monitoring for approval
-            this.startRequestMonitoring(accessCode, deviceId);
             
             return { success: true, action: 'request_submitted', message: 'Request submitted successfully' };
         } catch (error) {

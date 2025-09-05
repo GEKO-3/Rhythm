@@ -241,6 +241,13 @@
         </form>
 
         <div id="message" class="message" style="display: none;"></div>
+        
+        <!-- Clear saved data option -->
+        <div style="text-align: center; margin-top: 15px;">
+            <button type="button" id="clearDataBtn" style="background: none; border: none; color: rgba(245, 208, 0, 0.6); font-size: 0.8rem; cursor: pointer; text-decoration: underline; font-family: var(--font-family); display: none;">
+                Clear saved login data
+            </button>
+        </div>
     </div>
 
     <script type="module">
@@ -256,12 +263,6 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Login page loaded, initializing unified auth...');
             
-            // Initialize auth system if not already done
-            if (!window.rhythmAuth) {
-                window.rhythmAuth = new RhythmUnifiedAuth();
-                await window.rhythmAuth.initialize();
-            }
-            
             // Wait for auth system to initialize
             let attempts = 0;
             while (!window.rhythmAuth?.isInitialized && attempts < 50) {
@@ -275,12 +276,6 @@
                 return;
             }
             
-            // Auto-fill stored credentials if available
-            autoFillStoredCredentials();
-            
-            // Resume monitoring for any pending requests
-            resumePendingRequestMonitoring();
-            
             // Check if user is already authenticated
             const authResult = await window.rhythmAuth.checkAuthentication();
             if (authResult.isAuthenticated) {
@@ -292,8 +287,56 @@
                 return;
             }
             
-            // Real-time monitoring and auto-fill are already handled above
+            // Check for pending request
+            await checkPendingRequest();
+            
+            // Auto-fill saved login data
+            loadSavedLoginData();
         });
+
+        // Function to load saved login data
+        function loadSavedLoginData() {
+            try {
+                const savedData = localStorage.getItem('rhythmLoginData');
+                if (savedData) {
+                    const loginData = JSON.parse(savedData);
+                    
+                    // Fill name field
+                    if (loginData.name) {
+                        document.getElementById('name').value = loginData.name;
+                    }
+                    
+                    // Fill PIN fields
+                    if (loginData.pin && loginData.pin.length === 4) {
+                        const pinInputs = document.querySelectorAll('.pin-input');
+                        for (let i = 0; i < 4; i++) {
+                            if (pinInputs[i] && loginData.pin[i]) {
+                                pinInputs[i].value = loginData.pin[i];
+                            }
+                        }
+                    }
+                    
+                    console.log('Auto-filled login data from storage');
+                }
+            } catch (error) {
+                console.error('Error loading saved login data:', error);
+            }
+        }
+
+        // Function to save login data
+        function saveLoginData(name, pin) {
+            try {
+                const loginData = {
+                    name: name,
+                    pin: pin,
+                    savedAt: new Date().toISOString()
+                };
+                localStorage.setItem('rhythmLoginData', JSON.stringify(loginData));
+                console.log('Login data saved to storage');
+            } catch (error) {
+                console.error('Error saving login data:', error);
+            }
+        }
 
         // PIN input auto-advance functionality
         const pinInputs = document.querySelectorAll('.pin-input');
@@ -350,76 +393,6 @@
             });
         });
 
-        // Auto-fill stored credentials
-        function autoFillStoredCredentials() {
-            const storedCreds = window.rhythmAuth.getStoredCredentialsForAutofill();
-            if (storedCreds) {
-                // Fill name field
-                document.getElementById('name').value = storedCreds.fullName;
-                
-                // Fill PIN inputs
-                if (storedCreds.accessCode && storedCreds.accessCode.length === 4) {
-                    const digits = storedCreds.accessCode.split('');
-                    pinInputs.forEach((input, index) => {
-                        if (digits[index]) {
-                            input.value = digits[index];
-                        }
-                    });
-                }
-                
-                console.log('✅ Auto-filled stored credentials');
-            }
-        }
-        
-        // Resume monitoring for pending requests
-        function resumePendingRequestMonitoring() {
-            const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
-            if (pendingRequest) {
-                try {
-                    const requestData = JSON.parse(pendingRequest);
-                    console.log('📡 Resuming monitoring for pending request...');
-                    
-                    // Resume real-time monitoring
-                    window.rhythmAuth.resumePendingRequestMonitoring(
-                        requestData.accessCode,
-                        requestData.deviceId,
-                        {
-                            onApproved: () => {
-                                console.log('✅ Request approved! Redirecting...');
-                                showMessage('Your request was approved! Redirecting...', 'success');
-                                localStorage.removeItem('rhythmAuth_pendingRequest');
-                                setTimeout(() => {
-                                    window.rhythmAuth.redirectAfterLogin();
-                                }, 1000);
-                            },
-                            onRejected: () => {
-                                showMessage('Your access request has been rejected.', 'error');
-                                localStorage.removeItem('rhythmAuth_pendingRequest');
-                                enableForm();
-                            },
-                            onRevoked: () => {
-                                showMessage('Your access has been revoked.', 'error');
-                                localStorage.removeItem('rhythmAuth_pendingRequest');
-                                enableForm();
-                            },
-                            onError: (error) => {
-                                console.error('Error monitoring request:', error);
-                                showMessage('Connection error. Please refresh the page.', 'warning');
-                            }
-                        }
-                    );
-                    
-                    // Show pending status and disable form
-                    showMessage('Your request is pending approval. You will be automatically redirected when approved.', 'info');
-                    disableForm();
-                    
-                } catch (e) {
-                    console.error('Error resuming monitoring:', e);
-                    localStorage.removeItem('rhythmAuth_pendingRequest');
-                }
-            }
-        }
-
         // Handle form submission
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -446,6 +419,9 @@
                 const result = await window.rhythmAuth.submitLoginRequest(accessCode, fullName);
                 
                 if (result.success) {
+                    // Save login data for auto-fill on next visit
+                    saveLoginData(fullName, accessCode);
+                    
                     if (result.action === 'auto_login') {
                         showMessage('Access approved! Redirecting...', 'success');
                         setTimeout(() => {
@@ -478,6 +454,46 @@
             }
         });
 
+        // Check pending request status
+        async function checkPendingRequest() {
+            const pendingRequest = localStorage.getItem('rhythmAuth_pendingRequest');
+            if (pendingRequest) {
+                try {
+                    const requestData = JSON.parse(pendingRequest);
+                    const status = await window.rhythmAuth.checkRequestStatus(requestData.accessCode, requestData.deviceId);
+                    
+                    if (status === 'approved') {
+                        // Trigger authentication check which will handle login
+                        const authResult = await window.rhythmAuth.checkAuthentication();
+                        if (authResult.isAuthenticated) {
+                            localStorage.removeItem('rhythmAuth_pendingRequest');
+                            console.log('✅ Request approved! Redirecting...');
+                            showMessage('Your request was approved! Redirecting...', 'success');
+                            setTimeout(() => {
+                                window.rhythmAuth.redirectAfterLogin();
+                            }, 1000);
+                            return;
+                        }
+                    } else if (status === 'rejected') {
+                        localStorage.removeItem('rhythmAuth_pendingRequest');
+                        showMessage('Your access request has been rejected.', 'error');
+                    } else if (status === 'pending') {
+                        showMessage('Your request is still pending approval. Please wait for admin review.', 'info');
+                        disableForm();
+                    } else if (status === 'revoked') {
+                        localStorage.removeItem('rhythmAuth_pendingRequest');
+                        showMessage('Your access has been revoked.', 'error');
+                    } else if (status === 'none') {
+                        localStorage.removeItem('rhythmAuth_pendingRequest');
+                        showMessage('Your request was not found. Please submit a new request.', 'warning');
+                    }
+                } catch (e) {
+                    console.log('Error checking request status:', e);
+                    localStorage.removeItem('rhythmAuth_pendingRequest');
+                }
+            }
+        }
+
         function disableForm() {
             const nameInput = document.getElementById('name');
             const submitBtn = document.getElementById('submitBtn');
@@ -486,16 +502,6 @@
             pinInputs.forEach(input => input.disabled = true);
             submitBtn.disabled = true;
             submitBtn.textContent = 'Request Pending...';
-        }
-        
-        function enableForm() {
-            const nameInput = document.getElementById('name');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            nameInput.disabled = false;
-            pinInputs.forEach(input => input.disabled = false);
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Request Access';
         }
 
         function showMessage(message, type = 'info') {
