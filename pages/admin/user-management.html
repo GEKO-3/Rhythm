@@ -332,6 +332,12 @@
             border: 1px solid rgba(255, 107, 107, 0.3);
         }
 
+        .status-revoked {
+            background: rgba(158, 158, 158, 0.2);
+            color: #9e9e9e;
+            border: 1px solid rgba(158, 158, 158, 0.3);
+        }
+
         .btn-small {
             padding: 6px 12px;
             font-size: 0.8rem;
@@ -418,11 +424,11 @@
                 </div>
             </div>
             
-            <!-- Rejected Requests -->
+            <!-- Rejected & Revoked Users -->
             <div class="user-category">
-                <h3 class="category-title">❌ Rejected Requests</h3>
+                <h3 class="category-title">❌ Rejected & Revoked Users</h3>
                 <div id="rejectedList" class="user-list">
-                    <div class="loading">Loading rejected requests...</div>
+                    <div class="loading">Loading rejected & revoked users...</div>
                 </div>
             </div>
         </div>
@@ -501,6 +507,13 @@
                     } else {
                         categories.normalUsers.push({ accessCode, ...userData });
                     }
+                } else if (userData.status === 'revoked') {
+                    // Include revoked users in the rejected category
+                    categories.rejected.push({ 
+                        accessCode, 
+                        ...userData, 
+                        isRevoked: true 
+                    });
                 }
             });
 
@@ -582,11 +595,17 @@
             if (userData.rejectedAt) {
                 info += `<p><strong>Rejected:</strong> ${new Date(userData.rejectedAt).toLocaleDateString()}</p>`;
             }
+            if (userData.revokedAt) {
+                info += `<p><strong>Revoked:</strong> ${new Date(userData.revokedAt).toLocaleDateString()}</p>`;
+            }
             if (userData.requestedAt) {
                 info += `<p><strong>Requested:</strong> ${new Date(userData.requestedAt).toLocaleDateString()}</p>`;
             }
             if (userData.approvedBy) {
                 info += `<p><strong>By:</strong> ${userData.approvedBy}</p>`;
+            }
+            if (userData.revokedBy) {
+                info += `<p><strong>Revoked By:</strong> ${userData.revokedBy}</p>`;
             }
             if (userData.permissions && userData.permissions.length > 0) {
                 info += `<p><strong>Permissions:</strong> ${userData.permissions.join(', ')}</p>`;
@@ -600,8 +619,15 @@
                 pending: '<span class="status-badge status-pending">Pending</span>',
                 admin: '<span class="status-badge status-admin">Admin</span>',
                 user: '<span class="status-badge status-user">User</span>',
-                rejected: '<span class="status-badge status-rejected">Rejected</span>'
+                rejected: '<span class="status-badge status-rejected">Rejected</span>',
+                revoked: '<span class="status-badge status-revoked">Revoked</span>'
             };
+            
+            // For users in the rejected category, check if they're actually revoked
+            if (type === 'rejected' && userData.status === 'revoked') {
+                return badges.revoked;
+            }
+            
             return badges[type] || '';
         }
 
@@ -631,12 +657,22 @@
                     `;
                     break;
                 case 'rejected':
-                    // For rejected users, use compound key since that's how they're stored
+                    // For rejected/revoked users, use compound key since that's how they're stored
                     const rejectedKey = compoundKey || accessCode;
-                    actions = `
-                        <button class="btn btn-primary btn-small" onclick="approveRejectedUser('${rejectedKey}')">Approve</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteUser('${rejectedKey}', 'rejected')">Delete</button>
-                    `;
+                    
+                    if (userData.status === 'revoked') {
+                        // Revoked users can be reactivated or deleted
+                        actions = `
+                            <button class="btn btn-success btn-small" onclick="reactivateUser('${rejectedKey}')">Reactivate</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteUser('${rejectedKey}', 'revoked')">Delete</button>
+                        `;
+                    } else {
+                        // Rejected users can be approved or deleted
+                        actions = `
+                            <button class="btn btn-primary btn-small" onclick="approveRejectedUser('${rejectedKey}')">Approve</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteUser('${rejectedKey}', 'rejected')">Delete</button>
+                        `;
+                    }
                     break;
             }
 
@@ -659,7 +695,7 @@
                 const snapshot = await get(pendingRef);
                 
                 if (!snapshot.exists()) {
-                    alert('Pending request not found');
+                    console.error('Pending request not found');
                     return;
                 }
                 
@@ -682,12 +718,11 @@
                 // Remove from pending
                 await set(pendingRef, null);
                 
-                alert(`✅ Approved access for ${userData.fullName}`);
+                console.log(`✅ Approved access for ${userData.fullName}`);
                 loadAllUsers();
                 
             } catch (error) {
                 console.error('Error approving user:', error);
-                alert('Error approving user: ' + error.message);
             }
         };
 
@@ -698,7 +733,7 @@
                 const snapshot = await get(pendingRef);
                 
                 if (!snapshot.exists()) {
-                    alert('Pending request not found');
+                    console.error('Pending request not found');
                     return;
                 }
                 
@@ -717,12 +752,11 @@
                 // Remove from pending
                 await set(pendingRef, null);
                 
-                alert(`❌ Rejected request from ${userData.fullName}`);
+                console.log(`❌ Rejected request from ${userData.fullName}`);
                 loadAllUsers();
                 
             } catch (error) {
                 console.error('Error rejecting user:', error);
-                alert('Error rejecting user: ' + error.message);
             }
         };
 
@@ -733,7 +767,7 @@
                 const snapshot = await get(rejectedRef);
                 
                 if (!snapshot.exists()) {
-                    alert('Rejected request not found');
+                    console.error('Rejected request not found');
                     return;
                 }
                 
@@ -758,12 +792,11 @@
                 // Remove from rejected
                 await set(rejectedRef, null);
                 
-                alert(`✅ Approved previously rejected request from ${userData.fullName}`);
+                console.log(`✅ Approved previously rejected request from ${userData.fullName}`);
                 loadAllUsers();
                 
             } catch (error) {
                 console.error('Error approving rejected user:', error);
-                alert('Error approving rejected user: ' + error.message);
             }
         };
 
@@ -777,7 +810,7 @@
                 const snapshot = await get(userRef);
                 
                 if (!snapshot.exists()) {
-                    alert('User not found');
+                    console.error('User not found');
                     return;
                 }
                 
@@ -793,12 +826,11 @@
                 
                 await set(userRef, revokedData);
                 
-                alert(`🚫 Revoked access for ${userData.fullName}`);
+                console.log(`🚫 Revoked access for ${userData.fullName}`);
                 loadAllUsers();
                 
             } catch (error) {
                 console.error('Error revoking user:', error);
-                alert('Error revoking user: ' + error.message);
             }
         };
 
@@ -819,12 +851,11 @@
                 
                 await set(userRef, null);
                 
-                alert('🗑️ User record deleted');
+                console.log('🗑️ User record deleted');
                 loadAllUsers();
                 
             } catch (error) {
                 console.error('Error deleting user:', error);
-                alert('Error deleting user: ' + error.message);
             }
         };
 
@@ -835,14 +866,14 @@
                 const snapshot = await get(userRef);
                 
                 if (!snapshot.exists()) {
-                    alert('User not found with that access code');
+                    console.error('User not found with that access code');
                     return;
                 }
                 
                 const userData = snapshot.val();
                 
                 if (userData.role === 'admin' || userData.permissions?.includes('admin')) {
-                    alert('User is already an admin');
+                    console.log('User is already an admin');
                     return;
                 }
                 
@@ -857,12 +888,11 @@
                 
                 await set(userRef, updatedData);
                 
-                alert(`✅ ${userData.fullName} has been promoted to admin!`);
+                console.log(`✅ ${userData.fullName} has been promoted to admin!`);
                 loadAllUsers();
                 
             } catch (error) {
                 console.error('Error promoting user:', error);
-                alert('Failed to promote user: ' + error.message);
             }
         };
 
@@ -877,14 +907,14 @@
                 const snapshot = await get(userRef);
                 
                 if (!snapshot.exists()) {
-                    alert('User not found with that access code');
+                    console.error('User not found with that access code');
                     return;
                 }
                 
                 const userData = snapshot.val();
                 
                 if (userData.role !== 'admin' && !userData.permissions?.includes('admin')) {
-                    alert('User is not an admin');
+                    console.log('User is not an admin');
                     return;
                 }
                 
@@ -900,12 +930,11 @@
                 
                 await set(userRef, updatedData);
                 
-                alert(`⬇️ ${userData.fullName} has been demoted to regular user`);
+                console.log(`⬇️ ${userData.fullName} has been demoted to regular user`);
                 loadAllUsers();
                 
             } catch (error) {
                 console.error('Error demoting user:', error);
-                showMessage('Failed to demote user', 'error', 'promoteMessage');
             }
         };
 
@@ -914,7 +943,7 @@
             // Check authentication first
             if (!window.rhythmAuth?.isInitialized) {
                 console.error('❌ [User Management] Unified auth failed to initialize');
-                alert('Authentication system failed to initialize. Please refresh the page.');
+                console.error('Authentication system failed to initialize. Please refresh the page.');
                 window.location.href = '../../login.html';
                 return;
             }
@@ -938,7 +967,7 @@
                     permissions: user.permissions,
                     isAdmin: user.isAdmin
                 });
-                alert(`Hi ${user.fullName}, you don't have admin permissions to access user management.`);
+                console.log(`Hi ${user.fullName}, you don't have admin permissions to access user management.`);
                 window.location.href = '../songlist.html';
                 return;
             }

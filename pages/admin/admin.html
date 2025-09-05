@@ -312,9 +312,6 @@
         console.log('✅ Admin access granted for:', user.fullName);
         showAdminDashboard(user);
         
-        // Check install status and show PWA install option if needed
-        checkInstallStatus();
-        
       } catch (error) {
         console.error('❌ Authentication error:', error);
         showAccessDenied('Authentication error occurred.');
