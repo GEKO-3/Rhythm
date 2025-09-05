@@ -4,7 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rhythm Boduberu - Login</title>
-    <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
+    <meta name="description" content="Access Rhythm Boduberu song collection and admin panel. Traditional Maldivian Boduberu music group.">
+    <meta name="keywords" content="Rhythm Boduberu, Traditional Maldivian Music, Boduberu, Songs, Admin">
+    
+    <!-- SEO and social sharing -->
+    <meta property="og:title" content="Rhythm Boduberu - Login">
+    <meta property="og:description" content="Access Rhythm Boduberu song collection and admin panel">
+    <meta property="og:image" content="https://rhythmboduberu.com/assets/favicons/icons-512.png">
+    <meta property="og:url" content="https://rhythmboduberu.com/login.html">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://rhythmboduberu.com/login.html">
+    
+    <!-- Favicon and web app manifest -->
+    <link rel="icon" type="image/svg+xml" href="assets/favicons/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="assets/favicons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/icons-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/favicons/icons-512.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-touch-icon.png">
+    <link rel="manifest" href="assets/favicons/manifest.webmanifest">
+    
+    <!-- PWA meta tags -->
+    <meta name="theme-color" content="#f5d000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Rhythm Boduberu">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Rhythm Boduberu">
+    
     <style>
         :root {
           --primary-color: #f5d000;
@@ -219,6 +245,12 @@
 
     <script type="module">
         import RhythmUnifiedAuth from './js/rhythm-unified-auth.js';
+
+        // Disable PWA installation prompts
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            return false;
+        });
 
         // Wait for unified auth to initialize
         document.addEventListener('DOMContentLoaded', async function() {

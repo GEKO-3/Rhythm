@@ -2,7 +2,7 @@
   "name": "Rhythm Boduberu - Traditional Maldivian Music",
   "short_name": "Rhythm Boduberu",
   "description": "Traditional Maldivian Boduberu music group - Contact us for bookings and performances",
-  "start_url": "/",
+  "start_url": "/login.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

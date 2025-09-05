@@ -437,6 +437,13 @@
     <ul id="song-list"></ul>
   </div>
   <!-- Firebase and Core Scripts - NO CSV -->
+  <script>
+    // Disable PWA installation prompts
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        return false;
+    });
+  </script>
   <script type="module" src="../js/firebase-db.js"></script>
   <script>
     // Optimized Application Module using Shared Services

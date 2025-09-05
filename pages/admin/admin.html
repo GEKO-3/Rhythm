@@ -60,36 +60,6 @@
       }
     }
     
-    /* PWA install button */
-    .install-btn {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(245, 208, 0, 0.9);
-      color: #2b2b2b;
-      border: none;
-      border-radius: 25px;
-      padding: 10px 20px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      z-index: 200;
-      display: none;
-      font-family: 'Montserrat', Arial, sans-serif;
-      backdrop-filter: blur(10px);
-    }
-    
-    .install-btn:hover {
-      background: #f5d000;
-      transform: translateX(-50%) translateY(-2px);
-      box-shadow: 0 4px 12px rgba(245, 208, 0, 0.3);
-    }
-    
-    .install-btn.show {
-      display: block;
-    }
     .menu-container {
       background: rgba(43,43,43,0.7);
       width: 300px;
@@ -274,9 +244,6 @@
     </div>
   </div>
 
-  <!-- PWA Install Button -->
-  <button id="install-btn" class="install-btn">📱 Install Admin App</button>
-
   <h1 class="page-title">Admin</h1>
   <div class="menu-container">
     <button class="menu-btn" onclick="navigateToPage('../members.html')">Members</button>
@@ -292,58 +259,10 @@
     // Import Unified Auth System
     import './../../js/rhythm-unified-auth.js';
 
-    // PWA Installation Management
-    let deferredPrompt;
-    let isInstalled = false;
-
-    // Check if app is installed
-    function checkInstallStatus() {
-      // Check if running as installed PWA
-      if (window.matchMedia('(display-mode: standalone)').matches ||
-          window.matchMedia('(display-mode: window-controls-overlay)').matches ||
-          window.navigator.standalone === true) {
-        isInstalled = true;
-        document.getElementById('install-btn').style.display = 'none';
-        return true;
-      }
-      return false;
-    }
-
-    // PWA Install button handling
+    // Disable PWA installation prompts
     window.addEventListener('beforeinstallprompt', (e) => {
-      console.log('PWA install prompt available');
-      e.preventDefault();
-      deferredPrompt = e;
-      
-      // Only show install button if not already installed and user is authenticated
-      if (!isInstalled && window.rhythmAuth && window.rhythmAuth.isAuthenticated()) {
-        const installBtn = document.getElementById('install-btn');
-        installBtn.classList.add('show');
-      }
-    });
-
-    // Handle install button click
-    document.getElementById('install-btn').addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        
-        if (outcome === 'accepted') {
-          console.log('PWA installed successfully');
-          document.getElementById('install-btn').classList.remove('show');
-        } else {
-          console.log('PWA installation dismissed');
-        }
-        
-        deferredPrompt = null;
-      }
-    });
-
-    // Listen for app installation
-    window.addEventListener('appinstalled', (evt) => {
-      console.log('PWA was installed');
-      isInstalled = true;
-      document.getElementById('install-btn').classList.remove('show');
+        e.preventDefault();
+        return false;
     });
 
     // Initialize unified authentication check
