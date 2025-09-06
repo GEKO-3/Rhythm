@@ -690,6 +690,10 @@
         // New action functions for user management
         window.approveUser = async function(compoundKey) {
             try {
+                // Get current admin info
+                const authResult = await window.rhythmAuth.checkAuthentication();
+                const currentAdmin = authResult.user;
+                
                 // Move user from pending to approved users
                 const pendingRef = ref(database, `loginRequests/${compoundKey}`);
                 const snapshot = await get(pendingRef);
@@ -708,7 +712,7 @@
                     ...userData,
                     status: 'active',
                     approvedAt: Date.now(),
-                    approvedBy: 'developer',
+                    approvedBy: currentAdmin.fullName,
                     permissions: ['songlist', 'lyrics'],
                     role: 'user'
                 };
@@ -718,7 +722,7 @@
                 // Remove from pending
                 await set(pendingRef, null);
                 
-                console.log(`✅ Approved access for ${userData.fullName}`);
+                console.log(`✅ ${currentAdmin.fullName} approved access for ${userData.fullName}`);
                 loadAllUsers();
                 
             } catch (error) {
@@ -728,6 +732,10 @@
 
         window.rejectUser = async function(compoundKey) {
             try {
+                // Get current admin info
+                const authResult = await window.rhythmAuth.checkAuthentication();
+                const currentAdmin = authResult.user;
+                
                 // Move user from pending to rejected
                 const pendingRef = ref(database, `loginRequests/${compoundKey}`);
                 const snapshot = await get(pendingRef);
@@ -744,7 +752,7 @@
                 const rejectedData = {
                     ...userData,
                     rejectedAt: Date.now(),
-                    rejectedBy: 'developer'
+                    rejectedBy: currentAdmin.fullName
                 };
                 
                 await set(rejectedRef, rejectedData);
@@ -752,7 +760,7 @@
                 // Remove from pending
                 await set(pendingRef, null);
                 
-                console.log(`❌ Rejected request from ${userData.fullName}`);
+                console.log(`❌ ${currentAdmin.fullName} rejected request from ${userData.fullName}`);
                 loadAllUsers();
                 
             } catch (error) {
@@ -762,6 +770,10 @@
 
         window.approveRejectedUser = async function(compoundKey) {
             try {
+                // Get current admin info
+                const authResult = await window.rhythmAuth.checkAuthentication();
+                const currentAdmin = authResult.user;
+                
                 // Move user from rejected to approved users
                 const rejectedRef = ref(database, `rejectedLogins/${compoundKey}`);
                 const snapshot = await get(rejectedRef);
@@ -780,7 +792,7 @@
                     fullName: userData.fullName,
                     permissions: userData.permissions || ['songlist', 'lyrics'],
                     approvedAt: Date.now(),
-                    approvedBy: 'dev-admin',
+                    approvedBy: currentAdmin.fullName,
                     deviceId: userData.deviceId,
                     deviceInfo: userData.deviceInfo,
                     accessCode: accessCode,
@@ -792,7 +804,7 @@
                 // Remove from rejected
                 await set(rejectedRef, null);
                 
-                console.log(`✅ Approved previously rejected request from ${userData.fullName}`);
+                console.log(`✅ ${currentAdmin.fullName} approved previously rejected request from ${userData.fullName}`);
                 loadAllUsers();
                 
             } catch (error) {
@@ -806,6 +818,10 @@
             }
             
             try {
+                // Get current admin info
+                const authResult = await window.rhythmAuth.checkAuthentication();
+                const currentAdmin = authResult.user;
+                
                 const userRef = ref(database, `users/${accessCode}`);
                 const snapshot = await get(userRef);
                 
@@ -821,12 +837,12 @@
                     ...userData,
                     status: 'revoked',
                     revokedAt: Date.now(),
-                    revokedBy: 'developer'
+                    revokedBy: currentAdmin.fullName
                 };
                 
                 await set(userRef, revokedData);
                 
-                console.log(`🚫 Revoked access for ${userData.fullName}`);
+                console.log(`🚫 ${currentAdmin.fullName} revoked access for ${userData.fullName}`);
                 loadAllUsers();
                 
             } catch (error) {
@@ -862,6 +878,10 @@
         // Promote user to admin
         window.promoteUser = async function(accessCode) {
             try {
+                // Get current admin info
+                const authResult = await window.rhythmAuth.checkAuthentication();
+                const currentAdmin = authResult.user;
+                
                 const userRef = ref(database, `users/${accessCode}`);
                 const snapshot = await get(userRef);
                 
@@ -883,12 +903,12 @@
                     role: 'admin',
                     permissions: [...(userData.permissions || ['songlist', 'lyrics']), 'admin'],
                     promotedAt: Date.now(),
-                    promotedBy: 'dev-admin'
+                    promotedBy: currentAdmin.fullName
                 };
                 
                 await set(userRef, updatedData);
                 
-                console.log(`✅ ${userData.fullName} has been promoted to admin!`);
+                console.log(`✅ ${currentAdmin.fullName} promoted ${userData.fullName} to admin!`);
                 loadAllUsers();
                 
             } catch (error) {
@@ -903,6 +923,10 @@
             }
             
             try {
+                // Get current admin info
+                const authResult = await window.rhythmAuth.checkAuthentication();
+                const currentAdmin = authResult.user;
+                
                 const userRef = ref(database, `users/${accessCode}`);
                 const snapshot = await get(userRef);
                 
@@ -925,12 +949,12 @@
                     role: 'user',
                     permissions: updatedPermissions,
                     demotedAt: Date.now(),
-                    demotedBy: 'dev-admin'
+                    demotedBy: currentAdmin.fullName
                 };
                 
                 await set(userRef, updatedData);
                 
-                console.log(`⬇️ ${userData.fullName} has been demoted to regular user`);
+                console.log(`⬇️ ${currentAdmin.fullName} demoted ${userData.fullName} to regular user`);
                 loadAllUsers();
                 
             } catch (error) {
