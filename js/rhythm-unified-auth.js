@@ -56,12 +56,22 @@ class RhythmUnifiedAuth {
         console.log('🔍 [UnifiedAuth] Checking authentication...');
         
         try {
+            // Check if we're in offline mode first
+            const isOfflineMode = window.rhythmOffline?.shouldUseOfflineMode() || false;
+            console.log(`📡 [UnifiedAuth] Network mode: ${isOfflineMode ? 'OFFLINE' : 'ONLINE'}`);
+            
             // Get stored auth data
             const storedAuth = localStorage.getItem('rhythmAuth_approval');
             if (!storedAuth) {
                 console.log('❌ [UnifiedAuth] No stored auth data');
                 
-                // Try automatic login with stored device credentials
+                // In offline mode, can't authenticate without cached data
+                if (isOfflineMode) {
+                    console.log('📴 [UnifiedAuth] Offline mode: Cannot authenticate without cached data');
+                    return { isAuthenticated: false, user: null, reason: 'no_cached_auth_offline' };
+                }
+                
+                // Try automatic login with stored device credentials (online only)
                 const storedCredentials = this.getStoredCredentials();
                 if (storedCredentials) {
                     console.log('🔄 [UnifiedAuth] Attempting automatic login with stored credentials...');
@@ -101,54 +111,95 @@ class RhythmUnifiedAuth {
             const userData = JSON.parse(storedAuth);
             console.log('📦 [UnifiedAuth] Found stored auth for:', userData.fullName || userData.accessCode);
 
-            // If we have access code, verify with database
-            if (userData.accessCode && this.database) {
-                const dbUser = await this.getUser(userData.accessCode);
-                if (!dbUser) {
-                    console.log('❌ [UnifiedAuth] User not found in database');
-                    localStorage.removeItem('rhythmAuth_approval');
-                    return { isAuthenticated: false, user: null, reason: 'user_not_found' };
-                }
-
-                // Check if user is revoked
-                if (dbUser.status === 'revoked') {
-                    console.log('❌ [UnifiedAuth] User access revoked');
-                    localStorage.removeItem('rhythmAuth_approval');
-                    return { isAuthenticated: false, user: null, reason: 'access_revoked' };
-                }
-
-                // Check device match - STRICT enforcement for all users
-                const currentDeviceId = this.generateDeviceId();
-                console.log('🔍 [Device Debug] Current device ID:', currentDeviceId);
-                console.log('🔍 [Device Debug] DB user device ID:', dbUser.deviceId);
-                
-                const isDeviceMismatch = dbUser.deviceId && currentDeviceId !== dbUser.deviceId;
-                
-                if (isDeviceMismatch) {
-                    console.log('❌ [UnifiedAuth] Device mismatch detected');
-                    console.log('   Database device ID:', dbUser.deviceId);
-                    console.log('   Current device ID:', currentDeviceId);
-                    console.log('   User:', dbUser.fullName || dbUser.name);
-                    localStorage.removeItem('rhythmAuth_approval');
-                    return { isAuthenticated: false, user: null, reason: 'device_mismatch' };
-                }
-
-                // Update stored data with latest from database
-                const updatedUser = this.normalizeUserData(dbUser);
-                localStorage.setItem('rhythmAuth_approval', JSON.stringify(updatedUser));
-                this.currentUser = updatedUser;
-                
-                // Store device credentials for future use
-                this.storeDeviceCredentials(
-                    dbUser.fullName || dbUser.name || 'User', 
-                    userData.accessCode
-                );
-            } else {
-                // No database connection or access code, use stored data
-                this.currentUser = this.normalizeUserData(userData);
+            // Basic device check
+            const currentDeviceId = this.generateDeviceId();
+            if (userData.deviceId && userData.deviceId !== currentDeviceId) {
+                console.log('❌ [UnifiedAuth] Device ID mismatch in cached data');
+                return { isAuthenticated: false, user: null, reason: 'device_mismatch' };
             }
 
-            console.log('✅ [UnifiedAuth] Authentication successful');
+            // OFFLINE MODE: Use cached authentication without database verification
+            if (isOfflineMode) {
+                console.log('📴 [UnifiedAuth] OFFLINE MODE: Using cached authentication');
+                this.currentUser = this.normalizeUserData(userData);
+                this.currentUser.isOfflineAccess = true;
+                
+                console.log('✅ [UnifiedAuth] Authentication successful (OFFLINE MODE)');
+                return { 
+                    isAuthenticated: true, 
+                    user: this.currentUser, 
+                    reason: 'cached_auth_offline',
+                    isOffline: true 
+                };
+            }
+
+            // ONLINE MODE: Verify with database
+            console.log('🌐 [UnifiedAuth] ONLINE MODE: Verifying with database...');
+            
+            try {
+                // If we have access code, verify with database
+                if (userData.accessCode && this.database) {
+                    const dbUser = await this.getUser(userData.accessCode);
+                    if (!dbUser) {
+                        console.log('❌ [UnifiedAuth] User not found in database');
+                        localStorage.removeItem('rhythmAuth_approval');
+                        return { isAuthenticated: false, user: null, reason: 'user_not_found' };
+                    }
+
+                    // Check if user is revoked
+                    if (dbUser.status === 'revoked') {
+                        console.log('❌ [UnifiedAuth] User access revoked');
+                        localStorage.removeItem('rhythmAuth_approval');
+                        return { isAuthenticated: false, user: null, reason: 'access_revoked' };
+                    }
+
+                    // Check device match - STRICT enforcement for all users
+                    console.log('🔍 [Device Debug] Current device ID:', currentDeviceId);
+                    console.log('🔍 [Device Debug] DB user device ID:', dbUser.deviceId);
+                    
+                    const isDeviceMismatch = dbUser.deviceId && currentDeviceId !== dbUser.deviceId;
+                    
+                    if (isDeviceMismatch) {
+                        console.log('❌ [UnifiedAuth] Device mismatch detected');
+                        console.log('   Database device ID:', dbUser.deviceId);
+                        console.log('   Current device ID:', currentDeviceId);
+                        console.log('   User:', dbUser.fullName || dbUser.name);
+                        localStorage.removeItem('rhythmAuth_approval');
+                        return { isAuthenticated: false, user: null, reason: 'device_mismatch' };
+                    }
+
+                    // Update stored data with latest from database for future offline use
+                    const updatedUser = this.normalizeUserData(dbUser);
+                    localStorage.setItem('rhythmAuth_approval', JSON.stringify(updatedUser));
+                    this.currentUser = updatedUser;
+                    
+                    // Store device credentials for future use
+                    this.storeDeviceCredentials(
+                        dbUser.fullName || dbUser.name || 'User', 
+                        userData.accessCode
+                    );
+                } else {
+                    // No database connection or access code, use stored data
+                    this.currentUser = this.normalizeUserData(userData);
+                }
+                
+            } catch (networkError) {
+                console.warn('⚠️ [UnifiedAuth] Network error during verification, using cached data:', networkError.message);
+                
+                // Network failed, but we have cached data - use it
+                this.currentUser = this.normalizeUserData(userData);
+                this.currentUser.isOfflineAccess = true;
+                
+                console.log('✅ [UnifiedAuth] Authentication successful (network fallback to cache)');
+                return { 
+                    isAuthenticated: true, 
+                    user: this.currentUser, 
+                    reason: 'cached_auth_network_fallback',
+                    isOffline: true 
+                };
+            }
+
+            console.log('✅ [UnifiedAuth] Authentication successful (ONLINE MODE)');
             
             // Start preloading songlist data in background for PWA users
             const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
@@ -162,7 +213,12 @@ class RhythmUnifiedAuth {
                 });
             }
             
-            return { isAuthenticated: true, user: this.currentUser, reason: 'authenticated' };
+            return { 
+                isAuthenticated: true, 
+                user: this.currentUser, 
+                reason: 'authenticated',
+                isOffline: false 
+            };
 
         } catch (error) {
             console.error('❌ [UnifiedAuth] Authentication check failed:', error);
@@ -895,6 +951,17 @@ class RhythmUnifiedAuth {
         const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
                      window.navigator.standalone === true ||
                      document.referrer.includes('android-app://');
+
+        // Check if in offline mode
+        const isOfflineMode = this.currentUser?.isOfflineAccess || 
+                             window.rhythmOffline?.shouldUseOfflineMode() || 
+                             false;
+
+        if (isOfflineMode) {
+            console.log('📴 [UnifiedAuth] Offline mode detected - redirecting directly to songlist');
+            window.location.href = 'pages/songlist.html';
+            return;
+        }
 
         if (this.isAdmin()) {
             // Check user preference for admin destination

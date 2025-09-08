@@ -252,6 +252,7 @@
 
     <script type="module">
         import RhythmUnifiedAuth from './js/rhythm-unified-auth.js';
+        import RhythmOfflineManager from './js/rhythm-offline-manager.js';
 
         // Disable PWA installation prompts
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -277,6 +278,13 @@
                 }
             }
             
+            // Wait for offline manager to initialize first (if available)
+            let offlineAttempts = 0;
+            while (!window.rhythmOffline && offlineAttempts < 20) {
+                await new Promise(resolve => setTimeout(resolve, 50));
+                offlineAttempts++;
+            }
+            
             // Wait for auth system to initialize
             let attempts = 0;
             while (!window.rhythmAuth?.isInitialized && attempts < 50) {
@@ -290,16 +298,27 @@
                 return;
             }
             
+            // Check network status for offline handling
+            const isOfflineMode = window.rhythmOffline?.shouldUseOfflineMode() || false;
+            if (isOfflineMode) {
+                console.log('📴 [Login] Offline mode detected - checking cached authentication');
+            }
+            
             // Check if user is already authenticated
             const authResult = await window.rhythmAuth.checkAuthentication();
             if (authResult.isAuthenticated) {
-                console.log('User already authenticated, checking redirect preference...');
+                console.log('✅ [Login] User already authenticated, checking redirect preference...');
+                
+                if (authResult.isOffline) {
+                    console.log('📴 [Login] Offline authentication - redirecting directly to songlist');
+                    showMessage('Offline mode - Using cached access', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'pages/songlist.html';
+                    }, 1000);
+                    return;
+                }
                 
                 // Check if this is PWA mode or user preference for silent redirect
-                const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                             window.navigator.standalone === true ||
-                             document.referrer.includes('android-app://');
-                
                 if (isPWA) {
                     // For PWA users, start preloading immediately
                     console.log('🚀 PWA mode - starting background data preload...');

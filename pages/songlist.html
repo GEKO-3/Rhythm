@@ -1376,6 +1376,13 @@
           try {
             console.log('🔄 loadData started');
             
+            // Wait for offline manager to initialize first
+            let offlineAttempts = 0;
+            while (!window.rhythmOfflineManager?.isInitialized && offlineAttempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                offlineAttempts++;
+            }
+            
             // Wait for unified auth to initialize
             let attempts = 0;
             while (!window.rhythmAuth?.isInitialized && attempts < 50) {
