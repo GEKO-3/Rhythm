@@ -36,6 +36,9 @@
   <!-- Unified Authentication System -->
   <script type="module" src="../js/rhythm-unified-auth.js"></script>
   
+  <!-- Offline Support -->
+  <script type="module" src="../js/rhythm-offline-manager.js"></script>
+  
   <!-- 🚀 PERFORMANCE: Preload critical resources -->
   <link rel="preload" href="../assets/Fonts/Faruma.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="../assets/Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
@@ -491,8 +494,8 @@
     }
   </style>
   
-  <!-- Firebase Database Integration -->
-  <script type="module" src="../js/firebase-db.js"></script>
+  <!-- Firebase Database Integration with Offline Support -->
+  <script type="module" src="../js/firebase-db-offline.js"></script>
   
   <script>
     // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
@@ -526,8 +529,18 @@
       e.preventDefault();
     });
 
-    // Service Worker functionality removed - will be added later
-    // Offline/online status tracking removed for now
+    // Register service worker for offline support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../js/sw.js')
+          .then((registration) => {
+            console.log('✅ [ServiceWorker] Registered successfully:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('❌ [ServiceWorker] Registration failed:', error);
+          });
+      });
+    }
     
   </script>
 </head>
@@ -630,6 +643,32 @@
       `;
     }
     
+    function showOfflineNotice(networkQuality) {
+      console.log(`📱 [Lyrics] Showing offline notice for ${networkQuality} connection`);
+      
+      // Update existing offline indicator or create one
+      let indicator = document.getElementById('offline-indicator');
+      if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = 'offline-indicator';
+        indicator.className = 'offline-indicator';
+        document.body.appendChild(indicator);
+      }
+      
+      const messages = {
+        'offline': '📴 Offline - Using cached lyrics',
+        'poor': '🐌 Slow connection - Using cached lyrics'
+      };
+      
+      indicator.textContent = messages[networkQuality] || messages['offline'];
+      indicator.classList.add('show');
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        indicator.classList.remove('show');
+      }, 5000);
+    }
+    
     async function loadSongsData() {
       try {
         // Get the selected song ID from localStorage
@@ -638,7 +677,7 @@
           throw new Error('No song selected');
         }
 
-        console.log(`🎵 Loading specific song: ${selectedSongId}`);
+        console.log(`🎵 [Lyrics] Loading specific song: ${selectedSongId}`);
 
         // 🚀 SPEED OPTIMIZATION: Check for prefetched data first
         const prefetchedDataStr = localStorage.getItem('prefetchedSongData');
@@ -653,28 +692,48 @@
             
             if (isDataFresh && isCorrectSong) {
               songData = prefetchedData.data;
-              console.log('🚀 Using prefetched song data - INSTANT LOAD!');
+              console.log('🚀 [Lyrics] Using prefetched song data - INSTANT LOAD!');
               // Clean up prefetched data
               localStorage.removeItem('prefetchedSongData');
             }
           } catch (e) {
-            console.log('⚠️ Invalid prefetched data, will load from Firebase');
+            console.log('⚠️ [Lyrics] Invalid prefetched data, will load from database');
             localStorage.removeItem('prefetchedSongData');
           }
         }
 
-        // If no valid prefetched data, load from Firebase
+        // If no valid prefetched data, load from database with offline support
         if (!songData) {
-          console.log('📡 Loading song from Firebase...');
-          // Import and initialize Firebase database
-          const module = await import(`../js/firebase-db.js?t=${Date.now()}`);
-          const firebaseDB = new module.RhythmFirebaseDB();
+          console.log('📡 [Lyrics] Loading song from database with offline support...');
           
-          // Make it globally available
-          window.rhythmDB = firebaseDB;
+          // Use offline-enhanced Firebase database
+          if (!window.rhythmDB) {
+            // Import and initialize offline-enhanced Firebase database
+            const module = await import(`../js/firebase-db-offline.js?t=${Date.now()}`);
+            window.rhythmDB = new module.RhythmFirebaseDBOffline();
+          }
 
-          // Load the selected song from Firebase
-          songData = await firebaseDB.getSong(selectedSongId);
+          try {
+            // Load the selected song with offline support
+            songData = await window.rhythmDB.getSong(selectedSongId);
+            console.log(`🎵 [Lyrics] Loaded song from database: ${songData?.title || selectedSongId}`);
+          } catch (error) {
+            console.error(`❌ [Lyrics] Failed to load song ${selectedSongId}:`, error);
+            
+            // Show helpful error message based on offline status
+            if (window.rhythmOffline) {
+              const isOffline = window.rhythmOffline.shouldUseOfflineMode();
+              const hasCache = window.rhythmOffline.isOfflineReady();
+              
+              if (isOffline && !hasCache) {
+                throw new Error('Song not available offline. Please connect to the internet to load lyrics.');
+              } else if (isOffline) {
+                throw new Error('This song is not cached for offline use. Please connect to the internet to load it.');
+              }
+            }
+            
+            throw error;
+          }
         }
         
         if (songData) {
@@ -683,10 +742,20 @@
             id: selectedSongId,
             ...songData
           }];
-          console.log(`🎵 Loaded song: ${songData.title || 'Unknown Title'}`);
+          console.log(`✅ [Lyrics] Song ready for display: ${songData.title || 'Unknown Title'}`);
+          
+          // Show network status if using offline data
+          if (window.rhythmOffline) {
+            const networkQuality = window.rhythmOffline.getNetworkQuality();
+            if (networkQuality === 'offline' || networkQuality === 'poor') {
+              showOfflineNotice(networkQuality);
+            }
+          }
+          
         } else {
-          console.warn('Selected song not found in Firebase');
+          console.warn('❌ [Lyrics] Selected song not found');
           window.songs = [];
+          throw new Error('Song not found');
         }
 
         // We don't need showlist for lyrics display
@@ -700,10 +769,15 @@
         // Initialize lyrics display
         initializeLyrics();
         
+        // Show the page once everything is loaded
+        document.body.classList.add('loaded');
+        
       } catch (error) {
         console.error('Failed to load song data from Firebase:', error);
         // Show error message to user
         showSongNotFoundError(error.message);
+        // Still show the page even if there's an error
+        document.body.classList.add('loaded');
       }
     }
 

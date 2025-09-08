@@ -8,6 +8,31 @@
   <!-- Unified Authentication System -->
   <script type="module" src="../js/rhythm-unified-auth.js"></script>
   
+  <!-- Offline Support -->
+  <script type="module" src="../js/rhythm-offline-manager.js"></script>
+  
+  <style>
+    /* Critical CSS - loads immediately to prevent white flash */
+    html, body {
+      background-color: #1f1f1f !important;
+      color: #f5d000 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    
+    /* Hide content until fully styled */
+    body {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    body.loaded {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+  
   <!-- Preload critical fonts -->
   <link rel="preload" href="../assets/Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
   
@@ -429,22 +454,37 @@
             <img src="../src/Filter.png" alt="Filter" style="width: 20px; height: 20px;">
           </button>
           <div class="filter-content" id="filter-content">
-            <!-- Content will be generated dynamically -->
+            <!-- Content will be generated dynamically including offline options -->
           </div>
         </div>
       </div>
     </div>
     <ul id="song-list"></ul>
   </div>
-  <!-- Firebase and Core Scripts - NO CSV -->
+  <!-- Firebase and Core Scripts - Enhanced with Offline Support -->
   <script>
     // Disable PWA installation prompts
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         return false;
     });
+    
+    // Register service worker for offline support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../js/sw.js')
+          .then((registration) => {
+            console.log('✅ [ServiceWorker] Registered successfully:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('❌ [ServiceWorker] Registration failed:', error);
+          });
+      });
+    }
   </script>
-  <script type="module" src="../js/firebase-db.js"></script>
+  
+  <!-- Enhanced Firebase DB with offline support -->
+  <script type="module" src="../js/firebase-db-offline.js"></script>
   <script>
     // Optimized Application Module using Shared Services
     const RhythmSongList = (function() {
@@ -818,6 +858,8 @@
 
         async getSongsFromFirebase() {
           try {
+            console.log('🎵 [SongList] Getting songs with offline support...');
+            
             // Check if we have preloaded data from PWA startup
             const preloadedData = window.rhythmAuth?.getPreloadedSonglistData();
             if (preloadedData && preloadedData.songs) {
@@ -825,14 +867,28 @@
               return preloadedData.songs;
             }
             
-            // Firebase should already be initialized by app startup
-            if (!this.rhythmDB) {
-              console.warn('Firebase not ready, something went wrong with initialization');
-              return [];
+            // Use offline-enhanced Firebase DB
+            if (!window.rhythmDB) {
+              console.warn('⚠️ [SongList] Enhanced Firebase DB not ready, falling back to basic version');
+              if (!this.rhythmDB) {
+                console.error('❌ [SongList] No Firebase DB available');
+                return [];
+              }
+            } else {
+              this.rhythmDB = window.rhythmDB;
             }
             
-            // Get song names only - super fast
+            // Get song metadata with offline support
+            console.log('📡 [SongList] Fetching songs metadata...');
             const songsMetadata = await this.rhythmDB.getSongsMetadata();
+            console.log(`✅ [SongList] Got ${songsMetadata.length} songs metadata`);
+            
+            // Check offline status and show appropriate message
+            const offlineStatus = this.rhythmDB.getOfflineStatus();
+            if (offlineStatus.networkQuality === 'offline' || offlineStatus.networkQuality === 'poor') {
+              this.showNetworkNotice(offlineStatus);
+            }
+            
             const songs = [];
             
             // Convert to song list format
@@ -841,17 +897,61 @@
                 id: song.id,
                 timestamp: Date.now(), // Default timestamp
                 name: song.name,
-                genre: song.genre,
+                genre: song.genre || 'General',
+                hasLyrics: song.hasLyrics || false,
                 lyrics: 'loaded_on_demand' // Will load when needed
               });
             });
             
-
+            console.log(`🎵 [SongList] Processed ${songs.length} songs for display`);
             return songs;
             
           } catch (error) {
-            console.error('Error loading from Firebase:', error);
+            console.error('❌ [SongList] Error loading songs:', error);
+            
+            // Try to show a helpful error message
+            this.showOfflineError(error);
+            
             return []; // Fallback to empty array
+          }
+        },
+
+        showNetworkNotice(offlineStatus) {
+          const statusText = offlineStatus.networkQuality === 'offline' ? 
+            'offline' : 'experiencing connection issues';
+          
+          console.log(`📱 [SongList] App is ${statusText}, using cached data`);
+          
+          // Show a temporary notice to user
+          if (window.rhythmOffline) {
+            window.rhythmOffline.showNetworkStatus(offlineStatus.networkQuality);
+          }
+        },
+
+        showOfflineError(error) {
+          console.error('📴 [SongList] Network error, checking for offline data...', error);
+          
+          // Check if we have any cached data
+          if (window.rhythmOffline && window.rhythmOffline.isOfflineReady()) {
+            console.log('📖 [SongList] Offline data available, will retry with cached data');
+            if (window.rhythmOffline) {
+              window.rhythmOffline.showNetworkStatus('offline');
+            }
+          } else {
+            console.error('❌ [SongList] No offline data available');
+            this.showNoDataMessage();
+          }
+        },
+
+        showNoDataMessage() {
+          const songListElement = document.getElementById('song-list');
+          if (songListElement) {
+            songListElement.innerHTML = `
+              <li style="text-align: center; padding: 20px; color: #ff6b6b;">
+                📴 No internet connection and no offline data available.<br>
+                Please connect to the internet to load songs.
+              </li>
+            `;
           }
         },
         async loadSongsData() {
@@ -1029,6 +1129,14 @@
             .forEach(genre => {
               dropdownContent += `<a data-filter="${genre}" ${STATE.currentGenreFilter === genre ? 'class="active"' : ''}>${genre} (${genreCounts[genre]})</a>`;
             });
+          
+          // Add separator and offline management options
+          dropdownContent += `
+            <div style="border-top: 1px solid #555; margin: 8px 0;"></div>
+            <a href="#" onclick="App.showOfflineStatus(event)">📱 Offline Status</a>
+            <a href="#" onclick="App.refreshCache(event)">🔄 Refresh Cache</a>
+            <a href="#" onclick="App.preloadForOffline(event)">📥 Download for Offline</a>
+          `;
           
           ELEMENTS.filterContent.innerHTML = dropdownContent;
           
@@ -1460,6 +1568,135 @@
 
         setFilter(genre) {
           UI.setFilter(genre);
+        },
+
+        // === OFFLINE MANAGEMENT FUNCTIONS ===
+
+        showOfflineStatus(event) {
+          if (event) event.preventDefault();
+          ELEMENTS.filterContent.classList.remove('show');
+          
+          if (!window.rhythmDB) {
+            alert('❌ Offline manager not available');
+            return;
+          }
+          
+          const status = window.rhythmDB.getOfflineStatus();
+          const networkEmoji = {
+            'good': '🌐',
+            'poor': '🐌', 
+            'offline': '📴'
+          };
+          
+          const networkText = {
+            'good': 'Good connection',
+            'poor': 'Poor connection',
+            'offline': 'Offline'
+          };
+          
+          let message = `${networkEmoji[status.networkQuality]} Network: ${networkText[status.networkQuality]}\n`;
+          message += `📱 Offline Ready: ${status.ready ? 'Yes' : 'No'}\n\n`;
+          
+          if (status.lastSync) {
+            message += `🕒 Last Sync: ${status.lastSync.toLocaleString()}\n\n`;
+          }
+          
+          message += `📦 Cache Info:\n`;
+          Object.entries(status.cacheInfo).forEach(([name, info]) => {
+            if (typeof info === 'object') {
+              message += `  ${name}: ${info.size} (${info.age})\n`;
+            } else {
+              message += `  ${name}: ${info}\n`;
+            }
+          });
+          
+          alert(message);
+        },
+
+        async refreshCache(event) {
+          if (event) event.preventDefault();
+          ELEMENTS.filterContent.classList.remove('show');
+          
+          if (!window.rhythmDB) {
+            alert('❌ Offline manager not available');
+            return;
+          }
+          
+          try {
+            // Show loading state
+            const originalText = event?.target?.textContent || '🔄 Refresh Cache';
+            if (event?.target) {
+              event.target.textContent = '⏳ Refreshing...';
+              event.target.style.opacity = '0.6';
+            }
+            
+            console.log('🔄 [Manual] Refreshing offline cache...');
+            await window.rhythmDB.refreshOfflineCache();
+            
+            // Reload the current data
+            await DataManager.loadSongsData();
+            
+            alert('✅ Cache refreshed successfully!');
+            console.log('✅ [Manual] Cache refresh complete');
+            
+          } catch (error) {
+            console.error('❌ [Manual] Cache refresh failed:', error);
+            alert(`❌ Failed to refresh cache: ${error.message}`);
+          } finally {
+            // Restore button state
+            if (event?.target) {
+              event.target.textContent = originalText;
+              event.target.style.opacity = '1';
+            }
+          }
+        },
+
+        async preloadForOffline(event) {
+          if (event) event.preventDefault();
+          ELEMENTS.filterContent.classList.remove('show');
+          
+          if (!window.rhythmDB) {
+            alert('❌ Offline manager not available');
+            return;
+          }
+          
+          const confirmed = confirm(
+            '📥 Download all songs for offline use?\n\n' +
+            'This will download all songs and lyrics to your device. ' +
+            'This may take a few moments and use some storage space.\n\n' +
+            'Continue?'
+          );
+          
+          if (!confirmed) return;
+          
+          try {
+            // Show loading state
+            const originalText = event?.target?.textContent || '📥 Download for Offline';
+            if (event?.target) {
+              event.target.textContent = '📥 Downloading...';
+              event.target.style.opacity = '0.6';
+            }
+            
+            console.log('📥 [Manual] Starting offline preload...');
+            const success = await window.rhythmDB.preloadForOffline();
+            
+            if (success) {
+              alert('✅ All songs downloaded for offline use!');
+              console.log('✅ [Manual] Offline preload complete');
+            } else {
+              throw new Error('Preload failed');
+            }
+            
+          } catch (error) {
+            console.error('❌ [Manual] Offline preload failed:', error);
+            alert(`❌ Failed to download songs: ${error.message}`);
+          } finally {
+            // Restore button state
+            if (event?.target) {
+              event.target.textContent = originalText;
+              event.target.style.opacity = '1';
+            }
+          }
         }
       };
 
@@ -1475,6 +1712,9 @@
 
       // Initialize the application
       App.init();
+
+      // Show the page once everything is loaded
+      document.body.classList.add('loaded');
 
       return App;
     })();
