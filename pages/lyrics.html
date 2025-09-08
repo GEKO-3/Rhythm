@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="dv" style="background-color: #1f1f1f !important;">
 <head>
   <meta charset="UTF-8">
@@ -586,18 +586,12 @@
     async function initializeUnifiedAuth() {
       try {
         console.log('🔍 [Lyrics] Starting unified authentication...');
-        
-        // Wait for offline manager to initialize first
-        let offlineAttempts = 0;
-        while (!window.rhythmOffline?.isInitialized && offlineAttempts < 30) { // Reduced timeout
-            await new Promise(resolve => setTimeout(resolve, 50)); // Faster polling
-            offlineAttempts++;
-        }
+        const authStartTime = Date.now();
         
         // Wait for unified auth to initialize
         let attempts = 0;
         while (!window.rhythmAuth?.isInitialized && attempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise(resolve => setTimeout(resolve, 50)); // Faster polling
             attempts++;
         }
         
@@ -607,8 +601,12 @@
             return;
         }
         
+        console.log(`⚡ [Lyrics] Auth init took ${Date.now() - authStartTime}ms`);
+        
         // Use unified authentication check
+        const authCheckStart = Date.now();
         const authResult = await window.rhythmAuth.checkAuthentication();
+        console.log(`⚡ [Lyrics] Auth check took ${Date.now() - authCheckStart}ms`);
         
         if (!authResult.isAuthenticated) {
             console.log('❌ [Lyrics] User not authenticated:', authResult.reason);
@@ -632,7 +630,9 @@
         console.log('✅ [Lyrics] Authentication successful for:', user.fullName);
         
         // Authentication successful - load the lyrics page
+        const dataLoadStart = Date.now();
         await loadSongsData();
+        console.log(`⚡ [Lyrics] Data loading took ${Date.now() - dataLoadStart}ms`);
         
       } catch (error) {
         console.error('❌ [Lyrics] Authentication failed:', error);
@@ -715,9 +715,14 @@
           
           // Use local database enhanced Firebase wrapper
           if (!window.rhythmDB) {
-            // Import and initialize local database enhanced Firebase wrapper
-            const module = await import(`../js/firebase-db-offline.js?t=${Date.now()}`);
-            window.rhythmDB = new module.RhythmFirebaseDBOffline();
+            // Try to use already loaded module first
+            if (window.RhythmFirebaseDBOffline) {
+              window.rhythmDB = new window.RhythmFirebaseDBOffline();
+            } else {
+              // Fallback to dynamic import only if needed
+              const module = await import(`../js/firebase-db-offline.js?t=${Date.now()}`);
+              window.rhythmDB = new module.RhythmFirebaseDBOffline();
+            }
           }
 
           try {

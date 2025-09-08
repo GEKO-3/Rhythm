@@ -838,14 +838,14 @@
         initPromise: null,
 
         async initializeFirebase() {
-          // Return existing promise if already initializing
-          if (this.initPromise) {
-            return await this.initPromise;
-          }
-
           // Return true if already initialized (silently)
           if (this.rhythmDB) {
             return true;
+          }
+
+          // Return existing promise if already initializing
+          if (this.initPromise) {
+            return await this.initPromise;
           }
 
           // Create initialization promise
@@ -857,7 +857,14 @@
 
         async _doInitialize() {
           try {
+            // Try to use already loaded module first
+            if (window.RhythmFirebaseDBOffline) {
+              this.rhythmDB = new window.RhythmFirebaseDBOffline();
+              window.rhythmDB = this.rhythmDB;
+              return true;
+            }
 
+            // Fallback to dynamic import only if needed
             const module = await import(`../js/firebase-db-offline.js?t=${Date.now()}`);
             this.rhythmDB = new module.RhythmFirebaseDBOffline();
             // Make Firebase globally available for compatibility
@@ -1097,6 +1104,11 @@
         init() {
           this.cacheElements();
           this.setupEventListeners();
+          
+          // Add debouncing for performance
+          this.renderDebounceTimeout = null;
+          this.lastRenderTime = 0;
+          this.minRenderInterval = 100; // Minimum 100ms between renders
         },
 
         cacheElements() {
@@ -1148,6 +1160,12 @@
         initializeSongList() {
           console.log('🎨 initializeSongList started');
           
+          // Prevent multiple initializations
+          if (this.isInitialized) {
+            console.log('🎨 Song list already initialized, skipping...');
+            return;
+          }
+          
           // Restore saved filter state
           const savedFilter = localStorage.getItem('songListFilter');
           if (savedFilter) {
@@ -1183,6 +1201,9 @@
               sessionStorage.removeItem('returnToSongId');
             }, 500); // Wait for rendering to complete
           }
+          
+          // Mark as initialized
+          this.isInitialized = true;
         },
 
         updateFilterDropdown() {
@@ -1249,7 +1270,31 @@
           });
         },
 
+        // Debounced render to prevent excessive re-rendering
         renderList(searchFilter = '', genreFilter = 'all') {
+          // Clear any pending render
+          if (this.renderDebounceTimeout) {
+            clearTimeout(this.renderDebounceTimeout);
+          }
+          
+          // Check if we should delay this render
+          const now = Date.now();
+          const timeSinceLastRender = now - this.lastRenderTime;
+          
+          if (timeSinceLastRender < this.minRenderInterval) {
+            // Delay the render
+            this.renderDebounceTimeout = setTimeout(() => {
+              this.performRender(searchFilter, genreFilter);
+            }, this.minRenderInterval - timeSinceLastRender);
+          } else {
+            // Render immediately
+            this.performRender(searchFilter, genreFilter);
+          }
+        },
+
+        performRender(searchFilter = '', genreFilter = 'all') {
+          this.lastRenderTime = Date.now();
+          
           if (!STATE.songs || STATE.songs.length === 0) {
             this.showMessage('No songs available', '#999');
             return;
@@ -1465,13 +1510,19 @@
               // Firebase should already be initializing from immediate script execution
               // Just ensure it's ready before proceeding
               // Wait for Firebase initialization (silent if already initialized)
+              console.log('🔧 About to initialize Firebase...');
               await DataManager.initializeFirebase();
+              console.log('✅ Firebase initialization completed');
 
               // Initialize UI components
+              console.log('🎨 About to initialize UI...');
               UI.init();
+              console.log('✅ UI initialization completed');
 
               // Load the song data
+              console.log('📊 About to load data...');
               await this.loadData();
+              console.log('✅ Data loading completed');
 
               STATE.isInitialized = true;
               console.log('App initialization complete');
@@ -1487,18 +1538,6 @@
         async loadData() {
           try {
             console.log('🔄 loadData started');
-            
-            // Wait for offline manager to initialize first
-            let offlineAttempts = 0;
-            while (!window.rhythmOffline?.isInitialized && offlineAttempts < 30) { // Reduced timeout
-                await new Promise(resolve => setTimeout(resolve, 50)); // Faster polling
-                offlineAttempts++;
-            }
-            
-            // Give offline manager a moment to fully initialize (if it's ready)
-            if (window.rhythmOffline?.isInitialized) {
-                await new Promise(resolve => setTimeout(resolve, 100)); // Reduced delay
-            }
             
             // Wait for unified auth to initialize
             let attempts = 0;

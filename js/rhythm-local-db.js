@@ -22,9 +22,12 @@ class RhythmLocalDB {
         this.dbVersion = '2.0';
         
         // Sync settings
-        this.syncInterval = 5 * 60 * 1000; // Check for updates every 5 minutes
+        this.syncIntervalMs = 15 * 60 * 1000; // Check for updates every 15 minutes
         this.maxSyncAge = 24 * 60 * 60 * 1000; // Force full sync after 24 hours
         this.isOnline = navigator.onLine;
+        this.syncIntervalId = null; // Store the actual interval ID
+        this.lastSyncAttempt = 0; // Track last sync attempt to prevent spam
+        this.minSyncInterval = 60 * 1000; // Minimum 1 minute between sync attempts
         
         this.init();
     }
@@ -44,9 +47,11 @@ class RhythmLocalDB {
         // Load or create local database
         await this.loadLocalDatabase();
         
-        // Start background sync if online
+        // Start background sync if online (delay it a bit to not interfere with initial load)
         if (this.isOnline) {
-            this.startBackgroundSync();
+            setTimeout(() => {
+                this.startBackgroundSync();
+            }, 30000); // Start background sync after 30 seconds
         }
         
         this.isInitialized = true;
@@ -55,10 +60,13 @@ class RhythmLocalDB {
 
     setupNetworkListeners() {
         window.addEventListener('online', () => {
-            console.log('🌐 [LocalDB] Network restored - starting sync...');
+            console.log('🌐 [LocalDB] Network restored');
             this.isOnline = true;
-            this.syncWithFirebase();
-            this.startBackgroundSync();
+            // Do a single sync when network is restored, then start background sync
+            setTimeout(() => {
+                this.syncWithFirebase();
+                this.startBackgroundSync();
+            }, 5000); // Wait 5 seconds before syncing
         });
 
         window.addEventListener('offline', () => {
@@ -109,7 +117,9 @@ class RhythmLocalDB {
             const localMetadata = this.getLocalMetadata();
             
             if (localSongs && localMetadata) {
-                console.log(`📖 [LocalDB] Loaded ${Object.keys(localSongs).length} songs from local storage`);
+                const songsCount = Object.keys(localSongs).length;
+                console.log(`📖 [LocalDB] Loaded ${songsCount} songs from local storage`);
+                console.log(`📊 [LocalDB] Local storage: ${songsCount} songs, ${localMetadata.length} metadata entries`);
                 
                 // Check if we need to sync
                 const lastSync = this.getLastSyncTime();
@@ -215,6 +225,15 @@ class RhythmLocalDB {
             return false;
         }
 
+        // Check if we're syncing too frequently
+        const now = Date.now();
+        if (now - this.lastSyncAttempt < this.minSyncInterval) {
+            console.log('🕐 [LocalDB] Sync skipped - too soon since last attempt');
+            return true; // Return true to avoid error logging
+        }
+        
+        this.lastSyncAttempt = now;
+
         try {
             console.log('🔄 [LocalDB] Starting sync with Firebase...');
             
@@ -228,7 +247,10 @@ class RhythmLocalDB {
             const changes = this.findChanges(localMetadata, remoteMetadata);
             
             if (changes.added.length === 0 && changes.updated.length === 0 && changes.removed.length === 0) {
-                console.log('✅ [LocalDB] No changes detected - local data is up to date');
+                // Only log "no changes" occasionally to reduce console spam
+                if (Math.random() < 0.1) { // 10% chance to log
+                    console.log('✅ [LocalDB] No changes detected - local data is up to date');
+                }
                 this.updateLastSyncTime();
                 return true;
             }
@@ -280,8 +302,8 @@ class RhythmLocalDB {
             
             console.log(`📋 [LocalDB] Downloaded ${metadata.length} songs metadata`);
             
-            // Download top 20 songs for immediate offline access
-            const topSongs = metadata.slice(0, 20);
+            // Download top 50 songs for immediate offline access
+            const topSongs = metadata.slice(0, 50);
             const songPromises = topSongs.map(song => this.downloadAndCacheSong(song.id));
             
             const results = await Promise.allSettled(songPromises);
@@ -291,9 +313,9 @@ class RhythmLocalDB {
             
             this.updateLastSyncTime();
             
-            // Continue downloading remaining songs in background
+            // Continue downloading remaining songs in background more aggressively
             if (topSongs.length < metadata.length) {
-                this.backgroundDownloadSongs(metadata.slice(20));
+                this.backgroundDownloadSongs(metadata.slice(50));
             }
             
             return true;
@@ -319,24 +341,39 @@ class RhythmLocalDB {
     backgroundDownloadSongs(songsMetadata) {
         console.log(`🔄 [LocalDB] Starting background download of ${songsMetadata.length} remaining songs...`);
         
-        // Download songs one by one with delay to not overwhelm the system
+        // Download songs in batches to improve speed
         let index = 0;
-        const downloadNext = async () => {
+        const batchSize = 5; // Download 5 songs at once
+        
+        const downloadBatch = async () => {
             if (index >= songsMetadata.length || !this.isOnline) {
                 console.log('✅ [LocalDB] Background download completed');
                 return;
             }
             
-            const song = songsMetadata[index];
-            await this.downloadAndCacheSong(song.id);
-            index++;
+            // Get the next batch
+            const batch = songsMetadata.slice(index, index + batchSize);
+            const downloadPromises = batch.map(song => this.downloadAndCacheSong(song.id));
             
-            // Small delay between downloads
-            setTimeout(downloadNext, 500);
+            try {
+                await Promise.allSettled(downloadPromises);
+                index += batch.length;
+                
+                // Log progress
+                if (index % 20 === 0 || index >= songsMetadata.length) {
+                    console.log(`📥 [LocalDB] Downloaded ${index}/${songsMetadata.length} songs (${Math.round(index/songsMetadata.length*100)}%)`);
+                }
+                
+                // Small delay between batches
+                setTimeout(downloadBatch, 200);
+            } catch (error) {
+                console.warn('⚠️ [LocalDB] Batch download error:', error);
+                setTimeout(downloadBatch, 1000); // Longer delay on error
+            }
         };
         
-        // Start downloading after 5 seconds to not interfere with initial load
-        setTimeout(downloadNext, 5000);
+        // Start downloading after 2 seconds (reduced from 5)
+        setTimeout(downloadBatch, 2000);
     }
 
     findChanges(localMetadata, remoteMetadata) {
@@ -414,19 +451,19 @@ class RhythmLocalDB {
         // Stop existing sync
         this.stopBackgroundSync();
         
-        // Start periodic sync
-        this.syncInterval = setInterval(() => {
+        // Start periodic sync with correct interval
+        this.syncIntervalId = setInterval(() => {
             console.log('🔄 [LocalDB] Background sync check...');
             this.syncWithFirebase();
-        }, this.syncInterval);
+        }, this.syncIntervalMs);
         
-        console.log('✅ [LocalDB] Background sync started');
+        console.log(`✅ [LocalDB] Background sync started (every ${this.syncIntervalMs / 1000 / 60} minutes)`);
     }
 
     stopBackgroundSync() {
-        if (this.syncInterval) {
-            clearInterval(this.syncInterval);
-            this.syncInterval = null;
+        if (this.syncIntervalId) {
+            clearInterval(this.syncIntervalId);
+            this.syncIntervalId = null;
             console.log('⏹️ [LocalDB] Background sync stopped');
         }
     }

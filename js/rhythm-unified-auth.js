@@ -17,6 +17,12 @@ class RhythmUnifiedAuth {
         this.userStatusListener = null;
         this.preloadedData = null; // Cache for preloaded songlist data
         this.preloadPromise = null; // Track preload operations
+        
+        // Authentication caching
+        this.authCache = null; // Cache for authentication results
+        this.authCacheExpiry = 0; // Expiry time for auth cache
+        this.authCacheDuration = 30000; // Cache for 30 seconds (optimized for page navigation)
+        
         this.init();
     }
 
@@ -40,8 +46,8 @@ class RhythmUnifiedAuth {
 
             console.log('🚀 RhythmUnifiedAuth initialized');
             
-            // Auto-check authentication on init
-            await this.checkAuthentication();
+            // Don't auto-check authentication - let pages control when to authenticate
+            // await this.checkAuthentication();
             
         } catch (error) {
             console.error('❌ RhythmUnifiedAuth initialization failed:', error);
@@ -53,6 +59,16 @@ class RhythmUnifiedAuth {
      * This is the single function all pages should call
      */
     async checkAuthentication() {
+        // Check if we have a cached valid result
+        if (this.authCache && Date.now() < this.authCacheExpiry) {
+            console.log('⚡ [UnifiedAuth] Using cached authentication result');
+            return this.authCache;
+        }
+        
+        if (this.authCache && Date.now() >= this.authCacheExpiry) {
+            console.log('🕒 [UnifiedAuth] Auth cache expired, re-checking...');
+        }
+        
         console.log('🔍 [UnifiedAuth] Checking authentication...');
         
         try {
@@ -125,12 +141,19 @@ class RhythmUnifiedAuth {
                 this.currentUser.isOfflineAccess = true;
                 
                 console.log('✅ [UnifiedAuth] Authentication successful (OFFLINE MODE)');
-                return { 
+                
+                // Cache the offline result too
+                const result = { 
                     isAuthenticated: true, 
                     user: this.currentUser, 
                     reason: 'cached_auth_offline',
                     isOffline: true 
                 };
+                
+                this.authCache = result;
+                this.authCacheExpiry = Date.now() + this.authCacheDuration;
+                
+                return result;
             }
 
             // ONLINE MODE: Verify with database
@@ -173,11 +196,13 @@ class RhythmUnifiedAuth {
                     localStorage.setItem('rhythmAuth_approval', JSON.stringify(updatedUser));
                     this.currentUser = updatedUser;
                     
-                    // Store device credentials for future use
-                    this.storeDeviceCredentials(
-                        dbUser.fullName || dbUser.name || 'User', 
-                        userData.accessCode
-                    );
+                    // Store device credentials for future use (non-blocking)
+                    setTimeout(() => {
+                        this.storeDeviceCredentials(
+                            dbUser.fullName || dbUser.name || 'User', 
+                            userData.accessCode
+                        );
+                    }, 0);
                 } else {
                     // No database connection or access code, use stored data
                     this.currentUser = this.normalizeUserData(userData);
@@ -201,6 +226,17 @@ class RhythmUnifiedAuth {
 
             console.log('✅ [UnifiedAuth] Authentication successful (ONLINE MODE)');
             
+            // Cache the successful result
+            const result = { 
+                isAuthenticated: true, 
+                user: this.currentUser, 
+                reason: 'authenticated',
+                isOffline: false 
+            };
+            
+            this.authCache = result;
+            this.authCacheExpiry = Date.now() + this.authCacheDuration;
+            
             // Start preloading songlist data in background for PWA users
             const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
                          window.navigator.standalone === true ||
@@ -213,15 +249,13 @@ class RhythmUnifiedAuth {
                 });
             }
             
-            return { 
-                isAuthenticated: true, 
-                user: this.currentUser, 
-                reason: 'authenticated',
-                isOffline: false 
-            };
+            return result;
 
         } catch (error) {
             console.error('❌ [UnifiedAuth] Authentication check failed:', error);
+            // Clear any cached auth on failure
+            this.authCache = null;
+            this.authCacheExpiry = 0;
             return { isAuthenticated: false, user: null, reason: 'check_failed' };
         }
     }
@@ -383,6 +417,10 @@ class RhythmUnifiedAuth {
         localStorage.removeItem('rhythmAuth_approval');
         localStorage.removeItem('rhythmAuth_pendingRequest');
         this.currentUser = null;
+        
+        // Clear authentication cache
+        this.authCache = null;
+        this.authCacheExpiry = 0;
         
         // Clean up all listeners
         this.stopRequestMonitoring();
