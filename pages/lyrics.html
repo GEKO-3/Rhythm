@@ -713,16 +713,35 @@
         if (!songData) {
           console.log('� [Lyrics] Loading song from local database system...');
           
-          // Use local database enhanced Firebase wrapper
-          if (!window.rhythmDB) {
-            // Try to use already loaded module first
-            if (window.RhythmFirebaseDBOffline) {
-              window.rhythmDB = new window.RhythmFirebaseDBOffline();
-            } else {
-              // Fallback to dynamic import only if needed
+          // Use local database enhanced Firebase wrapper - ensure correct instance
+          let dbInitialized = false;
+          
+          // Check if we have a working instance
+          if (window.rhythmDB && typeof window.rhythmDB.getSong === 'function' && typeof window.rhythmDB.getDetailedStatus === 'function') {
+            console.log('✅ [Lyrics] Using existing working rhythmDB instance');
+            dbInitialized = true;
+          } else {
+            console.log('🔧 [Lyrics] Need to initialize rhythmDB...');
+            
+            // Force reimport to ensure we get the correct class
+            try {
               const module = await import(`../js/firebase-db-offline.js?t=${Date.now()}`);
               window.rhythmDB = new module.RhythmFirebaseDBOffline();
+              console.log('✅ [Lyrics] Created fresh RhythmFirebaseDBOffline instance');
+              dbInitialized = true;
+            } catch (error) {
+              console.error('❌ [Lyrics] Failed to create RhythmFirebaseDBOffline:', error);
+              dbInitialized = false;
             }
+          }
+          
+          // Verify methods exist
+          if (dbInitialized && window.rhythmDB) {
+            const hasGetSong = typeof window.rhythmDB.getSong === 'function';
+            const hasGetDetailedStatus = typeof window.rhythmDB.getDetailedStatus === 'function';
+            const hasIsSongCached = typeof window.rhythmDB.isSongCached === 'function';
+            
+            console.log(`🔍 [Lyrics] Method check - getSong: ${hasGetSong}, getDetailedStatus: ${hasGetDetailedStatus}, isSongCached: ${hasIsSongCached}`);
           }
 
           try {
@@ -733,7 +752,13 @@
             console.error(`❌ [Lyrics] Failed to load song ${selectedSongId}:`, error);
             
             // Show helpful error message based on offline status
-            const offlineStatus = window.rhythmDB?.getDetailedStatus();
+            let offlineStatus = null;
+            try {
+              offlineStatus = window.rhythmDB?.getDetailedStatus?.();
+            } catch (statusError) {
+              console.warn('⚠️ [Lyrics] Could not get detailed status:', statusError);
+            }
+            
             if (offlineStatus && !offlineStatus.isOnline) {
               if (!offlineStatus.ready) {
                 showSongNotFoundError('No songs cached for offline use. Please connect to the internet first to load and cache songs.');
@@ -759,8 +784,14 @@
           console.log(`✅ [Lyrics] Song ready for display: ${songData.title || 'Unknown Title'}`);
           
           // Cache this song for offline access if we're online (handled by local database automatically)
-          const status = window.rhythmDB?.getDetailedStatus();
-          if (status?.isOnline && !window.rhythmDB?.isSongCached(selectedSongId)) {
+          let status = null;
+          try {
+            status = window.rhythmDB?.getDetailedStatus?.();
+          } catch (statusError) {
+            console.warn('⚠️ [Lyrics] Could not get detailed status:', statusError);
+          }
+          
+          if (status?.isOnline && window.rhythmDB?.isSongCached && !window.rhythmDB.isSongCached(selectedSongId)) {
             console.log(`💾 [Lyrics] Song ${selectedSongId} automatically cached by local database for offline access`);
           }
           

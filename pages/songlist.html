@@ -857,6 +857,12 @@
 
         async _doInitialize() {
           try {
+            // Use existing instance if available and working
+            if (window.rhythmDB && typeof window.rhythmDB.getSongsMetadata === 'function') {
+              this.rhythmDB = window.rhythmDB;
+              return true;
+            }
+            
             // Try to use already loaded module first
             if (window.RhythmFirebaseDBOffline) {
               this.rhythmDB = new window.RhythmFirebaseDBOffline();
