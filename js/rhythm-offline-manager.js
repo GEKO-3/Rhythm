@@ -37,19 +37,23 @@ class RhythmOfflineManager {
         // Set up network listeners
         this.setupNetworkListeners();
         
-        // Initial network quality check
-        await this.checkNetworkQuality();
-        
-        // Start periodic network monitoring
-        this.startNetworkMonitoring();
+        // Start with a basic online/offline check (fast)
+        this.networkQuality = navigator.onLine ? 'good' : 'offline';
         
         // Check for cached data
         this.checkCachedData();
         
-        // Mark as initialized
+        // Mark as initialized immediately for fast startup
         this.isInitialized = true;
+        console.log('✅ [OfflineManager] Initialized successfully (fast mode)');
         
-        console.log('✅ [OfflineManager] Initialized successfully');
+        // Do detailed network quality check in background
+        setTimeout(() => {
+            this.checkNetworkQuality().then(() => {
+                // Start periodic network monitoring after first check
+                this.startNetworkMonitoring();
+            });
+        }, 100);
     }
 
     setupNetworkListeners() {

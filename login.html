@@ -280,10 +280,12 @@
             
             // Wait for offline manager to initialize first (if available)
             let offlineAttempts = 0;
-            while (!window.rhythmOffline && offlineAttempts < 20) {
+            while (!window.rhythmOffline?.isInitialized && offlineAttempts < 20) {
                 await new Promise(resolve => setTimeout(resolve, 50));
                 offlineAttempts++;
             }
+            
+            console.log('🔧 [Login] Offline manager ready:', window.rhythmOffline?.isInitialized);
             
             // Wait for auth system to initialize
             let attempts = 0;
@@ -300,21 +302,26 @@
             
             // Check network status for offline handling
             const isOfflineMode = window.rhythmOffline?.shouldUseOfflineMode() || false;
+            console.log('📡 [Login] Network mode detected:', isOfflineMode ? 'OFFLINE' : 'ONLINE');
+            
             if (isOfflineMode) {
                 console.log('📴 [Login] Offline mode detected - checking cached authentication');
             }
             
             // Check if user is already authenticated
             const authResult = await window.rhythmAuth.checkAuthentication();
+            console.log('🔍 [Login] Authentication result:', authResult);
+            
             if (authResult.isAuthenticated) {
                 console.log('✅ [Login] User already authenticated, checking redirect preference...');
                 
-                if (authResult.isOffline) {
-                    console.log('📴 [Login] Offline authentication - redirecting directly to songlist');
+                // Handle offline mode specifically
+                if (isOfflineMode || authResult.isOffline) {
+                    console.log('📴 [Login] Offline authentication detected - redirecting directly to songlist');
                     showMessage('Offline mode - Using cached access', 'success');
                     setTimeout(() => {
                         window.location.href = 'pages/songlist.html';
-                    }, 1000);
+                    }, 500); // Reduced delay for faster redirect
                     return;
                 }
                 

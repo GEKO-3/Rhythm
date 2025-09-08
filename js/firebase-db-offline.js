@@ -15,8 +15,8 @@ class RhythmFirebaseDBOffline extends RhythmFirebaseDB {
     async initOfflineManager() {
         // Wait for offline manager to be available and initialized
         let attempts = 0;
-        while ((!window.rhythmOffline || !window.rhythmOffline.isInitialized) && attempts < 50) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+        while ((!window.rhythmOffline || !window.rhythmOffline.isInitialized) && attempts < 30) {
+            await new Promise(resolve => setTimeout(resolve, 50)); // Faster polling
             attempts++;
         }
         
@@ -24,7 +24,7 @@ class RhythmFirebaseDBOffline extends RhythmFirebaseDB {
             this.offlineManager = window.rhythmOffline;
             console.log('✅ [OfflineDB] Connected to offline manager');
         } else {
-            console.warn('⚠️ [OfflineDB] Failed to connect to offline manager');
+            console.warn('⚠️ [OfflineDB] Timeout waiting for offline manager, proceeding without offline features');
         }
     }
 
@@ -39,7 +39,26 @@ class RhythmFirebaseDBOffline extends RhythmFirebaseDB {
             await this.initOfflineManager();
         }
 
-        // Always check offline manager first
+        // FAST PATH: If we have good connection, try fresh data first without cache checks
+        if (this.offlineManager && this.offlineManager.networkQuality === 'good') {
+            try {
+                console.log('🚀 [OfflineDB] Fast path: Attempting fresh fetch (good connection)...');
+                const freshData = await super.getSongsMetadata();
+                
+                // Cache in background without blocking
+                if (freshData && freshData.length > 0) {
+                    this.offlineManager.cacheSongsMetadata(freshData).catch(err => 
+                        console.warn('Background caching failed:', err));
+                }
+                
+                return freshData;
+            } catch (error) {
+                console.warn('⚠️ [OfflineDB] Fast path failed, falling back to offline logic:', error.message);
+                // Fall through to offline logic below
+            }
+        }
+
+        // OFFLINE PATH: Check cache first for poor/offline connections
         if (this.offlineManager) {
             const shouldUseOffline = this.offlineManager.shouldUseOfflineMode();
             const cachedData = this.offlineManager.getCachedSongsMetadata();

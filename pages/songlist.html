@@ -1378,14 +1378,14 @@
             
             // Wait for offline manager to initialize first
             let offlineAttempts = 0;
-            while (!window.rhythmOffline?.isInitialized && offlineAttempts < 50) {
-                await new Promise(resolve => setTimeout(resolve, 100));
+            while (!window.rhythmOffline?.isInitialized && offlineAttempts < 30) { // Reduced timeout
+                await new Promise(resolve => setTimeout(resolve, 50)); // Faster polling
                 offlineAttempts++;
             }
             
-            // Give offline manager a moment to fully initialize
+            // Give offline manager a moment to fully initialize (if it's ready)
             if (window.rhythmOffline?.isInitialized) {
-                await new Promise(resolve => setTimeout(resolve, 200));
+                await new Promise(resolve => setTimeout(resolve, 100)); // Reduced delay
             }
             
             // Wait for unified auth to initialize
