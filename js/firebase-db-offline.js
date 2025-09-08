@@ -2,6 +2,7 @@
  * FIREBASE DATABASE WITH LOCAL STORAGE INTEGRATION
  * Smart wrapper that uses local database for fast access and offline support
  * Falls back to direct Firebase access if local database is not available
+ * @version 2.1.0
  */
 
 import { RhythmFirebaseDB } from './firebase-db-optimized.js';

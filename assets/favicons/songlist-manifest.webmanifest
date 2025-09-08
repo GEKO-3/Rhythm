@@ -2,7 +2,7 @@
   "name": "Rhythm Boduberu - Song List",
   "short_name": "Rhythm Songs",
   "description": "Browse our collection of traditional Maldivian Boduberu songs",
-  "start_url": "/pages/songlist.html",
+  "start_url": "/pages/songlist.html?v=2.1",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

@@ -2,6 +2,7 @@
  * UNIFIED RHYTHM AUTHENTICATION SYSTEM
  * This is the single source of truth for all authentication
  * Used by login.html, songlist.html, admin pages, and any other pages
+ * @version 2.1.0
  */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -45,6 +46,7 @@ class RhythmUnifiedAuth {
             this.isInitialized = true;
 
             console.log('🚀 RhythmUnifiedAuth initialized');
+            console.log('📦 Version: 2.1.0');
             
             // Don't auto-check authentication - let pages control when to authenticate
             // await this.checkAuthentication();

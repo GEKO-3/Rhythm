@@ -486,9 +486,41 @@
     // Register service worker for offline support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('../js/sw.js')
-          .then((registration) => {
+        navigator.serviceWorker.register(`../js/sw.js?v=2.1`, { updateViaCache: 'none' })
+          .then(async (registration) => {
             console.log('✅ [ServiceWorker] Registered successfully:', registration.scope);
+            
+            // Force update check
+            registration.addEventListener('updatefound', () => {
+              console.log('🔄 [ServiceWorker] Update found, installing new version');
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('🚀 [ServiceWorker] New version installed, refresh recommended');
+                }
+              });
+            });
+            
+            // Check for updates
+            registration.update();
+            
+            // Add developer utility for cache clearing
+            window.clearAppCache = function() {
+              if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_CACHE' });
+                console.log('🧹 Clearing app cache...');
+              } else {
+                console.log('⚠️ No service worker controller available');
+              }
+            };
+            
+            // Listen for cache cleared message
+            navigator.serviceWorker.addEventListener('message', (event) => {
+              if (event.data && event.data.type === 'CACHE_CLEARED') {
+                console.log('✅ Cache cleared! Reload the page to see changes.');
+                console.log('💡 You can also run clearAppCache() in console to clear cache anytime');
+              }
+            });
           })
           .catch((error) => {
             console.log('❌ [ServiceWorker] Registration failed:', error);

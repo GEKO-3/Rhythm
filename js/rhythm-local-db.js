@@ -2,6 +2,7 @@
  * RHYTHM LOCAL DATABASE MANAGER
  * Smart local storage with incremental sync from Firebase
  * Stores songs metadata, lyrics, and handles offline functionality
+ * @version 2.1.0
  */
 
 class RhythmLocalDB {
@@ -34,6 +35,7 @@ class RhythmLocalDB {
 
     async init() {
         console.log('🔧 [LocalDB] Initializing local database...');
+        console.log('📦 [LocalDB] Version: 2.1.0');
         
         // Set up network listeners
         this.setupNetworkListeners();

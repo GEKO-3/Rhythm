@@ -3,8 +3,8 @@
  * Handles caching for offline functionality
  */
 
-const CACHE_NAME = 'rhythm-offline-v1';
-const DYNAMIC_CACHE = 'rhythm-dynamic-v1';
+const CACHE_NAME = 'rhythm-offline-v2.1'; // Updated version to force cache refresh
+const DYNAMIC_CACHE = 'rhythm-dynamic-v2.1'; // Updated version to force cache refresh
 
 // Critical files to cache for offline functionality
 const CRITICAL_ASSETS = [
@@ -13,9 +13,10 @@ const CRITICAL_ASSETS = [
   '/login.html',
   '/pages/songlist.html',
   '/pages/lyrics.html',
-  '/js/rhythm-offline-manager.js',
   '/js/rhythm-unified-auth.js',
-  '/js/firebase-db.js',
+  '/js/rhythm-local-db.js',
+  '/js/firebase-db-optimized.js',
+  '/js/firebase-db-offline.js',
   '/js/reverse-transliteration.js',
   '/assets/styles.css',
   '/assets/Fonts/Montserrat-VariableFont_wght.ttf',
@@ -44,6 +45,33 @@ const CACHE_FIRST_URLS = [
   '.svg',
   '.ico'
 ];
+
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'CLEAR_CACHE') {
+    console.log('🧹 Service Worker: Clearing all caches');
+    event.waitUntil(
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            console.log('🗑️ Service Worker: Deleting cache:', cacheName);
+            return caches.delete(cacheName);
+          })
+        );
+      }).then(() => {
+        console.log('✅ Service Worker: All caches cleared');
+        self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            client.postMessage({ type: 'CACHE_CLEARED' });
+          });
+        });
+      })
+    );
+  }
+  
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
 
 self.addEventListener('install', (event) => {
   console.log('🔧 Service Worker: Installing with offline support');
@@ -102,7 +130,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Determine caching strategy
+  // Force network-first for JavaScript files to prevent stale code
+  if (url.pathname.endsWith('.js') || url.search.includes('t=')) {
+    event.respondWith(forceNetworkStrategy(request));
+    return;
+  }
+
+  // Determine caching strategy for other files
   if (shouldUseNetworkFirst(url)) {
     event.respondWith(networkFirstStrategy(request));
   } else if (shouldUseCacheFirst(url)) {
@@ -120,6 +154,36 @@ function shouldUseNetworkFirst(url) {
 
 function shouldUseCacheFirst(url) {
   return CACHE_FIRST_URLS.some(pattern => url.pathname.includes(pattern));
+}
+
+// Force network strategy for JavaScript files to prevent stale code
+async function forceNetworkStrategy(request) {
+  try {
+    console.log('🔄 Service Worker: Force network fetch for:', request.url);
+    const networkResponse = await fetch(request, { cache: 'no-cache' });
+    
+    // Update cache with fresh version
+    if (networkResponse.ok) {
+      const responseClone = networkResponse.clone();
+      caches.open(DYNAMIC_CACHE).then((cache) => {
+        cache.put(request, responseClone);
+      });
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    console.log('❌ Service Worker: Force network failed for:', request.url);
+    
+    // Fallback to cache only if network completely fails
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      console.log('📦 Service Worker: Using stale cache as last resort for:', request.url);
+      return cachedResponse;
+    }
+    
+    // If no cache, return network error
+    return fetch(request);
+  }
 }
 
 async function networkFirstStrategy(request) {

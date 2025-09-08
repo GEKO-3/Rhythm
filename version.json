@@ -1,0 +1,12 @@
+{
+  "version": "2.1.0",
+  "timestamp": 1757371847000,
+  "description": "Fixed PWA caching issues and performance optimizations",
+  "changes": [
+    "Updated service worker cache version",
+    "Added force refresh for JavaScript files",
+    "Fixed authentication caching",
+    "Improved local database initialization",
+    "Added cache clearing utilities"
+  ]
+}
