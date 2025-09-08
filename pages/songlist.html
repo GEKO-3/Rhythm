@@ -8,8 +8,8 @@
   <!-- Unified Authentication System -->
   <script type="module" src="../js/rhythm-unified-auth.js"></script>
   
-  <!-- Offline Support -->
-  <script type="module" src="../js/rhythm-offline-manager.js"></script>
+  <!-- Local Database System -->
+  <script type="module" src="../js/rhythm-local-db.js"></script>
   
   <style>
     /* Critical CSS - loads immediately to prevent white flash */
@@ -292,6 +292,20 @@
       border: 1px solid transparent;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    ul#song-list li .song-name {
+      flex: 1;
+    }
+
+    ul#song-list li .offline-indicator {
+      font-size: 0.9em;
+      opacity: 0.7;
+      margin-left: 8px;
+      flex-shrink: 0;
     }
 
     ul#song-list li:hover {
@@ -858,7 +872,7 @@
 
         async getSongsFromFirebase() {
           try {
-            console.log('🎵 [SongList] Getting songs with offline support...');
+            console.log('🎵 [SongList] Getting songs with local database support...');
             
             // Check if we have preloaded data from PWA startup
             const preloadedData = window.rhythmAuth?.getPreloadedSonglistData();
@@ -867,7 +881,7 @@
               return preloadedData.songs;
             }
             
-            // Use offline-enhanced Firebase DB
+            // Use enhanced Firebase DB with local database integration
             if (!window.rhythmDB) {
               console.warn('⚠️ [SongList] Enhanced Firebase DB not ready, falling back to basic version');
               if (!this.rhythmDB) {
@@ -878,28 +892,34 @@
               this.rhythmDB = window.rhythmDB;
             }
             
-            // Get song metadata with offline support
-            console.log('📡 [SongList] Fetching songs metadata...');
+            // Get song metadata with local database (fast!)
+            console.log('� [SongList] Fetching songs metadata from local database...');
             const songsMetadata = await this.rhythmDB.getSongsMetadata();
             console.log(`✅ [SongList] Got ${songsMetadata.length} songs metadata`);
             
-            // Check offline status and show appropriate message
-            const offlineStatus = this.rhythmDB.getOfflineStatus();
-            if (offlineStatus.networkQuality === 'offline' || offlineStatus.networkQuality === 'poor') {
-              this.showNetworkNotice(offlineStatus);
+            // Check status and show info if needed
+            const status = this.rhythmDB.getDetailedStatus();
+            if (status.ready) {
+              console.log(`💾 [SongList] Local database ready: ${status.songsCount} songs, last sync: ${status.lastSync || 'Never'}`);
+              if (!status.isOnline) {
+                this.showOfflineNotice(status);
+              }
             }
             
             const songs = [];
             
-            // Convert to song list format
+            // Convert to song list format with offline indicators
             songsMetadata.forEach(song => {
+              const isOfflineAvailable = this.rhythmDB.isSongCached(song.id);
+              
               songs.push({
                 id: song.id,
-                timestamp: Date.now(), // Default timestamp
+                timestamp: Date.now(),
                 name: song.name,
                 genre: song.genre || 'General',
                 hasLyrics: song.hasLyrics || false,
-                lyrics: 'loaded_on_demand' // Will load when needed
+                lyrics: 'loaded_on_demand',
+                isOfflineAvailable: isOfflineAvailable // For showing offline indicators
               });
             });
             
@@ -916,16 +936,42 @@
           }
         },
 
-        showNetworkNotice(offlineStatus) {
-          const statusText = offlineStatus.networkQuality === 'offline' ? 
-            'offline' : 'experiencing connection issues';
+        showOfflineNotice(status) {
+          console.log('📱 [SongList] Running offline with local data');
           
-          console.log(`📱 [SongList] App is ${statusText}, using cached data`);
+          // Create or update status indicator
+          const indicator = document.createElement('div');
+          indicator.id = 'offline-status';
+          indicator.style.cssText = `
+            position: fixed;
+            top: env(safe-area-inset-top, 10px);
+            left: 10px;
+            right: 10px;
+            background: rgba(76, 175, 80, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+            transition: all 0.3s ease;
+          `;
+          indicator.textContent = `📱 Offline Mode - ${status.songsCount} songs available locally`;
           
-          // Show a temporary notice to user
-          if (window.rhythmOffline) {
-            window.rhythmOffline.showNetworkStatus(offlineStatus.networkQuality);
-          }
+          // Remove existing indicator
+          const existing = document.getElementById('offline-status');
+          if (existing) existing.remove();
+          
+          document.body.appendChild(indicator);
+          
+          // Auto-hide after 5 seconds
+          setTimeout(() => {
+            if (indicator.parentNode) {
+              indicator.style.opacity = '0';
+              setTimeout(() => indicator.remove(), 300);
+            }
+          }, 5000);
         },
 
         showOfflineError(error) {
@@ -990,6 +1036,58 @@
             // Initialize with empty data
             UI.initializeSongList();
           }
+        },
+
+        // Pre-cache popular songs for offline lyrics access
+        async preCachePopularSongs(songsToCache) {
+          if (!songsToCache || songsToCache.length === 0) {
+            return;
+          }
+
+          console.log(`🔄 [Background] Starting to pre-cache ${songsToCache.length} songs for offline access...`);
+          
+          // Do this in the background without blocking UI
+          setTimeout(async () => {
+            try {
+              let cachedCount = 0;
+              const existingCache = window.rhythmOffline?.getCachedFullSongs() || {};
+              
+              for (const song of songsToCache) {
+                // Skip if already cached
+                if (existingCache[song.id]) {
+                  continue;
+                }
+                
+                try {
+                  console.log(`💾 [Background] Caching song: ${song.name} (${song.id})`);
+                  const fullSongData = await this.rhythmDB.getSong(song.id);
+                  
+                  if (fullSongData) {
+                    existingCache[song.id] = fullSongData;
+                    cachedCount++;
+                    
+                    // Update cache every few songs to avoid losing progress
+                    if (cachedCount % 3 === 0) {
+                      await window.rhythmOffline?.cacheFullSongs(existingCache);
+                    }
+                  }
+                  
+                  // Small delay to not overwhelm the system
+                  await new Promise(resolve => setTimeout(resolve, 1000));
+                } catch (error) {
+                  console.warn(`⚠️ [Background] Failed to cache song ${song.id}:`, error.message);
+                }
+              }
+              
+              // Final cache update
+              if (cachedCount > 0) {
+                await window.rhythmOffline?.cacheFullSongs(existingCache);
+                console.log(`✅ [Background] Successfully cached ${cachedCount} songs for offline access`);
+              }
+            } catch (error) {
+              console.error('❌ [Background] Pre-caching failed:', error);
+            }
+          }, 2000); // Start after 2 seconds to not interfere with initial load
         },
 
 
@@ -1220,7 +1318,21 @@
 
         createSongElement(song) {
           const li = document.createElement('li');
-          li.textContent = song.name;
+          
+          // Check if song is available offline using the new local database
+          const isOfflineAvailable = song.isOfflineAvailable || 
+                                   (window.rhythmDB?.isSongCached(song.id)) || false;
+          
+          // Create song name with offline indicator
+          if (isOfflineAvailable) {
+            li.innerHTML = `
+              <span class="song-name">${song.name}</span>
+              <span class="offline-indicator" title="Available offline">📱</span>
+            `;
+          } else {
+            li.innerHTML = `<span class="song-name">${song.name}</span>`;
+          }
+          
           li.dataset.songId = song.id;
           li.dataset.songName = song.name;
           return li;

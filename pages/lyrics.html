@@ -36,8 +36,8 @@
   <!-- Unified Authentication System -->
   <script type="module" src="../js/rhythm-unified-auth.js"></script>
   
-  <!-- Offline Support -->
-  <script type="module" src="../js/rhythm-offline-manager.js"></script>
+  <!-- Local Database System -->
+  <script type="module" src="../js/rhythm-local-db.js"></script>
   
   <!-- 🚀 PERFORMANCE: Preload critical resources -->
   <link rel="preload" href="../assets/Fonts/Faruma.ttf" as="font" type="font/ttf" crossorigin>
@@ -709,37 +709,39 @@
           }
         }
 
-        // If no valid prefetched data, load from database with offline support
+        // If no valid prefetched data, load from local database system
         if (!songData) {
-          console.log('📡 [Lyrics] Loading song from database with offline support...');
+          console.log('� [Lyrics] Loading song from local database system...');
           
-          // Use offline-enhanced Firebase database
+          // Use local database enhanced Firebase wrapper
           if (!window.rhythmDB) {
-            // Import and initialize offline-enhanced Firebase database
+            // Import and initialize local database enhanced Firebase wrapper
             const module = await import(`../js/firebase-db-offline.js?t=${Date.now()}`);
             window.rhythmDB = new module.RhythmFirebaseDBOffline();
           }
 
           try {
-            // Load the selected song with offline support
+            // Load the selected song with local database support
             songData = await window.rhythmDB.getSong(selectedSongId);
-            console.log(`🎵 [Lyrics] Loaded song from database: ${songData?.title || selectedSongId}`);
+            console.log(`🎵 [Lyrics] Loaded song from local database: ${songData?.title || selectedSongId}`);
           } catch (error) {
             console.error(`❌ [Lyrics] Failed to load song ${selectedSongId}:`, error);
             
             // Show helpful error message based on offline status
-            if (window.rhythmOffline) {
-              const isOffline = window.rhythmOffline.shouldUseOfflineMode();
-              const hasCache = window.rhythmOffline.isOfflineReady();
-              
-              if (isOffline && !hasCache) {
-                throw new Error('Song not available offline. Please connect to the internet to load lyrics.');
-              } else if (isOffline) {
-                throw new Error('This song is not cached for offline use. Please connect to the internet to load it.');
+            const offlineStatus = window.rhythmDB?.getDetailedStatus();
+            if (offlineStatus && !offlineStatus.isOnline) {
+              if (!offlineStatus.ready) {
+                showSongNotFoundError('No songs cached for offline use. Please connect to the internet first to load and cache songs.');
+                return;
+              } else {
+                showSongNotFoundError(`This song "${selectedSongId}" is not available offline. Please connect to the internet to load it, or choose a different song from the songlist that has the 📱 icon.`);
+                return;
               }
             }
             
-            throw error;
+            // Generic error for online mode
+            showSongNotFoundError(`Failed to load song. Please check your connection and try again.`);
+            return;
           }
         }
         
@@ -751,12 +753,15 @@
           }];
           console.log(`✅ [Lyrics] Song ready for display: ${songData.title || 'Unknown Title'}`);
           
+          // Cache this song for offline access if we're online (handled by local database automatically)
+          const status = window.rhythmDB?.getDetailedStatus();
+          if (status?.isOnline && !window.rhythmDB?.isSongCached(selectedSongId)) {
+            console.log(`💾 [Lyrics] Song ${selectedSongId} automatically cached by local database for offline access`);
+          }
+          
           // Show network status if using offline data
-          if (window.rhythmOffline) {
-            const networkQuality = window.rhythmOffline.getNetworkQuality();
-            if (networkQuality === 'offline' || networkQuality === 'poor') {
-              showOfflineNotice(networkQuality);
-            }
+          if (status && !status.isOnline) {
+            showOfflineNotice('offline');
           }
           
         } else {
@@ -791,9 +796,22 @@
     function showSongNotFoundError(message) {
       document.body.innerHTML = `
         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: var(--font-family, Arial, sans-serif); background: var(--bg-color, #1f1f1f); color: var(--primary-color, #f5d000);">
-          <h2 style="color: var(--primary-color, #f5d000); margin-bottom: 20px;">Song Not Found</h2>
-          <p style="text-align: center; margin-bottom: 30px; max-width: 400px;">${message}</p>
-          <a href="songlist.html" style="padding: 12px 24px; background: var(--primary-color, #f5d000); color: var(--text-color, #2b2b2b); text-decoration: none; border-radius: 5px; font-weight: 600;">Back to Song List</a>
+          <h2 style="color: #ff6b6b; margin-bottom: 20px;">⚠️ Song Not Available</h2>
+          <p style="text-align: center; margin-bottom: 30px; max-width: 500px; line-height: 1.5;">${message}</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+            <a href="songlist.html" style="padding: 12px 24px; background: var(--primary-color, #f5d000); color: var(--text-color, #2b2b2b); text-decoration: none; border-radius: 5px; font-weight: 600;">← Back to Song List</a>
+            ${window.rhythmOffline?.shouldUseOfflineMode() ? 
+              `<button onclick="location.reload()" 
+                       style="padding: 12px 24px; background: #4caf50; color: white; 
+                              border: none; border-radius: 5px; font-weight: 600; cursor: pointer;">
+                 Try Again
+               </button>` : ''}
+          </div>
+          ${window.rhythmOffline?.shouldUseOfflineMode() ? 
+            `<p style="margin-top: 30px; font-size: 0.9em; color: #999; text-align: center; max-width: 500px; line-height: 1.4;">
+               💡 <strong>Tip:</strong> Visit songs online first to cache them for offline use. 
+               Look for the 📱 icon next to song names in the songlist - these songs are available offline.
+             </p>` : ''}
         </div>
       `;
     }
