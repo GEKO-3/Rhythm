@@ -13,12 +13,18 @@ class RhythmFirebaseDBOffline extends RhythmFirebaseDB {
     }
 
     async initOfflineManager() {
-        // Wait for offline manager to be available
-        if (typeof window !== 'undefined' && window.rhythmOffline) {
+        // Wait for offline manager to be available and initialized
+        let attempts = 0;
+        while ((!window.rhythmOffline || !window.rhythmOffline.isInitialized) && attempts < 50) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+            attempts++;
+        }
+        
+        if (window.rhythmOffline?.isInitialized) {
             this.offlineManager = window.rhythmOffline;
+            console.log('✅ [OfflineDB] Connected to offline manager');
         } else {
-            // Wait a bit and try again
-            setTimeout(() => this.initOfflineManager(), 100);
+            console.warn('⚠️ [OfflineDB] Failed to connect to offline manager');
         }
     }
 
@@ -27,6 +33,11 @@ class RhythmFirebaseDBOffline extends RhythmFirebaseDB {
      */
     async getSongsMetadata() {
         console.log('🎵 [OfflineDB] Getting songs metadata...');
+
+        // Ensure offline manager is initialized
+        if (!this.offlineManager) {
+            await this.initOfflineManager();
+        }
 
         // Always check offline manager first
         if (this.offlineManager) {
@@ -78,6 +89,11 @@ class RhythmFirebaseDBOffline extends RhythmFirebaseDB {
     async getSongs() {
         console.log('🎵 [OfflineDB] Getting full songs data...');
 
+        // Ensure offline manager is initialized
+        if (!this.offlineManager) {
+            await this.initOfflineManager();
+        }
+
         // Check offline manager
         if (this.offlineManager) {
             const shouldUseOffline = this.offlineManager.shouldUseOfflineMode();
@@ -122,6 +138,11 @@ class RhythmFirebaseDBOffline extends RhythmFirebaseDB {
      */
     async getSong(songId) {
         console.log(`🎵 [OfflineDB] Getting song: ${songId}...`);
+
+        // Ensure offline manager is initialized
+        if (!this.offlineManager) {
+            await this.initOfflineManager();
+        }
 
         // Check offline manager for cached song
         if (this.offlineManager) {

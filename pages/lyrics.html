@@ -589,7 +589,7 @@
         
         // Wait for offline manager to initialize first
         let offlineAttempts = 0;
-        while (!window.rhythmOfflineManager?.isInitialized && offlineAttempts < 50) {
+        while (!window.rhythmOffline?.isInitialized && offlineAttempts < 50) {
             await new Promise(resolve => setTimeout(resolve, 100));
             offlineAttempts++;
         }

@@ -844,8 +844,8 @@
         async _doInitialize() {
           try {
 
-            const module = await import(`../js/firebase-db.js?t=${Date.now()}`);
-            this.rhythmDB = new module.RhythmFirebaseDB();
+            const module = await import(`../js/firebase-db-offline.js?t=${Date.now()}`);
+            this.rhythmDB = new module.RhythmFirebaseDBOffline();
             // Make Firebase globally available for compatibility
             window.rhythmDB = this.rhythmDB;
 
@@ -1378,9 +1378,14 @@
             
             // Wait for offline manager to initialize first
             let offlineAttempts = 0;
-            while (!window.rhythmOfflineManager?.isInitialized && offlineAttempts < 50) {
+            while (!window.rhythmOffline?.isInitialized && offlineAttempts < 50) {
                 await new Promise(resolve => setTimeout(resolve, 100));
                 offlineAttempts++;
+            }
+            
+            // Give offline manager a moment to fully initialize
+            if (window.rhythmOffline?.isInitialized) {
+                await new Promise(resolve => setTimeout(resolve, 200));
             }
             
             // Wait for unified auth to initialize

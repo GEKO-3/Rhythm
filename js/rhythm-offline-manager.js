@@ -8,6 +8,7 @@ class RhythmOfflineManager {
     constructor() {
         this.isOnline = navigator.onLine;
         this.networkQuality = 'good'; // good, poor, offline
+        this.isInitialized = false; // Track initialization status
         this.cacheKeys = {
             songsMetadata: 'rhythm_songs_metadata',
             fullSongs: 'rhythm_songs_full',
@@ -44,6 +45,9 @@ class RhythmOfflineManager {
         
         // Check for cached data
         this.checkCachedData();
+        
+        // Mark as initialized
+        this.isInitialized = true;
         
         console.log('✅ [OfflineManager] Initialized successfully');
     }
