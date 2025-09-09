@@ -66,6 +66,31 @@ self.addEventListener('message', (event) => {
         });
       })
     );
+  } else if (event.data && event.data.type === 'FORCE_UPDATE_CHECK') {
+    console.log('🔄 Service Worker: Force update check requested');
+    event.waitUntil(
+      Promise.all([
+        // Force clear dynamic cache to ensure fresh content
+        caches.delete(DYNAMIC_CACHE),
+        // Invalidate critical JS files in main cache
+        caches.open(CACHE_NAME).then(cache => {
+          const jsFiles = CRITICAL_ASSETS.filter(asset => asset.endsWith('.js'));
+          return Promise.all(
+            jsFiles.map(file => cache.delete(file))
+          );
+        })
+      ]).then(() => {
+        console.log('✅ Service Worker: Force update completed');
+        self.clients.matchAll().then((clients) => {
+          clients.forEach((client) => {
+            client.postMessage({ 
+              type: 'FORCE_UPDATE_COMPLETED',
+              timestamp: new Date().toISOString()
+            });
+          });
+        });
+      })
+    );
   }
   
   if (event.data && event.data.type === 'SKIP_WAITING') {
@@ -74,45 +99,71 @@ self.addEventListener('message', (event) => {
 });
 
 self.addEventListener('install', (event) => {
-  console.log('🔧 Service Worker: Installing with offline support');
+  console.log('🔧 Service Worker: Installing v2.1 with force update');
+  
+  // Skip waiting to activate immediately
+  self.skipWaiting();
   
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => {
+    Promise.all([
+      // Clear old caches first
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName.includes('rhythm-offline-v1') || cacheName.includes('rhythm-dynamic-v1')) {
+              console.log('�️ Service Worker: Force deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      }),
+      // Then populate new cache
+      caches.open(CACHE_NAME).then((cache) => {
         console.log('📦 Service Worker: Caching critical assets');
-        return cache.addAll(CRITICAL_ASSETS.map(url => {
-          // Handle relative URLs
-          return url.startsWith('/') ? url : '/' + url;
-        }));
+        return Promise.allSettled(
+          CRITICAL_ASSETS.map(url => {
+            return cache.add(url).catch(error => {
+              console.warn(`⚠️ Service Worker: Failed to cache ${url}:`, error.message);
+            });
+          })
+        );
       })
-      .then(() => {
-        console.log('✅ Service Worker: Critical assets cached');
-        self.skipWaiting();
-      })
-      .catch((error) => {
-        console.error('❌ Service Worker: Failed to cache critical assets:', error);
-      })
+    ])
   );
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('🚀 Service Worker: Activating');
+  console.log('✅ Service Worker: Activating v2.1 and claiming clients');
   
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          // Delete old caches
-          if (cacheName !== CACHE_NAME && cacheName !== DYNAMIC_CACHE) {
-            console.log('🗑️ Service Worker: Deleting old cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      console.log('✅ Service Worker: Activated and claiming clients');
-      self.clients.claim();
-    })
+    Promise.all([
+      // Clean up old caches
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames
+            .filter(name => name.startsWith('rhythm-') && name !== CACHE_NAME && name !== DYNAMIC_CACHE)
+            .map(name => {
+              console.log('🗑️ Service Worker: Deleting old cache:', name);
+              return caches.delete(name);
+            })
+        );
+      }),
+      // Claim all clients immediately
+      self.clients.claim().then(() => {
+        console.log('👥 Service Worker: Claimed all clients for immediate update');
+        
+        // Notify all clients about the update
+        return self.clients.matchAll().then(clients => {
+          clients.forEach(client => {
+            client.postMessage({
+              type: 'SW_UPDATED',
+              version: '2.1',
+              timestamp: new Date().toISOString()
+            });
+          });
+        });
+      })
+    ])
   );
 });
 

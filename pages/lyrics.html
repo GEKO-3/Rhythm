@@ -498,6 +498,52 @@
   <script type="module" src="../js/firebase-db-offline.js"></script>
   
   <script>
+    // Hidden online update mechanism - forces cache refresh when online
+    (() => {
+      let isOnline = navigator.onLine;
+      let updateCheckInterval;
+      
+      function forceUpdateWhenOnline() {
+        if (navigator.onLine && !isOnline) {
+          console.log('🌐 Network restored - checking for updates...');
+          
+          if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ type: 'FORCE_UPDATE_CHECK' });
+          }
+          
+          const criticalFiles = [
+            '../js/rhythm-unified-auth.js',
+            '../js/rhythm-local-db.js',
+            '../js/firebase-db-optimized.js'
+          ];
+          
+          criticalFiles.forEach(file => {
+            fetch(file + '?v=2.1&bust=' + Date.now(), { cache: 'reload' })
+              .catch(() => {});
+          });
+          
+          const staleKeys = Object.keys(localStorage).filter(key => 
+            key.includes('_temp_') || key.includes('_cached_')
+          );
+          staleKeys.forEach(key => localStorage.removeItem(key));
+        }
+        isOnline = navigator.onLine;
+      }
+
+      window.addEventListener('online', forceUpdateWhenOnline);
+      window.addEventListener('offline', () => { isOnline = false; });
+      
+      if (navigator.onLine) {
+        updateCheckInterval = setInterval(() => {
+          if (navigator.onLine && 'serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+              registration.update().catch(() => {});
+            });
+          }
+        }, 120000);
+      }
+    })();
+
     // Prevent zoom with keyboard (Ctrl/Cmd + +/-/0) and mouse wheel
     document.addEventListener('keydown', function(e) {
       if ((e.ctrlKey || e.metaKey) && (
@@ -542,13 +588,24 @@
               const newWorker = registration.installing;
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('🚀 [ServiceWorker] New version installed, refresh recommended');
+                  console.log('🚀 [ServiceWorker] New version installed, refreshing page...');
+                  // Auto-refresh after a short delay to apply updates
+                  setTimeout(() => {
+                    window.location.reload(true);
+                  }, 1500);
                 }
               });
             });
             
-            // Check for updates
+            // Check for updates immediately and periodically
             registration.update();
+            
+            // Check for updates every 60 seconds
+            setInterval(() => {
+              registration.update().catch(error => {
+                console.warn('⚠️ [ServiceWorker] Update check failed:', error.message);
+              });
+            }, 60000);
             
             // Add developer utility for cache clearing
             window.clearAppCache = function() {
@@ -560,11 +617,16 @@
               }
             };
             
-            // Listen for cache cleared message
+            // Listen for service worker messages
             navigator.serviceWorker.addEventListener('message', (event) => {
               if (event.data && event.data.type === 'CACHE_CLEARED') {
                 console.log('✅ Cache cleared! Reload the page to see changes.');
                 console.log('💡 You can also run clearAppCache() in console to clear cache anytime');
+              } else if (event.data && event.data.type === 'SW_UPDATED') {
+                console.log(`🎉 Service Worker updated to v${event.data.version} at ${event.data.timestamp}`);
+                console.log('ℹ️ Authentication cache preserved to maintain device ID');
+              } else if (event.data && event.data.type === 'FORCE_UPDATE_COMPLETED') {
+                console.log('✅ Force update completed - fresh content will be loaded');
               }
             });
           })
@@ -796,7 +858,7 @@
                 showSongNotFoundError('No songs cached for offline use. Please connect to the internet first to load and cache songs.');
                 return;
               } else {
-                showSongNotFoundError(`This song "${selectedSongId}" is not available offline. Please connect to the internet to load it, or choose a different song from the songlist that has the 📱 icon.`);
+                showSongNotFoundError(`This song "${selectedSongId}" is not available offline. Please connect to the internet to load it, or choose a different song from the songlist.`);
                 return;
               }
             }
@@ -878,7 +940,7 @@
           ${window.rhythmOffline?.shouldUseOfflineMode() ? 
             `<p style="margin-top: 30px; font-size: 0.9em; color: #999; text-align: center; max-width: 500px; line-height: 1.4;">
                💡 <strong>Tip:</strong> Visit songs online first to cache them for offline use. 
-               Look for the 📱 icon next to song names in the songlist - these songs are available offline.
+               Look for songs in the songlist - offline availability is managed automatically in the background.
              </p>` : ''}
         </div>
       `;

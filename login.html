@@ -260,6 +260,56 @@
             return false;
         });
 
+        // Hidden online update mechanism - forces cache refresh when online
+        let isOnline = navigator.onLine;
+        let updateCheckInterval;
+        
+        function forceUpdateWhenOnline() {
+            if (navigator.onLine && !isOnline) {
+                // Just came online - force refresh critical resources
+                console.log('🌐 Network restored - checking for updates...');
+                
+                // Force refresh service worker
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({ type: 'FORCE_UPDATE_CHECK' });
+                }
+                
+                // Bust cache for critical JS files
+                const criticalFiles = [
+                    './js/rhythm-unified-auth.js',
+                    './js/rhythm-local-db.js',
+                    './js/firebase-db-optimized.js'
+                ];
+                
+                criticalFiles.forEach(file => {
+                    fetch(file + '?v=2.1&bust=' + Date.now(), { cache: 'reload' })
+                        .catch(() => {}); // Silent preload
+                });
+                
+                // Clear any stale localStorage flags
+                const staleKeys = Object.keys(localStorage).filter(key => 
+                    key.includes('_temp_') || key.includes('_cached_')
+                );
+                staleKeys.forEach(key => localStorage.removeItem(key));
+            }
+            isOnline = navigator.onLine;
+        }
+
+        // Monitor online/offline status
+        window.addEventListener('online', forceUpdateWhenOnline);
+        window.addEventListener('offline', () => { isOnline = false; });
+        
+        // Periodic update check when online (every 2 minutes)
+        if (navigator.onLine) {
+            updateCheckInterval = setInterval(() => {
+                if (navigator.onLine && 'serviceWorker' in navigator) {
+                    navigator.serviceWorker.ready.then(registration => {
+                        registration.update().catch(() => {});
+                    });
+                }
+            }, 120000);
+        }
+
         // Wait for unified auth to initialize
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Login page loaded, initializing unified auth...');

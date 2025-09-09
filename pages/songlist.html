@@ -301,13 +301,6 @@
       flex: 1;
     }
 
-    ul#song-list li .offline-indicator {
-      font-size: 0.9em;
-      opacity: 0.7;
-      margin-left: 8px;
-      flex-shrink: 0;
-    }
-
     ul#song-list li:hover {
       background: var(--hover-color);
       color: var(--text-color);
@@ -496,13 +489,24 @@
               const newWorker = registration.installing;
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('🚀 [ServiceWorker] New version installed, refresh recommended');
+                  console.log('🚀 [ServiceWorker] New version installed, refreshing page...');
+                  // Auto-refresh after a short delay to apply updates
+                  setTimeout(() => {
+                    window.location.reload(true);
+                  }, 1500);
                 }
               });
             });
             
-            // Check for updates
+            // Check for updates immediately and periodically
             registration.update();
+            
+            // Check for updates every 60 seconds
+            setInterval(() => {
+              registration.update().catch(error => {
+                console.warn('⚠️ [ServiceWorker] Update check failed:', error.message);
+              });
+            }, 60000);
             
             // Add developer utility for cache clearing
             window.clearAppCache = function() {
@@ -514,11 +518,16 @@
               }
             };
             
-            // Listen for cache cleared message
+            // Listen for service worker messages
             navigator.serviceWorker.addEventListener('message', (event) => {
               if (event.data && event.data.type === 'CACHE_CLEARED') {
                 console.log('✅ Cache cleared! Reload the page to see changes.');
                 console.log('💡 You can also run clearAppCache() in console to clear cache anytime');
+              } else if (event.data && event.data.type === 'SW_UPDATED') {
+                console.log(`🎉 Service Worker updated to v${event.data.version} at ${event.data.timestamp}`);
+                console.log('ℹ️ Authentication cache preserved to maintain device ID');
+              } else if (event.data && event.data.type === 'FORCE_UPDATE_COMPLETED') {
+                console.log('✅ Force update completed - fresh content will be loaded');
               }
             });
           })
@@ -532,6 +541,52 @@
   <!-- Enhanced Firebase DB with offline support -->
   <script type="module" src="../js/firebase-db-offline.js"></script>
   <script>
+    // Hidden online update mechanism - forces cache refresh when online
+    (() => {
+      let isOnline = navigator.onLine;
+      let updateCheckInterval;
+      
+      function forceUpdateWhenOnline() {
+        if (navigator.onLine && !isOnline) {
+          console.log('🌐 Network restored - checking for updates...');
+          
+          if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage({ type: 'FORCE_UPDATE_CHECK' });
+          }
+          
+          const criticalFiles = [
+            '../js/rhythm-unified-auth.js',
+            '../js/rhythm-local-db.js',
+            '../js/firebase-db-optimized.js'
+          ];
+          
+          criticalFiles.forEach(file => {
+            fetch(file + '?v=2.1&bust=' + Date.now(), { cache: 'reload' })
+              .catch(() => {});
+          });
+          
+          const staleKeys = Object.keys(localStorage).filter(key => 
+            key.includes('_temp_') || key.includes('_cached_')
+          );
+          staleKeys.forEach(key => localStorage.removeItem(key));
+        }
+        isOnline = navigator.onLine;
+      }
+
+      window.addEventListener('online', forceUpdateWhenOnline);
+      window.addEventListener('offline', () => { isOnline = false; });
+      
+      if (navigator.onLine) {
+        updateCheckInterval = setInterval(() => {
+          if (navigator.onLine && 'serviceWorker' in navigator) {
+            navigator.serviceWorker.ready.then(registration => {
+              registration.update().catch(() => {});
+            });
+          }
+        }, 120000);
+      }
+    })();
+
     // Optimized Application Module using Shared Services
     const RhythmSongList = (function() {
       'use strict';
@@ -1406,15 +1461,8 @@
           const isOfflineAvailable = song.isOfflineAvailable || 
                                    (window.rhythmDB?.isSongCached(song.id)) || false;
           
-          // Create song name with offline indicator
-          if (isOfflineAvailable) {
-            li.innerHTML = `
-              <span class="song-name">${song.name}</span>
-              <span class="offline-indicator" title="Available offline">📱</span>
-            `;
-          } else {
-            li.innerHTML = `<span class="song-name">${song.name}</span>`;
-          }
+          // Create song name without offline indicator emoji
+          li.innerHTML = `<span class="song-name">${song.name}</span>`;
           
           li.dataset.songId = song.id;
           li.dataset.songName = song.name;

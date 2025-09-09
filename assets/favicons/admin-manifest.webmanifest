@@ -2,7 +2,7 @@
   "name": "Rhythm Boduberu - Admin Panel",
   "short_name": "Rhythm Admin",
   "description": "Administrative panel for managing Rhythm Boduberu music group operations, member applications, and content",
-  "start_url": "/pages/admin/admin.html",
+  "start_url": "/pages/admin/admin.html?v=2.1&update=20241221",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",

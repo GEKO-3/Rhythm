@@ -2,7 +2,7 @@
   "name": "Rhythm Boduberu - Dev Menu",
   "short_name": "Rhythm Dev",
   "description": "Developer menu for Rhythm Boduberu website management",
-  "start_url": "/dev",
+  "start_url": "/dev?v=2.1&update=20241221",
   "display": "standalone",
   "background_color": "#1f1f1f",
   "theme_color": "#f5d000",
