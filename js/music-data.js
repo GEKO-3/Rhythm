@@ -72,6 +72,15 @@ const musicData = [
         trackId: "2134114245",
         thumbnailUrl: "src/thumb/908.jpg"
     },
+        {
+        id: 9,
+        title: "Fari Yaaraa",
+        artist: "Ithoa",
+        form: "Recording",
+        original: true,
+        trackId: "2168950890",
+        thumbnailUrl: "src/thumb/909.jpg"
+    },
 ];
 
 // Export for use in other files
