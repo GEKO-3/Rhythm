@@ -81,6 +81,16 @@ const musicData = [
         trackId: "2168950890",
         thumbnailUrl: "src/thumb/909.jpg"
     },
+            {
+        id: 10,
+        title: "Vaathee Hithaama",
+        artist: "Haikal",
+        form: "Live Performance",
+        original: false,
+        trackId: "2170253430",
+        thumbnailUrl: "src/thumb/801.jpg"
+    },
+
 ];
 
 // Export for use in other files
