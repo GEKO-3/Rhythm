@@ -136,7 +136,7 @@
     <section class="main-section">
         <div class="video-fallback"></div>
         <video class="video-background" autoplay muted loop playsinline>
-            <source src="src/bg-video.mp4" type="video/mp4">
+            <source src="src/bg-video.mp4?v=2.1.2" type="video/mp4">
             Your browser does not support the video tag.
         </video>
         <div class="background-overlay"></div>
@@ -286,8 +286,8 @@
     <!-- Add your additional content sections below this line -->
 
     <script src="https://w.soundcloud.com/player/api.js" defer></script>
-    <script src="js/music-data.js?v=2.1.1" defer></script>
-    <script src="js/music-player.js?v=2.1.1" defer></script>
+    <script src="js/music-data.js?v=2.1.2" defer></script>
+    <script src="js/music-player.js?v=2.1.2" defer></script>
     <script>
         // Video fallback handling - optimized
         document.addEventListener('DOMContentLoaded', function() {
@@ -1656,7 +1656,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
-                navigator.serviceWorker.register(`sw.js?v=2.1.1`, { updateViaCache: 'none' })
+                navigator.serviceWorker.register(`sw.js?v=2.1.2`, { updateViaCache: 'none' })
                     .then(function(registration) {
                         console.log('✅ [ServiceWorker] Registered successfully:', registration.scope);
                         

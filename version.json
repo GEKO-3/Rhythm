@@ -1,12 +1,12 @@
 {
-  "version": "2.1.1",
+  "version": "2.1.2",
   "timestamp": 1758648000000,
-  "description": "Force cache refresh for new music data updates",
+  "description": "Fix video background cache issues",
   "changes": [
-    "Updated service worker cache version to v2.1.1",
-    "Fixed cache invalidation for music-data.js updates",
-    "Ensured new content appears on live website",
-    "Added cache clearing utilities",
-    "Force refresh for all JavaScript files"
+    "Added cache-busting parameter to bg-video.mp4",
+    "Updated service worker cache version to v2.1.2",
+    "Fixed video background not loading on live website",
+    "Ensured video content refreshes properly",
+    "Force refresh for video assets"
   ]
 }
