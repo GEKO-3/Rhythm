@@ -6,6 +6,9 @@
     <meta name="description" content="Rhythm Boduberu - Booking Application Form">
     <title>Rhythm Boduberu - Join Our Team</title>
     
+    <!-- Google reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn"></script>
+    
     <!-- Favicon and web app manifest -->
     <link rel="icon" href="assets/favicons/favicon.ico" type="image/x-icon">
     <link rel="shortcut icon" href="assets/favicons/favicon.ico" type="image/x-icon">
@@ -1191,8 +1194,21 @@
                 }
             }
             
-            // All validations passed, show confirmation dialog
-            showDialog();
+            // All validations passed, execute reCAPTCHA v3 and show confirmation dialog
+            grecaptcha.ready(function() {
+                grecaptcha.execute('6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn', {action: 'application_form'}).then(function(token) {
+                    // reCAPTCHA verification successful, show confirmation dialog
+                    showDialog();
+                }).catch(function(error) {
+                    // reCAPTCHA failed
+                    console.error('reCAPTCHA failed:', error);
+                    showMessage('Security verification failed. Please try again.', 'error');
+                    loading.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Application';
+                    formSubmitted = false;
+                });
+            });
         });
 
         // Enhanced form interactions

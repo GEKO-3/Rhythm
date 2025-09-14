@@ -232,11 +232,62 @@
         </div>
     </section>
 
+    <!-- Footer Section -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <img src="src/Logo_1.svg" alt="Rhythm Boduberu Logo" class="footer-logo-img">
+                <span class="footer-brand">Rhythm Boduberu</span>
+            </div>
+            
+            <div class="footer-social">
+                <a href="https://www.facebook.com/share/15pXtBHaRS/" target="_blank" class="footer-social-link" aria-label="Facebook">
+                    <img src="src/Footer Facebook.svg" alt="Facebook" class="social-icon-img">
+                </a>
+                <a href="https://www.instagram.com/rhythm_boduberu__" target="_blank" class="footer-social-link" aria-label="Instagram">
+                    <img src="src/Footer Instagram.svg" alt="Instagram" class="social-icon-img">
+                </a>
+                <a href="https://www.tiktok.com/@rhythm_boduberu_" target="_blank" class="footer-social-link" aria-label="TikTok">
+                    <img src="src/Footer Tiktok.svg" alt="TikTok" class="social-icon-img">
+                </a>
+                <a href="https://on.soundcloud.com/m60NOOoeFiEVGq1dTw" target="_blank" class="footer-social-link" aria-label="SoundCloud">
+                    <img src="src/Footer Soundcloud.svg" alt="SoundCloud" class="social-icon-img">
+                </a>
+                <a href="https://www.youtube.com/@rhythmboduberu" target="_blank" class="footer-social-link" aria-label="YouTube">
+                    <img src="src/Footer youtube.svg" alt="YouTube" class="social-icon-img">
+                </a>
+                <a href="https://invite.viber.com/?g2=AQBr7RgqaOJOp1SaLAlHeZH%2BrPk4S3rwDdiOGwLstgf9PWiKNB9kWaZS3SSn%2Bw1o" target="_blank" class="footer-social-link" aria-label="Viber">
+                    <img src="src/Footer Viber.svg" alt="Viber" class="social-icon-img">
+                </a>
+            </div>
+            
+            <div class="footer-contact">
+                <p class="footer-phone">
+                    <a href="tel:+9607576784" class="phone-button">
+                        <img src="src/Footer Phone.svg" alt="Call" class="contact-icon"> 7576784
+                    </a>
+                    <a href="tel:+9609128889" class="phone-button">
+                        <img src="src/Footer Phone.svg" alt="Call" class="contact-icon"> 9128889
+                    </a>
+                </p>
+                <p class="footer-email">
+                    <img src="src/Footer Email.svg" alt="Email" class="contact-icon"> 
+                    <a href="mailto:info@rhythmboduberu.com">info@rhythmboduberu.com</a>
+                </p>
+            </div>
+            
+            <div class="footer-copyright">
+                <p>&copy; 2025 Rhythm Boduberu. All rights reserved.</p>
+                <p class="footer-tagline">Premier Traditional Maldivian Boduberu Music Group</p>
+            </div>
+        </div>
+    </footer>
+
     <!-- Add your additional content sections below this line -->
 
     <script src="https://w.soundcloud.com/player/api.js" defer></script>
-    <script src="js/music-data.js" defer></script>
-    <script src="js/music-player.js" defer></script>
+    <script src="js/music-data.js?v=2.1.1" defer></script>
+    <script src="js/music-player.js?v=2.1.1" defer></script>
     <script>
         // Video fallback handling - optimized
         document.addEventListener('DOMContentLoaded', function() {
@@ -1599,6 +1650,48 @@
                 }
             }, 100); // Small initial delay to let everything settle
         });
+    </script>
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register(`sw.js?v=2.1.1`, { updateViaCache: 'none' })
+                    .then(function(registration) {
+                        console.log('✅ [ServiceWorker] Registered successfully:', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', function() {
+                            const newWorker = registration.installing;
+                            console.log('🔄 [ServiceWorker] Update found, installing new version');
+                            
+                            newWorker.addEventListener('statechange', function() {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('🚀 [ServiceWorker] New version installed, refreshing page...');
+                                    // Optionally auto-refresh or show notification
+                                    window.location.reload();
+                                }
+                            });
+                        });
+                        
+                        // Force update check
+                        registration.update().catch(function(error) {
+                            console.warn('⚠️ [ServiceWorker] Update check failed:', error.message);
+                        });
+                        
+                        // Handle messages from service worker
+                        navigator.serviceWorker.addEventListener('message', function(event) {
+                            if (event.data && event.data.type === 'CACHE_UPDATED') {
+                                console.log('📱 [ServiceWorker] Cache updated, reloading...');
+                                window.location.reload();
+                            }
+                        });
+                        
+                    }).catch(function(error) {
+                        console.log('❌ [ServiceWorker] Registration failed:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>

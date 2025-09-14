@@ -11,6 +11,9 @@
     <!-- Performance optimizations: Resource hints -->
     <link rel="preconnect" href="https://cdnjs.cloudflare.com">
     
+    <!-- Google reCAPTCHA v3 -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn"></script>
+    
     <!-- Critical CSS -->
     <link rel="stylesheet" href="assets/styles.css">
     
@@ -1707,10 +1710,24 @@
             const submitBtn = document.querySelector('.submit-btn');
             const originalText = submitBtn.textContent;
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
+            submitBtn.textContent = 'Verifying...';
             
-            // Submit to Firebase instead of Google Forms
-            submitToFirebase(name, phone, company, interest, submitBtn, originalText);
+            // Execute reCAPTCHA v3
+            grecaptcha.ready(function() {
+                grecaptcha.execute('6LcOzo8rAAAAAEizuJcFwiBsdBma016NjaS6faGn', {action: 'sponsor_form'}).then(function(token) {
+                    // reCAPTCHA verification successful, proceed with submission
+                    submitBtn.textContent = 'Submitting...';
+                    
+                    // Submit to Firebase instead of Google Forms
+                    submitToFirebase(name, phone, company, interest, submitBtn, originalText);
+                }).catch(function(error) {
+                    // reCAPTCHA failed
+                    console.error('reCAPTCHA failed:', error);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                    alert('Security verification failed. Please try again.');
+                });
+            });
         });
         
         
