@@ -71,7 +71,8 @@
       overscroll-behavior: none;
       /* 🚀 PERFORMANCE: Optimize rendering */
       will-change: scroll-position;
-      contain: layout style;
+      /* Remove contain: layout to fix fixed positioning */
+      contain: style;
     }
     input, textarea, select, button {
       touch-action: manipulation;
