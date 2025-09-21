@@ -1,12 +1,12 @@
 {
-  "version": "2.1.2",
-  "timestamp": 1758648000000,
-  "description": "Fix video background cache issues",
+  "version": "2.1.3",
+  "timestamp": 1726927200000,
+  "description": "Admin page updates and attendance integration",
   "changes": [
-    "Added cache-busting parameter to bg-video.mp4",
-    "Updated service worker cache version to v2.1.2",
-    "Fixed video background not loading on live website",
-    "Ensured video content refreshes properly",
-    "Force refresh for video assets"
+    "Added back button to admin page",
+    "Added attendance page to admin menu",
+    "Updated service worker cache version to v2.1.3",
+    "Fixed admin page caching issues",
+    "Enhanced admin navigation experience"
   ]
 }

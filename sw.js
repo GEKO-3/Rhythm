@@ -1,17 +1,20 @@
 // Simple Service Worker for Rhythm Boduberu
 // Provides basic offline functionality without aggressive caching
 
-const CACHE_NAME = 'rhythm-v2.1.2';
+const CACHE_NAME = 'rhythm-v2.1.3';
 const ESSENTIAL_ASSETS = [
   './',
   './pages/songlist.html',
   './pages/lyrics.html',
+  './pages/attendance.html',
   './login.html',
+  './pages/admin/admin.html',
   './js/rhythm-unified-auth.js',
   './js/rhythm-local-db.js',
   './js/firebase-db-offline.js',
   './js/firebase-db-optimized.js',
-  './js/music-data.js'
+  './js/music-data.js',
+  './js/members-data.js'
 ];
 
 // Install event - cache essential assets
