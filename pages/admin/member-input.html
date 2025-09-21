@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Data Input - Rhythm Admin</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="../../assets/favicons/icons-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../../assets/favicons/icons-512.png">
+    <link rel="manifest" href="../../assets/favicons/manifest.webmanifest">
+    
+    <!-- Font definitions -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('../../assets/Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --primary-hover: #fced98;
+            --primary-dark: #E6B800;
+            --bg-color: #1f1f1f;
+            --bg-light: #2b2b2b;
+            --text-light: #ffffff;
+            --text-dark: #2b2b2b;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --warning-color: #ff9800;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, var(--bg-light), var(--bg-color));
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-section img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .logo-section h1 {
+            color: var(--primary-color);
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-link {
+            color: var(--text-light);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover {
+            background-color: var(--primary-color);
+            color: var(--text-dark);
+        }
+
+        .main-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .form-card {
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .form-title {
+            color: var(--primary-color);
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            color: #cccccc;
+            margin-bottom: 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-label {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .form-input {
+            background: var(--bg-color);
+            border: 2px solid rgba(245, 208, 0, 0.2);
+            border-radius: var(--border-radius);
+            padding: 12px 16px;
+            color: var(--text-light);
+            font-size: 1em;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #888888;
+        }
+
+        .form-select {
+            background: var(--bg-color);
+            border: 2px solid rgba(245, 208, 0, 0.2);
+            border-radius: var(--border-radius);
+            padding: 12px 16px;
+            color: var(--text-light);
+            font-size: 1em;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.1);
+        }
+
+        .photo-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+            object-fit: cover;
+            margin: 10px auto;
+            display: block;
+            background: var(--bg-color);
+        }
+
+        .photo-path-hint {
+            font-size: 0.8em;
+            color: #888888;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        .user-connection {
+            background: rgba(245, 208, 0, 0.1);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .user-connection h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .access-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--error-color);
+        }
+
+        .status-indicator.active {
+            background: var(--success-color);
+        }
+
+        .status-indicator.admin {
+            background: var(--primary-color);
+        }
+
+        .status-indicator.pending {
+            background: var(--warning-color);
+        }
+
+        .status-indicator.rejected {
+            background: var(--error-color);
+        }
+
+        .status-indicator.revoked {
+            background: #9e9e9e;
+        }
+
+        /* Generated info styles */
+        .generated-info {
+            background: linear-gradient(135deg, rgba(245, 208, 0, 0.1), rgba(245, 208, 0, 0.05));
+            border: 1px solid rgba(245, 208, 0, 0.2);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .generated-info h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 5px 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        .info-value {
+            color: var(--text-light);
+            font-weight: 500;
+            font-family: 'Courier New', monospace;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--text-dark);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-light);
+            color: var(--text-dark);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #45a049;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: var(--border-radius);
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: var(--transition);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background: var(--success-color);
+        }
+
+        .notification.error {
+            background: var(--error-color);
+        }
+
+        .notification.warning {
+            background: var(--warning-color);
+        }
+
+        .members-list {
+            margin-top: 40px;
+            background: var(--bg-light);
+            border-radius: var(--border-radius);
+            padding: 20px;
+        }
+
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(245, 208, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .member-item:hover {
+            background: rgba(245, 208, 0, 0.05);
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color);
+        }
+
+        .member-details h4 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .member-details p {
+            color: #cccccc;
+            font-size: 0.9em;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.8em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .main-container {
+                margin: 20px auto;
+                padding: 0 15px;
+            }
+
+            .form-card {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .member-item {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .member-actions {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="admin-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="../../src/Logo.png" alt="Rhythm Logo">
+                <div>
+                    <h1>Rhythm Admin</h1>
+                    <p style="font-size: 0.8em; color: #cccccc;">Member Management</p>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="../members.html" class="nav-link">View Members</a>
+                <a href="../../index.html" class="nav-link">Home</a>
+                <a href="../../login.html" class="nav-link">Logout</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Member Form -->
+        <div class="form-card">
+            <h2 class="form-title">Add/Edit Member</h2>
+            <p class="form-subtitle">Manage member information and app access</p>
+            
+            <form id="memberForm" class="form-grid" autocomplete="off" novalidate>
+                <!-- Member ID (hidden for new members) -->
+                <input type="hidden" id="memberId" autocomplete="off" />
+                
+                <!-- Member Number (generates photo path, index, and user ID) -->
+                <div class="form-group">
+                    <label for="memberNumber" class="form-label">Member Number</label>
+                    <input type="text" id="memberNumber" class="form-input" 
+                           placeholder="e.g., 1000" pattern="[0-9]{4}" maxlength="4"
+                           autocomplete="off" />
+                    <div class="photo-path-hint">
+                        Enter 4-digit number to auto-generate photo path (src/img/1000.png), index (RB1000), and user ID (1000)
+                    </div>
+                    <img id="photoPreview" class="photo-preview" style="display: none;" alt="Member Photo" />
+                </div>
+
+                <!-- Generated fields (hidden but will be populated) -->
+                <input type="hidden" id="photoPath" autocomplete="off" />
+                <input type="hidden" id="rhythmIndexNumber" autocomplete="off" />
+                <input type="hidden" id="userId" autocomplete="off" />
+
+                <!-- Display generated values -->
+                <div class="generated-info" id="generatedInfo" style="display: none;">
+                    <h4>Generated Information:</h4>
+                    <div class="info-row">
+                        <span class="info-label">Photo Path:</span>
+                        <span id="displayPhotoPath" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Index Number:</span>
+                        <span id="displayIndexNumber" class="info-value"></span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">User ID:</span>
+                        <span id="displayUserId" class="info-value"></span>
+                    </div>
+                    <div class="access-status">
+                        <span class="status-indicator" id="accessIndicator"></span>
+                        <span id="accessStatus">No app access</span>
+                    </div>
+                </div>
+
+                <!-- Full Name -->
+                <div class="form-group">
+                    <label for="fullName" class="form-label">Full Name</label>
+                    <input type="text" id="fullName" class="form-input" 
+                           placeholder="Enter full name" required autocomplete="off" />
+                </div>
+
+                <!-- Residence -->
+                <div class="form-group">
+                    <label for="residence" class="form-label">Residence</label>
+                    <input type="text" id="residence" class="form-input" 
+                           placeholder="Enter residence/location" autocomplete="off" />
+                </div>
+
+                <!-- Role -->
+                <div class="form-group">
+                    <label for="role" class="form-label">Role</label>
+                    <select id="role" class="form-select" required autocomplete="off">
+                        <option value="">Select Role</option>
+                        <option value="Lead Vocalist">Lead Vocalist</option>
+                        <option value="Back Vocalist">Back Vocalist</option>
+                        <option value="Drummer">Drummer</option>
+                        <option value="Instrumentalist">Instrumentalist</option>
+                        <option value="Media">Media</option>
+                        <option value="Dancer">Dancer</option>
+                    </select>
+                </div>
+
+                <!-- Date of Birth -->
+                <div class="form-group">
+                    <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                    <input type="date" id="dateOfBirth" class="form-input" autocomplete="off" />
+                </div>
+
+                <!-- Contact Number -->
+                <div class="form-group">
+                    <label for="contactNumber" class="form-label">Contact Number</label>
+                    <input type="tel" id="contactNumber" class="form-input" 
+                           placeholder="Enter contact number" autocomplete="off" />
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        💾 Save Member
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                        🔄 Reset Form
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="loadMembersList()">
+                        📋 View All Members
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Members List -->
+        <div class="members-list" id="membersList" style="display: none;">
+            <h3 style="color: var(--primary-color); margin-bottom: 20px;">Existing Members</h3>
+            <div id="membersContainer">
+                <!-- Members will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Scripts -->
+    <script src="../../js/members-data.js"></script>
+    <script type="module" src="../../js/rhythm-unified-auth.js"></script>
+    
+    <script>
+        let isEditing = false;
+        let currentMemberId = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAndSetup();
+        });
+
+        async function initializeAndSetup() {
+            try {
+                await initializeMembersData();
+                initializePage();
+                setupEventListeners();
+                checkForEditMode(); // Only call after Firebase is ready
+            } catch (error) {
+                console.error('❌ Error in initialization:', error);
+                showNotification('Error initializing application', 'error');
+            }
+        }
+
+        async function initializeMembersData() {
+            try {
+                // Wait for MembersData class to be available
+                while (typeof window.MembersData === 'undefined') {
+                    console.log('🔄 Waiting for MembersData class...');
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+
+                // Initialize members data if not already available
+                if (typeof window.membersData === 'undefined') {
+                    console.log('🔄 Initializing members data...');
+                    window.membersData = new window.MembersData();
+                }
+                
+                // Wait for Firebase initialization
+                while (!window.membersData.isFirebaseReady) {
+                    console.log('🔄 Waiting for Firebase to initialize...');
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                console.log('✅ Members data initialized and ready');
+            } catch (error) {
+                console.error('❌ Error initializing members data:', error);
+                showNotification('Error connecting to database', 'error');
+                throw error; // Re-throw to handle in parent function
+            }
+        }
+
+        function initializePage() {
+            // Setup member number input with auto-generation
+            const memberNumberInput = document.getElementById('memberNumber');
+            let statusCheckTimeout;
+            
+            memberNumberInput.addEventListener('input', (e) => {
+                const memberNumber = e.target.value;
+                
+                // Only allow 4 digits
+                if (memberNumber && !/^\d{1,4}$/.test(memberNumber)) {
+                    e.target.value = memberNumber.replace(/[^\d]/g, '').slice(0, 4);
+                    return;
+                }
+                
+                updateGeneratedFields(memberNumber);
+                
+                // Clear previous timeout
+                clearTimeout(statusCheckTimeout);
+                
+                // Set new timeout to debounce API calls for user status
+                if (memberNumber && memberNumber.length === 4) {
+                    statusCheckTimeout = setTimeout(() => updateAccessStatus(memberNumber), 500);
+                } else {
+                    // Clear status if incomplete number
+                    clearAccessStatus();
+                }
+            });
+        }
+
+        function checkForEditMode() {
+            // Check URL parameters for edit mode
+            const urlParams = new URLSearchParams(window.location.search);
+            const editId = urlParams.get('edit') || localStorage.getItem('editMemberId');
+            
+            if (editId) {
+                editMember(editId);
+                localStorage.removeItem('editMemberId'); // Clear after use
+            }
+        }
+
+        function setupEventListeners() {
+            // Form submission
+            document.getElementById('memberForm').addEventListener('submit', handleFormSubmit);
+        }
+
+        function updatePhotoPreview() {
+            const photoPath = document.getElementById('photoPath').value;
+            const preview = document.getElementById('photoPreview');
+            
+            if (photoPath.trim()) {
+                preview.src = '../../' + photoPath;
+                preview.style.display = 'block';
+                preview.onerror = function() {
+                    this.style.display = 'none';
+                    showNotification('Photo not found at specified path', 'error');
+                };
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function updateGeneratedFields(memberNumber) {
+            const photoPathField = document.getElementById('photoPath');
+            const indexNumberField = document.getElementById('rhythmIndexNumber');
+            const userIdField = document.getElementById('userId');
+            const generatedInfo = document.getElementById('generatedInfo');
+            
+            if (memberNumber && memberNumber.length === 4) {
+                // Generate the three fields
+                const photoPath = `src/img/${memberNumber}.png`;
+                const indexNumber = `RB${memberNumber}`;
+                const userId = memberNumber;
+                
+                // Update hidden fields
+                photoPathField.value = photoPath;
+                indexNumberField.value = indexNumber;
+                userIdField.value = userId;
+                
+                // Update display fields
+                document.getElementById('displayPhotoPath').textContent = photoPath;
+                document.getElementById('displayIndexNumber').textContent = indexNumber;
+                document.getElementById('displayUserId').textContent = userId;
+                
+                // Show generated info
+                generatedInfo.style.display = 'block';
+                
+                // Update photo preview
+                updatePhotoPreview();
+            } else {
+                // Clear fields if incomplete
+                photoPathField.value = '';
+                indexNumberField.value = '';
+                userIdField.value = '';
+                generatedInfo.style.display = 'none';
+                
+                // Hide photo preview
+                document.getElementById('photoPreview').style.display = 'none';
+            }
+        }
+
+        function clearAccessStatus() {
+            const indicator = document.getElementById('accessIndicator');
+            const status = document.getElementById('accessStatus');
+            
+            indicator.classList.remove('active', 'admin', 'pending', 'rejected', 'revoked');
+            status.textContent = 'No app access';
+            status.style.color = '#cccccc';
+        }
+
+        async function updateAccessStatus(memberNumber = null) {
+            const userId = memberNumber || document.getElementById('userId').value;
+            const indicator = document.getElementById('accessIndicator');
+            const status = document.getElementById('accessStatus');
+            
+            if (!userId || !userId.trim()) {
+                clearAccessStatus();
+                return;
+            }
+
+            try {
+                // Check actual user status from authentication system
+                const userStatusObj = await window.membersData.getUserStatus(userId.trim());
+                const userStatus = userStatusObj?.status || 'no_access';
+                
+                // Update indicator classes
+                indicator.classList.remove('active', 'admin', 'pending', 'rejected', 'revoked');
+                
+                switch (userStatus) {
+                    case 'admin':
+                        indicator.classList.add('admin');
+                        status.textContent = 'Administrator Access';
+                        status.style.color = 'var(--primary-color)';
+                        break;
+                    case 'user':
+                        indicator.classList.add('active');
+                        status.textContent = 'App access granted';
+                        status.style.color = 'var(--success-color)';
+                        break;
+                    case 'pending':
+                        indicator.classList.add('pending');
+                        status.textContent = 'Access pending approval';
+                        status.style.color = 'var(--warning-color)';
+                        break;
+                    case 'rejected':
+                        indicator.classList.add('rejected');
+                        status.textContent = 'Access rejected';
+                        status.style.color = 'var(--error-color)';
+                        break;
+                    case 'revoked':
+                        indicator.classList.add('revoked');
+                        status.textContent = 'Access revoked';
+                        status.style.color = '#9e9e9e';
+                        break;
+                    default:
+                        status.textContent = 'User ID not found in system';
+                        status.style.color = '#cccccc';
+                        break;
+                }
+            } catch (error) {
+                console.error('Error checking user status:', error);
+                status.textContent = 'Error checking access status';
+                status.style.color = 'var(--error-color)';
+            }
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            try {
+                const formData = getFormData();
+                
+                // Validate required fields
+                if (!formData.fullName || !formData.rhythmIndexNumber || !formData.role) {
+                    showNotification('Please fill in all required fields', 'error');
+                    return;
+                }
+                
+                // Save member data (use addMember for new members, updateMember for edits)
+                let savedMember;
+                if (isEditing && currentMemberId) {
+                    savedMember = await window.membersData.updateMember(currentMemberId, formData);
+                    savedMember.fullName = formData.fullName; // Ensure fullName is available for notification
+                } else {
+                    savedMember = await window.membersData.addMember(formData);
+                }
+                
+                showNotification(`Member ${savedMember.fullName || formData.fullName} saved successfully!`, 'success');
+                
+                if (!isEditing) {
+                    resetForm();
+                }
+                
+                // Refresh members list if visible
+                const membersList = document.getElementById('membersList');
+                if (membersList.style.display !== 'none') {
+                    loadMembersList();
+                }
+                
+            } catch (error) {
+                console.error('Error saving member:', error);
+                showNotification('Error saving member data', 'error');
+            }
+        }
+
+        function getFormData() {
+            const userId = document.getElementById('userId').value.trim();
+            
+            return {
+                id: document.getElementById('memberId').value || undefined,
+                photoPath: document.getElementById('photoPath').value.trim(),
+                fullName: document.getElementById('fullName').value.trim(),
+                rhythmIndexNumber: document.getElementById('rhythmIndexNumber').value.trim(),
+                residence: document.getElementById('residence').value.trim(),
+                role: document.getElementById('role').value,
+                dateOfBirth: document.getElementById('dateOfBirth').value,
+                contactNumber: document.getElementById('contactNumber').value.trim(),
+                userId: userId || null,
+                hasAppAccess: Boolean(userId)
+            };
+        }
+
+        function resetForm() {
+            document.getElementById('memberForm').reset();
+            document.getElementById('memberId').value = '';
+            document.getElementById('memberNumber').value = '';
+            document.getElementById('photoPath').value = '';
+            document.getElementById('rhythmIndexNumber').value = '';
+            document.getElementById('userId').value = '';
+            document.getElementById('photoPreview').style.display = 'none';
+            document.getElementById('generatedInfo').style.display = 'none';
+            clearAccessStatus();
+            isEditing = false;
+            currentMemberId = null;
+            
+            // Update form title
+            document.querySelector('.form-title').textContent = 'Add/Edit Member';
+        }
+
+        async function loadMembersList() {
+            try {
+                const membersList = document.getElementById('membersList');
+                const container = document.getElementById('membersContainer');
+                
+                // Show loading
+                container.innerHTML = '<p style="text-align: center; color: #cccccc;">Loading members...</p>';
+                membersList.style.display = 'block';
+                
+                // Load members
+                const membersData = await window.membersData.getAllMembers();
+                const members = Object.values(membersData); // Convert object to array
+                
+                if (members.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #cccccc;">No members found</p>';
+                    return;
+                }
+                
+                // Generate members HTML
+                container.innerHTML = members.map(member => `
+                    <div class="member-item">
+                        <div class="member-info">
+                            <img src="../../${member.photoPath || 'src/Logo.png'}" 
+                                 alt="${member.fullName}" class="member-avatar"
+                                 onerror="this.src='../../src/Logo.png'" />
+                            <div class="member-details">
+                                <h4>${member.fullName}</h4>
+                                <p>${member.role} • ${member.rhythmIndexNumber}</p>
+                                <p style="font-size: 0.8em;">
+                                    ${member.hasAppAccess ? '✅ App Access' : '❌ No Access'}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="member-actions">
+                            <button class="btn btn-primary btn-small" onclick="editMember('${member.id}')">
+                                ✏️ Edit
+                            </button>
+                            <button class="btn btn-secondary btn-small" onclick="deleteMember('${member.id}')">
+                                🗑️ Delete
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading members:', error);
+                showNotification('Error loading members list', 'error');
+            }
+        }
+
+        async function editMember(memberId) {
+            try {
+                // Ensure Firebase is ready before attempting to load member
+                if (!window.membersData || !window.membersData.isFirebaseReady) {
+                    console.log('🔄 Firebase not ready, waiting...');
+                    showNotification('Initializing database connection...', 'warning');
+                    
+                    // Wait for Firebase to be ready
+                    while (!window.membersData || !window.membersData.isFirebaseReady) {
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
+                }
+
+                const member = await window.membersData.getMember(memberId);
+                if (!member) {
+                    showNotification('Member not found', 'error');
+                    return;
+                }
+                
+                // Populate form
+                document.getElementById('memberId').value = member.id;
+                document.getElementById('fullName').value = member.fullName;
+                document.getElementById('residence').value = member.residence || '';
+                document.getElementById('role').value = member.role;
+                document.getElementById('dateOfBirth').value = member.dateOfBirth || '';
+                document.getElementById('contactNumber').value = member.contactNumber || '';
+                
+                // Extract member number from existing data
+                let memberNumber = '';
+                if (member.userId) {
+                    memberNumber = member.userId;
+                } else if (member.rhythmIndexNumber && member.rhythmIndexNumber.startsWith('RB')) {
+                    memberNumber = member.rhythmIndexNumber.replace('RB', '');
+                } else if (member.photoPath && member.photoPath.includes('/img/')) {
+                    const match = member.photoPath.match(/\/img\/(\d+)\.png/);
+                    if (match) memberNumber = match[1];
+                }
+                
+                // Populate member number field and generate other fields
+                if (memberNumber && /^\d{4}$/.test(memberNumber)) {
+                    document.getElementById('memberNumber').value = memberNumber;
+                    updateGeneratedFields(memberNumber);
+                    updateAccessStatus(memberNumber);
+                } else {
+                    // Fallback: populate individual hidden fields if member number extraction failed
+                    document.getElementById('photoPath').value = member.photoPath || member.photo || '';
+                    document.getElementById('rhythmIndexNumber').value = member.rhythmIndexNumber;
+                    document.getElementById('userId').value = member.userId || '';
+                    updatePhotoPreview();
+                    updateAccessStatus();
+                }
+                isEditing = true;
+                currentMemberId = memberId;
+                
+                // Update form title
+                document.querySelector('.form-title').textContent = `Edit Member: ${member.fullName}`;
+                
+                // Scroll to form
+                document.querySelector('.form-card').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Error loading member for edit:', error);
+                showNotification('Error loading member data', 'error');
+            }
+        }
+
+        async function deleteMember(memberId) {
+            if (!confirm('Are you sure you want to delete this member?')) {
+                return;
+            }
+            
+            try {
+                await window.membersData.deleteMember(memberId);
+                showNotification('Member deleted successfully', 'success');
+                loadMembersList();
+            } catch (error) {
+                console.error('Error deleting member:', error);
+                showNotification('Error deleting member', 'error');
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

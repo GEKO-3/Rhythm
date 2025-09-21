@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Details - Rhythm</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicons/icons-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../assets/favicons/icons-512.png">
+    <link rel="manifest" href="../assets/favicons/manifest.webmanifest">
+    
+    <!-- Font definitions -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('../assets/Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --primary-hover: #fced98;
+            --primary-dark: #E6B800;
+            --bg-color: #1f1f1f;
+            --bg-light: #2b2b2b;
+            --bg-card: #2d2d2d;
+            --text-light: #ffffff;
+            --text-muted: #cccccc;
+            --text-dark: #2b2b2b;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --border-radius: 16px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1a1a1a 100%);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background (removed flickering animation) */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 25% 25%, rgba(245, 208, 0, 0.02) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(245, 208, 0, 0.01) 0%, transparent 50%);
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-light), var(--bg-color));
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            /* Removed backdrop-filter to prevent flickering */
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-button {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: var(--primary-color);
+            color: var(--text-dark);
+            transform: translateX(-5px);
+        }
+
+        .header-title h1 {
+            color: var(--primary-color);
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 2px solid var(--text-light);
+            color: var(--text-light);
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 0.9em;
+        }
+
+        .nav-btn:hover {
+            background: var(--text-light);
+            color: var(--text-dark);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .member-profile {
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(245, 208, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .member-profile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--gradient);
+        }
+
+        .profile-header {
+            padding: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(245, 208, 0, 0.05), rgba(245, 208, 0, 0.02));
+        }
+
+        .profile-photo {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            border: 4px solid var(--primary-color);
+            object-fit: cover;
+            margin: 0 auto 25px;
+            display: block;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 8px 32px rgba(245, 208, 0, 0.2);
+            will-change: transform; /* Optimize for animations */
+        }
+
+        .profile-photo:hover {
+            transform: scale(1.02); /* Reduced scale for smoother effect */
+            box-shadow: 0 10px 36px rgba(245, 208, 0, 0.25);
+        }
+
+        .member-name {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .member-role-badge {
+            background: var(--gradient);
+            color: var(--text-dark);
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .member-index-display {
+            background: rgba(245, 208, 0, 0.1);
+            color: var(--primary-color);
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 1em;
+            font-weight: 600;
+            border: 2px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .profile-content {
+            padding: 40px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .info-section {
+            background: rgba(245, 208, 0, 0.05);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .info-section h3 {
+            color: var(--primary-color);
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .info-item:hover {
+            background: rgba(245, 208, 0, 0.05);
+        }
+
+        .info-icon {
+            color: var(--primary-color);
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+            font-weight: 600;
+            min-width: 100px;
+            font-size: 0.9em;
+        }
+
+        .info-value {
+            color: var(--text-light);
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .access-section {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(76, 175, 80, 0.05));
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+            text-align: center;
+        }
+
+        .access-section.no-access {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1), rgba(244, 67, 54, 0.05));
+            border-color: rgba(244, 67, 54, 0.2);
+        }
+
+        .access-section.admin {
+            background: linear-gradient(135deg, rgba(245, 208, 0, 0.1), rgba(245, 208, 0, 0.05));
+            border-color: rgba(245, 208, 0, 0.3);
+        }
+
+        .access-section.pending {
+            background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 152, 0, 0.05));
+            border-color: rgba(255, 152, 0, 0.2);
+        }
+
+        .access-section.rejected {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.1), rgba(244, 67, 54, 0.05));
+            border-color: rgba(244, 67, 54, 0.2);
+        }
+
+        .access-section.revoked {
+            background: linear-gradient(135deg, rgba(158, 158, 158, 0.1), rgba(158, 158, 158, 0.05));
+            border-color: rgba(158, 158, 158, 0.2);
+        }
+
+        .access-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .access-section.granted .access-icon {
+            color: var(--success-color);
+        }
+
+        .access-section.admin .access-icon {
+            color: var(--primary-color);
+        }
+
+        .access-section.pending .access-icon {
+            color: #ff9800;
+        }
+
+        .access-section.rejected .access-icon {
+            color: var(--error-color);
+        }
+
+        .access-section.revoked .access-icon {
+            color: #9e9e9e;
+        }
+
+        .access-section.no-access .access-icon {
+            color: var(--error-color);
+        }
+
+        .access-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .access-section.granted .access-title {
+            color: var(--success-color);
+        }
+
+        .access-section.admin .access-title {
+            color: var(--primary-color);
+        }
+
+        .access-section.pending .access-title {
+            color: #ff9800;
+        }
+
+        .access-section.rejected .access-title {
+            color: var(--error-color);
+        }
+
+        .access-section.revoked .access-title {
+            color: #9e9e9e;
+        }
+
+        .access-section.no-access .access-title {
+            color: var(--error-color);
+        }
+
+        .access-description {
+            color: var(--text-muted);
+            font-size: 0.95em;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: var(--text-dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(245, 208, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-light);
+            border: 2px solid var(--text-light);
+        }
+
+        .btn-secondary:hover {
+            background: var(--text-light);
+            color: var(--text-dark);
+        }
+
+        /* Loading States */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 500px;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(245, 208, 0, 0.2);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .error-state h3 {
+            color: var(--error-color);
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+
+        .error-state p {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .main-container {
+                padding: 20px 15px;
+            }
+
+            .profile-header {
+                padding: 30px 20px;
+            }
+
+            .profile-photo {
+                width: 140px;
+                height: 140px;
+            }
+
+            .member-name {
+                font-size: 2em;
+            }
+
+            .profile-content {
+                padding: 30px 20px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn {
+                width: 100%;
+                max-width: 250px;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .member-name {
+                font-size: 1.8em;
+            }
+
+            .member-role-badge {
+                font-size: 1em;
+                padding: 10px 20px;
+            }
+
+            .info-section {
+                padding: 20px;
+            }
+
+            .access-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="members.html" class="back-button">
+                ← Back to Members
+            </a>
+            <div class="header-title">
+                <h1>Member Profile</h1>
+            </div>
+            <div class="header-actions">
+                <a href="../index.html" class="nav-btn">🏠 Home</a>
+                <a href="admin/member-input.html" class="nav-btn">⚙️ Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div id="memberContainer">
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p style="color: var(--text-muted); font-size: 1.1em;">Loading member details...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/members-data.js"></script>
+    <script type="module" src="../js/rhythm-unified-auth.js"></script>
+    
+    <script>
+        let currentMember = null;
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            initializeAndLoadMember();
+        });
+
+        async function initializeAndLoadMember() {
+            try {
+                // Wait for MembersData to be available
+                if (typeof window.MembersData === 'undefined') {
+                    console.log('🔄 Waiting for MembersData class...');
+                    setTimeout(initializeAndLoadMember, 200);
+                    return;
+                }
+
+                // Wait for membersData instance to be ready
+                if (typeof window.membersData === 'undefined' || !window.membersData.isFirebaseReady) {
+                    console.log('🔄 Waiting for Firebase to initialize...');
+                    setTimeout(initializeAndLoadMember, 200);
+                    return;
+                }
+
+                // Now load the member details
+                await loadMemberDetail();
+            } catch (error) {
+                console.error('❌ Error in initialization:', error);
+                setTimeout(initializeAndLoadMember, 1000); // Retry after 1 second
+            }
+        }
+
+        function initializePage() {
+            console.log('📋 Member Detail page initialized');
+        }
+
+        async function loadMemberDetail() {
+            try {
+                // Get member ID from localStorage
+                const memberId = localStorage.getItem('selectedMemberId');
+                
+                if (!memberId) {
+                    showErrorState('No member selected', 'Please select a member from the members list.');
+                    return;
+                }
+
+                console.log(`📊 Loading member details for: ${memberId}`);
+                
+                currentMember = await window.membersData.getMemberWithUserStatus(memberId);
+                
+                if (!currentMember) {
+                    showErrorState('Member not found', 'The requested member could not be found.');
+                    return;
+                }
+
+                console.log(`✅ Loaded member: ${currentMember.fullName}`);
+                renderMemberProfile();
+                
+            } catch (error) {
+                console.error('❌ Error loading member details:', error);
+                showErrorState('Error loading member', 'Unable to load member details. Please try again.');
+            }
+        }
+
+        function renderMemberProfile() {
+            const container = document.getElementById('memberContainer');
+            // Fix photo field reference (use 'photo' from sample data, fallback to 'photoPath')
+            const photoSrc = (currentMember.photo || currentMember.photoPath) ? `../${currentMember.photo || currentMember.photoPath}` : '../src/Logo.png';
+            
+            container.innerHTML = `
+                <div class="member-profile">
+                    <div class="profile-header">
+                        <img src="${photoSrc}" alt="${currentMember.fullName}" class="profile-photo"
+                             onerror="this.src='../src/Logo.png'" />
+                        <h1 class="member-name">${currentMember.fullName}</h1>
+                        <div class="member-role-badge">${currentMember.role}</div>
+                        <div class="member-index-display">${currentMember.rhythmIndexNumber}</div>
+                    </div>
+                    
+                    <div class="profile-content">
+                        <div class="info-grid">
+                            <div class="info-section">
+                                <h3>
+                                    👤 Personal Information
+                                </h3>
+                                
+                                ${currentMember.dateOfBirth ? `
+                                    <div class="info-item">
+                                        <span class="info-icon">🎂</span>
+                                        <span class="info-label">Birthday:</span>
+                                        <span class="info-value">${formatDate(currentMember.dateOfBirth)}</span>
+                                    </div>
+                                ` : ''}
+                                
+                                ${currentMember.residence ? `
+                                    <div class="info-item">
+                                        <span class="info-icon">📍</span>
+                                        <span class="info-label">Residence:</span>
+                                        <span class="info-value">${currentMember.residence}</span>
+                                    </div>
+                                ` : ''}
+                                
+                                ${currentMember.contactNumber ? `
+                                    <div class="info-item">
+                                        <span class="info-icon">📱</span>
+                                        <span class="info-label">Contact:</span>
+                                        <span class="info-value">${currentMember.contactNumber}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            
+                            <div class="info-section">
+                                <h3>
+                                    🎵 Rhythm Information
+                                </h3>
+                                
+                                <div class="info-item">
+                                    <span class="info-icon">🎭</span>
+                                    <span class="info-label">Role:</span>
+                                    <span class="info-value">${currentMember.role}</span>
+                                </div>
+                                
+                                <div class="info-item">
+                                    <span class="info-icon">🔢</span>
+                                    <span class="info-label">Index:</span>
+                                    <span class="info-value">${currentMember.rhythmIndexNumber}</span>
+                                </div>
+                                
+                                ${(currentMember.memberSince || currentMember.joinDate) ? `
+                                    <div class="info-item">
+                                        <span class="info-icon">📅</span>
+                                        <span class="info-label">Joined:</span>
+                                        <span class="info-value">${formatDate(currentMember.memberSince || currentMember.joinDate)}</span>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="info-item">
+                                    <span class="info-icon">✅</span>
+                                    <span class="info-label">Status:</span>
+                                    <span class="info-value">Active Member</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        ${renderAccessSection()}
+                        
+                        <div class="action-buttons">
+                            <a href="members.html" class="btn btn-secondary">
+                                👥 Back to Members
+                            </a>
+                            <button onclick="editCurrentMember()" class="btn btn-primary">
+                                ✏️ Edit Member
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAccessSection() {
+            const userStatus = currentMember.userStatus || 'no-access';
+            const statusInfo = getAccessStatusInfo(userStatus);
+            
+            return `
+                <div class="access-section ${statusInfo.class}">
+                    <span class="access-icon">${statusInfo.icon}</span>
+                    <h3 class="access-title">
+                        ${statusInfo.title}
+                    </h3>
+                    <p class="access-description">
+                        ${statusInfo.description}
+                    </p>
+                    ${currentMember.userId ? `
+                        <p class="access-description" style="margin-top: 10px;">
+                            <strong>Connected User ID:</strong> ${currentMember.userId}
+                        </p>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function getAccessStatusInfo(status) {
+            switch (status) {
+                case 'admin':
+                    return {
+                        class: 'access-section admin',
+                        icon: '👑',
+                        title: 'Administrator Access',
+                        description: 'This member has full administrative access to the Rhythm system with elevated privileges.'
+                    };
+                case 'granted':
+                    return {
+                        class: 'access-section granted',
+                        icon: '✅',
+                        title: 'App Access Granted',
+                        description: 'This member has access to the Rhythm mobile app and can view exclusive content.'
+                    };
+                case 'pending':
+                    return {
+                        class: 'access-section pending',
+                        icon: '⏳',
+                        title: 'Access Pending',
+                        description: 'This member has requested app access and is waiting for admin approval.'
+                    };
+                case 'rejected':
+                    return {
+                        class: 'access-section rejected',
+                        icon: '❌',
+                        title: 'Access Rejected',
+                        description: 'This member\'s app access request has been rejected by an administrator.'
+                    };
+                case 'revoked':
+                    return {
+                        class: 'access-section revoked',
+                        icon: '🚫',
+                        title: 'Access Revoked',
+                        description: 'This member\'s app access has been revoked by an administrator.'
+                    };
+                default:
+                    return {
+                        class: 'access-section no-access',
+                        icon: '❌',
+                        title: 'No App Access',
+                        description: 'This member does not have app access. Contact admin to grant access.'
+                    };
+            }
+        }
+
+        function showErrorState(title, message) {
+            const container = document.getElementById('memberContainer');
+            container.innerHTML = `
+                <div class="error-state">
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                    <a href="members.html" class="btn btn-primary">
+                        👥 Back to Members
+                    </a>
+                </div>
+            `;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        function calculateAge(birthDate) {
+            if (!birthDate) return 'N/A';
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        function editCurrentMember() {
+            if (!currentMember || !currentMember.id) {
+                console.error('No member data available for editing');
+                return;
+            }
+            
+            // Store the member ID for editing
+            localStorage.setItem('editMemberId', currentMember.id);
+            
+            // Navigate to the member input form
+            window.location.href = 'admin/member-input.html?edit=' + currentMember.id;
+        }
+
+        // Handle edit link with member ID
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('a[href*="member-input.html?edit="]')) {
+                // The edit link will automatically include the member ID
+                localStorage.setItem('editMemberId', currentMember.id);
+            }
+        });
+    </script>
+</body>
+</html>

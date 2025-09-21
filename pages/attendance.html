@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance - Rhythm Boduberu</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicons/icons-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../assets/favicons/icons-512.png">
+    <link rel="manifest" href="../assets/favicons/manifest.webmanifest">
+    
+    <!-- Font definitions -->
+    <style>
+        @font-face {
+            font-family: 'Faruma';
+            src: url('../assets/Fonts/Faruma.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+        
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            font-display: swap;
+            font-weight: normal;
+            font-style: normal;
+        }
+    </style>
+    
+    <style>
+        :root {
+            --primary-color: #f5d000;
+            --primary-hover: #fced98;
+            --primary-dark: #E6B800;
+            --bg-color: #1f1f1f;
+            --bg-light: #2b2b2b;
+            --bg-card: #2d2d2d;
+            --text-light: #ffffff;
+            --text-muted: #cccccc;
+            --text-dark: #2b2b2b;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --warning-color: #ff9800;
+            --border-radius: 16px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.4);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --gradient: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'SF-Pro', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-color) 0%, #1a1a1a 100%);
+            color: var(--text-light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 25% 25%, rgba(245, 208, 0, 0.02) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(245, 208, 0, 0.01) 0%, transparent 50%);
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-light), var(--bg-color));
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-section img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            object-fit: cover;
+        }
+
+        .logo-text h1 {
+            color: var(--primary-color);
+            font-size: 1.8em;
+            font-weight: bold;
+            font-family: 'Faruma', serif;
+        }
+
+        .logo-text p {
+            color: var(--text-muted);
+            font-size: 0.85em;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-input {
+            background: var(--bg-color);
+            border: 2px solid rgba(245, 208, 0, 0.2);
+            border-radius: 25px;
+            padding: 10px 20px 10px 45px;
+            color: var(--text-light);
+            width: 250px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-color);
+            color: var(--text-dark);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 3em;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            font-family: 'Faruma', serif;
+        }
+
+        .page-title p {
+            color: var(--text-muted);
+            font-size: 1.1em;
+        }
+
+        /* Event Controls */
+        .event-controls {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 40px;
+            border: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .controls-header h2 {
+            color: var(--primary-color);
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .add-event-btn {
+            background: var(--gradient);
+            color: var(--text-dark);
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-event-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        /* Event Creation Form */
+        .event-form {
+            display: none;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .form-input, .form-select {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: var(--text-light);
+            font-size: 1em;
+            transition: var(--transition);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.1);
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Events Table */
+        .events-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .events-header {
+            margin-bottom: 25px;
+        }
+
+        .events-header h2 {
+            color: var(--primary-color);
+            font-size: 1.5em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .events-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .events-table th,
+        .events-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .events-table th {
+            background: rgba(245, 208, 0, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .events-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .event-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .event-type.practice { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+        .event-type.recording { background: rgba(156, 39, 176, 0.2); color: #9C27B0; }
+        .event-type.live { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+        .event-type.show { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+        .event-type.activity { background: rgba(33, 150, 243, 0.2); color: #2196F3; }
+
+        .attendance-btn {
+            background: var(--gradient);
+            color: var(--text-dark);
+            padding: 6px 15px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .attendance-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Attendance Modal */
+        .attendance-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .attendance-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-hover);
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            color: var(--primary-color);
+            font-size: 1.4em;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .attendance-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .member-attendance {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        .member-attendance:hover {
+            border-color: rgba(245, 208, 0, 0.3);
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .member-photo {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--bg-light);
+        }
+
+        .member-details h4 {
+            color: var(--text-light);
+            font-size: 0.95em;
+            margin-bottom: 2px;
+        }
+
+        .member-details p {
+            color: var(--text-muted);
+            font-size: 0.8em;
+        }
+
+        .attendance-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .attendance-option {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.85em;
+        }
+
+        .attendance-option.present {
+            border-color: var(--success-color);
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success-color);
+        }
+
+        .attendance-option.absent {
+            border-color: var(--error-color);
+            background: rgba(244, 67, 54, 0.1);
+            color: var(--error-color);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: var(--text-light);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .events-table {
+                font-size: 0.9em;
+            }
+
+            .attendance-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .attendance-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="../src/Logo.png" alt="Rhythm Logo" />
+                <div class="logo-text">
+                    <h1>Rhythm Attendance</h1>
+                    <p>Boduberu Group</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="search-input" 
+                           placeholder="Search events..." />
+                    <span class="search-icon">🔍</span>
+                </div>
+                <a href="members.html" class="nav-btn">👥 Members</a>
+                <a href="admin/member-input.html" class="nav-btn">⚙️ Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="page-title">
+            <h1>Attendance</h1>
+            <p>Track member attendance for events and activities</p>
+        </div>
+
+        <!-- Event Controls -->
+        <div class="event-controls">
+            <div class="controls-header">
+                <h2>Event Management</h2>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div id="firebaseStatus" style="color: #ff9800; font-size: 0.9em;">
+                        🔄 Connecting to Firebase...
+                    </div>
+                    <button class="add-event-btn" onclick="toggleEventForm()">
+                        ➕ Add Event
+                    </button>
+                </div>
+            </div>
+
+            <!-- Event Creation Form -->
+            <div class="event-form" id="eventForm">
+                <form id="createEventForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="eventName" class="form-label">Event Name</label>
+                            <input type="text" id="eventName" class="form-input" 
+                                   placeholder="Enter event name" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="eventType" class="form-label">Event Type</label>
+                            <select id="eventType" class="form-select" required>
+                                <option value="">Select Type</option>
+                                <option value="practice">Practice</option>
+                                <option value="recording">Recording</option>
+                                <option value="live">Live</option>
+                                <option value="show">Show</option>
+                                <option value="activity">Activity</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="eventDate" class="form-label">Date</label>
+                            <input type="date" id="eventDate" class="form-input" required />
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Create Event</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Recent Events -->
+        <div class="events-section">
+            <div class="events-header">
+                <h2>Recent Events</h2>
+                <p style="color: var(--text-muted);">Click on an event to mark attendance</p>
+            </div>
+
+            <div id="eventsContainer">
+                <div class="empty-state">
+                    <h3>No Events Yet</h3>
+                    <p>Create your first event to start tracking attendance</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Modal -->
+    <div class="attendance-modal" id="attendanceModal">
+        <div class="attendance-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Mark Attendance</h3>
+                <button class="close-btn" onclick="closeAttendanceModal()">&times;</button>
+            </div>
+
+            <div id="attendanceGrid" class="attendance-grid">
+                <!-- Members will be loaded here -->
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeAttendanceModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveAttendance()">Save Attendance</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/members-data.js"></script>
+    <script>
+        let allMembers = [];
+        let allEvents = [];
+        let currentEvent = null;
+        let attendanceData = {};
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initializeData();
+            await loadMembers();
+            await loadEvents();
+            setupEventListeners();
+        });
+
+        function updateFirebaseStatus(status, message) {
+            const statusEl = document.getElementById('firebaseStatus');
+            if (statusEl) {
+                statusEl.innerHTML = message;
+                if (status === 'connected') {
+                    statusEl.style.color = '#4CAF50';
+                } else if (status === 'error') {
+                    statusEl.style.color = '#f44336';
+                } else {
+                    statusEl.style.color = '#ff9800';
+                }
+            }
+        }
+
+        async function initializeData() {
+            try {
+                console.log('🚀 Starting initializeData...');
+                updateFirebaseStatus('loading', '🔄 Loading MembersData class...');
+                
+                // Wait for MembersData class to be available
+                while (typeof window.MembersData === 'undefined') {
+                    console.log('🔄 Waiting for MembersData class...');
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+                
+                console.log('✅ MembersData class available');
+                updateFirebaseStatus('loading', '🔄 Initializing Firebase...');
+
+                // Initialize members data if not already available
+                if (typeof window.membersData === 'undefined') {
+                    console.log('🔄 Initializing members data...');
+                    window.membersData = new window.MembersData();
+                }
+                
+                console.log('✅ MembersData instance created');
+                
+                // Wait for Firebase initialization
+                while (!window.membersData.isFirebaseReady) {
+                    console.log('🔄 Waiting for Firebase to initialize...');
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                console.log('✅ Firebase initialized successfully');
+                console.log('📊 Firebase functions available:', typeof window.membersData.firebaseFunctions);
+                
+                if (window.membersData.firebaseFunctions) {
+                    updateFirebaseStatus('connected', '✅ Firebase Connected');
+                } else {
+                    updateFirebaseStatus('error', '❌ Firebase functions missing');
+                }
+                
+                console.log('✅ Data initialized and ready');
+            } catch (error) {
+                console.error('❌ Error initializing data:', error);
+                updateFirebaseStatus('error', '❌ Firebase connection failed');
+            }
+        }
+
+        async function loadMembers() {
+            try {
+                console.log('📊 Loading members data...');
+                const membersData = await window.membersData.getAllMembers();
+                allMembers = Object.values(membersData);
+                console.log(`✅ Loaded ${allMembers.length} members`);
+            } catch (error) {
+                console.error('❌ Error loading members:', error);
+            }
+        }
+
+        async function loadEvents() {
+            try {
+                console.log('🔄 Starting loadEvents...');
+                console.log('📊 window.membersData:', typeof window.membersData);
+                console.log('📊 window.MembersData:', typeof window.MembersData);
+                
+                // Wait for Firebase to be ready
+                if (typeof window.membersData === 'undefined' || !window.membersData.isFirebaseReady) {
+                    console.log('🔄 Waiting for Firebase to initialize...');
+                    setTimeout(loadEvents, 100);
+                    return;
+                }
+                
+                console.log('✅ Firebase is ready, loading events...');
+                console.log('📊 window.membersData.firebaseFunctions:', typeof window.membersData.firebaseFunctions);
+                console.log('📊 window.membersData.database:', typeof window.membersData.database);
+                
+                // Load events from Firebase
+                const eventsRef = window.membersData.firebaseFunctions.ref(window.membersData.database, 'events');
+                console.log('📊 eventsRef created:', eventsRef);
+                
+                const snapshot = await window.membersData.firebaseFunctions.get(eventsRef);
+                console.log('📊 snapshot:', snapshot);
+                
+                if (snapshot.exists()) {
+                    const eventsData = snapshot.val();
+                    console.log('📊 eventsData from Firebase:', eventsData);
+                    allEvents = Object.keys(eventsData).map(key => ({
+                        ...eventsData[key],
+                        id: key
+                    }));
+                } else {
+                    console.log('📊 No events found in Firebase');
+                    allEvents = [];
+                }
+                
+                // Sort events by date (newest first)
+                allEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                renderEvents();
+                console.log('✅ Events loaded from Firebase:', allEvents.length, 'events');
+            } catch (error) {
+                console.error('❌ Error loading events:', error);
+                // Fallback to localStorage for offline support
+                const storedEvents = localStorage.getItem('rhythmEvents');
+                allEvents = storedEvents ? JSON.parse(storedEvents) : [];
+                allEvents.sort((a, b) => new Date(b.date) - new Date(a.date));
+                renderEvents();
+                console.log('💾 Loaded from localStorage fallback:', allEvents.length, 'events');
+            }
+        }
+
+        function setupEventListeners() {
+            // Set default date to today
+            document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
+            
+            // Setup search functionality
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    const searchTerm = e.target.value.toLowerCase();
+                    filterEvents(searchTerm);
+                });
+            }
+            
+            // Setup form submission
+            const createEventForm = document.getElementById('createEventForm');
+            if (createEventForm) {
+                createEventForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    console.log('📝 Form submitted, calling createEvent...');
+                    await createEvent(e);
+                });
+            }
+        }
+
+        function filterEvents(searchTerm) {
+            const eventCards = document.querySelectorAll('.event-card');
+            eventCards.forEach(card => {
+                const eventName = card.querySelector('h3').textContent.toLowerCase();
+                const eventType = card.querySelector('.event-type').textContent.toLowerCase();
+                const eventDate = card.querySelector('.event-date').textContent.toLowerCase();
+                
+                const matches = eventName.includes(searchTerm) || 
+                               eventType.includes(searchTerm) || 
+                               eventDate.includes(searchTerm);
+                
+                card.style.display = matches ? 'block' : 'none';
+            });
+        }
+
+        function toggleEventForm() {
+            const form = document.getElementById('eventForm');
+            const isHidden = form.style.display === 'none' || getComputedStyle(form).display === 'none';
+            form.style.display = isHidden ? 'block' : 'none';
+            console.log('📋 Form toggled:', isHidden ? 'showing' : 'hiding');
+        }
+
+        async function createEvent(e) {
+            try {
+                console.log('📝 createEvent function called');
+                
+                const eventName = document.getElementById('eventName').value;
+                const eventType = document.getElementById('eventType').value;
+                const eventDate = document.getElementById('eventDate').value;
+                
+                console.log('📝 Form values:', { eventName, eventType, eventDate });
+                
+                if (!eventName || !eventType || !eventDate) {
+                    showNotification('Please fill in all fields', 'error');
+                    return;
+                }
+                
+                const newEvent = {
+                    id: Date.now().toString(),
+                    name: eventName,
+                    type: eventType,
+                    date: eventDate,
+                    createdAt: new Date().toISOString(),
+                    attendance: {}
+                };
+                
+                console.log('📅 New event object:', newEvent);
+                allEvents.unshift(newEvent);
+                console.log('📊 All events array:', allEvents);
+                
+                await saveEvents();
+                renderEvents();
+                
+                // Reset form
+                if (e && e.target) {
+                    e.target.reset();
+                } else {
+                    document.getElementById('createEventForm').reset();
+                }
+                document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
+                toggleEventForm();
+                
+                showNotification('Event created successfully!', 'success');
+            } catch (error) {
+                console.error('❌ Error creating event:', error);
+                showNotification('Error creating event: ' + error.message, 'error');
+            }
+        }
+
+        async function saveEvents() {
+            try {
+                console.log('💾 Attempting to save events:', allEvents.length, 'events');
+                
+                if (typeof window.membersData === 'undefined' || !window.membersData.isFirebaseReady) {
+                    console.log('⚠️ Firebase not ready, saving to localStorage as fallback');
+                    localStorage.setItem('rhythmEvents', JSON.stringify(allEvents));
+                    updateFirebaseStatus('error', '⚠️ Firebase offline - using local storage');
+                    return;
+                }
+                
+                if (!window.membersData.firebaseFunctions) {
+                    console.log('⚠️ Firebase functions not available');
+                    localStorage.setItem('rhythmEvents', JSON.stringify(allEvents));
+                    updateFirebaseStatus('error', '⚠️ Firebase functions missing');
+                    return;
+                }
+                
+                // Save to Firebase
+                const eventsRef = window.membersData.firebaseFunctions.ref(window.membersData.database, 'events');
+                const eventsData = {};
+                
+                allEvents.forEach(event => {
+                    eventsData[event.id] = {
+                        name: event.name,
+                        type: event.type,
+                        date: event.date,
+                        createdAt: event.createdAt,
+                        attendance: event.attendance || {}
+                    };
+                });
+                
+                console.log('🔥 Saving to Firebase:', eventsData);
+                await window.membersData.firebaseFunctions.set(eventsRef, eventsData);
+                
+                // Also save to localStorage as backup
+                localStorage.setItem('rhythmEvents', JSON.stringify(allEvents));
+                console.log('✅ Events saved to Firebase and localStorage');
+                updateFirebaseStatus('connected', '✅ Saved to Firebase');
+            } catch (error) {
+                console.error('❌ Error saving events to Firebase:', error);
+                // Fallback to localStorage
+                localStorage.setItem('rhythmEvents', JSON.stringify(allEvents));
+                console.log('💾 Saved to localStorage as fallback');
+                updateFirebaseStatus('error', '❌ Firebase save failed - using local storage');
+            }
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('eventsContainer');
+            
+            if (allEvents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Events Yet</h3>
+                        <p>Create your first event to start tracking attendance</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const eventsHTML = `
+                <table class="events-table">
+                    <thead>
+                        <tr>
+                            <th>Event Name</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Attendance</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${allEvents.map(event => {
+                            const attendanceCount = Object.values(event.attendance || {}).filter(status => status === 'present').length;
+                            const totalMembers = allMembers.length;
+                            
+                            return `
+                                <tr>
+                                    <td><strong>${event.name}</strong></td>
+                                    <td><span class="event-type ${event.type}">${capitalizeFirst(event.type)}</span></td>
+                                    <td>${formatDate(event.date)}</td>
+                                    <td>${attendanceCount}/${totalMembers} present</td>
+                                    <td>
+                                        <button class="attendance-btn" onclick="openAttendanceModal('${event.id}')">
+                                            Mark Attendance
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = eventsHTML;
+        }
+
+        function openAttendanceModal(eventId) {
+            currentEvent = allEvents.find(event => event.id === eventId);
+            if (!currentEvent) return;
+            
+            document.getElementById('modalTitle').textContent = `Mark Attendance - ${currentEvent.name}`;
+            
+            const grid = document.getElementById('attendanceGrid');
+            grid.innerHTML = allMembers.map(member => {
+                const currentStatus = currentEvent.attendance?.[member.id] || '';
+                const photoSrc = member.photo || member.photoPath ? `../${member.photo || member.photoPath}` : '../src/Logo.png';
+                
+                return `
+                    <div class="member-attendance">
+                        <div class="member-info">
+                            <img src="${photoSrc}" alt="${member.fullName}" class="member-photo"
+                                 onerror="this.src='../src/Logo.png'" />
+                            <div class="member-details">
+                                <h4>${member.fullName}</h4>
+                                <p>${member.role} • ${member.rhythmIndexNumber}</p>
+                            </div>
+                        </div>
+                        <div class="attendance-options">
+                            <button class="attendance-option ${currentStatus === 'present' ? 'present' : ''}" 
+                                    onclick="setAttendance('${member.id}', 'present')">Present</button>
+                            <button class="attendance-option ${currentStatus === 'absent' ? 'absent' : ''}" 
+                                    onclick="setAttendance('${member.id}', 'absent')">Absent</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            attendanceData = { ...currentEvent.attendance } || {};
+            document.getElementById('attendanceModal').style.display = 'block';
+        }
+
+        function closeAttendanceModal() {
+            document.getElementById('attendanceModal').style.display = 'none';
+            currentEvent = null;
+            attendanceData = {};
+        }
+
+        function setAttendance(memberId, status) {
+            attendanceData[memberId] = status;
+            
+            // Update button states
+            const memberCard = document.querySelector(`[onclick="setAttendance('${memberId}', 'present')"]`).closest('.member-attendance');
+            const buttons = memberCard.querySelectorAll('.attendance-option');
+            
+            buttons.forEach(btn => {
+                btn.classList.remove('present', 'absent');
+                if (btn.textContent.toLowerCase() === status) {
+                    btn.classList.add(status);
+                }
+            });
+        }
+
+        async function saveAttendance() {
+            if (!currentEvent) return;
+            
+            // Update event attendance
+            currentEvent.attendance = { ...attendanceData };
+            
+            // Update events array
+            const eventIndex = allEvents.findIndex(event => event.id === currentEvent.id);
+            if (eventIndex !== -1) {
+                allEvents[eventIndex] = currentEvent;
+                await saveEvents();
+                renderEvents();
+            }
+            
+            closeAttendanceModal();
+            showNotification('Attendance saved successfully!', 'success');
+        }
+
+        // Utility functions
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            // Simple notification - in production you might want a more sophisticated system
+            const notification = document.createElement('div');
+            let backgroundColor;
+            switch(type) {
+                case 'success': backgroundColor = '#4CAF50'; break;
+                case 'error': backgroundColor = '#f44336'; break;
+                default: backgroundColor = '#2196F3'; break;
+            }
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                transition: all 0.3s ease;
+                background: ${backgroundColor};
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('attendanceModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAttendanceModal();
+            }
+        });
+    </script>
+</body>
+</html>

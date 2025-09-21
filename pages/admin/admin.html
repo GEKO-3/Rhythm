@@ -48,6 +48,49 @@
       /* Support for window controls overlay */
       -webkit-app-region: no-drag;
     }
+
+    /* Back Button Styles */
+    .back-button {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(43, 43, 43, 0.9);
+      border: 2px solid #f5d000;
+      color: #f5d000;
+      padding: 10px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-weight: 600;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      z-index: 100;
+    }
+
+    .back-button:hover {
+      background: #f5d000;
+      color: #1f1f1f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(245, 208, 0, 0.3);
+    }
+
+    .back-button:active {
+      transform: translateY(0);
+    }
+
+    /* Responsive styles for back button */
+    @media (max-width: 768px) {
+      .back-button {
+        top: 15px;
+        left: 15px;
+        padding: 8px 16px;
+        font-size: 0.8em;
+      }
+    }
     
     /* Window controls overlay support */
     @media (display-mode: window-controls-overlay) {
@@ -224,6 +267,11 @@
   </style>
 </head>
 <body>
+  <!-- Back Button -->
+  <a href="../../login.html" class="back-button">
+    ← Back to Login
+  </a>
+
   <!-- Access Denied Overlay -->
   <div class="access-denied-overlay hidden" id="access-denied-overlay">
     <div class="access-denied-container">

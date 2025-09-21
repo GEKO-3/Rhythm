@@ -1,0 +1,86 @@
+{
+  "members": {
+    "member_001": {
+      "id": "member_001",
+      "fullName": "Ali Shamrooh",
+      "rhythmIndexNumber": "RHY001",
+      "photoPath": "src/members/ali-shamrooh.jpg",
+      "residence": "Male', Maldives",
+      "role": "Lead Vocalist",
+      "dateOfBirth": "1995-05-15",
+      "contactNumber": "+960 7123456",
+      "userId": null,
+      "hasAppAccess": false,
+      "joinDate": "2020-01-15T00:00:00.000Z",
+      "isActive": true,
+      "lastUpdated": "2025-09-21T10:00:00.000Z"
+    },
+    "member_002": {
+      "id": "member_002",
+      "fullName": "Mohamed Nibras",
+      "rhythmIndexNumber": "RHY002",
+      "photoPath": "src/members/mohamed-nibras.jpg",
+      "residence": "Male', Maldives",
+      "role": "Lead Drummer",
+      "dateOfBirth": "1992-08-22",
+      "contactNumber": "+960 7234567",
+      "userId": "user_authenticated_001",
+      "hasAppAccess": true,
+      "joinDate": "2020-01-15T00:00:00.000Z",
+      "isActive": true,
+      "lastUpdated": "2025-09-21T10:00:00.000Z"
+    },
+    "member_003": {
+      "id": "member_003",
+      "fullName": "Adam Shimrah",
+      "rhythmIndexNumber": "RHY003",
+      "photoPath": "src/members/adam-shimrah.jpg",
+      "residence": "Hulhumale', Maldives",
+      "role": "Drummer",
+      "dateOfBirth": "1998-03-10",
+      "contactNumber": "+960 7345678",
+      "userId": null,
+      "hasAppAccess": false,
+      "joinDate": "2020-02-01T00:00:00.000Z",
+      "isActive": true,
+      "lastUpdated": "2025-09-21T10:00:00.000Z"
+    },
+    "member_004": {
+      "id": "member_004",
+      "fullName": "Abdulla Asif",
+      "rhythmIndexNumber": "RHY004",
+      "photoPath": "src/members/abdulla-asif.jpg",
+      "residence": "Vilimale', Maldives",
+      "role": "Vocalist",
+      "dateOfBirth": "1996-11-05",
+      "contactNumber": "+960 7456789",
+      "userId": "user_authenticated_002",
+      "hasAppAccess": true,
+      "joinDate": "2020-02-15T00:00:00.000Z",
+      "isActive": true,
+      "lastUpdated": "2025-09-21T10:00:00.000Z"
+    },
+    "member_005": {
+      "id": "member_005",
+      "fullName": "Mohamed Aiham",
+      "rhythmIndexNumber": "RHY005",
+      "photoPath": "src/members/mohamed-aiham.jpg",
+      "residence": "Male', Maldives",
+      "role": "Bass Drummer",
+      "dateOfBirth": "1994-07-18",
+      "contactNumber": "+960 7567890",
+      "userId": null,
+      "hasAppAccess": false,
+      "joinDate": "2020-03-01T00:00:00.000Z",
+      "isActive": true,
+      "lastUpdated": "2025-09-21T10:00:00.000Z"
+    }
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "lastUpdated": "2025-09-21T10:00:00.000Z",
+    "totalMembers": 5,
+    "activeMembers": 5,
+    "membersWithAccess": 2
+  }
+}
