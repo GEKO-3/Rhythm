@@ -293,9 +293,9 @@
                         .catch(() => {}); // Silent preload
                 });
                 
-                // Clear any stale localStorage flags
+                // Clear only truly temporary cache flags (preserve user data)
                 const staleKeys = Object.keys(localStorage).filter(key => 
-                    key.includes('_temp_') || key.includes('_cached_')
+                    key.includes('_temp_cache_') || key.includes('_stale_')
                 );
                 staleKeys.forEach(key => localStorage.removeItem(key));
             }
@@ -317,25 +317,18 @@
             }, 120000);
         }
 
-        // Force PWA update check
-        async function forcePWAUpdate() {
+        // Gentle PWA update check (non-disruptive)
+        async function checkForPWAUpdate() {
             if ('serviceWorker' in navigator) {
                 try {
                     const registration = await navigator.serviceWorker.ready;
-                    console.log('🔄 Checking for PWA updates...');
                     
-                    // Force update check
+                    // Only check for updates, don't force reload
                     await registration.update();
                     
-                    // Check if there's a waiting service worker
+                    // Log if update is available but don't auto-activate
                     if (registration.waiting) {
-                        console.log('💫 New version available, activating...');
-                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-                        
-                        // Reload page after short delay
-                        setTimeout(() => {
-                            window.location.reload();
-                        }, 1000);
+                        console.log('💫 New PWA version available (will activate on next visit)');
                     }
                 } catch (error) {
                     console.log('Update check failed:', error);
@@ -343,18 +336,16 @@
             }
         }
 
-        // Load version information with aggressive cache busting
+        // Load version information (gentle cache busting)
         async function loadVersionInfo() {
             try {
-                // Multiple cache busting strategies
-                const cacheBuster = `v=${Date.now()}&r=${Math.random()}&bust=2.2.0`;
-                const response = await fetch(`./version.json?${cacheBuster}`, {
-                    cache: 'no-cache',
-                    headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
-                        'Pragma': 'no-cache'
-                    }
-                });
+                // Try normal fetch first
+                let response = await fetch('./version.json');
+                
+                // If that fails, try with light cache busting
+                if (!response.ok) {
+                    response = await fetch(`./version.json?v=${Date.now()}`);
+                }
                 
                 if (!response.ok) throw new Error('Failed to fetch version');
                 
@@ -376,7 +367,7 @@
                 if (versionInfo) {
                     versionInfo.innerHTML = `
                         <span style="color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; font-family: var(--font-family);">
-                            Rhythm Boduberu • Cache Issue
+                            v2.2.0 • Rhythm Boduberu
                         </span>
                     `;
                 }
@@ -387,11 +378,11 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Login page loaded, initializing unified auth...');
             
-            // Force PWA update check first
-            await forcePWAUpdate();
+            // Load version info immediately (non-blocking)
+            loadVersionInfo();
             
-            // Load version info immediately with cache busting
-            await loadVersionInfo();
+            // Check for PWA updates quietly in background
+            checkForPWAUpdate();
             
             // Check if this is PWA mode and user might be already logged in
             const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
