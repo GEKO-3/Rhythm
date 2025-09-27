@@ -1,13 +1,13 @@
 {
-  "version": "2.2.0",
-  "timestamp": 1727395200000,
-  "description": "Production Firebase database rules with admin access",
+  "version": "2.2.1",
+  "timestamp": 1727396400000,
+  "description": "Fixed login cache and version display issues",
   "changes": [
-    "Implemented production Firebase database security rules",
-    "Enabled admin write access for lyrics, events, and user management",
-    "Added version display to login screen",
-    "Configured proper database permissions for all features",
-    "Enhanced security while maintaining full admin functionality",
-    "All admin features now work: user approval, lyrics editing, attendance management"
+    "Fixed PWA cache clearing that was removing user login data",
+    "Fixed version display not loading properly on login screen",
+    "Improved PWA update strategy to be non-disruptive",
+    "Preserved user authentication state and saved credentials",
+    "Enhanced version loading with better fallback mechanisms",
+    "Maintained all Firebase database rule functionality from v2.2.0"
   ]
 }
