@@ -1,0 +1,101 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    
+    "songs": {
+      ".read": true,
+      ".write": true
+    },
+    
+    "songsMetadata": {
+      ".read": true,
+      ".write": true
+    },
+    
+    "members": {
+      ".read": true,
+      ".write": true
+    },
+    
+    "sponsors": {
+      ".read": true,
+      ".write": true,
+      "$sponsorId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    
+    "applications": {
+      ".read": true,
+      ".write": true,
+      "$applicationId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    
+    "events": {
+      ".read": true,
+      ".write": true
+    },
+    
+    "approvedUsers": {
+      ".read": true,
+      ".write": true
+    },
+    
+    "loginRequests": {
+      ".read": true,
+      ".write": true,
+      "$requestId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    
+    "rejectedLogins": {
+      ".read": true,
+      ".write": true
+    },
+    
+    "users": {
+      ".read": true,
+      ".write": true
+    },
+    
+    "pending_requests": {
+      ".read": true,
+      ".write": true,
+      "$requestId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    
+    "rejected_requests": {
+      ".read": true,
+      ".write": true
+    },
+    
+    "accessRequests": {
+      ".read": true,
+      ".write": true,
+      "$requestId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    
+    "admin": {
+      ".read": true,
+      ".write": true
+    },
+    
+    "version": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}

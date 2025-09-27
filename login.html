@@ -248,6 +248,13 @@
                 Clear saved login data
             </button>
         </div>
+        
+        <!-- Version number -->
+        <div id="versionInfo" style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(245, 208, 0, 0.2);">
+            <span style="color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; font-family: var(--font-family);">
+                Loading version...
+            </span>
+        </div>
     </div>
 
     <script type="module">
@@ -310,9 +317,41 @@
             }, 120000);
         }
 
+        // Load version information
+        async function loadVersionInfo() {
+            try {
+                const response = await fetch('./version.json?v=' + Date.now());
+                if (!response.ok) throw new Error('Failed to fetch version');
+                
+                const versionData = await response.json();
+                const versionInfo = document.getElementById('versionInfo');
+                
+                if (versionInfo) {
+                    versionInfo.innerHTML = `
+                        <span style="color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; font-family: var(--font-family);">
+                            v${versionData.version} • ${versionData.description || 'Rhythm Boduberu'}
+                        </span>
+                    `;
+                }
+            } catch (error) {
+                console.log('Could not load version info:', error.message);
+                const versionInfo = document.getElementById('versionInfo');
+                if (versionInfo) {
+                    versionInfo.innerHTML = `
+                        <span style="color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; font-family: var(--font-family);">
+                            Rhythm Boduberu
+                        </span>
+                    `;
+                }
+            }
+        }
+
         // Wait for unified auth to initialize
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Login page loaded, initializing unified auth...');
+            
+            // Load version info immediately
+            loadVersionInfo();
             
             // Check if this is PWA mode and user might be already logged in
             const isPWA = window.matchMedia('(display-mode: standalone)').matches || 

@@ -1,12 +1,13 @@
 {
-  "version": "2.1.3",
-  "timestamp": 1726927200000,
-  "description": "Admin page updates and attendance integration",
+  "version": "2.2.0",
+  "timestamp": 1727395200000,
+  "description": "Production Firebase database rules with admin access",
   "changes": [
-    "Added back button to admin page",
-    "Added attendance page to admin menu",
-    "Updated service worker cache version to v2.1.3",
-    "Fixed admin page caching issues",
-    "Enhanced admin navigation experience"
+    "Implemented production Firebase database security rules",
+    "Enabled admin write access for lyrics, events, and user management",
+    "Added version display to login screen",
+    "Configured proper database permissions for all features",
+    "Enhanced security while maintaining full admin functionality",
+    "All admin features now work: user approval, lyrics editing, attendance management"
   ]
 }
