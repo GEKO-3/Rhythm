@@ -317,14 +317,51 @@
             }, 120000);
         }
 
-        // Load version information
+        // Force PWA update check
+        async function forcePWAUpdate() {
+            if ('serviceWorker' in navigator) {
+                try {
+                    const registration = await navigator.serviceWorker.ready;
+                    console.log('🔄 Checking for PWA updates...');
+                    
+                    // Force update check
+                    await registration.update();
+                    
+                    // Check if there's a waiting service worker
+                    if (registration.waiting) {
+                        console.log('💫 New version available, activating...');
+                        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        
+                        // Reload page after short delay
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                } catch (error) {
+                    console.log('Update check failed:', error);
+                }
+            }
+        }
+
+        // Load version information with aggressive cache busting
         async function loadVersionInfo() {
             try {
-                const response = await fetch('./version.json?v=' + Date.now());
+                // Multiple cache busting strategies
+                const cacheBuster = `v=${Date.now()}&r=${Math.random()}&bust=2.2.0`;
+                const response = await fetch(`./version.json?${cacheBuster}`, {
+                    cache: 'no-cache',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache'
+                    }
+                });
+                
                 if (!response.ok) throw new Error('Failed to fetch version');
                 
                 const versionData = await response.json();
                 const versionInfo = document.getElementById('versionInfo');
+                
+                console.log('📦 Loaded version data:', versionData);
                 
                 if (versionInfo) {
                     versionInfo.innerHTML = `
@@ -339,7 +376,7 @@
                 if (versionInfo) {
                     versionInfo.innerHTML = `
                         <span style="color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; font-family: var(--font-family);">
-                            Rhythm Boduberu
+                            Rhythm Boduberu • Cache Issue
                         </span>
                     `;
                 }
@@ -350,8 +387,11 @@
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('Login page loaded, initializing unified auth...');
             
-            // Load version info immediately
-            loadVersionInfo();
+            // Force PWA update check first
+            await forcePWAUpdate();
+            
+            // Load version info immediately with cache busting
+            await loadVersionInfo();
             
             // Check if this is PWA mode and user might be already logged in
             const isPWA = window.matchMedia('(display-mode: standalone)').matches || 

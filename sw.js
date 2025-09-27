@@ -1,7 +1,7 @@
 // Simple Service Worker for Rhythm Boduberu
 // Provides basic offline functionality without aggressive caching
 
-const CACHE_NAME = 'rhythm-v2.1.3';
+const CACHE_NAME = 'rhythm-v2.2.0';
 const ESSENTIAL_ASSETS = [
   './',
   './pages/songlist.html',
@@ -97,4 +97,18 @@ self.addEventListener('fetch', event => {
         });
       })
   );
+});
+
+// Handle messages from the client
+self.addEventListener('message', event => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    console.log('💫 Service Worker: Skipping waiting, activating new version...');
+    self.skipWaiting();
+  }
+  
+  if (event.data && event.data.type === 'FORCE_UPDATE_CHECK') {
+    console.log('🔄 Service Worker: Force update requested');
+    // This will trigger an update check
+    self.registration.update();
+  }
 });
