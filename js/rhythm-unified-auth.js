@@ -1057,10 +1057,10 @@ class RhythmUnifiedAuth {
                 Choose your destination:
             </p>
             <div style="display: flex; flex-direction: column; gap: 15px;">
-                <button onclick="rhythmAuth.goToSonglist(${isPWA})" class="submit-btn" style="background: var(--primary-color);">
+                <button onclick="window.rhythmAuth.goToSonglist(${isPWA})" class="submit-btn" style="background: var(--primary-color);">
                     Song List
                 </button>
-                <button onclick="rhythmAuth.goToAdmin(${isPWA})" class="submit-btn" style="background: #ff6b6b;">
+                <button onclick="window.rhythmAuth.goToAdmin(${isPWA})" class="submit-btn" style="background: #ff6b6b;">
                     Admin Panel
                 </button>
             </div>
@@ -1068,7 +1068,7 @@ class RhythmUnifiedAuth {
             
             <!-- Clear notification settings option -->
             <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(245, 208, 0, 0.2);">
-                <button type="button" onclick="rhythmAuth.clearNotificationSettings()" style="background: none; border: none; color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; cursor: pointer; text-decoration: underline; font-family: var(--font-family);">
+                <button type="button" onclick="window.rhythmAuth.clearNotificationSettings()" style="background: none; border: none; color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; cursor: pointer; text-decoration: underline; font-family: var(--font-family);">
                     Clear notification settings
                 </button>
             </div>

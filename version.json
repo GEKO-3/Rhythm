@@ -1,15 +1,15 @@
 {
-  "version": "2.3.3",
-  "timestamp": 1727641800000,
-  "description": "Enhanced clear notification settings availability across all interfaces",
+  "version": "2.3.4",
+  "timestamp": 1727642400000,
+  "description": "Fixed scope issues and ensured clear notification settings works in admin choice interface",
   "changes": [
-    "Added clear notification settings to admin/songlist choice interface",
-    "Enhanced unified auth with clearNotificationSettings method",
-    "Made notification settings clearing available at all auth stages",
-    "Improved user control over notification preferences",
-    "Added consistent styling for clear settings buttons across interfaces",
-    "Enhanced admin choice screen with notification management",
-    "Streamlined notification settings reset functionality",
-    "Better accessibility for notification preference management"
+    "Fixed scope issues in admin choice interface for proper function calls",
+    "Ensured window.rhythmAuth references work correctly in HTML onclick handlers",
+    "Fixed clear notification settings button functionality in choice screen",
+    "Corrected global scope access for all admin choice interface buttons",
+    "Improved reliability of admin destination choice interface",
+    "Enhanced error handling for notification settings management",
+    "Stabilized admin choice screen user interactions",
+    "Verified all admin choice buttons work with proper global scope"
   ]
 }
