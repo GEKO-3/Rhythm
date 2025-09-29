@@ -436,16 +436,37 @@
             if (authResult.isAuthenticated) {
                 console.log('✅ [Login] User already authenticated, checking redirect preference...');
                 
-                // Initialize notifications for already authenticated users
+                // Initialize notifications for already authenticated users (PWA-aware)
                 if (window.rhythmNotifications && window.rhythmNotifications.isInitialized) {
-                    // Don't await this - let it run in background
-                    window.rhythmNotifications.requestPermission().then(result => {
-                        if (result.success) {
-                            console.log('✅ Notifications enabled for returning user');
+                    // Check if PWA mode for immediate notification request
+                    const isPWAMode = window.matchMedia('(display-mode: standalone)').matches || 
+                                     window.navigator.standalone === true ||
+                                     document.referrer.includes('android-app://');
+                    
+                    if (isPWAMode && Notification.permission === 'default') {
+                        console.log('📱 PWA user returning - requesting notifications');
+                        // For PWA, request immediately
+                        window.rhythmNotifications.requestPermission().then(result => {
+                            if (result.success) {
+                                console.log('✅ Notifications enabled for PWA returning user');
+                            } else {
+                                console.log('ℹ️ Notifications not enabled for PWA:', result.reason);
+                            }
+                        }).catch(err => {
+                            console.log('Notification setup failed:', err);
+                        });
+                    } else if (!isPWAMode) {
+                        // For web users, just initialize silently if already granted
+                        if (Notification.permission === 'granted') {
+                            window.rhythmNotifications.requestPermission().then(result => {
+                                if (result.success) {
+                                    console.log('✅ Notifications enabled for returning user');
+                                }
+                            }).catch(err => {
+                                console.log('Notification setup failed:', err);
+                            });
                         }
-                    }).catch(err => {
-                        console.log('Notification setup failed:', err);
-                    });
+                    }
                 }
                 
                 // Handle offline mode specifically
@@ -626,17 +647,36 @@
                         showMessage('Access approved! Redirecting...', 'success');
                         startPWAPreloading(); // Start preloading for PWA
                         
-                        // Initialize notifications for authenticated users
+                        // Initialize notifications for authenticated users (PWA-aware)
                         if (window.rhythmNotifications && window.rhythmNotifications.isInitialized) {
-                            window.rhythmNotifications.requestPermission().then(result => {
-                                if (result.success) {
-                                    console.log('✅ Notifications enabled for user');
-                                } else {
-                                    console.log('ℹ️ Notifications not enabled:', result.message);
-                                }
-                            }).catch(err => {
-                                console.log('Notification setup failed:', err);
-                            });
+                            const isPWAMode = window.matchMedia('(display-mode: standalone)').matches || 
+                                             window.navigator.standalone === true ||
+                                             document.referrer.includes('android-app://');
+                            
+                            // For PWA users, always try to request notifications
+                            if (isPWAMode) {
+                                console.log('📱 PWA user logged in - requesting notifications');
+                                window.rhythmNotifications.requestPermission().then(result => {
+                                    if (result.success) {
+                                        console.log('✅ Notifications enabled for PWA user');
+                                    } else {
+                                        console.log('ℹ️ Notifications not enabled for PWA:', result.reason);
+                                    }
+                                }).catch(err => {
+                                    console.log('Notification setup failed:', err);
+                                });
+                            } else {
+                                // For web users, request but don't force
+                                window.rhythmNotifications.requestPermission().then(result => {
+                                    if (result.success) {
+                                        console.log('✅ Notifications enabled for user');
+                                    } else {
+                                        console.log('ℹ️ Notifications not enabled:', result.reason);
+                                    }
+                                }).catch(err => {
+                                    console.log('Notification setup failed:', err);
+                                });
+                            }
                         }
                         
                         setTimeout(() => {

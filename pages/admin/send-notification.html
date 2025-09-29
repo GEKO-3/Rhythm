@@ -172,7 +172,11 @@
             <p>Send custom push notifications to approved users</p>
         </div>
 
-        <div class="notification-form">
+        <div id="authStatus" class="result info" style="display: block;">
+            🔄 Initializing authentication system...
+        </div>
+
+        <div class="notification-form" id="notificationForm" style="display: none;">
             <div class="form-group">
                 <label>Quick Templates:</label>
                 <div class="quick-templates">
@@ -307,30 +311,79 @@
 
         // Check authentication on load
         window.addEventListener('load', () => {
-            setTimeout(checkAuth, 1000);
             setupPreviewUpdates();
+            initializeAuth();
         });
 
-        function checkAuth() {
-            const authInstance = window.rhythmAuth;
-            if (!authInstance) {
-                showResult('Authentication service not loaded', 'error');
-                return;
-            }
+        async function initializeAuth() {
+            try {
+                showResult('Initializing authentication...', 'info');
+                
+                // Wait for auth system to be available
+                let attempts = 0;
+                while (!window.rhythmAuth && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
 
-            currentUser = authInstance.getCurrentUser();
-            if (!currentUser) {
-                showResult('You must be logged in to send notifications', 'error');
-                return;
-            }
+                if (!window.rhythmAuth) {
+                    showResult('Authentication system failed to load', 'error');
+                    return;
+                }
 
-            if (!currentUser.isAdmin) {
-                showResult('Admin access required to send notifications', 'error');
-                return;
-            }
+                // Wait for auth system to initialize
+                while (!window.rhythmAuth.isInitialized && attempts < 100) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
 
-            showResult(`Welcome ${currentUser.fullName}! You can now send notifications.`, 'success');
-            console.log('✅ Admin authenticated:', currentUser.fullName);
+                console.log('🔍 Auth system loaded, checking authentication...');
+                
+                // Check current authentication status
+                const authResult = await window.rhythmAuth.checkAuthentication();
+                
+                if (!authResult.isAuthenticated) {
+                    document.getElementById('authStatus').innerHTML = '❌ You must be logged in to send notifications. Redirecting to login...';
+                    document.getElementById('authStatus').className = 'result error';
+                    // Redirect to login after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = '../../login.html';
+                    }, 3000);
+                    return;
+                }
+
+                currentUser = authResult.user;
+
+                if (!currentUser) {
+                    document.getElementById('authStatus').innerHTML = '❌ No user data available';
+                    document.getElementById('authStatus').className = 'result error';
+                    return;
+                }
+
+                // Check admin privileges
+                const isAdmin = window.rhythmAuth.isAdmin();
+                if (!isAdmin) {
+                    document.getElementById('authStatus').innerHTML = '❌ Admin access required to send notifications. Redirecting...';
+                    document.getElementById('authStatus').className = 'result error';
+                    // Redirect to main page after 3 seconds
+                    setTimeout(() => {
+                        window.location.href = '../../pages/songlist.html';
+                    }, 3000);
+                    return;
+                }
+
+                // Hide auth status and show form
+                document.getElementById('authStatus').style.display = 'none';
+                document.getElementById('notificationForm').style.display = 'block';
+                
+                showResult(`Welcome ${currentUser.fullName}! You can now send notifications.`, 'success');
+                console.log('✅ Admin authenticated:', currentUser.fullName);
+                
+            } catch (error) {
+                console.error('❌ Authentication check failed:', error);
+                document.getElementById('authStatus').innerHTML = `❌ Authentication error: ${error.message}`;
+                document.getElementById('authStatus').className = 'result error';
+            }
         }
 
         function loadTemplate(templateName) {
@@ -373,6 +426,17 @@
 
             try {
                 showResult('Loading recipient tokens...', 'info');
+
+                // Wait for Firebase to be initialized
+                let attempts = 0;
+                while (!window.firebaseDb && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (!window.firebaseDb) {
+                    throw new Error('Firebase database not initialized');
+                }
 
                 const database = window.firebaseDb;
                 const tokensRef = ref(database, 'userTokens');
@@ -467,6 +531,7 @@
         async function sendNotification() {
             if (!currentUser) {
                 showResult('Please authenticate first', 'error');
+                await initializeAuth(); // Try to re-initialize auth
                 return;
             }
 

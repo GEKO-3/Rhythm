@@ -1,15 +1,19 @@
 {
-  "version": "2.2.2",
-  "timestamp": 1736186800000,
-  "description": "Implemented FCM push notifications with security restrictions",
+  "version": "2.3.0",
+  "timestamp": 1736273200000,
+  "description": "Complete PWA notification system with admin panel and smart prompting",
   "changes": [
-    "Added Firebase Cloud Messaging (FCM) for push notifications",
-    "Implemented security restrictions to only allow approved users",
-    "Created comprehensive notification service with user validation",
-    "Added VAPID key configuration for web push notifications",
-    "Implemented security checks: user status validation and access control",
-    "Added test notification functionality for debugging",
-    "Enhanced user approval verification before notification setup",
-    "Created notification permission validation system"
+    "Added comprehensive PWA-aware notification initialization",
+    "Created admin notification sending panel with templates and recipient filtering",
+    "Implemented smart notification prompting (immediate for PWA, optional for web)",
+    "Added GitHub Pages compatible notification sending using Firebase Legacy API",
+    "Enhanced songlist page with automatic notification setup for authenticated users",
+    "Added user-friendly notification prompts with success/failure feedback",
+    "Implemented one-time ask system for web users to prevent notification spam",
+    "Added notification service imports to key pages (songlist, members)",
+    "Enhanced login page with PWA-specific notification handling",
+    "Created notification templates for events, birthdays, alerts, and updates",
+    "Added comprehensive security validation throughout notification system",
+    "Improved user experience with informative prompts and visual feedback"
   ]
 }
