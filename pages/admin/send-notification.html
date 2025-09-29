@@ -163,6 +163,69 @@
         .template-btn:hover {
             background: rgba(245, 208, 0, 0.3);
         }
+
+        .user-checkboxes {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #555;
+            border-radius: 4px;
+            padding: 10px;
+            background: #1a1a1a;
+        }
+
+        .user-checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 8px;
+            margin: 4px 0;
+            background: rgba(245, 208, 0, 0.05);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .user-checkbox-item:hover {
+            background: rgba(245, 208, 0, 0.1);
+        }
+
+        .user-checkbox-item input[type="checkbox"] {
+            margin-right: 10px;
+            transform: scale(1.2);
+            accent-color: #f5d000;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: #f5d000;
+            font-size: 14px;
+        }
+
+        .user-details {
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 2px;
+        }
+
+        .user-badge {
+            background: #f5d000;
+            color: #2b2b2b;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .user-badge.admin {
+            background: #ff6b6b;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -217,11 +280,23 @@
 
             <div class="form-group">
                 <label for="recipients">Recipients</label>
-                <select id="recipients">
+                <select id="recipients" onchange="handleRecipientChange()">
                     <option value="all">All Approved Users</option>
                     <option value="admins">Admins Only</option>
                     <option value="members">Members Only</option>
+                    <option value="specific">Select Specific Users</option>
                 </select>
+            </div>
+
+            <div class="form-group" id="specificUsersContainer" style="display: none;">
+                <label>Select Users:</label>
+                <div id="userCheckboxes" class="user-checkboxes">
+                    <!-- User checkboxes will be populated here -->
+                </div>
+                <div style="margin-top: 10px;">
+                    <button type="button" onclick="selectAllUsers()" class="btn" style="background: rgba(245, 208, 0, 0.2); color: #f5d000; font-size: 12px; padding: 6px 12px;">Select All</button>
+                    <button type="button" onclick="selectNoUsers()" class="btn" style="background: rgba(245, 208, 0, 0.2); color: #f5d000; font-size: 12px; padding: 6px 12px;">Clear All</button>
+                </div>
             </div>
 
             <div class="preview-box">
@@ -249,6 +324,10 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, get, child } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
+        // Make Firebase functions globally available
+        window.firebaseRef = ref;
+        window.firebaseGet = get;
+
         // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
@@ -274,6 +353,7 @@
     <script>
         let recipientTokens = [];
         let currentUser = null;
+        let allAvailableUsers = []; // Store all users for specific selection
 
         // Templates for quick setup
         const templates = {
@@ -414,6 +494,58 @@
             document.getElementById('previewBody').textContent = body;
         }
 
+        function handleRecipientChange() {
+            const recipientType = document.getElementById('recipients').value;
+            const specificContainer = document.getElementById('specificUsersContainer');
+            
+            if (recipientType === 'specific') {
+                specificContainer.style.display = 'block';
+                populateUserCheckboxes();
+            } else {
+                specificContainer.style.display = 'none';
+            }
+        }
+
+        function populateUserCheckboxes() {
+            const container = document.getElementById('userCheckboxes');
+            
+            if (allAvailableUsers.length === 0) {
+                container.innerHTML = '<p style="color: #ccc; text-align: center;">Please load recipients first</p>';
+                return;
+            }
+
+            container.innerHTML = allAvailableUsers.map(user => `
+                <div class="user-checkbox-item" onclick="toggleUserCheckbox('${user.userId}')">
+                    <input type="checkbox" id="user_${user.userId}" value="${user.userId}" onchange="event.stopPropagation()">
+                    <div class="user-info">
+                        <div class="user-name">${user.userName}</div>
+                        <div class="user-details">ID: ${user.userId} • Status: ${user.status || 'active'}</div>
+                    </div>
+                    ${user.isAdmin ? '<span class="user-badge admin">👑 Admin</span>' : '<span class="user-badge">👤 Member</span>'}
+                </div>
+            `).join('');
+        }
+
+        function toggleUserCheckbox(userId) {
+            const checkbox = document.getElementById(`user_${userId}`);
+            checkbox.checked = !checkbox.checked;
+        }
+
+        function selectAllUsers() {
+            const checkboxes = document.querySelectorAll('#userCheckboxes input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = true);
+        }
+
+        function selectNoUsers() {
+            const checkboxes = document.querySelectorAll('#userCheckboxes input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = false);
+        }
+
+        function getSelectedUsers() {
+            const checkboxes = document.querySelectorAll('#userCheckboxes input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
         async function loadRecipients() {
             if (!currentUser) {
                 showResult('Please authenticate first', 'error');
@@ -438,24 +570,78 @@
                     throw new Error('Firebase database not initialized');
                 }
 
-                const database = window.firebaseDb;
-                const tokensRef = ref(database, 'userTokens');
-                const usersRef = ref(database, 'users');
+                // Use the authenticated database connection from rhythmAuth
+                const database = window.rhythmAuth?.database || window.firebaseDb;
+                
+                // Check if we have proper authentication context
+                if (!window.rhythmAuth?.isAuthenticated()) {
+                    throw new Error('Not authenticated with Firebase');
+                }
 
-                // Get all tokens and user data
-                const [tokensSnapshot, usersSnapshot] = await Promise.all([
-                    get(tokensRef),
-                    get(usersRef)
-                ]);
-
-                const tokens = tokensSnapshot.val() || {};
+                // First, get users data (this should work with current rules)
+                const usersRef = window.firebaseRef(database, 'users');
+                const usersSnapshot = await window.firebaseGet(usersRef);
                 const users = usersSnapshot.val() || {};
 
+                // Try to get tokens, but fallback to users-only approach if it fails
+                let tokens = {};
+                try {
+                    const tokensRef = window.firebaseRef(database, 'userTokens');
+                    const tokensSnapshot = await window.firebaseGet(tokensRef);
+                    const rawTokens = tokensSnapshot.val() || {};
+                    
+                    // Convert from accessCode-keyed tokens to userId-keyed format
+                    // The tokens are stored as: userTokens/accessCode -> {token, userId, userName, ...}
+                    Object.entries(rawTokens).forEach(([accessCode, tokenData]) => {
+                        if (tokenData && tokenData.token && tokenData.approved !== false) {
+                            // Find the corresponding user by accessCode
+                            const userId = Object.keys(users).find(uid => 
+                                users[uid].accessCode === accessCode
+                            );
+                            
+                            if (userId && isUserApproved(users[userId])) {
+                                tokens[userId] = {
+                                    token: tokenData.token,
+                                    userName: tokenData.userName || users[userId].fullName || users[userId].name,
+                                    userId: userId,
+                                    accessCode: accessCode,
+                                    deviceId: tokenData.deviceId,
+                                    platform: tokenData.platform || 'web',
+                                    updatedAt: tokenData.updatedAt
+                                };
+                            }
+                        }
+                    });
+                    
+                    console.log(`✅ Loaded ${Object.keys(tokens).length} FCM tokens from database`);
+                    if (Object.keys(tokens).length > 0) {
+                        console.log('📋 Token details:', Object.entries(tokens).map(([userId, data]) => 
+                            `${data.userName} (${userId}): ${data.token.substring(0, 20)}...`
+                        ).join('\n'));
+                    }
+                } catch (tokenError) {
+                    console.warn('Could not load FCM tokens, using user data only:', tokenError.message);
+                    // We'll create mock token entries from users who have deviceId
+                    Object.entries(users).forEach(([userId, userData]) => {
+                        if (userData.deviceId && isUserApproved(userData)) {
+                            tokens[userId] = {
+                                token: 'mock_token_' + userId, // Placeholder
+                                userName: userData.fullName || userData.name,
+                                userId: userId,
+                                approved: true,
+                                status: userData.status
+                            };
+                        }
+                    });
+                }
+
+                // Store all available users for specific selection
+                allAvailableUsers = [];
                 recipientTokens = [];
                 const recipientType = document.getElementById('recipients').value;
                 let recipientCount = 0;
 
-                // Filter based on selection and user approval
+                // First, collect all approved users
                 Object.entries(tokens).forEach(([userId, tokenData]) => {
                     const user = users[userId];
                     
@@ -464,27 +650,54 @@
                         return;
                     }
 
-                    // Filter by recipient type
-                    if (recipientType === 'admins' && !user.isAdmin) return;
-                    if (recipientType === 'members' && user.isAdmin) return;
-
-                    recipientTokens.push({
+                    const userInfo = {
                         token: tokenData.token,
                         userId: userId,
-                        userName: tokenData.userName || user.fullName,
-                        isAdmin: user.isAdmin || false
-                    });
+                        userName: tokenData.userName || user.fullName || user.name,
+                        isAdmin: user.isAdmin || user.role === 'admin' || false,
+                        status: user.status || 'active'
+                    };
+
+                    allAvailableUsers.push(userInfo);
+
+                    // Filter by recipient type for the current selection
+                    if (recipientType === 'admins' && !userInfo.isAdmin) return;
+                    if (recipientType === 'members' && userInfo.isAdmin) return;
+                    if (recipientType === 'specific') return; // Will be handled separately
+
+                    recipientTokens.push(userInfo);
                     recipientCount++;
                 });
+
+                // Handle specific user selection
+                if (recipientType === 'specific') {
+                    const selectedUserIds = getSelectedUsers();
+                    recipientTokens = allAvailableUsers.filter(user => selectedUserIds.includes(user.userId));
+                    recipientCount = recipientTokens.length;
+                    
+                    // Refresh the checkbox display
+                    populateUserCheckboxes();
+                }
 
                 // Display recipients
                 displayRecipients(recipientTokens);
                 
                 if (recipientCount > 0) {
-                    showResult(`Found ${recipientCount} approved recipients`, 'success');
-                    document.getElementById('sendBtn').disabled = false;
+                    const hasMockTokens = recipientTokens.some(r => r.token.startsWith('mock_token_'));
+                    if (hasMockTokens) {
+                        showResult(`Found ${recipientCount} approved users, but FCM tokens not available. Please ensure users have enabled notifications.`, 'info');
+                        document.getElementById('sendBtn').disabled = true;
+                    } else {
+                        const recipientTypeText = recipientType === 'specific' ? 'selected' : recipientType;
+                        showResult(`Found ${recipientCount} ${recipientTypeText} recipients with notification tokens`, 'success');
+                        document.getElementById('sendBtn').disabled = false;
+                    }
                 } else {
-                    showResult('No approved recipients found', 'error');
+                    if (recipientType === 'specific') {
+                        showResult(`No users selected. Please select users from the list above.`, 'info');
+                    } else {
+                        showResult('No approved recipients found', 'error');
+                    }
                     document.getElementById('sendBtn').disabled = true;
                 }
 
@@ -513,17 +726,21 @@
 
         function displayRecipients(recipients) {
             const container = document.getElementById('recipientsList');
+            const recipientType = document.getElementById('recipients').value;
             
             if (recipients.length === 0) {
                 container.style.display = 'none';
                 return;
             }
 
-            container.innerHTML = recipients.map(recipient => 
-                `<div class="recipient-item">
-                    ${recipient.isAdmin ? '👑' : '👤'} ${recipient.userName} (${recipient.userId})
-                </div>`
-            ).join('');
+            const title = recipientType === 'specific' ? 'Selected Recipients:' : 'Recipients:';
+            container.innerHTML = `<div style="font-weight: bold; margin-bottom: 10px; color: #f5d000;">${title}</div>` +
+                recipients.map(recipient => 
+                    `<div class="recipient-item">
+                        ${recipient.isAdmin ? '👑' : '👤'} ${recipient.userName} (${recipient.userId})
+                        ${recipient.token.startsWith('mock_token_') ? ' <span style="color: #ff6b6b; font-size: 11px;">⚠️ No FCM token</span>' : ' <span style="color: #4caf50; font-size: 11px;">✅ Ready</span>'}
+                    </div>`
+                ).join('');
             
             container.style.display = 'block';
         }
@@ -535,6 +752,18 @@
                 return;
             }
 
+            const recipientType = document.getElementById('recipients').value;
+            
+            // For specific selection, get currently selected users
+            if (recipientType === 'specific') {
+                const selectedUserIds = getSelectedUsers();
+                if (selectedUserIds.length === 0) {
+                    showResult('Please select at least one user to send notifications to', 'error');
+                    return;
+                }
+                recipientTokens = allAvailableUsers.filter(user => selectedUserIds.includes(user.userId));
+            }
+            
             if (recipientTokens.length === 0) {
                 showResult('Please load recipients first', 'error');
                 return;

@@ -1,19 +1,15 @@
 {
-  "version": "2.3.0",
-  "timestamp": 1736273200000,
-  "description": "Complete PWA notification system with admin panel and smart prompting",
+  "version": "2.3.1",
+  "timestamp": 1727640000000,
+  "description": "Fixed FCM token loading and added specific user targeting for notifications",
   "changes": [
-    "Added comprehensive PWA-aware notification initialization",
-    "Created admin notification sending panel with templates and recipient filtering",
-    "Implemented smart notification prompting (immediate for PWA, optional for web)",
-    "Added GitHub Pages compatible notification sending using Firebase Legacy API",
-    "Enhanced songlist page with automatic notification setup for authenticated users",
-    "Added user-friendly notification prompts with success/failure feedback",
-    "Implemented one-time ask system for web users to prevent notification spam",
-    "Added notification service imports to key pages (songlist, members)",
-    "Enhanced login page with PWA-specific notification handling",
-    "Created notification templates for events, birthdays, alerts, and updates",
-    "Added comprehensive security validation throughout notification system",
-    "Improved user experience with informative prompts and visual feedback"
+    "Fixed FCM token loading issue in admin notification panel",
+    "Added proper token mapping from accessCode-keyed database to user ID format",
+    "Implemented specific user selection for targeted notification sending",
+    "Added user checkbox interface with bulk selection controls",
+    "Enhanced admin panel with visual feedback for recipient selection",
+    "Fixed permission denied errors when loading FCM tokens",
+    "Added comprehensive token validation and user approval checking",
+    "Improved logging for token loading debugging and verification"
   ]
 }

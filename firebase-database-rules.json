@@ -65,6 +65,24 @@
       ".write": true
     },
     
+    "userTokens": {
+      ".read": true,
+      ".write": true,
+      "$userId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    
+    "fcm-tokens": {
+      ".read": true,
+      ".write": true,
+      "$userId": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    
     "pending_requests": {
       ".read": true,
       ".write": true,
