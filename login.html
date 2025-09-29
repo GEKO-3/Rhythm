@@ -891,6 +891,15 @@
                     // Check if permission was already granted
                     if (Notification.permission === 'granted') {
                         console.log('✅ Notifications already enabled for PWA');
+                        
+                        // Even if permission is granted, ensure we have a valid token
+                        console.log('🔍 Checking for existing FCM token...');
+                        const result = await window.rhythmNotifications.requestPermission();
+                        if (result.success) {
+                            console.log('🎫 FCM token confirmed/generated for PWA user');
+                        } else {
+                            console.log('⚠️ FCM token issue:', result.reason);
+                        }
                         return;
                     }
 

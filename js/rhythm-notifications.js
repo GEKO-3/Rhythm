@@ -478,10 +478,133 @@ class RhythmNotificationService {
             return { success: false, reason: 'error', error: error.message };
         }
     }
+
+    /**
+     * Debug function to manually regenerate FCM token
+     * SECURITY: Only for approved users
+     */
+    async regenerateToken() {
+        try {
+            console.log('🔄 Manually regenerating FCM token...');
+            
+            // Get current user from rhythm auth
+            const currentUser = window.rhythmAuth?.getCurrentUser();
+            if (!currentUser || !currentUser.accessCode) {
+                throw new Error('No authenticated user found');
+            }
+
+            // Verify user is approved
+            if (!this.isUserApprovedForNotifications(currentUser)) {
+                throw new Error('User not approved for notifications');
+            }
+
+            // Check notification permission
+            console.log('🔍 Current notification permission:', Notification.permission);
+            
+            if (Notification.permission !== 'granted') {
+                console.log('⚠️ Notification permission not granted. Requesting...');
+                const permission = await Notification.requestPermission();
+                if (permission !== 'granted') {
+                    throw new Error('Notification permission denied');
+                }
+            }
+
+            // Force regenerate token
+            console.log('🎫 Generating new FCM token...');
+            const token = await getToken(this.messaging, { vapidKey: this.vapidKey });
+            
+            if (!token) {
+                throw new Error('Failed to generate FCM token');
+            }
+
+            console.log('✅ New FCM token generated:', token.substring(0, 20) + '...');
+            this.currentToken = token;
+
+            // Save to database
+            await this.saveTokenToDatabase(token);
+            
+            console.log('💾 Token saved successfully');
+            
+            // Show success message
+            alert(`✅ FCM Token regenerated successfully!\n\nToken: ${token.substring(0, 30)}...\n\nYou should now be able to receive notifications.`);
+            
+            return { success: true, token };
+
+        } catch (error) {
+            console.error('❌ Error regenerating FCM token:', error);
+            alert(`❌ Failed to regenerate FCM token: ${error.message}`);
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * Debug function to check current token status
+     */
+    async checkTokenStatus() {
+        try {
+            console.log('🔍 Checking FCM token status...');
+            
+            // Get current user
+            const currentUser = window.rhythmAuth?.getCurrentUser();
+            console.log('👤 Current user:', currentUser?.fullName || 'None');
+            
+            // Check notification permission
+            console.log('🔔 Notification permission:', Notification.permission);
+            
+            // Check if user is approved
+            if (currentUser) {
+                const isApproved = this.isUserApprovedForNotifications(currentUser);
+                console.log('✅ User approved for notifications:', isApproved);
+            }
+            
+            // Check stored token
+            const storedToken = localStorage.getItem('rhythm_fcm_token');
+            console.log('💾 Stored token:', storedToken ? `${storedToken.substring(0, 20)}...` : 'None');
+            
+            // Check current token
+            console.log('🎫 Current token:', this.currentToken ? `${this.currentToken.substring(0, 20)}...` : 'None');
+            
+            // Try to get fresh token if permission is granted
+            if (Notification.permission === 'granted' && this.messaging) {
+                try {
+                    const freshToken = await getToken(this.messaging, { vapidKey: this.vapidKey });
+                    console.log('🔄 Fresh token:', freshToken ? `${freshToken.substring(0, 20)}...` : 'Failed to get');
+                } catch (tokenError) {
+                    console.log('❌ Error getting fresh token:', tokenError.message);
+                }
+            }
+            
+            return {
+                user: currentUser,
+                permission: Notification.permission,
+                storedToken: !!storedToken,
+                currentToken: !!this.currentToken,
+                isApproved: currentUser ? this.isUserApprovedForNotifications(currentUser) : false
+            };
+
+        } catch (error) {
+            console.error('❌ Error checking token status:', error);
+            return { error: error.message };
+        }
+    }
 }
 
 // Create global instance
 window.rhythmNotifications = new RhythmNotificationService();
+
+// Global debug functions for console access
+window.debugNotifications = {
+    checkStatus: () => window.rhythmNotifications?.checkTokenStatus(),
+    regenerateToken: () => window.rhythmNotifications?.regenerateToken(),
+    testNotification: () => window.rhythmNotifications?.testNotification(),
+    getToken: () => window.rhythmNotifications?.currentToken,
+    getStoredToken: () => localStorage.getItem('rhythm_fcm_token'),
+    clearToken: () => {
+        localStorage.removeItem('rhythm_fcm_token');
+        window.rhythmNotifications.currentToken = null;
+        console.log('🗑️ FCM token cleared');
+    }
+};
 
 // Export for modules
 export default RhythmNotificationService;
