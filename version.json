@@ -1,13 +1,14 @@
 {
-  "version": "2.3.4",
-  "timestamp": 1727643600000,
-  "description": "Enhanced FCM token debugging and regeneration capabilities",
+  "version": "2.3.5",
+  "timestamp": 1727644800000,
+  "description": "Automatic FCM token generation when notifications are enabled",
   "changes": [
-    "Added FCM token debugging and regeneration functions",
-    "Implemented debugNotifications global object with comprehensive token management",
-    "Enhanced notification initialization with automatic token verification",
-    "Added checkTokenStatus and regenerateToken methods for troubleshooting",
-    "Improved token generation flow for users with granted permissions",
-    "Added console debug functions for easy FCM token troubleshooting"
+    "Implemented automatic FCM token generation when notifications are enabled",
+    "Added periodic token monitoring and auto-regeneration every 5 minutes",
+    "Enhanced token generation with service worker registration fallback",
+    "Added automatic token verification for users with granted permissions",
+    "Improved notification initialization with ensureNotificationToken function",
+    "Added visual feedback when FCM tokens are automatically generated",
+    "Enhanced token persistence and database synchronization"
   ]
 }

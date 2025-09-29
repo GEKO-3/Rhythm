@@ -43,6 +43,9 @@ class RhythmNotificationService {
             // Set up foreground message handler
             this.setupForegroundMessageHandler();
             
+            // Start periodic token verification
+            this.startTokenMonitoring();
+            
             this.isInitialized = true;
             console.log('🔔 Notification Service initialized');
             
@@ -143,7 +146,14 @@ class RhythmNotificationService {
                 throw new Error('Messaging not initialized');
             }
 
-            // Get FCM token
+            // Ensure we have notification permission
+            if (Notification.permission !== 'granted') {
+                throw new Error('Notification permission not granted');
+            }
+
+            console.log('🔄 Generating FCM token...');
+            
+            // Get FCM token (this will always try to get a fresh token)
             const token = await getToken(this.messaging, { vapidKey: this.vapidKey });
             
             if (token) {
@@ -153,9 +163,33 @@ class RhythmNotificationService {
                 // Save token to database with user verification
                 await this.saveTokenToDatabase(token);
                 
+                console.log('✅ FCM token generated and saved successfully');
                 return { success: true, token };
             } else {
-                console.log('❌ No registration token available');
+                console.log('❌ No registration token available - service worker may not be registered');
+                
+                // Try to register service worker if not registered
+                if ('serviceWorker' in navigator) {
+                    try {
+                        const registration = await navigator.serviceWorker.register('/sw.js');
+                        console.log('🔧 Service worker registered, retrying token generation...');
+                        
+                        // Wait a moment for SW to be ready
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                        
+                        // Retry token generation
+                        const retryToken = await getToken(this.messaging, { vapidKey: this.vapidKey });
+                        if (retryToken) {
+                            console.log('🎫 FCM Token obtained after SW registration:', retryToken.substring(0, 20) + '...');
+                            this.currentToken = retryToken;
+                            await this.saveTokenToDatabase(retryToken);
+                            return { success: true, token: retryToken };
+                        }
+                    } catch (swError) {
+                        console.log('⚠️ Service worker registration failed:', swError.message);
+                    }
+                }
+                
                 return { success: false, reason: 'no_token' };
             }
 
@@ -477,6 +511,57 @@ class RhythmNotificationService {
             console.error('❌ Error testing notification:', error);
             return { success: false, reason: 'error', error: error.message };
         }
+    }
+
+    /**
+     * Start periodic token monitoring and auto-generation
+     */
+    startTokenMonitoring() {
+        // Check token every 5 minutes
+        setInterval(async () => {
+            try {
+                // Only check if user is authenticated and permission is granted
+                const currentUser = window.rhythmAuth?.getCurrentUser();
+                if (!currentUser || Notification.permission !== 'granted') {
+                    return;
+                }
+
+                // Only for approved users
+                if (!this.isUserApprovedForNotifications(currentUser)) {
+                    return;
+                }
+
+                // Check if we have a current token
+                if (!this.currentToken) {
+                    console.log('🔄 Periodic check: No FCM token found, generating...');
+                    const result = await this.getAndSaveToken();
+                    if (result.success) {
+                        console.log('✅ Periodic FCM token generation successful');
+                    }
+                }
+
+            } catch (error) {
+                console.log('⚠️ Periodic token check failed:', error.message);
+            }
+        }, 5 * 60 * 1000); // 5 minutes
+
+        // Also do an immediate check after 10 seconds
+        setTimeout(async () => {
+            try {
+                const currentUser = window.rhythmAuth?.getCurrentUser();
+                if (currentUser && Notification.permission === 'granted' && 
+                    this.isUserApprovedForNotifications(currentUser) && !this.currentToken) {
+                    
+                    console.log('🔄 Initial token check: Generating FCM token...');
+                    const result = await this.getAndSaveToken();
+                    if (result.success) {
+                        console.log('✅ Initial FCM token generation successful');
+                    }
+                }
+            } catch (error) {
+                console.log('⚠️ Initial token check failed:', error.message);
+            }
+        }, 10000);
     }
 
     /**
