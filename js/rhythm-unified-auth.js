@@ -1065,6 +1065,13 @@ class RhythmUnifiedAuth {
                 </button>
             </div>
             ${rememberOption}
+            
+            <!-- Clear notification settings option -->
+            <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(245, 208, 0, 0.2);">
+                <button type="button" onclick="rhythmAuth.clearNotificationSettings()" style="background: none; border: none; color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; cursor: pointer; text-decoration: underline; font-family: var(--font-family);">
+                    Clear notification settings
+                </button>
+            </div>
         `;
         
         document.body.appendChild(choiceContainer);
@@ -1099,6 +1106,32 @@ class RhythmUnifiedAuth {
         localStorage.removeItem('rhythm_admin_preference');
         localStorage.removeItem('rhythm_silent_redirect');
         console.log('🔄 PWA preferences reset');
+    }
+
+    /**
+     * Clear notification settings (available in choice interface)
+     */
+    clearNotificationSettings() {
+        try {
+            // Clear local storage items
+            localStorage.removeItem('rhythm_notification_asked');
+            localStorage.removeItem('rhythm_fcm_token');
+            localStorage.removeItem('rhythm_notification_permission');
+            
+            // Clear session storage if any
+            sessionStorage.removeItem('rhythm_notification_asked');
+            
+            console.log('🧹 Notification settings cleared');
+            alert('✅ Notification settings have been cleared. You will be asked about notifications again next time.');
+            
+            // Optionally refresh the page
+            if (confirm('Would you like to refresh the page to see the changes?')) {
+                location.reload();
+            }
+        } catch (error) {
+            console.error('Error clearing notification settings:', error);
+            alert('❌ Error clearing notification settings');
+        }
     }
 
     /**

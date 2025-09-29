@@ -1,15 +1,15 @@
 {
-  "version": "2.3.2",
-  "timestamp": 1727641200000,
-  "description": "Moved notification prompts to login page and added clear notification settings",
+  "version": "2.3.3",
+  "timestamp": 1727641800000,
+  "description": "Enhanced clear notification settings availability across all interfaces",
   "changes": [
-    "Moved notification permission prompts from songlist to login page",
-    "Added user-friendly notification prompts with visual feedback",
-    "Implemented clear notification settings functionality",
-    "Enhanced login page with PWA-aware notification initialization",
-    "Added optional notification offers for web users with memory",
-    "Created slideIn animation for notification toasts",
-    "Added clear notification settings button to login page",
-    "Improved notification flow for better user experience"
+    "Added clear notification settings to admin/songlist choice interface",
+    "Enhanced unified auth with clearNotificationSettings method",
+    "Made notification settings clearing available at all auth stages",
+    "Improved user control over notification preferences",
+    "Added consistent styling for clear settings buttons across interfaces",
+    "Enhanced admin choice screen with notification management",
+    "Streamlined notification settings reset functionality",
+    "Better accessibility for notification preference management"
   ]
 }
