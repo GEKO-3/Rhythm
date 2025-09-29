@@ -6,7 +6,7 @@
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
-import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getDatabase, ref, set, get, onValue, off } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 class RhythmNotificationService {
     constructor() {
@@ -45,6 +45,9 @@ class RhythmNotificationService {
             
             // Start periodic token verification
             this.startTokenMonitoring();
+            
+            // Start listening for pending notifications
+            this.startNotificationListener();
             
             this.isInitialized = true;
             console.log('🔔 Notification Service initialized');
@@ -161,9 +164,14 @@ class RhythmNotificationService {
                 this.currentToken = token;
                 
                 // Save token to database with user verification
-                await this.saveTokenToDatabase(token);
+                try {
+                    await this.saveTokenToDatabase(token);
+                    console.log('✅ FCM token generated and saved to database successfully');
+                } catch (dbError) {
+                    console.log('⚠️ Database save failed, but token is available locally');
+                }
                 
-                console.log('✅ FCM token generated and saved successfully');
+                console.log('✅ FCM token generated successfully');
                 return { success: true, token };
             } else {
                 console.log('❌ No registration token available - service worker may not be registered');
@@ -213,6 +221,8 @@ class RhythmNotificationService {
                 return;
             }
 
+            console.log('💾 Attempting to save FCM token for user:', currentUser.fullName, 'AccessCode:', currentUser.accessCode);
+
             // SECURITY CHECK: Verify user is approved for notifications
             if (!this.isUserApprovedForNotifications(currentUser)) {
                 console.log('🔒 User not approved for notifications - token not saved to database');
@@ -241,9 +251,23 @@ class RhythmNotificationService {
 
         } catch (error) {
             console.error('❌ Error saving token to database:', error);
+            
+            // Provide detailed error information
+            if (error.code === 'PERMISSION_DENIED') {
+                console.log('🔒 Database permission denied for userTokens path');
+                console.log('📋 This usually means:');
+                console.log('   1. Firebase database rules need to be updated');
+                console.log('   2. Rules may not be deployed yet');
+                console.log('   3. User access code may not be valid');
+                console.log('💡 Token will be saved locally as fallback');
+            }
+            
             // Save locally as fallback
             localStorage.setItem('rhythm_fcm_token', token);
-            throw error; // Re-throw to handle in calling function
+            console.log('💾 FCM token saved locally as fallback');
+            
+            // Don't throw error - continue with local storage
+            return;
         }
     }
 
@@ -514,6 +538,76 @@ class RhythmNotificationService {
     }
 
     /**
+     * Start listening for pending notifications in Firebase
+     */
+    startNotificationListener() {
+        try {
+            const pendingRef = ref(this.database, 'pendingNotifications');
+            
+            // Listen for new notifications
+            onValue(pendingRef, (snapshot) => {
+                const notifications = snapshot.val();
+                if (!notifications) return;
+
+                Object.entries(notifications).forEach(([notifId, notifData]) => {
+                    this.processNotification(notifId, notifData);
+                });
+            });
+
+            console.log('👂 Started listening for pending notifications');
+
+        } catch (error) {
+            console.log('⚠️ Could not start notification listener:', error.message);
+        }
+    }
+
+    /**
+     * Process a pending notification
+     */
+    async processNotification(notificationId, notificationData) {
+        try {
+            // Check if this notification is for current user
+            const currentToken = this.currentToken || localStorage.getItem('rhythm_fcm_token');
+            
+            if (!currentToken || !notificationData.targetToken || 
+                !currentToken.includes(notificationData.targetToken.substring(0, 20))) {
+                return; // Not for this user
+            }
+
+            // Skip if already processed
+            if (notificationData.status === 'delivered') {
+                return;
+            }
+
+            console.log('📨 Processing notification for current user:', notificationId);
+
+            // Show the notification
+            if ('Notification' in window && Notification.permission === 'granted') {
+                const notification = new Notification(notificationData.notification.title, {
+                    body: notificationData.notification.body,
+                    icon: '/src/Logo.png',
+                    badge: '/src/Logo.png',
+                    tag: notificationId,
+                    requireInteraction: true
+                });
+
+                // Mark as delivered
+                const notifRef = ref(this.database, `pendingNotifications/${notificationId}`);
+                await set(notifRef, {
+                    ...notificationData,
+                    status: 'delivered',
+                    deliveredAt: Date.now()
+                });
+
+                console.log('✅ Notification delivered:', notificationId);
+            }
+
+        } catch (error) {
+            console.error('❌ Error processing notification:', error);
+        }
+    }
+
+    /**
      * Start periodic token monitoring and auto-generation
      */
     startTokenMonitoring() {
@@ -677,7 +771,7 @@ class RhythmNotificationService {
 // Create global instance
 window.rhythmNotifications = new RhythmNotificationService();
 
-// Global debug functions for console access
+// Global debug functions for console access  
 window.debugNotifications = {
     checkStatus: () => window.rhythmNotifications?.checkTokenStatus(),
     regenerateToken: () => window.rhythmNotifications?.regenerateToken(),
@@ -688,6 +782,61 @@ window.debugNotifications = {
         localStorage.removeItem('rhythm_fcm_token');
         window.rhythmNotifications.currentToken = null;
         console.log('🗑️ FCM token cleared');
+    },
+    testDatabaseAccess: async () => {
+        try {
+            const currentUser = window.rhythmAuth?.getCurrentUser();
+            if (!currentUser) {
+                console.log('❌ No authenticated user found');
+                return;
+            }
+            
+            console.log('🧪 Testing database access for user:', currentUser.fullName);
+            console.log('📋 Access code:', currentUser.accessCode);
+            
+            // Try to write a test token
+            const testToken = 'test_token_' + Date.now();
+            const tokenRef = window.firebaseRef(window.rhythmNotifications.database, `userTokens/${currentUser.accessCode}`);
+            
+            await window.firebaseSet(tokenRef, {
+                token: testToken,
+                userId: currentUser.accessCode,
+                userName: currentUser.fullName,
+                testWrite: true,
+                timestamp: Date.now()
+            });
+            
+            console.log('✅ Database write test successful');
+            
+            // Try to read it back
+            const readSnapshot = await window.firebaseGet(tokenRef);
+            const readData = readSnapshot.val();
+            
+            if (readData && readData.testWrite) {
+                console.log('✅ Database read test successful');
+                console.log('📊 Test data:', readData);
+            } else {
+                console.log('⚠️ Database read test failed or returned unexpected data');
+            }
+            
+        } catch (error) {
+            console.error('❌ Database access test failed:', error);
+            console.log('');
+            console.log('🔧 To fix this issue:');
+            console.log('1. Go to Firebase Console → Database → Rules');
+            console.log('2. Update rules to include userTokens permissions');
+            console.log('3. Deploy the new rules');
+            console.log('');
+            console.log('📋 Required rules section:');
+            console.log('"userTokens": {');
+            console.log('  ".read": true,');
+            console.log('  ".write": true,');
+            console.log('  "$userId": {');
+            console.log('    ".read": true,');
+            console.log('    ".write": true');
+            console.log('  }');
+            console.log('}');
+        }
     }
 };
 

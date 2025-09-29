@@ -1,14 +1,13 @@
 {
-  "version": "2.3.5",
-  "timestamp": 1727644800000,
-  "description": "Automatic FCM token generation when notifications are enabled",
+  "version": "2.3.10",
+  "timestamp": 1727650800000,
+  "description": "Complete notification system overhaul with real-time delivery",
   "changes": [
-    "Implemented automatic FCM token generation when notifications are enabled",
-    "Added periodic token monitoring and auto-regeneration every 5 minutes",
-    "Enhanced token generation with service worker registration fallback",
-    "Added automatic token verification for users with granted permissions",
-    "Improved notification initialization with ensureNotificationToken function",
-    "Added visual feedback when FCM tokens are automatically generated",
-    "Enhanced token persistence and database synchronization"
+    "Fixed CORS policy issues by replacing FCM HTTP API with Firebase Database",
+    "Implemented real-time notification queue and delivery system",
+    "Added automatic notification processing for online users",
+    "Enhanced admin panel with delivery status and user explanation",
+    "Created GitHub Pages compatible notification system",
+    "Improved notification reliability with database persistence"
   ]
 }

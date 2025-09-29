@@ -114,6 +114,15 @@
     "version": {
       ".read": true,
       ".write": true
+    },
+    
+    "pendingNotifications": {
+      ".read": true,
+      ".write": true,
+      "$notificationId": {
+        ".read": true,
+        ".write": true
+      }
     }
   }
 }
