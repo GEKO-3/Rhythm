@@ -260,6 +260,7 @@
     <script type="module">
         import RhythmUnifiedAuth from './js/rhythm-unified-auth.js';
         import RhythmLocalDB from './js/rhythm-local-db.js';
+        import './js/rhythm-notifications.js';
 
         // Disable PWA installation prompts
         window.addEventListener('beforeinstallprompt', (e) => {
@@ -434,6 +435,18 @@
             
             if (authResult.isAuthenticated) {
                 console.log('✅ [Login] User already authenticated, checking redirect preference...');
+                
+                // Initialize notifications for already authenticated users
+                if (window.rhythmNotifications && window.rhythmNotifications.isInitialized) {
+                    // Don't await this - let it run in background
+                    window.rhythmNotifications.requestPermission().then(result => {
+                        if (result.success) {
+                            console.log('✅ Notifications enabled for returning user');
+                        }
+                    }).catch(err => {
+                        console.log('Notification setup failed:', err);
+                    });
+                }
                 
                 // Handle offline mode specifically
                 if (isOfflineMode || authResult.isOffline) {
@@ -612,6 +625,20 @@
                     if (result.action === 'auto_login') {
                         showMessage('Access approved! Redirecting...', 'success');
                         startPWAPreloading(); // Start preloading for PWA
+                        
+                        // Initialize notifications for authenticated users
+                        if (window.rhythmNotifications && window.rhythmNotifications.isInitialized) {
+                            window.rhythmNotifications.requestPermission().then(result => {
+                                if (result.success) {
+                                    console.log('✅ Notifications enabled for user');
+                                } else {
+                                    console.log('ℹ️ Notifications not enabled:', result.message);
+                                }
+                            }).catch(err => {
+                                console.log('Notification setup failed:', err);
+                            });
+                        }
+                        
                         setTimeout(() => {
                             window.rhythmAuth.redirectAfterLogin();
                         }, 1000);
@@ -831,6 +858,28 @@
             if (window.rhythmAuth) {
                 window.rhythmAuth.resetPWAPreferences();
                 console.log('PWA preferences reset. Refresh to see login choice again.');
+            }
+        };
+
+        // Debug function: Test notifications (available in console)
+        window.testNotifications = async () => {
+            if (window.rhythmNotifications && window.rhythmNotifications.isInitialized) {
+                try {
+                    const permission = await window.rhythmNotifications.requestPermission();
+                    console.log('Permission result:', permission);
+                    
+                    if (permission.success) {
+                        console.log('✅ Testing notification...');
+                        window.rhythmNotifications.testNotification();
+                        console.log('🔔 Test notification sent! Check your notifications.');
+                    } else {
+                        console.log('❌ Notifications not permitted:', permission.message);
+                    }
+                } catch (error) {
+                    console.error('Test failed:', error);
+                }
+            } else {
+                console.log('❌ Notification service not initialized');
             }
         };
     </script>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythm Notifications Test</title>
+    <style>
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #2b2b2b;
+            color: #f5d000;
+        }
+        .container {
+            background: rgba(43, 43, 43, 0.95);
+            border: 1px solid #f5d000;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        button {
+            background: #f5d000;
+            color: #2b2b2b;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #e6c200;
+        }
+        .result {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            min-height: 20px;
+        }
+        .success { background: rgba(76, 175, 80, 0.2); }
+        .error { background: rgba(244, 67, 54, 0.2); }
+        .info { background: rgba(33, 150, 243, 0.2); }
+        .warning { background: rgba(255, 152, 0, 0.2); }
+        code {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔔 Rhythm Boduberu Notification Security Test</h1>
+    
+    <div class="container">
+        <h3>User Authentication Status</h3>
+        <button onclick="checkUserAuth()">Check User Authentication</button>
+        <div id="authResult" class="result"></div>
+    </div>
+
+    <div class="container">
+        <h3>Notification Permission Validation</h3>
+        <button onclick="validatePermissions()">Validate Permissions</button>
+        <div id="validationResult" class="result"></div>
+    </div>
+
+    <div class="container">
+        <h3>Request Notification Permission</h3>
+        <button onclick="requestNotifications()">Request Permission (Security Check)</button>
+        <div id="permissionResult" class="result"></div>
+    </div>
+
+    <div class="container">
+        <h3>Test Notification</h3>
+        <button onclick="testNotification()">Send Test Notification</button>
+        <div id="testResult" class="result"></div>
+    </div>
+
+    <div class="container">
+        <h3>Security Information</h3>
+        <p><strong>Security Features:</strong></p>
+        <ul>
+            <li>✅ User approval verification before any notification setup</li>
+            <li>✅ Status check (must be 'active' or 'approved')</li>
+            <li>✅ Access revocation detection</li>
+            <li>✅ Token storage only for approved users</li>
+            <li>✅ Comprehensive permission validation</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h3>Admin Features</h3>
+        <p>If you're an admin, you can:</p>
+        <button onclick="window.location.href='pages/admin/send-notification.html'" style="background: #f5d000; color: #2b2b2b; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+            📱 Send Custom Notifications
+        </button>
+    </div>
+
+    <!-- Load dependencies -->
+    <script type="module" src="js/rhythm-unified-auth.js"></script>
+    <script type="module" src="js/rhythm-notifications.js"></script>
+
+    <script>
+        // Wait for services to initialize
+        setTimeout(() => {
+            console.log('🧪 Test page loaded, services initialized');
+        }, 1000);
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = message;
+            element.className = `result ${type}`;
+        }
+
+        async function checkUserAuth() {
+            try {
+                const authInstance = window.rhythmAuth;
+                if (!authInstance) {
+                    showResult('authResult', '❌ Authentication service not loaded', 'error');
+                    return;
+                }
+
+                const user = authInstance.getCurrentUser();
+                if (!user) {
+                    showResult('authResult', '❌ No user authenticated', 'warning');
+                    return;
+                }
+
+                showResult('authResult', 
+                    `✅ User: <code>${user.fullName}</code><br>
+                     Status: <code>${user.status}</code><br>
+                     Access Code: <code>${user.accessCode}</code><br>
+                     Is Admin: <code>${user.isAdmin || false}</code>`, 
+                    'success');
+
+            } catch (error) {
+                showResult('authResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function validatePermissions() {
+            try {
+                const notificationService = window.rhythmNotifications;
+                if (!notificationService) {
+                    showResult('validationResult', '❌ Notification service not loaded', 'error');
+                    return;
+                }
+
+                const validation = await notificationService.validateNotificationPermissions();
+                
+                if (validation.valid) {
+                    showResult('validationResult', 
+                        `✅ Permissions valid for user: <code>${validation.user}</code><br>
+                         Status: <code>${validation.status}</code>`, 
+                        'success');
+                } else {
+                    showResult('validationResult', 
+                        `❌ Validation failed: <code>${validation.reason}</code>`, 
+                        'error');
+                }
+
+            } catch (error) {
+                showResult('validationResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function requestNotifications() {
+            try {
+                const notificationService = window.rhythmNotifications;
+                if (!notificationService) {
+                    showResult('permissionResult', '❌ Notification service not loaded', 'error');
+                    return;
+                }
+
+                showResult('permissionResult', '⏳ Requesting permission...', 'info');
+                
+                const result = await notificationService.requestPermission();
+                
+                if (result.success) {
+                    showResult('permissionResult', 
+                        `✅ Permission granted and token saved<br>
+                         Token: <code>${result.token ? result.token.substring(0, 20) + '...' : 'Not available'}</code>`, 
+                        'success');
+                } else {
+                    let message = `❌ Permission request failed: <code>${result.reason}</code>`;
+                    if (result.userStatus) {
+                        message += `<br>User Status: <code>${result.userStatus}</code>`;
+                    }
+                    showResult('permissionResult', message, 'error');
+                }
+
+            } catch (error) {
+                showResult('permissionResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testNotification() {
+            try {
+                const notificationService = window.rhythmNotifications;
+                if (!notificationService) {
+                    showResult('testResult', '❌ Notification service not loaded', 'error');
+                    return;
+                }
+
+                showResult('testResult', '⏳ Sending test notification...', 'info');
+                
+                const result = await notificationService.testNotification();
+                
+                if (result.success) {
+                    showResult('testResult', 
+                        `✅ Test notification sent successfully to: <code>${result.user}</code>`, 
+                        'success');
+                } else {
+                    showResult('testResult', 
+                        `❌ Test failed: <code>${result.reason}</code>`, 
+                        'error');
+                }
+
+            } catch (error) {
+                showResult('testResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-check auth status on load
+        setTimeout(checkUserAuth, 1500);
+    </script>
+</body>
+</html>

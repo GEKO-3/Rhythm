@@ -1,13 +1,15 @@
 {
-  "version": "2.2.1",
-  "timestamp": 1727396400000,
-  "description": "Fixed login cache and version display issues",
+  "version": "2.2.2",
+  "timestamp": 1736186800000,
+  "description": "Implemented FCM push notifications with security restrictions",
   "changes": [
-    "Fixed PWA cache clearing that was removing user login data",
-    "Fixed version display not loading properly on login screen",
-    "Improved PWA update strategy to be non-disruptive",
-    "Preserved user authentication state and saved credentials",
-    "Enhanced version loading with better fallback mechanisms",
-    "Maintained all Firebase database rule functionality from v2.2.0"
+    "Added Firebase Cloud Messaging (FCM) for push notifications",
+    "Implemented security restrictions to only allow approved users",
+    "Created comprehensive notification service with user validation",
+    "Added VAPID key configuration for web push notifications",
+    "Implemented security checks: user status validation and access control",
+    "Added test notification functionality for debugging",
+    "Enhanced user approval verification before notification setup",
+    "Created notification permission validation system"
   ]
 }
