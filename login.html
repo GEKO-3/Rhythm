@@ -503,6 +503,21 @@
             
             // Auto-fill saved login data
             loadSavedLoginData();
+            
+            // Log debug functions availability
+            setTimeout(() => {
+                if (window.debugNotifications) {
+                    console.log('');
+                    console.log('🛠️ FCM Debug Functions Available:');
+                    console.log('  debugNotifications.checkStatus() - Check FCM token status');
+                    console.log('  debugNotifications.regenerateToken() - Force regenerate FCM token');
+                    console.log('  debugNotifications.testNotification() - Send test notification');
+                    console.log('  debugNotifications.getToken() - Get current token');
+                    console.log('  debugNotifications.getStoredToken() - Get stored token');
+                    console.log('  debugNotifications.clearToken() - Clear stored token');
+                    console.log('');
+                }
+            }, 2000);
         });
 
         // Function to load saved login data
