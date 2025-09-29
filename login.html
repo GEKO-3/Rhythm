@@ -61,6 +61,17 @@
             box-sizing: border-box;
         }
 
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
         body {
             font-family: var(--font-family);
             background-color: var(--bg-color);
@@ -246,6 +257,13 @@
         <div style="text-align: center; margin-top: 15px;">
             <button type="button" id="clearDataBtn" style="background: none; border: none; color: rgba(245, 208, 0, 0.6); font-size: 0.8rem; cursor: pointer; text-decoration: underline; font-family: var(--font-family); display: none;">
                 Clear saved login data
+            </button>
+        </div>
+        
+        <!-- Clear notification settings option -->
+        <div style="text-align: center; margin-top: 10px;">
+            <button type="button" onclick="clearNotificationSettings()" style="background: none; border: none; color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; cursor: pointer; text-decoration: underline; font-family: var(--font-family);">
+                Clear notification settings
             </button>
         </div>
         
@@ -436,37 +454,9 @@
             if (authResult.isAuthenticated) {
                 console.log('✅ [Login] User already authenticated, checking redirect preference...');
                 
-                // Initialize notifications for already authenticated users (PWA-aware)
-                if (window.rhythmNotifications && window.rhythmNotifications.isInitialized) {
-                    // Check if PWA mode for immediate notification request
-                    const isPWAMode = window.matchMedia('(display-mode: standalone)').matches || 
-                                     window.navigator.standalone === true ||
-                                     document.referrer.includes('android-app://');
-                    
-                    if (isPWAMode && Notification.permission === 'default') {
-                        console.log('📱 PWA user returning - requesting notifications');
-                        // For PWA, request immediately
-                        window.rhythmNotifications.requestPermission().then(result => {
-                            if (result.success) {
-                                console.log('✅ Notifications enabled for PWA returning user');
-                            } else {
-                                console.log('ℹ️ Notifications not enabled for PWA:', result.reason);
-                            }
-                        }).catch(err => {
-                            console.log('Notification setup failed:', err);
-                        });
-                    } else if (!isPWAMode) {
-                        // For web users, just initialize silently if already granted
-                        if (Notification.permission === 'granted') {
-                            window.rhythmNotifications.requestPermission().then(result => {
-                                if (result.success) {
-                                    console.log('✅ Notifications enabled for returning user');
-                                }
-                            }).catch(err => {
-                                console.log('Notification setup failed:', err);
-                            });
-                        }
-                    }
+                // Initialize notifications for already authenticated users
+                if (authResult.user) {
+                    initializeNotifications(authResult.user);
                 }
                 
                 // Handle offline mode specifically
@@ -647,37 +637,8 @@
                         showMessage('Access approved! Redirecting...', 'success');
                         startPWAPreloading(); // Start preloading for PWA
                         
-                        // Initialize notifications for authenticated users (PWA-aware)
-                        if (window.rhythmNotifications && window.rhythmNotifications.isInitialized) {
-                            const isPWAMode = window.matchMedia('(display-mode: standalone)').matches || 
-                                             window.navigator.standalone === true ||
-                                             document.referrer.includes('android-app://');
-                            
-                            // For PWA users, always try to request notifications
-                            if (isPWAMode) {
-                                console.log('📱 PWA user logged in - requesting notifications');
-                                window.rhythmNotifications.requestPermission().then(result => {
-                                    if (result.success) {
-                                        console.log('✅ Notifications enabled for PWA user');
-                                    } else {
-                                        console.log('ℹ️ Notifications not enabled for PWA:', result.reason);
-                                    }
-                                }).catch(err => {
-                                    console.log('Notification setup failed:', err);
-                                });
-                            } else {
-                                // For web users, request but don't force
-                                window.rhythmNotifications.requestPermission().then(result => {
-                                    if (result.success) {
-                                        console.log('✅ Notifications enabled for user');
-                                    } else {
-                                        console.log('ℹ️ Notifications not enabled:', result.reason);
-                                    }
-                                }).catch(err => {
-                                    console.log('Notification setup failed:', err);
-                                });
-                            }
-                        }
+                        // Initialize notifications with user-friendly prompts
+                        initializeNotifications(result.user);
                         
                         setTimeout(() => {
                             window.rhythmAuth.redirectAfterLogin();
@@ -898,6 +859,226 @@
             if (window.rhythmAuth) {
                 window.rhythmAuth.resetPWAPreferences();
                 console.log('PWA preferences reset. Refresh to see login choice again.');
+            }
+        };
+
+        // Enhanced notification initialization with user-friendly prompts
+        async function initializeNotifications(user) {
+            try {
+                // Check if we're in PWA mode
+                const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                             window.navigator.standalone === true ||
+                             document.referrer.includes('android-app://');
+
+                console.log('🔔 Initializing notifications for user:', user.fullName, 'PWA:', isPWA);
+
+                // Wait for notification service to be available
+                let attempts = 0;
+                while (!window.rhythmNotifications && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (!window.rhythmNotifications || !window.rhythmNotifications.isInitialized) {
+                    console.log('⚠️ Notification service not available');
+                    return;
+                }
+
+                // For PWA users, always request notification permission with prompt
+                if (isPWA) {
+                    console.log('📱 PWA detected - requesting notification permission');
+                    
+                    // Check if permission was already granted
+                    if (Notification.permission === 'granted') {
+                        console.log('✅ Notifications already enabled for PWA');
+                        return;
+                    }
+
+                    // Request permission with user-friendly prompt
+                    if (Notification.permission === 'default') {
+                        // Show a brief message before requesting permission
+                        showNotificationPrompt();
+                        
+                        // Wait a moment for user to read the message
+                        setTimeout(async () => {
+                            try {
+                                const result = await window.rhythmNotifications.requestPermission();
+                                if (result.success) {
+                                    console.log('✅ Notifications enabled for PWA user');
+                                    showNotificationSuccess();
+                                } else {
+                                    console.log('ℹ️ Notifications not enabled:', result.reason);
+                                }
+                            } catch (error) {
+                                console.log('⚠️ Notification setup failed:', error);
+                            }
+                        }, 2000);
+                    }
+                } else {
+                    // For web users, only request if they haven't been asked before
+                    const hasAskedBefore = localStorage.getItem('rhythm_notification_asked');
+                    if (!hasAskedBefore && Notification.permission === 'default') {
+                        console.log('🌐 Web user - offering optional notifications');
+                        
+                        // Show optional notification offer
+                        setTimeout(() => {
+                            showOptionalNotificationOffer();
+                        }, 3000); // Show after 3 seconds
+                    }
+                }
+
+            } catch (error) {
+                console.error('❌ Error initializing notifications:', error);
+            }
+        }
+
+        function showNotificationPrompt() {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(33, 150, 243, 0.95);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                max-width: 300px;
+                font-family: inherit;
+                animation: slideIn 0.3s ease-out;
+            `;
+
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">🔔</span>
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px; margin-bottom: 2px;">Enable Notifications</div>
+                        <div style="font-size: 13px; opacity: 0.9;">Get notified about events, birthdays, and updates</div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 4000);
+        }
+
+        function showNotificationSuccess() {
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(76, 175, 80, 0.95);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                max-width: 300px;
+                font-family: inherit;
+                animation: slideIn 0.3s ease-out;
+            `;
+
+            toast.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">✅</span>
+                    <div>
+                        <div style="font-weight: 600; font-size: 14px; margin-bottom: 2px;">Notifications Enabled!</div>
+                        <div style="font-size: 13px; opacity: 0.9;">You'll receive updates and alerts</div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+
+        function showOptionalNotificationOffer() {
+            // Only show if user hasn't been asked before
+            if (localStorage.getItem('rhythm_notification_asked')) {
+                return;
+            }
+
+            // Mark that we've asked
+            localStorage.setItem('rhythm_notification_asked', 'true');
+
+            const toast = document.createElement('div');
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: rgba(43, 43, 43, 0.95);
+                color: #f5d000;
+                padding: 15px 20px;
+                border-radius: 10px;
+                border: 1px solid #f5d000;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+                z-index: 10000;
+                max-width: 320px;
+                font-family: inherit;
+                animation: slideIn 0.3s ease-out;
+            `;
+
+            toast.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <div style="font-weight: 600; font-size: 14px; margin-bottom: 5px;">📱 Enable Notifications?</div>
+                    <div style="font-size: 13px; opacity: 0.8;">Get updates about events, birthdays, and announcements</div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="this.parentElement.parentElement.querySelector('.enable-btn').click()" 
+                            style="background: #f5d000; color: #2b2b2b; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold;">
+                        Enable
+                    </button>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: transparent; color: #f5d000; border: 1px solid #f5d000; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 12px;">
+                        Maybe Later
+                    </button>
+                </div>
+                <button class="enable-btn" style="display: none;" onclick="window.rhythmNotifications?.requestPermission().then(() => this.parentElement.remove())"></button>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Auto remove after 15 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 15000);
+        }
+
+        // Clear notification settings function
+        window.clearNotificationSettings = () => {
+            try {
+                // Clear local storage items
+                localStorage.removeItem('rhythm_notification_asked');
+                localStorage.removeItem('rhythm_fcm_token');
+                localStorage.removeItem('rhythm_notification_permission');
+                
+                // Clear session storage if any
+                sessionStorage.removeItem('rhythm_notification_asked');
+                
+                console.log('🧹 Notification settings cleared');
+                alert('✅ Notification settings have been cleared. You will be asked about notifications again next time.');
+                
+                // Optionally refresh the page
+                if (confirm('Would you like to refresh the page to see the changes?')) {
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Error clearing notification settings:', error);
+                alert('❌ Error clearing notification settings');
             }
         };
 

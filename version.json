@@ -1,15 +1,15 @@
 {
-  "version": "2.3.1",
-  "timestamp": 1727640000000,
-  "description": "Fixed FCM token loading and added specific user targeting for notifications",
+  "version": "2.3.2",
+  "timestamp": 1727641200000,
+  "description": "Moved notification prompts to login page and added clear notification settings",
   "changes": [
-    "Fixed FCM token loading issue in admin notification panel",
-    "Added proper token mapping from accessCode-keyed database to user ID format",
-    "Implemented specific user selection for targeted notification sending",
-    "Added user checkbox interface with bulk selection controls",
-    "Enhanced admin panel with visual feedback for recipient selection",
-    "Fixed permission denied errors when loading FCM tokens",
-    "Added comprehensive token validation and user approval checking",
-    "Improved logging for token loading debugging and verification"
+    "Moved notification permission prompts from songlist to login page",
+    "Added user-friendly notification prompts with visual feedback",
+    "Implemented clear notification settings functionality",
+    "Enhanced login page with PWA-aware notification initialization",
+    "Added optional notification offers for web users with memory",
+    "Created slideIn animation for notification toasts",
+    "Added clear notification settings button to login page",
+    "Improved notification flow for better user experience"
   ]
 }
