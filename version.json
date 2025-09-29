@@ -1,15 +1,12 @@
 {
-  "version": "2.3.4",
+  "version": "2.3.5",
   "timestamp": 1727642400000,
-  "description": "Fixed scope issues and ensured clear notification settings works in admin choice interface",
+  "description": "Added clear notification settings to admin destination choice page",
   "changes": [
-    "Fixed scope issues in admin choice interface for proper function calls",
-    "Ensured window.rhythmAuth references work correctly in HTML onclick handlers",
-    "Fixed clear notification settings button functionality in choice screen",
-    "Corrected global scope access for all admin choice interface buttons",
-    "Improved reliability of admin destination choice interface",
-    "Enhanced error handling for notification settings management",
-    "Stabilized admin choice screen user interactions",
-    "Verified all admin choice buttons work with proper global scope"
+    "Added clear notification settings button to admin destination choice page",
+    "Implemented clearNotificationSettings method in rhythmAuth class",
+    "Enhanced admin user experience with easy notification management",
+    "Added consistent notification settings access across login and admin flows",
+    "Maintained visual consistency with existing UI design patterns"
   ]
 }

@@ -1,7 +1,7 @@
 // Simple Service Worker for Rhythm Boduberu
 // Provides basic offline functionality without aggressive caching
 
-const CACHE_NAME = 'rhythm-v2.3.4';
+const CACHE_NAME = 'rhythm-v2.3.3';
 const ESSENTIAL_ASSETS = [
   './',
   './pages/songlist.html',
