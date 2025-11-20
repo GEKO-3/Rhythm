@@ -129,11 +129,19 @@ class RhythmUnifiedAuth {
             const userData = JSON.parse(storedAuth);
             console.log('📦 [UnifiedAuth] Found stored auth for:', userData.fullName || userData.accessCode);
 
-            // Basic device check
+            // Basic device check - only if device ID is set
             const currentDeviceId = this.generateDeviceId();
             if (userData.deviceId && userData.deviceId !== currentDeviceId) {
                 console.log('❌ [UnifiedAuth] Device ID mismatch in cached data');
+                console.log('   Cached device:', userData.deviceId);
+                console.log('   Current device:', currentDeviceId);
                 return { isAuthenticated: false, user: null, reason: 'device_mismatch' };
+            }
+            
+            // For old users without device ID, set it now
+            if (!userData.deviceId) {
+                console.log('🔄 [UnifiedAuth] Legacy user without device ID - will bind on next verification');
+                userData.deviceId = currentDeviceId;
             }
 
             // OFFLINE MODE: Use cached authentication without database verification
@@ -178,10 +186,11 @@ class RhythmUnifiedAuth {
                         return { isAuthenticated: false, user: null, reason: 'access_revoked' };
                     }
 
-                    // Check device match - STRICT enforcement for all users
+                    // Check device match
                     console.log('🔍 [Device Debug] Current device ID:', currentDeviceId);
                     console.log('🔍 [Device Debug] DB user device ID:', dbUser.deviceId);
                     
+                    // Only enforce device check if user already has a device ID set
                     const isDeviceMismatch = dbUser.deviceId && currentDeviceId !== dbUser.deviceId;
                     
                     if (isDeviceMismatch) {
@@ -191,6 +200,22 @@ class RhythmUnifiedAuth {
                         console.log('   User:', dbUser.fullName || dbUser.name);
                         localStorage.removeItem('rhythmAuth_approval');
                         return { isAuthenticated: false, user: null, reason: 'device_mismatch' };
+                    }
+                    
+                    // For legacy users without device ID, bind them now
+                    if (!dbUser.deviceId) {
+                        console.log('🔄 [UnifiedAuth] Legacy user detected - binding to current device');
+                        try {
+                            await this.updateUser(userData.accessCode, { 
+                                deviceId: currentDeviceId,
+                                lastActive: Date.now(),
+                                firstDeviceBinding: Date.now()
+                            });
+                            dbUser.deviceId = currentDeviceId;
+                            console.log('✅ [UnifiedAuth] Legacy user successfully bound to device');
+                        } catch (error) {
+                            console.warn('⚠️ [UnifiedAuth] Failed to bind legacy user, but allowing access');
+                        }
                     }
 
                     // Update stored data with latest from database for future offline use
@@ -681,9 +706,9 @@ class RhythmUnifiedAuth {
                     };
                 }
                 
-                // If no device ID is set, bind to current device (first login)
+                // If no device ID is set, bind to current device (first login for old users)
                 if (!existingUser.deviceId) {
-                    console.log('🔄 [UnifiedAuth] First login - binding user to current device');
+                    console.log('🔄 [UnifiedAuth] No device binding found - binding user to current device (legacy user)');
                     try {
                         await this.updateUser(accessCode, { 
                             deviceId: deviceId, 
@@ -691,21 +716,19 @@ class RhythmUnifiedAuth {
                             firstDeviceBinding: Date.now()
                         });
                         existingUser.deviceId = deviceId;
-                        console.log('✅ [UnifiedAuth] User bound to device:', deviceId);
+                        console.log('✅ [UnifiedAuth] Legacy user bound to device:', deviceId);
                     } catch (error) {
                         console.error('❌ [UnifiedAuth] Failed to bind user to device:', error);
-                        return { 
-                            success: false, 
-                            action: 'binding_failed', 
-                            message: 'Failed to bind account to device. Please try again.' 
-                        };
+                        // Even if binding fails, allow login for backward compatibility
+                        console.warn('⚠️ [UnifiedAuth] Proceeding with login despite binding failure');
                     }
                 }
                 
                 // Device matches or was just set - proceed with login
-                console.log('✅ [UnifiedAuth] Device verified, logging in...');
+                console.log('✅ [UnifiedAuth] Device verified or bound, logging in...');
                 const loginData = this.loginUser({
                     ...existingUser,
+                    deviceId: deviceId, // Ensure device ID is set in local storage
                     lastActive: Date.now()
                 });
                 
