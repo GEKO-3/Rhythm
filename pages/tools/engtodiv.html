@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
-<link rel="manifest" href="favicons/manifest.webmanifest">
+      <link rel="icon" type="image/png" sizes="192x192" href="../../assets/favicons/icons-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../../assets/favicons/icons-512.png">
+<link rel="manifest" href="../../assets/favicons/manifest.webmanifest">
     <title>Dhivehi Transliteration Tool</title>
     <style>
         /* Local font definitions */
         @font-face {
             font-family: 'Faruma';
-            src: url('Fonts/Faruma.ttf') format('truetype');
+            src: url('../../assets/Fonts/Faruma.ttf') format('truetype');
             font-display: swap;
             font-weight: normal;
             font-style: normal;
@@ -19,7 +19,7 @@
         
         @font-face {
             font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            src: url('../../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
             font-display: swap;
             font-weight: normal;
             font-style: normal;
@@ -425,7 +425,7 @@
 
     <!-- Include Tesseract.js for OCR functionality -->
     <script src="https://unpkg.com/tesseract.js@v4.1.1/dist/tesseract.min.js"></script>
-    <script src="transliteration.js"></script>
+    <script src="../../js/transliteration.js"></script>
     <script>
         function transliterate() {
             const inputDisplay = document.getElementById('inputDisplay');
@@ -944,8 +944,8 @@
             // Prepare the text for import
             const textToImport = encodeURIComponent(output.value);
             
-            // Open lyrics submitter with imported text and song name
-            let url = `lyrics-submit.html?import=${textToImport}`;
+            // Open lyrics editor with imported text and song name
+            let url = `../admin/lyrics-edit.html?import=${textToImport}`;
             if (songName) {
                 url += `&songName=${encodeURIComponent(songName)}`;
             }

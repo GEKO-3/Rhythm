@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <title>Lyrics Editor</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <link rel="icon" type="image/png" sizes="192x192" href="favicons/icons-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="favicons/icons-512.png">
-<link rel="manifest" href="favicons/manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/favicons/icons-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="../../assets/favicons/icons-512.png">
+<link rel="manifest" href="../../assets/favicons/manifest.webmanifest">
   <style>
     /* Local font definitions */
     @font-face {
       font-family: 'Faruma';
-      src: url('Fonts/Faruma.ttf') format('truetype');
+      src: url('../../assets/Fonts/Faruma.ttf') format('truetype');
       font-display: swap;
       font-weight: normal;
       font-style: normal;
@@ -19,15 +19,15 @@
     
     @font-face {
       font-family: 'Montserrat';
-      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      src: url('../../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
       font-display: swap;
       font-weight: normal;
       font-style: normal;
     }
     
     html, body {
-      touch-action: pan-x pan-y;
-      overscroll-behavior: none;
+      touch-action: auto;
+      overscroll-behavior: auto;
     }
     input, textarea, select, button {
       touch-action: manipulation;
@@ -398,9 +398,37 @@
       <button onclick="addSection()">Add Section</button>
       <button onclick="addBreak()">Add Break</button>
       <button onclick="copyToClipboard()">Copy to Clipboard</button>
+      <button onclick="submitToFirebase()" style="background: #28a745;">Submit to Firebase</button>
       <button onclick="resetTool()">Reset</button>
     </div>
   </div>
+  
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+      authDomain: "rhythm-ea7a1.firebaseapp.com",
+      databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "rhythm-ea7a1",
+      storageBucket: "rhythm-ea7a1.firebasestorage.app",
+      messagingSenderId: "776053739080",
+      appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    
+    // Make database available globally
+    window.firebaseDB = database;
+    window.firebaseRef = ref;
+    window.firebaseSet = set;
+    window.firebaseGet = get;
+  </script>
+  
   <script>
     let sectionCount = 0;
     function transliterateToThaana(text) {
@@ -658,7 +686,7 @@
       try {
         // Try to fetch songs.js and parse max id
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', '/songs.js', false); // synchronous
+        xhr.open('GET', '../../data/songs-database.json', false); // synchronous
         xhr.send(null);
         if (xhr.status === 200) {
           const match = xhr.responseText.match(/id:\s*(\d+)/g);
@@ -912,7 +940,7 @@
     // Populate song name suggestions from songs.js
     let songIdMap = {};
     function populateSongNameSuggestions() {
-      fetch('/songs.js')
+      fetch('../../data/songs-database.json')
         .then(response => response.text())
         .then(jsText => {
           // Extract id, name, genre and lyrics from the JS file
@@ -1218,6 +1246,117 @@
     
     // Call handleImportedText when page loads
     document.addEventListener('DOMContentLoaded', handleImportedText);
+    
+    // Submit to Firebase function
+    async function submitToFirebase() {
+      const songName = document.getElementById('song-name-input').value.trim();
+      const genreBtn = document.getElementById('genre-btn');
+      const genre = genreBtn.textContent.replace('▼', '').trim() || 'General';
+      
+      if (!songName) {
+        alert('Please enter a song name before submitting!');
+        return;
+      }
+      
+      if (genre === 'Select Genre' || genre === 'General') {
+        alert('Please select a genre before submitting!');
+        return;
+      }
+      
+      if (!window.firebaseDB) {
+        alert('Firebase is not initialized. Please refresh the page and try again.');
+        return;
+      }
+      
+      // Get the formatted lyrics text
+      const container = document.getElementById('sections');
+      const children = Array.from(container.children);
+      
+      let lyricsText = '';
+      children.forEach(child => {
+        if (child.classList.contains('section')) {
+          const sectionTitle = child.querySelector('.section-title').value.trim();
+          if (sectionTitle) {
+            lyricsText += sectionTitle + '\n';
+          }
+          const lines = child.querySelectorAll('.line');
+          lines.forEach(line => {
+            const input = line.querySelector('input[type="text"]');
+            const starBtn = line.querySelector('.star-line-btn');
+            let text = input.value.trim();
+            if (text) {
+              if (starBtn.classList.contains('active')) text = '*' + text;
+              lyricsText += text + '\n';
+            }
+          });
+          lyricsText += '\n';
+        } else if (child.classList.contains('break-line')) {
+          lyricsText += '-\n';
+        }
+      });
+      
+      lyricsText = lyricsText.trim();
+      
+      if (!lyricsText) {
+        alert('Please add some lyrics before submitting!');
+        return;
+      }
+      
+      // Confirm submission
+      if (!confirm(`Submit "${songName}" to Firebase database?\n\nGenre: ${genre}\n\nThis will add/update the song in the database.`)) {
+        return;
+      }
+      
+      try {
+        // Show loading state
+        const submitBtn = event.target;
+        const originalText = submitBtn.textContent;
+        submitBtn.textContent = 'Submitting...';
+        submitBtn.disabled = true;
+        
+        // Prepare the song data structure matching Firebase format
+        const now = new Date().toISOString();
+        const songData = {
+          name: songName,
+          genre: genre,
+          lyrics: lyricsText,
+          dateAdded: now,
+          lastModified: now
+        };
+        
+        // Submit to Firebase under songs/{songName}
+        const songRef = window.firebaseRef(window.firebaseDB, `songs/${songName}`);
+        
+        // Check if song already exists
+        const snapshot = await window.firebaseGet(songRef);
+        const isUpdate = snapshot.exists();
+        
+        // Save to Firebase
+        await window.firebaseSet(songRef, songData);
+        
+        // Success!
+        alert(`✅ Success! Song "${songName}" has been ${isUpdate ? 'updated' : 'added'} to Firebase database.`);
+        
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        
+        console.log('Song submitted successfully:', songName, songData);
+        
+      } catch (error) {
+        console.error('Error submitting to Firebase:', error);
+        alert(`❌ Error submitting to Firebase: ${error.message}\n\nPlease check the console for details.`);
+        
+        // Reset button
+        if (event.target) {
+          event.target.textContent = 'Submit to Firebase';
+          event.target.disabled = false;
+        }
+      }
+    }
+    
+    // Make submitToFirebase available globally
+    window.submitToFirebase = submitToFirebase;
   </script>
 </body>
 </html>

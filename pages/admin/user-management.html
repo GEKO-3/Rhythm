@@ -59,6 +59,32 @@
             border: 1px solid var(--border-color);
             text-align: center;
             backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: var(--hover-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 208, 0, 0.3);
         }
 
         .header h1 {
@@ -74,28 +100,7 @@
             font-size: 1.1rem;
         }
 
-        .dev-warning {
-            background: linear-gradient(135deg, #cc0000 0%, #990000 100%);
-            border: 2px solid #ff4444;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 30px;
-            text-align: center;
-            box-shadow: 0 0 20px rgba(204, 0, 0, 0.3);
-        }
 
-        .dev-warning h3 {
-            color: #ffffff;
-            font-size: 1.3rem;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-
-        .dev-warning p {
-            color: #ffcccc;
-            font-size: 1rem;
-            line-height: 1.4;
-        }
 
         .section {
             background: var(--card-bg);
@@ -388,13 +393,9 @@
 <body>
     <div class="dev-container">
         <div class="header">
-            <h1>🔧 Dev Admin Management</h1>
+            <a href="admin.html" class="back-btn">← Back to Admin</a>
+            <h1>🔧 User Management</h1>
             <p class="subtitle">Create and manage admin accounts</p>
-        </div>
-
-        <div class="dev-warning">
-            <h3>⚠️ DEVELOPER ACCESS ONLY</h3>
-            <p>This page allows creation and management of admin accounts and user access. Only authorized developers should access this panel.</p>
         </div>
 
         <div class="section">

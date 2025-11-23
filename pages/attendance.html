@@ -323,6 +323,101 @@
             transform: translateY(-1px);
         }
 
+        /* Statistics Panel */
+        .statistics-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            border-color: rgba(245, 208, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .stat-icon {
+            font-size: 1.5em;
+        }
+
+        .stat-title {
+            color: var(--text-muted);
+            font-size: 0.85em;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            color: var(--primary-color);
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .stat-subtitle {
+            color: var(--text-muted);
+            font-size: 0.75em;
+            margin-top: 5px;
+        }
+
+        /* Date Filter */
+        .date-filter {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .date-filter .form-group {
+            flex: 1;
+            min-width: 180px;
+        }
+
+        .filter-btn {
+            padding: 12px 24px;
+            background: var(--gradient);
+            color: var(--text-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .clear-filter-btn {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .clear-filter-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
         /* Events Table */
         .events-section {
             background: rgba(255, 255, 255, 0.05);
@@ -342,6 +437,148 @@
             font-size: 1.5em;
             font-weight: 600;
             margin-bottom: 5px;
+        }
+
+        /* Paid Badge */
+        .paid-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .mark-paid-btn {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid #4CAF50;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .mark-paid-btn:hover {
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        .mark-paid-btn.paid {
+            background: rgba(76, 175, 80, 0.3);
+            cursor: default;
+        }
+
+        /* Member Details Modal */
+        .member-details-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .member-details-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-hover);
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .member-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .member-header img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid var(--primary-color);
+            object-fit: cover;
+        }
+
+        .member-header-info h2 {
+            color: var(--primary-color);
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .member-header-info p {
+            color: var(--text-muted);
+            font-size: 0.95em;
+        }
+
+        .attendance-history {
+            margin-top: 20px;
+        }
+
+        .attendance-history h3 {
+            color: var(--primary-color);
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .history-table th {
+            background: rgba(245, 208, 0, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .status-badge.present {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .status-badge.absent {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .status-badge.not-marked {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
         }
 
         .events-table {
@@ -655,6 +892,45 @@
             </div>
         </div>
 
+        <!-- Statistics Panel -->
+        <div class="statistics-panel" id="statisticsPanel">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">📊</span>
+                </div>
+                <div class="stat-title">Average Show Attendance</div>
+                <div class="stat-value" id="avgShowAttendance">--%</div>
+                <div class="stat-subtitle" id="showCount">0 shows tracked</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">🎯</span>
+                </div>
+                <div class="stat-title">Average Practice Attendance</div>
+                <div class="stat-value" id="avgPracticeAttendance">--%</div>
+                <div class="stat-subtitle" id="practiceCount">0 practices tracked</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">🎪</span>
+                </div>
+                <div class="stat-title">Latest Show Attendance</div>
+                <div class="stat-value" id="latestShowAttendance">--%</div>
+                <div class="stat-subtitle" id="latestShowDate">No recent shows</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">🎵</span>
+                </div>
+                <div class="stat-title">Latest Practice Attendance</div>
+                <div class="stat-value" id="latestPracticeAttendance">--%</div>
+                <div class="stat-subtitle" id="latestPracticeDate">No recent practices</div>
+            </div>
+        </div>
+
         <!-- Recent Events -->
         <div class="events-section">
             <div class="events-header">
@@ -662,11 +938,48 @@
                 <p style="color: var(--text-muted);">Click on an event to mark attendance</p>
             </div>
 
+            <!-- Date Filter -->
+            <div class="date-filter">
+                <div class="form-group">
+                    <label for="startDate" class="form-label">Start Date</label>
+                    <input type="date" id="startDate" class="form-input" />
+                </div>
+                <div class="form-group">
+                    <label for="endDate" class="form-label">End Date</label>
+                    <input type="date" id="endDate" class="form-input" />
+                </div>
+                <button class="filter-btn" onclick="applyDateFilter()">Apply Filter</button>
+                <button class="clear-filter-btn" onclick="clearDateFilter()">Clear</button>
+            </div>
+
             <div id="eventsContainer">
                 <div class="empty-state">
                     <h3>No Events Yet</h3>
                     <p>Create your first event to start tracking attendance</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Attendance Table View -->
+        <div class="events-section" style="margin-top: 30px;">
+            <div class="events-header">
+                <h2>Member Attendance Overview</h2>
+                <p style="color: var(--text-muted);">Click on a member to view detailed attendance history</p>
+            </div>
+
+            <div id="attendanceTableContainer">
+                <table class="events-table">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Attendance</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody">
+                        <!-- Member rows will be loaded here -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -690,13 +1003,36 @@
         </div>
     </div>
 
+    <!-- Member Details Modal -->
+    <div class="member-details-modal" id="memberDetailsModal">
+        <div class="member-details-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Member Attendance Details</h3>
+                <button class="close-btn" onclick="closeMemberDetailsModal()">&times;</button>
+            </div>
+
+            <div class="member-header" id="memberDetailsHeader">
+                <!-- Member info will be loaded here -->
+            </div>
+
+            <div class="attendance-history">
+                <h3>Attendance History</h3>
+                <div id="memberAttendanceHistory">
+                    <!-- History table will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="../js/members-data.js"></script>
     <script>
         let allMembers = [];
         let allEvents = [];
+        let filteredEvents = [];
         let currentEvent = null;
         let attendanceData = {};
+        let dateFilter = { start: null, end: null };
 
         // Initialize page
         document.addEventListener('DOMContentLoaded', async function() {
@@ -704,6 +1040,8 @@
             await loadMembers();
             await loadEvents();
             setupEventListeners();
+            updateStatistics();
+            renderAttendanceTable();
         });
 
         function updateFirebaseStatus(status, message) {
@@ -998,10 +1336,11 @@
                         ${allEvents.map(event => {
                             const attendanceCount = Object.values(event.attendance || {}).filter(status => status === 'present').length;
                             const totalMembers = allMembers.length;
+                            const paidBadge = event.paid ? '<span class="paid-badge">Paid</span>' : '';
                             
                             return `
                                 <tr>
-                                    <td><strong>${event.name}</strong></td>
+                                    <td><strong>${event.name} ${paidBadge}</strong></td>
                                     <td><span class="event-type ${event.type}">${capitalizeFirst(event.type)}</span></td>
                                     <td>${formatDate(event.date)}</td>
                                     <td>${attendanceCount}/${totalMembers} present</td>
@@ -1009,6 +1348,10 @@
                                         <button class="attendance-btn" onclick="openAttendanceModal('${event.id}')">
                                             Mark Attendance
                                         </button>
+                                        ${event.paid 
+                                            ? `<button class="mark-paid-btn" onclick="event.stopPropagation(); unmarkEventAsPaid('${event.id}')" style="background: #666; margin-left: 5px;">Unmark Paid</button>`
+                                            : `<button class="mark-paid-btn" onclick="event.stopPropagation(); markEventAsPaid('${event.id}')" style="margin-left: 5px;">Mark as Paid</button>`
+                                        }
                                     </td>
                                 </tr>
                             `;
@@ -1108,6 +1451,220 @@
             });
         }
 
+        function updateStatistics() {
+            // Filter out paid events for statistics
+            const unpaidEvents = allEvents.filter(e => !e.paid);
+            
+            // Separate by type (case-insensitive)
+            const shows = unpaidEvents.filter(e => e.type && e.type.toLowerCase() === 'show');
+            const practices = unpaidEvents.filter(e => e.type && e.type.toLowerCase() === 'practice');
+            
+            // Calculate average attendance
+            const avgShow = shows.length > 0 
+                ? shows.reduce((sum, e) => sum + Object.values(e.attendance || {}).filter(status => status === 'present').length, 0) / shows.length 
+                : 0;
+            const avgPractice = practices.length > 0
+                ? practices.reduce((sum, e) => sum + Object.values(e.attendance || {}).filter(status => status === 'present').length, 0) / practices.length
+                : 0;
+            
+            // Get latest events
+            const latestShow = shows.length > 0 ? shows[0] : null;
+            const latestPractice = practices.length > 0 ? practices[0] : null;
+            
+            // Update DOM safely
+            const avgShowEl = document.getElementById('avgShowAttendance');
+            const avgPracticeEl = document.getElementById('avgPracticeAttendance');
+            const latestShowEl = document.getElementById('latestShowAttendance');
+            const latestPracticeEl = document.getElementById('latestPracticeAttendance');
+            
+            if (avgShowEl) avgShowEl.textContent = avgShow.toFixed(1);
+            if (avgPracticeEl) avgPracticeEl.textContent = avgPractice.toFixed(1);
+            if (latestShowEl) {
+                latestShowEl.textContent = latestShow 
+                    ? Object.values(latestShow.attendance || {}).filter(status => status === 'present').length
+                    : '0';
+            }
+            if (latestPracticeEl) {
+                latestPracticeEl.textContent = latestPractice
+                    ? Object.values(latestPractice.attendance || {}).filter(status => status === 'present').length
+                    : '0';
+            }
+        }
+
+        function applyDateFilter() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            dateFilter.start = startDate ? new Date(startDate) : null;
+            dateFilter.end = endDate ? new Date(endDate) : null;
+            
+            // Apply filter
+            filteredEvents = allEvents.filter(event => {
+                const eventDate = new Date(event.date);
+                if (dateFilter.start && eventDate < dateFilter.start) return false;
+                if (dateFilter.end && eventDate > dateFilter.end) return false;
+                return true;
+            });
+            
+            updateStatistics();
+            renderAttendanceTable();
+            renderEvents();
+            
+            showNotification('Date filter applied', 'success');
+        }
+
+        function clearDateFilter() {
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            dateFilter.start = null;
+            dateFilter.end = null;
+            
+            filteredEvents = [...allEvents];
+            
+            updateStatistics();
+            renderAttendanceTable();
+            renderEvents();
+            
+            showNotification('Date filter cleared', 'success');
+        }
+
+        function renderAttendanceTable() {
+            const tableBody = document.getElementById('attendanceTableBody');
+            tableBody.innerHTML = '';
+            
+            // Use filtered events
+            const eventsToUse = filteredEvents.length > 0 ? filteredEvents : allEvents;
+            
+            // Filter out paid events
+            const unpaidEvents = eventsToUse.filter(e => !e.paid);
+            
+            // Calculate attendance for each member
+            const memberStats = allMembers.map(member => {
+                const attended = unpaidEvents.filter(event => 
+                    event.attendance && event.attendance[member.id] === 'present'
+                ).length;
+                const total = unpaidEvents.length;
+                const percentage = total > 0 ? ((attended / total) * 100).toFixed(1) : 0;
+                
+                return {
+                    ...member,
+                    attended,
+                    total,
+                    percentage
+                };
+            });
+            
+            // Sort by attendance percentage
+            memberStats.sort((a, b) => b.percentage - a.percentage);
+            
+            // Render table rows
+            memberStats.forEach(member => {
+                const row = document.createElement('tr');
+                row.style.cursor = 'pointer';
+                row.onclick = () => showMemberDetails(member);
+                
+                const photoSrc = member.photo || member.photoPath ? `../${member.photo || member.photoPath}` : '../src/Logo.png';
+                
+                row.innerHTML = `
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <img src="${photoSrc}" alt="${member.fullName}" 
+                                 style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
+                                 onerror="this.src='../src/Logo.png'">
+                            <span>${member.fullName}</span>
+                        </div>
+                    </td>
+                    <td>${member.attended}/${member.total}</td>
+                    <td>${member.percentage}%</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        function showMemberDetails(member) {
+            const modal = document.getElementById('memberDetailsModal');
+            
+            // Update member info
+            const photoSrc = member.photo || member.photoPath ? `../${member.photo || member.photoPath}` : '../src/Logo.png';
+            document.getElementById('detailMemberPhoto').src = photoSrc;
+            document.getElementById('detailMemberPhoto').onerror = function() { this.src = '../src/Logo.png'; };
+            document.getElementById('detailMemberName').textContent = member.fullName;
+            document.getElementById('detailMemberRole').textContent = member.role || 'Member';
+            
+            // Render attendance history
+            const historyBody = document.getElementById('attendanceHistoryBody');
+            historyBody.innerHTML = '';
+            
+            // Use filtered events
+            const eventsToUse = filteredEvents.length > 0 ? filteredEvents : allEvents;
+            
+            const memberEvents = eventsToUse.map(event => ({
+                ...event,
+                attended: event.attendance && event.attendance[member.id] === 'present'
+            }));
+            
+            memberEvents.forEach(event => {
+                const row = document.createElement('tr');
+                const statusClass = event.attended ? 'status-badge present' : 'status-badge absent';
+                const statusText = event.attended ? 'Present' : 'Absent';
+                const paidBadge = event.paid ? '<span class="paid-badge">Paid</span>' : '';
+                
+                row.innerHTML = `
+                    <td>${formatDate(event.date)}</td>
+                    <td>${event.name} ${paidBadge}</td>
+                    <td><span class="event-type ${event.type}">${capitalizeFirst(event.type)}</span></td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                `;
+                
+                historyBody.appendChild(row);
+            });
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeMemberDetails() {
+            document.getElementById('memberDetailsModal').style.display = 'none';
+        }
+
+        async function markEventAsPaid(eventId) {
+            try {
+                const event = allEvents.find(e => e.id === eventId);
+                if (!event) return;
+                
+                event.paid = true;
+                
+                await saveEvents();
+                updateStatistics();
+                renderAttendanceTable();
+                renderEvents();
+                
+                showNotification('Event marked as paid', 'success');
+            } catch (error) {
+                console.error('Error marking event as paid:', error);
+                showNotification('Failed to mark event as paid', 'error');
+            }
+        }
+
+        async function unmarkEventAsPaid(eventId) {
+            try {
+                const event = allEvents.find(e => e.id === eventId);
+                if (!event) return;
+                
+                event.paid = false;
+                
+                await saveEvents();
+                updateStatistics();
+                renderAttendanceTable();
+                renderEvents();
+                
+                showNotification('Payment status removed', 'success');
+            } catch (error) {
+                console.error('Error unmarking event:', error);
+                showNotification('Failed to update payment status', 'error');
+            }
+        }
+
         function showNotification(message, type = 'info') {
             // Simple notification - in production you might want a more sophisticated system
             const notification = document.createElement('div');
@@ -1143,6 +1700,27 @@
         document.getElementById('attendanceModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeAttendanceModal();
+            }
+        });
+
+        // Close member details modal when clicking outside
+        document.getElementById('memberDetailsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeMemberDetails();
+            }
+        });
+
+        // Add event listeners for date filter buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            const applyFilterBtn = document.querySelector('.filter-btn');
+            const clearFilterBtn = document.querySelector('.clear-filter-btn');
+            
+            if (applyFilterBtn) {
+                applyFilterBtn.addEventListener('click', applyDateFilter);
+            }
+            
+            if (clearFilterBtn) {
+                clearFilterBtn.addEventListener('click', clearDateFilter);
             }
         });
     </script>
