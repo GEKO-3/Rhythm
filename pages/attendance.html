@@ -834,7 +834,8 @@
                     <span class="search-icon">🔍</span>
                 </div>
                 <a href="members.html" class="nav-btn">👥 Members</a>
-                <a href="admin/member-input.html" class="nav-btn">⚙️ Admin</a>
+                <a href="admin/member-input.html" class="nav-btn">➕ Add Member</a>
+                <a href="admin/admin.html" class="nav-btn">⚙️ Admin</a>
             </div>
         </div>
     </header>
@@ -972,8 +973,10 @@
                     <thead>
                         <tr>
                             <th>Member</th>
-                            <th>Attendance</th>
-                            <th>Percentage</th>
+                            <th>Shows</th>
+                            <th>Practices</th>
+                            <th>Activities</th>
+                            <th>Overall %</th>
                         </tr>
                     </thead>
                     <tbody id="attendanceTableBody">
@@ -1008,18 +1011,32 @@
         <div class="member-details-content">
             <div class="modal-header">
                 <h3 class="modal-title">Member Attendance Details</h3>
-                <button class="close-btn" onclick="closeMemberDetailsModal()">&times;</button>
+                <button class="close-btn" onclick="closeMemberDetails()">&times;</button>
             </div>
 
-            <div class="member-header" id="memberDetailsHeader">
-                <!-- Member info will be loaded here -->
+            <div class="member-header">
+                <img id="detailMemberPhoto" src="" alt="Member" class="member-photo" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                <div style="margin-left: 20px;">
+                    <h2 id="detailMemberName" style="color: var(--primary-color); margin-bottom: 5px;"></h2>
+                    <p id="detailMemberRole" style="color: var(--text-muted); font-size: 1.1em;"></p>
+                </div>
             </div>
 
             <div class="attendance-history">
                 <h3>Attendance History</h3>
-                <div id="memberAttendanceHistory">
-                    <!-- History table will be loaded here -->
-                </div>
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Event</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceHistoryBody">
+                        <!-- History will be loaded here -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -1538,18 +1555,37 @@
             // Filter out paid events
             const unpaidEvents = eventsToUse.filter(e => !e.paid);
             
+            // Separate events by type
+            const shows = unpaidEvents.filter(e => e.type && e.type.toLowerCase() === 'show');
+            const practices = unpaidEvents.filter(e => e.type && e.type.toLowerCase() === 'practice');
+            const activities = unpaidEvents.filter(e => e.type && e.type.toLowerCase() === 'activity');
+            
             // Calculate attendance for each member
             const memberStats = allMembers.map(member => {
-                const attended = unpaidEvents.filter(event => 
+                const showsAttended = shows.filter(event => 
                     event.attendance && event.attendance[member.id] === 'present'
                 ).length;
-                const total = unpaidEvents.length;
-                const percentage = total > 0 ? ((attended / total) * 100).toFixed(1) : 0;
+                const practicesAttended = practices.filter(event => 
+                    event.attendance && event.attendance[member.id] === 'present'
+                ).length;
+                const activitiesAttended = activities.filter(event => 
+                    event.attendance && event.attendance[member.id] === 'present'
+                ).length;
+                
+                const totalAttended = showsAttended + practicesAttended + activitiesAttended;
+                const totalEvents = unpaidEvents.length;
+                const percentage = totalEvents > 0 ? ((totalAttended / totalEvents) * 100).toFixed(1) : 0;
                 
                 return {
                     ...member,
-                    attended,
-                    total,
+                    showsAttended,
+                    showsTotal: shows.length,
+                    practicesAttended,
+                    practicesTotal: practices.length,
+                    activitiesAttended,
+                    activitiesTotal: activities.length,
+                    totalAttended,
+                    totalEvents,
                     percentage
                 };
             });
@@ -1574,7 +1610,9 @@
                             <span>${member.fullName}</span>
                         </div>
                     </td>
-                    <td>${member.attended}/${member.total}</td>
+                    <td>${member.showsAttended}/${member.showsTotal}</td>
+                    <td>${member.practicesAttended}/${member.practicesTotal}</td>
+                    <td>${member.activitiesAttended}/${member.activitiesTotal}</td>
                     <td>${member.percentage}%</td>
                 `;
                 
@@ -1587,40 +1625,54 @@
             
             // Update member info
             const photoSrc = member.photo || member.photoPath ? `../${member.photo || member.photoPath}` : '../src/Logo.png';
-            document.getElementById('detailMemberPhoto').src = photoSrc;
-            document.getElementById('detailMemberPhoto').onerror = function() { this.src = '../src/Logo.png'; };
-            document.getElementById('detailMemberName').textContent = member.fullName;
-            document.getElementById('detailMemberRole').textContent = member.role || 'Member';
+            const photoEl = document.getElementById('detailMemberPhoto');
+            if (photoEl) {
+                photoEl.src = photoSrc;
+                photoEl.onerror = function() { this.src = '../src/Logo.png'; };
+            }
+            
+            const nameEl = document.getElementById('detailMemberName');
+            if (nameEl) nameEl.textContent = member.fullName || member.name || 'Unknown';
+            
+            const roleEl = document.getElementById('detailMemberRole');
+            if (roleEl) roleEl.textContent = `${member.role || 'Member'} • ${member.rhythmIndexNumber || 'N/A'}`;
             
             // Render attendance history
             const historyBody = document.getElementById('attendanceHistoryBody');
+            if (!historyBody) {
+                console.error('attendanceHistoryBody not found');
+                return;
+            }
             historyBody.innerHTML = '';
             
-            // Use filtered events
+            // Use filtered events or all events
             const eventsToUse = filteredEvents.length > 0 ? filteredEvents : allEvents;
             
-            const memberEvents = eventsToUse.map(event => ({
-                ...event,
-                attended: event.attendance && event.attendance[member.id] === 'present'
-            }));
+            if (eventsToUse.length === 0) {
+                historyBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px;">No events found</td></tr>';
+            } else {
+                eventsToUse.forEach(event => {
+                    const attended = event.attendance && event.attendance[member.id] === 'present';
+                    const row = document.createElement('tr');
+                    const statusClass = attended ? 'status-badge present' : 'status-badge absent';
+                    const statusText = attended ? 'Present' : 'Absent';
+                    const paidBadge = event.paid ? ' <span class="paid-badge">Paid</span>' : '';
+                    
+                    row.innerHTML = `
+                        <td>${formatDate(event.date)}</td>
+                        <td>${event.name}${paidBadge}</td>
+                        <td><span class="event-type ${event.type}">${capitalizeFirst(event.type || 'event')}</span></td>
+                        <td><span class="${statusClass}">${statusText}</span></td>
+                    `;
+                    
+                    historyBody.appendChild(row);
+                });
+            }
             
-            memberEvents.forEach(event => {
-                const row = document.createElement('tr');
-                const statusClass = event.attended ? 'status-badge present' : 'status-badge absent';
-                const statusText = event.attended ? 'Present' : 'Absent';
-                const paidBadge = event.paid ? '<span class="paid-badge">Paid</span>' : '';
-                
-                row.innerHTML = `
-                    <td>${formatDate(event.date)}</td>
-                    <td>${event.name} ${paidBadge}</td>
-                    <td><span class="event-type ${event.type}">${capitalizeFirst(event.type)}</span></td>
-                    <td><span class="${statusClass}">${statusText}</span></td>
-                `;
-                
-                historyBody.appendChild(row);
-            });
-            
-            modal.style.display = 'flex';
+            // Show modal
+            if (modal) {
+                modal.style.display = 'flex';
+            }
         }
 
         function closeMemberDetails() {
