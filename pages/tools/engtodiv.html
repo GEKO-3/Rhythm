@@ -41,6 +41,28 @@
             box-shadow: 0 4px 32px rgba(0,0,0,0.18);
             padding: 32px 28px 28px 28px;
         }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(43, 43, 43, 0.9);
+            color: #f5d000;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 1000;
+            display: inline-block;
+            font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
+        }
+        .back-btn:hover {
+            background: #f5d000;
+            color: #2b2b2b;
+            transform: translateX(-3px);
+            border-color: #f5d000;
+        }
         h1 {
             color: #f5d000;
             font-size: 2.2rem;
@@ -348,6 +370,7 @@
     </style>
 </head>
 <body>
+    <a href="../admin/admin.html" class="back-btn">← Back to Admin</a>
     <div class="container">
         <h1>Dhivehi Transliteration Tool</h1>
         <p>Convert Dhivehi Latin text to Dhivehi script (Thaana)</p>

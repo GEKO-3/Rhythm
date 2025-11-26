@@ -9,7 +9,7 @@
   <style>
     @font-face {
       font-family: 'Faruma';
-      src: url('Fonts/Faruma.ttf') format('truetype');
+      src: url('../../assets/Fonts/Faruma.ttf') format('truetype');
       font-display: swap;
       font-weight: normal;
       font-style: normal;
@@ -17,7 +17,7 @@
     
     @font-face {
       font-family: 'Montserrat';
-      src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      src: url('../../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
       font-display: swap;
       font-weight: normal;
       font-style: normal;
@@ -25,8 +25,8 @@
   </style>
   
   <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="favicons/favicon.svg">
-  <link rel="icon" type="image/x-icon" href="favicons/favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="../../assets/favicons/favicon.svg">
+  <link rel="icon" type="image/x-icon" href="../../assets/favicons/favicon.ico">
   
   <style>
     :root {
@@ -452,8 +452,9 @@
   
   <div class="copy-feedback" id="copy-feedback">Copied to clipboard!</div>
   
-  <script src="lyrics-showlist-config.js"></script>
-  <script>
+  <!-- Firebase DB with offline support -->
+  <script type="module" src="../../js/firebase-db-offline.js"></script>
+  <script type="module">
     let availableSongs = [];
     let currentList = [];
     let draggedElement = null;
@@ -470,254 +471,67 @@
       loadLatestShowlist();
     });
     
-    // Load songs from CSV (new method)
+    // Load songs from Firebase
     async function loadSongs() {
       try {
-        console.log('Fetching CSV from Google Sheets...');
-        const response = await fetch(window.RhythmLyricsShowConfig.lyricsSheet);
+        console.log('🎵 Loading songs from Firebase...');
         
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        // Wait for Firebase DB to be ready
+        let attempts = 0;
+        while (!window.rhythmDB && attempts < 50) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          attempts++;
         }
         
-        const csvText = await response.text();
-        console.log('CSV text length:', csvText.length);
-        
-        // Parse CSV properly using state machine
-        const rows = [];
-        let currentRow = [];
-        let currentField = '';
-        let inQuotes = false;
-        let i = 0;
-        
-        while (i < csvText.length) {
-          const char = csvText[i];
-          const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
-          
-          if (char === '"') {
-            if (inQuotes && nextChar === '"') {
-              // Escaped quote
-              currentField += '"';
-              i += 2;
-            } else {
-              // Toggle quote state
-              inQuotes = !inQuotes;
-              i++;
-            }
-          } else if (char === ',' && !inQuotes) {
-            // End of field
-            currentRow.push(currentField);
-            currentField = '';
-            i++;
-          } else if ((char === '\n' || char === '\r') && !inQuotes) {
-            // End of row
-            if (currentField || currentRow.length > 0) {
-              currentRow.push(currentField);
-              if (currentRow.length > 0) {
-                rows.push(currentRow);
-              }
-              currentRow = [];
-              currentField = '';
-            }
-            // Skip \r\n combinations
-            if (char === '\r' && nextChar === '\n') {
-              i += 2;
-            } else {
-              i++;
-            }
-          } else {
-            currentField += char;
-            i++;
-          }
+        if (!window.rhythmDB) {
+          throw new Error('Firebase DB not available');
         }
         
-        // Add the last row if it exists
-        if (currentField || currentRow.length > 0) {
-          currentRow.push(currentField);
-          if (currentRow.length > 0) {
-            rows.push(currentRow);
-          }
-        }
+        // Get all songs from Firebase
+        const songsData = await window.rhythmDB.getSongs();
+        console.log('✅ Loaded', Object.keys(songsData).length, 'songs from Firebase');
         
-        console.log('Parsed rows:', rows.length);
-        
-        // Process data rows and deduplicate by ID
+        // Convert to array and process
         const songMap = new Map();
         
-        for (let i = 1; i < rows.length; i++) { // Skip header row
-          const columns = rows[i];
-          if (columns.length >= 5) { // Ensure we have all required columns
-            const timestamp = columns[0] ? columns[0].trim() : '';
-            const id = parseInt(columns[1] ? columns[1].trim() : '0', 10);
-            const name = columns[2] ? columns[2].trim() : '';
-            const genre = columns[3] ? columns[3].trim() : '';
-            const lyrics = columns[4] ? columns[4].trim() : '';
-            
-            if (!isNaN(id) && name && genre && lyrics) {
-              const song = { id, timestamp, name, genre, lyrics };
-              
-              // Keep only the most recent version of each song (by ID)
-              if (!songMap.has(id) || new Date(timestamp) > new Date(songMap.get(id).timestamp)) {
-                songMap.set(id, song);
-              }
-            }
+        Object.entries(songsData).forEach(([songId, songData]) => {
+          const song = {
+            id: songId,
+            name: songData.name || '',
+            genre: songData.genre || '',
+            lyrics: songData.lyrics || '',
+            timestamp: songData.dateAdded || songData.lastModified || ''
+          };
+          
+          if (song.name && song.genre && song.lyrics) {
+            songMap.set(songId, song);
           }
-        }
+        });
         
         const songs = Array.from(songMap.values()).sort((a, b) => a.name.localeCompare(b.name));
         availableSongs = songs.map(song => song.name);
         document.getElementById('total-songs').textContent = availableSongs.length;
         
-        console.log('Loaded', availableSongs.length, 'songs from CSV');
+        console.log('✅ Loaded', availableSongs.length, 'songs from Firebase');
         
       } catch (error) {
-        console.error('Failed to load songs from CSV:', error);
-        
-        // Fallback to songs.js if CSV fails
-        try {
-          const response = await fetch('/songs.js');
-          const scriptContent = await response.text();
-          
-          // Replace const with window assignment to make it global
-          const modifiedScript = scriptContent.replace('const songs =', 'window.songs =');
-          eval(modifiedScript);
-          
-          availableSongs = window.songs.map(song => song.name).sort();
-          document.getElementById('total-songs').textContent = availableSongs.length;
-          
-          console.log('Fallback: Loaded', availableSongs.length, 'songs from songs.js');
-        } catch (fallbackError) {
-          console.error('Failed to load songs from both CSV and songs.js:', fallbackError);
-          alert('Failed to load songs. Please check your connection and try again.');
-        }
+        console.error('❌ Failed to load songs from Firebase:', error);
+        alert('Failed to load songs. Please check your connection and try again.');
       }
     }
 
-    // Load latest showlist from CSV
+    // Load latest showlist (simplified - showlist feature disabled for now)
     async function loadLatestShowlist() {
       try {
-        // First, get the latest showlist
-        const showlistResponse = await fetch(window.RhythmLyricsShowConfig.showListSheet);
-        const showlistCsv = await showlistResponse.text();
-        
-        // Parse the showlist CSV
-        const showlistRows = parseCSV(showlistCsv);
-        console.log('Showlist CSV rows:', showlistRows.length);
-        if (showlistRows.length > 0) {
-          console.log('Header row:', showlistRows[0]);
-          if (showlistRows.length > 1) {
-            console.log('First data row:', showlistRows[1]);
-            console.log('Last data row:', showlistRows[showlistRows.length - 1]);
-          }
+        console.log('ℹ️ Showlist feature currently disabled (migrating from CSV to Firebase)');
+        // Hide the latest showlist section
+        const section = document.getElementById('latest-showlist-section');
+        if (section) {
+          section.style.display = 'none';
         }
-        if (showlistRows.length <= 1) return; // No data beyond headers
-        
-        // Get the latest entry (last row)
-        const latestRow = showlistRows[showlistRows.length - 1];
-        const latestUID = latestRow[1]; // UID is in column 2 (index 1)
-        const latestShowlistData = latestRow[2]; // Showlist is in column 3 (index 2)
-        const latestShowName = latestRow[3]; // Show Name is in column 4 (index 3)
-        
-        console.log('Latest showlist data:', {
-          uid: latestUID,
-          showlistData: latestShowlistData,
-          showName: latestShowName
-        });
-        
-        // Check if this showlist is cancelled
-        const cancelResponse = await fetch(window.RhythmLyricsShowConfig.cancelSheet);
-        const cancelCsv = await cancelResponse.text();
-        
-        // Parse the cancel CSV
-        const cancelRows = parseCSV(cancelCsv);
-        console.log('Cancel CSV rows:', cancelRows.length);
-        if (cancelRows.length > 0) {
-          console.log('Cancel header row:', cancelRows[0]);
-          if (cancelRows.length > 1) {
-            console.log('Cancel first data row:', cancelRows[1]);
-          }
-        }
-        const isCancelled = cancelRows.some(row => 
-          row[1] === latestUID && row[2] && row[2].toLowerCase() === 'yes' // Adjusted column indices
-        );
-        
-        console.log('Is cancelled check:', {
-          latestUID,
-          isCancelled,
-          cancelRows: cancelRows.map(row => ({ uid: row[1], cancelled: row[2] }))
-        });
-        
-        if (!isCancelled && latestShowName) {
-          // Show the latest showlist
-          latestShowlist = {
-            uid: latestUID,
-            name: latestShowName
-          };
-          
-          console.log('Setting latest showlist:', latestShowlist);
-          document.getElementById('latest-showlist-name').textContent = latestShowName;
-          document.getElementById('latest-showlist-section').style.display = 'block';
-        } else {
-          console.log('Not showing showlist - cancelled:', isCancelled, 'showName:', latestShowName);
-        }
-        
       } catch (error) {
         console.error('Failed to load latest showlist:', error);
       }
-    }
-
-    // Parse CSV data
-    function parseCSV(csvText) {
-      const rows = [];
-      let currentRow = [];
-      let currentField = '';
-      let inQuotes = false;
-      let i = 0;
-      
-      while (i < csvText.length) {
-        const char = csvText[i];
-        const nextChar = i + 1 < csvText.length ? csvText[i + 1] : null;
-        
-        if (char === '"') {
-          if (inQuotes && nextChar === '"') {
-            currentField += '"';
-            i += 2;
-          } else {
-            inQuotes = !inQuotes;
-            i++;
-          }
-        } else if (char === ',' && !inQuotes) {
-          currentRow.push(currentField.trim());
-          currentField = '';
-          i++;
-        } else if ((char === '\n' || char === '\r') && !inQuotes) {
-          if (currentField || currentRow.length > 0) {
-            currentRow.push(currentField.trim());
-            if (currentRow.length > 0) {
-              rows.push(currentRow);
-            }
-            currentRow = [];
-            currentField = '';
-          }
-          if (char === '\r' && nextChar === '\n') {
-            i += 2;
-          } else {
-            i++;
-          }
-        } else {
-          currentField += char;
-          i++;
-        }
-      }
-      
-      if (currentField || currentRow.length > 0) {
-        currentRow.push(currentField.trim());
-        if (currentRow.length > 0) {
-          rows.push(currentRow);
-        }
-      }
-      
-      return rows;
     }
 
     // Generate unique ID
