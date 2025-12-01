@@ -616,7 +616,7 @@
                     </thead>
                     <tbody>
                         ${filteredOrders.map(order => {
-                            const total = order.quantity * 150;
+                            const total = order.quantity * 100;
                             const date = new Date(order.timestamp).toLocaleDateString();
                             return `
                                 <tr>
@@ -649,7 +649,7 @@
             const totalShirts = allOrders.reduce((sum, order) => sum + order.quantity, 0);
             const totalRevenue = allOrders.reduce((sum, order) => {
                 if (order.status !== 'cancelled') {
-                    return sum + (order.quantity * 150);
+                    return sum + (order.quantity * 100);
                 }
                 return sum;
             }, 0);
@@ -730,7 +730,7 @@
             const headers = ['Date', 'Customer', 'Phone', 'Size', 'Color', 'Quantity', 'Total', 'Status', 'Notes'];
             const rows = filteredOrders.map(order => {
                 const date = new Date(order.timestamp).toLocaleDateString();
-                const total = order.quantity * 150;
+                const total = order.quantity * 100;
                 return [
                     date,
                     order.customerName,

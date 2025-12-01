@@ -587,7 +587,7 @@
                 })).sort((a, b) => b.timestamp - a.timestamp);
                 
                 ordersList.innerHTML = ordersArray.map(order => {
-                    const total = order.quantity * 150;
+                    const total = order.quantity * 100;
                     return `
                         <div class="order-card">
                             <div class="order-header">
@@ -667,7 +667,7 @@
                 }
                 
                 // Update total
-                const total = order.quantity * 150;
+                const total = order.quantity * 100;
                 document.getElementById('totalPrice').textContent = `Total: MVR ${total.toLocaleString()}`;
                 
                 // Update form title
