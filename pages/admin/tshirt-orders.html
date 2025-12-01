@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-Shirt Orders - Admin</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="../../assets/favicons/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="../../assets/favicons/favicon.ico">
+    
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, update, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDl6vxD7M9N_KJPickaVLU02kxel0u3evU",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "820660200012",
+            appId: "1:820660200012:web:71ac0f59cfaa5e68cbe5fc"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        window.firebaseDB = { ref, set, get, update, remove, onValue, database };
+    </script>
+    
+    <style>
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            font-display: swap;
+        }
+        
+        :root {
+            --primary-color: #f5d000;
+            --bg-dark: #1f1f1f;
+            --bg-card: #2b2b2b;
+            --text-light: #ffffff;
+            --text-muted: #aaaaaa;
+            --success-color: #4CAF50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+            --info-color: #2196F3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .back-btn {
+            background: rgba(43, 43, 43, 0.9);
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: 1px solid rgba(245, 208, 0, 0.3);
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+        
+        .back-btn:hover {
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            transform: translateX(-3px);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            text-align: center;
+        }
+        
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        
+        .stat-value {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        
+        .stat-sublabel {
+            color: var(--text-muted);
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .filters {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+        }
+        
+        .filters-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .filter-label {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        
+        select, input {
+            padding: 10px;
+            background: var(--bg-dark);
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .export-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 208, 0, 0.4);
+        }
+        
+        .orders-container {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+        }
+        
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .orders-table th {
+            background: var(--bg-dark);
+            color: var(--primary-color);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(245, 208, 0, 0.3);
+        }
+        
+        .orders-table td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .orders-table tr:hover {
+            background: rgba(245, 208, 0, 0.05);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .status-confirmed {
+            background: var(--info-color);
+            color: white;
+        }
+        
+        .status-completed {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .status-cancelled {
+            background: var(--error-color);
+            color: white;
+        }
+        
+        .color-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .color-badge.pink {
+            background: #ff69b4;
+            color: white;
+        }
+        
+        .color-badge.white {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-status {
+            background: var(--info-color);
+            color: white;
+        }
+        
+        .btn-delete {
+            background: var(--error-color);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--success-color);
+        }
+        
+        .notification.error {
+            background: var(--error-color);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+        }
+        
+        .modal-header {
+            color: var(--primary-color);
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .orders-table {
+                font-size: 0.85em;
+            }
+            
+            .orders-table th,
+            .orders-table td {
+                padding: 10px 5px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <a href="admin.html" class="back-btn">← Back to Admin</a>
+                <h1>👕 T-Shirt Orders Management</h1>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Orders</div>
+                <div class="stat-value" id="totalOrders">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Shirts</div>
+                <div class="stat-value" id="totalShirts">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value" id="totalRevenue">0</div>
+                <div class="stat-sublabel">MVR</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pending Orders</div>
+                <div class="stat-value" id="pendingOrders">0</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select id="filterStatus">
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Color</label>
+                    <select id="filterColor">
+                        <option value="all">All Colors</option>
+                        <option value="Pink">Pink</option>
+                        <option value="White">White</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Size</label>
+                    <select id="filterSize">
+                        <option value="all">All Sizes</option>
+                        <option value="2XS">2XS</option>
+                        <option value="XS">XS</option>
+                        <option value="S">S</option>
+                        <option value="M">M</option>
+                        <option value="L">L</option>
+                        <option value="XL">XL</option>
+                        <option value="2XL">2XL</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Search</label>
+                    <input type="text" id="searchInput" placeholder="Name or phone...">
+                </div>
+                <div class="filter-group">
+                    <button class="export-btn" onclick="exportToCSV()">📥 Export CSV</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="orders-container">
+            <div class="orders-header">
+                <h2 style="color: var(--primary-color);">All Orders</h2>
+                <div style="color: var(--text-muted);" id="ordersCount">0 orders</div>
+            </div>
+            
+            <div id="ordersTableContainer">
+                <div class="empty-state">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                    </svg>
+                    <p>No orders yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="statusModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Update Order Status</div>
+            <div class="filter-group">
+                <label class="filter-label">Select Status</label>
+                <select id="newStatus">
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button style="background: var(--text-muted); color: white;" onclick="closeStatusModal()">Cancel</button>
+                <button style="background: var(--primary-color); color: var(--bg-dark);" onclick="saveStatus()">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script>
+        let allOrders = [];
+        let currentOrderId = null;
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Load all orders
+        async function loadOrders() {
+            try {
+                const { ref, get, database } = window.firebaseDB;
+                const ordersRef = ref(database, 'allTshirtOrders');
+                const snapshot = await get(ordersRef);
+                
+                if (!snapshot.exists()) {
+                    allOrders = [];
+                    renderOrders();
+                    updateStats();
+                    return;
+                }
+                
+                const ordersData = snapshot.val();
+                allOrders = Object.entries(ordersData).map(([id, order]) => ({
+                    id,
+                    ...order
+                })).sort((a, b) => b.timestamp - a.timestamp);
+                
+                renderOrders();
+                updateStats();
+                
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showNotification('Failed to load orders', 'error');
+            }
+        }
+        
+        // Filter orders
+        function filterOrders() {
+            const status = document.getElementById('filterStatus').value;
+            const color = document.getElementById('filterColor').value;
+            const size = document.getElementById('filterSize').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            
+            return allOrders.filter(order => {
+                if (status !== 'all' && order.status !== status) return false;
+                if (color !== 'all' && order.color !== color) return false;
+                if (size !== 'all' && order.shirtSize !== size) return false;
+                if (search && !order.customerName.toLowerCase().includes(search) && 
+                    !order.phoneNumber.includes(search)) return false;
+                return true;
+            });
+        }
+        
+        // Render orders
+        function renderOrders() {
+            const filteredOrders = filterOrders();
+            const container = document.getElementById('ordersTableContainer');
+            
+            document.getElementById('ordersCount').textContent = 
+                `${filteredOrders.length} order${filteredOrders.length !== 1 ? 's' : ''}`;
+            
+            if (filteredOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                        </svg>
+                        <p>No orders found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = `
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Size</th>
+                            <th>Color</th>
+                            <th>Qty</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredOrders.map(order => {
+                            const total = order.quantity * 150;
+                            const date = new Date(order.timestamp).toLocaleDateString();
+                            return `
+                                <tr>
+                                    <td>${date}</td>
+                                    <td>${order.customerName}</td>
+                                    <td>${order.phoneNumber}</td>
+                                    <td><strong>${order.shirtSize}</strong></td>
+                                    <td><span class="color-badge ${order.color.toLowerCase()}">${order.color}</span></td>
+                                    <td>${order.quantity}</td>
+                                    <td><strong>MVR ${total.toLocaleString()}</strong></td>
+                                    <td><span class="status-badge status-${order.status || 'pending'}">${(order.status || 'pending').toUpperCase()}</span></td>
+                                    <td>${order.notes || '-'}</td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <button class="action-btn btn-status" onclick="openStatusModal('${order.id}', '${order.status || 'pending'}')">📝</button>
+                                            <button class="action-btn btn-delete" onclick="deleteOrder('${order.id}')">🗑️</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        // Update statistics
+        function updateStats() {
+            const totalOrders = allOrders.length;
+            const totalShirts = allOrders.reduce((sum, order) => sum + order.quantity, 0);
+            const totalRevenue = allOrders.reduce((sum, order) => {
+                if (order.status !== 'cancelled') {
+                    return sum + (order.quantity * 150);
+                }
+                return sum;
+            }, 0);
+            const pendingOrders = allOrders.filter(o => o.status === 'pending' || !o.status).length;
+            
+            document.getElementById('totalOrders').textContent = totalOrders;
+            document.getElementById('totalShirts').textContent = totalShirts;
+            document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString();
+            document.getElementById('pendingOrders').textContent = pendingOrders;
+        }
+        
+        // Open status modal
+        window.openStatusModal = function(orderId, currentStatus) {
+            currentOrderId = orderId;
+            document.getElementById('newStatus').value = currentStatus;
+            document.getElementById('statusModal').classList.add('show');
+        }
+        
+        // Close status modal
+        window.closeStatusModal = function() {
+            document.getElementById('statusModal').classList.remove('show');
+            currentOrderId = null;
+        }
+        
+        // Save status
+        window.saveStatus = async function() {
+            if (!currentOrderId) return;
+            
+            try {
+                const newStatus = document.getElementById('newStatus').value;
+                const { ref, update, database } = window.firebaseDB;
+                
+                const orderRef = ref(database, `allTshirtOrders/${currentOrderId}`);
+                await update(orderRef, { 
+                    status: newStatus,
+                    updatedAt: Date.now()
+                });
+                
+                showNotification('Order status updated!', 'success');
+                closeStatusModal();
+                loadOrders();
+                
+            } catch (error) {
+                console.error('Error updating status:', error);
+                showNotification('Failed to update status', 'error');
+            }
+        }
+        
+        // Delete order
+        window.deleteOrder = async function(orderId) {
+            if (!confirm('Are you sure you want to delete this order? This cannot be undone.')) {
+                return;
+            }
+            
+            try {
+                const { ref, remove, database } = window.firebaseDB;
+                const orderRef = ref(database, `allTshirtOrders/${orderId}`);
+                await remove(orderRef);
+                
+                showNotification('Order deleted!', 'success');
+                loadOrders();
+                
+            } catch (error) {
+                console.error('Error deleting order:', error);
+                showNotification('Failed to delete order', 'error');
+            }
+        }
+        
+        // Export to CSV
+        window.exportToCSV = function() {
+            const filteredOrders = filterOrders();
+            
+            if (filteredOrders.length === 0) {
+                showNotification('No orders to export', 'error');
+                return;
+            }
+            
+            const headers = ['Date', 'Customer', 'Phone', 'Size', 'Color', 'Quantity', 'Total', 'Status', 'Notes'];
+            const rows = filteredOrders.map(order => {
+                const date = new Date(order.timestamp).toLocaleDateString();
+                const total = order.quantity * 150;
+                return [
+                    date,
+                    order.customerName,
+                    order.phoneNumber,
+                    order.shirtSize,
+                    order.color,
+                    order.quantity,
+                    total,
+                    order.status || 'pending',
+                    order.notes || ''
+                ];
+            });
+            
+            const csvContent = [
+                headers.join(','),
+                ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `tshirt-orders-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            showNotification('Orders exported successfully!', 'success');
+        }
+        
+        // Event listeners
+        document.getElementById('filterStatus').addEventListener('change', renderOrders);
+        document.getElementById('filterColor').addEventListener('change', renderOrders);
+        document.getElementById('filterSize').addEventListener('change', renderOrders);
+        document.getElementById('searchInput').addEventListener('input', renderOrders);
+        
+        // Wait for Firebase to load
+        let attempts = 0;
+        const waitForFirebase = setInterval(() => {
+            if (window.firebaseDB) {
+                clearInterval(waitForFirebase);
+                loadOrders();
+                
+                // Set up real-time updates
+                const { ref, onValue, database } = window.firebaseDB;
+                const ordersRef = ref(database, 'allTshirtOrders');
+                onValue(ordersRef, () => {
+                    loadOrders();
+                });
+            } else if (attempts++ > 50) {
+                clearInterval(waitForFirebase);
+                showNotification('Failed to connect to database', 'error');
+            }
+        }, 100);
+    </script>
+</body>
+</html>

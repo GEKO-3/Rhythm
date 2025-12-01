@@ -123,6 +123,28 @@
         ".read": true,
         ".write": true
       }
+    },
+    
+    "tshirtOrders": {
+      ".read": true,
+      ".write": true,
+      "$deviceId": {
+        ".read": true,
+        ".write": true,
+        "$orderId": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    },
+    
+    "allTshirtOrders": {
+      ".read": true,
+      ".write": true,
+      "$orderId": {
+        ".read": true,
+        ".write": true
+      }
     }
   }
 }

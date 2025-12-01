@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythm Boduberu - T-Shirt Order</title>
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/svg+xml" href="../assets/favicons/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="../assets/favicons/favicon.ico">
+    <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicons/icons-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="../assets/favicons/icons-512.png">
+    
+    <!-- Firebase -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, push, update, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        
+        const firebaseConfig = {
+            apiKey: "AIzaSyDl6vxD7M9N_KJPickaVLU02kxel0u3evU",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "820660200012",
+            appId: "1:820660200012:web:71ac0f59cfaa5e68cbe5fc"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        
+        window.firebaseDB = { ref, set, get, push, update, remove, database };
+    </script>
+    
+    <style>
+        @font-face {
+            font-family: 'Montserrat';
+            src: url('../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            font-display: swap;
+        }
+        
+        :root {
+            --primary-color: #f5d000;
+            --bg-dark: #1f1f1f;
+            --bg-card: #2b2b2b;
+            --text-light: #ffffff;
+            --text-muted: #aaaaaa;
+            --pink-color: #ff69b4;
+            --white-color: #ffffff;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1em;
+        }
+        
+        .price-badge {
+            display: inline-block;
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        
+        .size-chart {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+        }
+        
+        .size-chart h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .size-chart-image {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .size-chart-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid rgba(245, 208, 0, 0.2);
+        }
+        
+        .order-form {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        input[type="text"],
+        input[type="tel"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            background: var(--bg-dark);
+            border: 2px solid rgba(245, 208, 0, 0.3);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-size: 1em;
+            font-family: 'Montserrat', Arial, sans-serif;
+            transition: all 0.3s;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.1);
+        }
+        
+        .color-selection {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .color-option {
+            flex: 1;
+            position: relative;
+        }
+        
+        .color-option input[type="radio"] {
+            display: none;
+        }
+        
+        .color-label {
+            display: block;
+            padding: 15px;
+            border: 3px solid transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        
+        .color-label.pink {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+        }
+        
+        .color-label.white {
+            background: white;
+            color: #333;
+            border: 2px solid #ddd;
+        }
+        
+        .color-option input[type="radio"]:checked + .color-label {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .submit-btn {
+            background: var(--primary-color);
+            color: var(--bg-dark);
+            border: none;
+            padding: 15px 40px;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            font-family: 'Montserrat', Arial, sans-serif;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 208, 0, 0.4);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        .my-orders {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 30px;
+            border: 2px solid rgba(245, 208, 0, 0.3);
+        }
+        
+        .my-orders h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+        
+        .order-card {
+            background: var(--bg-dark);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 2px solid rgba(245, 208, 0, 0.2);
+            position: relative;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .order-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .order-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .edit-btn,
+        .delete-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+        
+        .edit-btn {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #1976D2;
+        }
+        
+        .delete-btn {
+            background: var(--error-color);
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+        
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .order-detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .order-detail-label {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .order-detail-value {
+            color: var(--text-light);
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .color-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .color-badge.pink {
+            background: var(--pink-color);
+            color: white;
+        }
+        
+        .color-badge.white {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: var(--success-color);
+        }
+        
+        .notification.error {
+            background: var(--error-color);
+        }
+        
+        .total-price {
+            text-align: right;
+            font-size: 1.3em;
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .order-form,
+            .my-orders,
+            .size-chart {
+                padding: 20px;
+            }
+            
+            .color-selection {
+                flex-direction: column;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .order-actions {
+                width: 100%;
+            }
+            
+            .edit-btn,
+            .delete-btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎵 Rhythm Boduberu T-Shirt</h1>
+            <p class="subtitle">Official Merchandise</p>
+            <div class="price-badge">MVR 150 per shirt</div>
+        </header>
+        
+        <div class="size-chart">
+            <h2>📏 Size Chart</h2>
+            <div class="size-chart-image">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" 
+                     alt="Size Chart" 
+                     id="sizeChartImg"
+                     style="display: none;">
+                <p style="color: var(--text-muted); font-style: italic;">
+                    Please refer to the size measurements before ordering
+                </p>
+            </div>
+        </div>
+        
+        <div class="order-form">
+            <h2 style="color: var(--primary-color); margin-bottom: 25px;">
+                <span id="formTitle">Place Your Order</span>
+            </h2>
+            
+            <form id="orderForm">
+                <input type="hidden" id="orderId" value="">
+                
+                <div class="form-group">
+                    <label for="customerName">Full Name *</label>
+                    <input type="text" id="customerName" required placeholder="Enter your name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phoneNumber">Phone Number *</label>
+                    <input type="tel" id="phoneNumber" required placeholder="7XXXXXX">
+                </div>
+                
+                <div class="form-group">
+                    <label for="shirtSize">Size *</label>
+                    <select id="shirtSize" required>
+                        <option value="">Select size</option>
+                        <option value="2XS">2XS (Double Extra Small)</option>
+                        <option value="XS">XS (Extra Small)</option>
+                        <option value="S">S (Small)</option>
+                        <option value="M">M (Medium)</option>
+                        <option value="L">L (Large)</option>
+                        <option value="XL">XL (Extra Large)</option>
+                        <option value="2XL">2XL (Double XL)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Color *</label>
+                    <div class="color-selection">
+                        <div class="color-option">
+                            <input type="radio" id="colorPink" name="color" value="Pink" required>
+                            <label for="colorPink" class="color-label pink">
+                                🌸 Pink
+                            </label>
+                        </div>
+                        <div class="color-option">
+                            <input type="radio" id="colorWhite" name="color" value="White" required>
+                            <label for="colorWhite" class="color-label white">
+                                ⚪ White
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="quantity">Quantity *</label>
+                    <input type="number" id="quantity" min="1" value="1" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notes">Additional Notes (Optional)</label>
+                    <input type="text" id="notes" placeholder="Any special requests or notes">
+                </div>
+                
+                <div class="total-price" id="totalPrice">
+                    Total: MVR 150
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    🛒 Place Order
+                </button>
+            </form>
+        </div>
+        
+        <div class="my-orders">
+            <h2>📦 My Orders</h2>
+            <div id="ordersList">
+                <div class="empty-state">
+                    <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                    </svg>
+                    <p>No orders yet. Place your first order above!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="notification" class="notification"></div>
+    
+    <script>
+        // Device ID management
+        function getDeviceId() {
+            let deviceId = localStorage.getItem('tshirt_device_id');
+            if (!deviceId) {
+                deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('tshirt_device_id', deviceId);
+            }
+            return deviceId;
+        }
+        
+        const deviceId = getDeviceId();
+        let editingOrderId = null;
+        
+        // Update total price
+        document.getElementById('quantity').addEventListener('input', function() {
+            const quantity = parseInt(this.value) || 1;
+            const total = quantity * 150;
+            document.getElementById('totalPrice').textContent = `Total: MVR ${total.toLocaleString()}`;
+        });
+        
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Load orders for this device
+        async function loadOrders() {
+            try {
+                const { ref, get, database } = window.firebaseDB;
+                const ordersRef = ref(database, `tshirtOrders/${deviceId}`);
+                const snapshot = await get(ordersRef);
+                
+                const ordersList = document.getElementById('ordersList');
+                
+                if (!snapshot.exists()) {
+                    ordersList.innerHTML = `
+                        <div class="empty-state">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/>
+                            </svg>
+                            <p>No orders yet. Place your first order above!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const orders = snapshot.val();
+                const ordersArray = Object.entries(orders).map(([id, order]) => ({
+                    id,
+                    ...order
+                })).sort((a, b) => b.timestamp - a.timestamp);
+                
+                ordersList.innerHTML = ordersArray.map(order => {
+                    const total = order.quantity * 150;
+                    return `
+                        <div class="order-card">
+                            <div class="order-header">
+                                <div class="order-name">${order.customerName}</div>
+                                <div class="order-actions">
+                                    <button class="edit-btn" onclick="editOrder('${order.id}')">✏️ Edit</button>
+                                    <button class="delete-btn" onclick="deleteOrder('${order.id}')">🗑️ Delete</button>
+                                </div>
+                            </div>
+                            <div class="order-details">
+                                <div class="order-detail-item">
+                                    <span class="order-detail-label">Phone</span>
+                                    <span class="order-detail-value">${order.phoneNumber}</span>
+                                </div>
+                                <div class="order-detail-item">
+                                    <span class="order-detail-label">Size</span>
+                                    <span class="order-detail-value">${order.shirtSize}</span>
+                                </div>
+                                <div class="order-detail-item">
+                                    <span class="order-detail-label">Color</span>
+                                    <span class="order-detail-value">
+                                        <span class="color-badge ${order.color.toLowerCase()}">${order.color}</span>
+                                    </span>
+                                </div>
+                                <div class="order-detail-item">
+                                    <span class="order-detail-label">Quantity</span>
+                                    <span class="order-detail-value">${order.quantity}x</span>
+                                </div>
+                                <div class="order-detail-item">
+                                    <span class="order-detail-label">Total</span>
+                                    <span class="order-detail-value">MVR ${total.toLocaleString()}</span>
+                                </div>
+                                ${order.notes ? `
+                                <div class="order-detail-item" style="grid-column: 1 / -1;">
+                                    <span class="order-detail-label">Notes</span>
+                                    <span class="order-detail-value">${order.notes}</span>
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                showNotification('Failed to load orders', 'error');
+            }
+        }
+        
+        // Edit order
+        window.editOrder = async function(orderId) {
+            try {
+                const { ref, get, database } = window.firebaseDB;
+                const orderRef = ref(database, `tshirtOrders/${deviceId}/${orderId}`);
+                const snapshot = await get(orderRef);
+                
+                if (!snapshot.exists()) {
+                    showNotification('Order not found', 'error');
+                    return;
+                }
+                
+                const order = snapshot.val();
+                
+                // Populate form
+                document.getElementById('orderId').value = orderId;
+                document.getElementById('customerName').value = order.customerName;
+                document.getElementById('phoneNumber').value = order.phoneNumber;
+                document.getElementById('shirtSize').value = order.shirtSize;
+                document.getElementById('quantity').value = order.quantity;
+                document.getElementById('notes').value = order.notes || '';
+                
+                // Set color
+                if (order.color === 'Pink') {
+                    document.getElementById('colorPink').checked = true;
+                } else {
+                    document.getElementById('colorWhite').checked = true;
+                }
+                
+                // Update total
+                const total = order.quantity * 150;
+                document.getElementById('totalPrice').textContent = `Total: MVR ${total.toLocaleString()}`;
+                
+                // Update form title
+                document.getElementById('formTitle').textContent = 'Edit Your Order';
+                document.getElementById('submitBtn').textContent = '✅ Update Order';
+                
+                // Scroll to form
+                document.querySelector('.order-form').scrollIntoView({ behavior: 'smooth' });
+                
+                editingOrderId = orderId;
+                
+            } catch (error) {
+                console.error('Error loading order:', error);
+                showNotification('Failed to load order', 'error');
+            }
+        }
+        
+        // Delete order
+        window.deleteOrder = async function(orderId) {
+            if (!confirm('Are you sure you want to delete this order?')) {
+                return;
+            }
+            
+            try {
+                const { ref, remove, database } = window.firebaseDB;
+                const orderRef = ref(database, `tshirtOrders/${deviceId}/${orderId}`);
+                await remove(orderRef);
+                
+                // Also remove from admin view
+                const adminRef = ref(database, `allTshirtOrders/${orderId}`);
+                await remove(adminRef);
+                
+                showNotification('Order deleted successfully!', 'success');
+                loadOrders();
+                
+            } catch (error) {
+                console.error('Error deleting order:', error);
+                showNotification('Failed to delete order', 'error');
+            }
+        }
+        
+        // Reset form
+        function resetForm() {
+            document.getElementById('orderForm').reset();
+            document.getElementById('orderId').value = '';
+            document.getElementById('formTitle').textContent = 'Place Your Order';
+            document.getElementById('submitBtn').textContent = '🛒 Place Order';
+            document.getElementById('totalPrice').textContent = 'Total: MVR 150';
+            editingOrderId = null;
+        }
+        
+        // Submit form
+        document.getElementById('orderForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const customerName = document.getElementById('customerName').value.trim();
+            const phoneNumber = document.getElementById('phoneNumber').value.trim();
+            const shirtSize = document.getElementById('shirtSize').value;
+            const color = document.querySelector('input[name="color"]:checked').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            const notes = document.getElementById('notes').value.trim();
+            
+            const orderData = {
+                customerName,
+                phoneNumber,
+                shirtSize,
+                color,
+                quantity,
+                notes,
+                deviceId,
+                timestamp: Date.now(),
+                updatedAt: Date.now(),
+                status: 'pending'
+            };
+            
+            try {
+                const { ref, set, push, database } = window.firebaseDB;
+                
+                if (editingOrderId) {
+                    // Update existing order in both locations
+                    const orderRef = ref(database, `tshirtOrders/${deviceId}/${editingOrderId}`);
+                    await set(orderRef, orderData);
+                    
+                    // Also update in admin view
+                    const adminRef = ref(database, `allTshirtOrders/${editingOrderId}`);
+                    await set(adminRef, orderData);
+                    
+                    showNotification('Order updated successfully!', 'success');
+                } else {
+                    // Create new order
+                    const ordersRef = ref(database, `tshirtOrders/${deviceId}`);
+                    const newOrderRef = push(ordersRef);
+                    const newOrderId = newOrderRef.key;
+                    
+                    await set(newOrderRef, orderData);
+                    
+                    // Also save to admin view with same ID
+                    const adminRef = ref(database, `allTshirtOrders/${newOrderId}`);
+                    await set(adminRef, orderData);
+                    
+                    showNotification('Order placed successfully!', 'success');
+                }
+                
+                resetForm();
+                loadOrders();
+                
+            } catch (error) {
+                console.error('Error submitting order:', error);
+                showNotification('Failed to submit order. Please try again.', 'error');
+            }
+        });
+        
+        // Wait for Firebase to load
+        let attempts = 0;
+        const waitForFirebase = setInterval(() => {
+            if (window.firebaseDB) {
+                clearInterval(waitForFirebase);
+                loadOrders();
+            } else if (attempts++ > 50) {
+                clearInterval(waitForFirebase);
+                showNotification('Failed to connect to database', 'error');
+            }
+        }, 100);
+    </script>
+</body>
+</html>
