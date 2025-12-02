@@ -599,6 +599,7 @@
                             <th>Qty</th>
                             <th>Total</th>
                             <th>Status</th>
+                            <th>Receipt</th>
                             <th>Notes</th>
                             <th>Actions</th>
                         </tr>
@@ -616,6 +617,7 @@
                                     <td>${order.quantity}</td>
                                     <td><strong>MVR ${total.toLocaleString()}</strong></td>
                                     <td><span class="status-badge status-${order.status || 'pending'}">${(order.status || 'pending').toUpperCase()}</span></td>
+                                    <td>${order.paymentReceiptUrl ? `<a href="${order.paymentReceiptUrl}" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: 600;">📄 View</a>` : '-'}</td>
                                     <td>${order.notes || '-'}</td>
                                     <td>
                                         <div class="action-btns">
@@ -765,7 +767,7 @@
                 return;
             }
             
-            const headers = ['Date', 'Customer', 'Phone', 'Size', 'Quantity', 'Total', 'Status', 'Notes'];
+            const headers = ['Date', 'Customer', 'Phone', 'Size', 'Quantity', 'Total', 'Status', 'Receipt URL', 'Notes'];
             const rows = filteredOrders.map(order => {
                 const date = new Date(order.timestamp).toLocaleDateString();
                 const total = order.quantity * 120;
@@ -777,6 +779,7 @@
                     order.quantity,
                     total,
                     order.status || 'pending',
+                    order.paymentReceiptUrl || 'No receipt',
                     order.notes || ''
                 ];
             });
