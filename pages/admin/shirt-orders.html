@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>T-Shirt Orders - Admin</title>
+    <title>Black Shirt Orders - Admin</title>
     
     <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="../../assets/favicons/favicon.svg">
@@ -256,25 +256,6 @@
             color: white;
         }
         
-        .color-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-        }
-        
-        .color-badge.pink {
-            background: #ff69b4;
-            color: white;
-        }
-        
-        .color-badge.white {
-            background: white;
-            color: #333;
-            border: 1px solid #ddd;
-        }
-        
         .action-btns {
             display: flex;
             gap: 8px;
@@ -412,7 +393,7 @@
         <div class="header">
             <div>
                 <a href="admin.html" class="back-btn">← Back to Admin</a>
-                <h1>👕 T-Shirt Orders Management</h1>
+                <h1>🖤 Black Shirt Orders Management</h1>
             </div>
         </div>
         
@@ -441,41 +422,19 @@
                 <h2 style="color: var(--primary-color);">📊 Pending Sizes Breakdown</h2>
             </div>
             
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-                <div>
-                    <h3 style="color: #ff69b4; margin-bottom: 15px; text-align: center;">💗 Pink</h3>
-                    <table class="orders-table">
-                        <thead>
-                            <tr>
-                                <th>Size</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sizesBreakdownPink">
-                            <tr>
-                                <td colspan="2" style="text-align: center; color: var(--text-muted);">No pending orders</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div>
-                    <h3 style="color: white; margin-bottom: 15px; text-align: center;">🤍 White</h3>
-                    <table class="orders-table">
-                        <thead>
-                            <tr>
-                                <th>Size</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody id="sizesBreakdownWhite">
-                            <tr>
-                                <td colspan="2" style="text-align: center; color: var(--text-muted);">No pending orders</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <table class="orders-table">
+                <thead>
+                    <tr>
+                        <th>Size</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody id="sizesBreakdown">
+                    <tr>
+                        <td colspan="2" style="text-align: center; color: var(--text-muted);">No pending orders</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         
         <div class="filters">
@@ -491,24 +450,15 @@
                     </select>
                 </div>
                 <div class="filter-group">
-                    <label class="filter-label">Color</label>
-                    <select id="filterColor">
-                        <option value="all">All Colors</option>
-                        <option value="Pink">Pink</option>
-                        <option value="White">White</option>
-                    </select>
-                </div>
-                <div class="filter-group">
                     <label class="filter-label">Size</label>
                     <select id="filterSize">
                         <option value="all">All Sizes</option>
-                        <option value="2XS">2XS</option>
                         <option value="XS">XS</option>
                         <option value="S">S</option>
                         <option value="M">M</option>
                         <option value="L">L</option>
                         <option value="XL">XL</option>
-                        <option value="2XL">2XL</option>
+                        <option value="XXL">XXL</option>
                     </select>
                 </div>
                 <div class="filter-group">
@@ -578,7 +528,7 @@
         async function loadOrders() {
             try {
                 const { ref, get, database } = window.firebaseDB;
-                const ordersRef = ref(database, 'allTshirtOrders');
+                const ordersRef = ref(database, 'allShirtOrders');
                 const snapshot = await get(ordersRef);
                 
                 if (!snapshot.exists()) {
@@ -606,13 +556,11 @@
         // Filter orders
         function filterOrders() {
             const status = document.getElementById('filterStatus').value;
-            const color = document.getElementById('filterColor').value;
             const size = document.getElementById('filterSize').value;
             const search = document.getElementById('searchInput').value.toLowerCase();
             
             return allOrders.filter(order => {
                 if (status !== 'all' && order.status !== status) return false;
-                if (color !== 'all' && order.color !== color) return false;
                 if (size !== 'all' && order.shirtSize !== size) return false;
                 if (search && !order.customerName.toLowerCase().includes(search) && 
                     !order.phoneNumber.includes(search)) return false;
@@ -648,7 +596,6 @@
                             <th>Customer</th>
                             <th>Phone</th>
                             <th>Size</th>
-                            <th>Color</th>
                             <th>Qty</th>
                             <th>Total</th>
                             <th>Status</th>
@@ -658,7 +605,7 @@
                     </thead>
                     <tbody>
                         ${filteredOrders.map(order => {
-                            const total = order.quantity * 100;
+                            const total = order.quantity * 120;
                             const date = new Date(order.timestamp).toLocaleDateString();
                             return `
                                 <tr>
@@ -666,7 +613,6 @@
                                     <td>${order.customerName}</td>
                                     <td>${order.phoneNumber}</td>
                                     <td><strong>${order.shirtSize}</strong></td>
-                                    <td><span class="color-badge ${order.color.toLowerCase()}">${order.color}</span></td>
                                     <td>${order.quantity}</td>
                                     <td><strong>MVR ${total.toLocaleString()}</strong></td>
                                     <td><span class="status-badge status-${order.status || 'pending'}">${(order.status || 'pending').toUpperCase()}</span></td>
@@ -691,7 +637,7 @@
             const totalShirts = allOrders.reduce((sum, order) => sum + order.quantity, 0);
             const totalRevenue = allOrders.reduce((sum, order) => {
                 if (order.status !== 'cancelled') {
-                    return sum + (order.quantity * 100);
+                    return sum + (order.quantity * 120);
                 }
                 return sum;
             }, 0);
@@ -702,32 +648,18 @@
             document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString();
             document.getElementById('pendingOrders').textContent = pendingOrders;
             
-            // Update sizes breakdown for pending orders
+            // Update sizes breakdown
             updateSizesBreakdown();
         }
         
         // Update sizes breakdown
         function updateSizesBreakdown() {
             const pendingOrders = allOrders.filter(o => (o.status === 'pending' || !o.status) && o.status !== 'cancelled');
-            
-            // Separate by color
-            const pinkOrders = pendingOrders.filter(o => o.color === 'Pink');
-            const whiteOrders = pendingOrders.filter(o => o.color === 'White');
-            
-            // Update Pink table
-            updateColorTable('sizesBreakdownPink', pinkOrders, '#ff69b4');
-            
-            // Update White table
-            updateColorTable('sizesBreakdownWhite', whiteOrders, 'white');
-        }
-        
-        // Update individual color table
-        function updateColorTable(tbodyId, orders, color) {
             const sizesMap = {};
             let totalPending = 0;
             
             // Count quantities by size
-            orders.forEach(order => {
+            pendingOrders.forEach(order => {
                 if (!sizesMap[order.shirtSize]) {
                     sizesMap[order.shirtSize] = 0;
                 }
@@ -735,13 +667,13 @@
                 totalPending += order.quantity;
             });
             
-            // Sort sizes in order: 2XS, XS, S, M, L, XL, 2XL
-            const sizeOrder = ['2XS', 'XS', 'S', 'M', 'L', 'XL', '2XL'];
+            // Sort sizes in order: XS, S, M, L, XL, XXL
+            const sizeOrder = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
             const sortedSizes = Object.entries(sizesMap).sort((a, b) => {
                 return sizeOrder.indexOf(a[0]) - sizeOrder.indexOf(b[0]);
             });
             
-            const tbody = document.getElementById(tbodyId);
+            const tbody = document.getElementById('sizesBreakdown');
             
             if (sortedSizes.length === 0) {
                 tbody.innerHTML = `
@@ -788,7 +720,7 @@
                 const newStatus = document.getElementById('newStatus').value;
                 const { ref, update, database } = window.firebaseDB;
                 
-                const orderRef = ref(database, `allTshirtOrders/${currentOrderId}`);
+                const orderRef = ref(database, `allShirtOrders/${currentOrderId}`);
                 await update(orderRef, { 
                     status: newStatus,
                     updatedAt: Date.now()
@@ -812,7 +744,7 @@
             
             try {
                 const { ref, remove, database } = window.firebaseDB;
-                const orderRef = ref(database, `allTshirtOrders/${orderId}`);
+                const orderRef = ref(database, `allShirtOrders/${orderId}`);
                 await remove(orderRef);
                 
                 showNotification('Order deleted!', 'success');
@@ -833,16 +765,15 @@
                 return;
             }
             
-            const headers = ['Date', 'Customer', 'Phone', 'Size', 'Color', 'Quantity', 'Total', 'Status', 'Notes'];
+            const headers = ['Date', 'Customer', 'Phone', 'Size', 'Quantity', 'Total', 'Status', 'Notes'];
             const rows = filteredOrders.map(order => {
                 const date = new Date(order.timestamp).toLocaleDateString();
-                const total = order.quantity * 100;
+                const total = order.quantity * 120;
                 return [
                     date,
                     order.customerName,
                     order.phoneNumber,
                     order.shirtSize,
-                    order.color,
                     order.quantity,
                     total,
                     order.status || 'pending',
@@ -859,7 +790,7 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `tshirt-orders-${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `black-shirt-orders-${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             window.URL.revokeObjectURL(url);
             
@@ -868,7 +799,6 @@
         
         // Event listeners
         document.getElementById('filterStatus').addEventListener('change', renderOrders);
-        document.getElementById('filterColor').addEventListener('change', renderOrders);
         document.getElementById('filterSize').addEventListener('change', renderOrders);
         document.getElementById('searchInput').addEventListener('input', renderOrders);
         
@@ -881,7 +811,7 @@
                 
                 // Set up real-time updates
                 const { ref, onValue, database } = window.firebaseDB;
-                const ordersRef = ref(database, 'allTshirtOrders');
+                const ordersRef = ref(database, 'allShirtOrders');
                 onValue(ordersRef, () => {
                     loadOrders();
                 });

@@ -145,6 +145,28 @@
         ".read": true,
         ".write": true
       }
+    },
+    
+    "shirtOrders": {
+      ".read": true,
+      ".write": true,
+      "$deviceId": {
+        ".read": true,
+        ".write": true,
+        "$orderId": {
+          ".read": true,
+          ".write": true
+        }
+      }
+    },
+    
+    "allShirtOrders": {
+      ".read": true,
+      ".write": true,
+      "$orderId": {
+        ".read": true,
+        ".write": true
+      }
     }
   }
 }
