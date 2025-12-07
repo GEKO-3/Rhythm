@@ -16,15 +16,11 @@
     <!-- Critical CSS - moved to external file for better caching -->
     <link rel="stylesheet" href="assets/styles.css">
     
-    <!-- Preload critical fonts -->
+    <!-- Preload only critical font -->
     <link rel="preload" href="assets/Fonts/Montserrat-Regular.ttf" as="font" type="font/ttf" crossorigin>
-    <link rel="preload" href="assets/Fonts/Montserrat-Bold.ttf" as="font" type="font/ttf" crossorigin>
     
-    <!-- Preload critical images -->
-    <link rel="preload" href="src/Rhytham Logo.webp" as="image">
+    <!-- Preload only hero image -->
     <link rel="preload" href="src/Logo_1.svg" as="image">
-    <link rel="preload" href="src/Background.webp" as="image">
-    <link rel="preload" href="src/Logo.png" as="image">
     
     <!-- Favicon and web app manifest -->
     <link rel="icon" href="/assets/favicon.ico" type="image/x-icon">
@@ -135,7 +131,7 @@
     
     <section class="main-section">
         <div class="video-fallback"></div>
-        <video class="video-background" autoplay muted loop playsinline>
+        <video class="video-background" autoplay muted loop playsinline preload="none">
             <source src="src/bg-video.mp4?v=2.1.2" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -146,27 +142,27 @@
         </div>
         <div class="container">
             <a href="https://www.facebook.com/share/15pXtBHaRS/?mibextid=wwXIfr" target="_blank" class="link-button" aria-label="Visit Example Link 1">
-                <img src="src/Facebook.png" alt="Facebook">
+                <img src="src/Facebook.png" alt="Facebook" loading="lazy">
             </a>
             <a href="https://www.instagram.com/rhythm_boduberu__?igsh=MTc2dHdhbmk3cGxhbQ%3D%3D&utm_source=qr" target="_blank" class="link-button" aria-label="Visit Example Link 2">
-                <img src="src/Instagram.png" alt="Instagram">
+                <img src="src/Instagram.png" alt="Instagram" loading="lazy">
             </a>
             <a href="https://www.tiktok.com/@rhythm_boduberu_?_t=ZS-8t3wWH3Rura&_r=1" target="_blank" class="link-button" aria-label="Visit Example Link 3">
-                <img src="src/Tiktok.png" alt="Tiktok">
+                <img src="src/Tiktok.png" alt="Tiktok" loading="lazy">
             </a>
             <a href="https://on.soundcloud.com/m60NOOoeFiEVGq1dTw" target="_blank" class="link-button" aria-label="Visit Example Link 4">
-                <img src="src/Soundcloud.png" alt="Soundcloud">
+                <img src="src/Soundcloud.png" alt="Soundcloud" loading="lazy">
             </a>
             <a href="https://www.youtube.com/@rhythmboduberu" target="_blank" class="link-button" aria-label="Visit Example Link 5">
-                <img src="src/Youtube.png" alt="Youtube">
+                <img src="src/Youtube.png" alt="Youtube" loading="lazy">
             </a>
         </div>
         <div class="container2">
             <a href="https://invite.viber.com/?g2=AQBr7RgqaOJOp1SaLAlHeZH%2BrPk4S3rwDdiOGwLstgf9PWiKNB9kWaZS3SSn%2Bw1o" class="link-button2" aria-label="Join Our Viber Community">
-                <img src="src/Viber.png" alt="Join Our Viber Community">
+                <img src="src/Viber.png" alt="Join Our Viber Community" loading="lazy">
             </a>
             <a href="tel:+9607576784" class="link-button2" aria-label="Call Now">
-                <img src="src/Call.png" alt="Call Now">
+                <img src="src/Call.png" alt="Call Now" loading="lazy">
             </a>
         </div>
         <footer>
@@ -1557,34 +1553,41 @@
                 
                 // Calculate how many lines needed to fill the screen (optimized for performance)
                 const viewportHeight = window.innerHeight;
-                const lineHeight = 40;
-                const numberOfLines = Math.ceil(viewportHeight / lineHeight) + 1; // Reduced extra lines from 2 to 1
+                const lineHeight = 50; // Increased from 40 to 50 - fewer lines
+                const numberOfLines = Math.ceil(viewportHeight / lineHeight);
                 
                 // Clear any existing lines
                 patternContainer.innerHTML = '';
+                
+                // Use DocumentFragment for better performance
+                const fragment = document.createDocumentFragment();
                 
                 // Create pattern lines with performance optimizations
                 for (let i = 0; i < numberOfLines; i++) {
                     const line = document.createElement('div');
                     line.className = 'pattern-line';
                     line.style.top = (i * lineHeight) + 'px';
-                    // Add performance optimizations
                     line.style.willChange = 'transform';
                     line.style.transform = 'translateZ(0)';
-                    patternContainer.appendChild(line);
+                    fragment.appendChild(line);
                 }
                 
+                patternContainer.appendChild(fragment);
                 console.log('Generated', numberOfLines, 'optimized pattern lines');
             }
             
             // Generate pattern lines on load
             generatePatternLines();
             
-            // Regenerate lines on resize
-            window.addEventListener('resize', generatePatternLines);
+            // Regenerate lines on resize with debounce
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(generatePatternLines, 250);
+            });
             
-            // Ensure minimum display time of 2 seconds, regardless of page load speed
-            const minDisplayTime = 2000; // 2 seconds minimum
+            // Ensure minimum display time of 1 second, regardless of page load speed
+            const minDisplayTime = 1000; // 1 second minimum
             const startTime = Date.now();
             
             // Start enlarging animation 800ms before fade-out begins

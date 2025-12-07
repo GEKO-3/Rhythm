@@ -976,7 +976,7 @@
                             <th>Shows</th>
                             <th>Practices</th>
                             <th>Activities</th>
-                            <th>Overall %</th>
+                            <th>Total Attended</th>
                         </tr>
                     </thead>
                     <tbody id="attendanceTableBody">
@@ -1305,7 +1305,8 @@
                         type: event.type,
                         date: event.date,
                         createdAt: event.createdAt,
-                        attendance: event.attendance || {}
+                        attendance: event.attendance || {},
+                        paid: event.paid || false
                     };
                 });
                 
@@ -1613,7 +1614,7 @@
                     <td>${member.showsAttended}/${member.showsTotal}</td>
                     <td>${member.practicesAttended}/${member.practicesTotal}</td>
                     <td>${member.activitiesAttended}/${member.activitiesTotal}</td>
-                    <td>${member.percentage}%</td>
+                    <td><strong>${member.totalAttended}/${member.totalEvents}</strong></td>
                 `;
                 
                 tableBody.appendChild(row);
