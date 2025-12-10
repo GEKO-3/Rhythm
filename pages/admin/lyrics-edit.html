@@ -1270,6 +1270,111 @@
     // Call handleImportedText when page loads
     document.addEventListener('DOMContentLoaded', handleImportedText);
     
+    // Load edit data if coming from edit button
+    document.addEventListener('DOMContentLoaded', function() {
+      const editData = localStorage.getItem('editSongData');
+      if (editData) {
+        try {
+          const songData = JSON.parse(editData);
+          console.log('📝 Loading song for editing:', songData.name);
+          
+          // Set song name
+          document.getElementById('song-name-input').value = songData.name;
+          localStorage.setItem('lyricsEditorSongName', songData.name);
+          
+          // Set genre
+          if (songData.genre) {
+            selectedGenre = songData.genre;
+            localStorage.setItem('lyricsEditorGenre', songData.genre);
+            updateGenreButton();
+          }
+          
+          // Load the parsed lyrics if available, otherwise parse the raw lyrics
+          if (songData.parsedLyrics && songData.parsedLyrics.length > 0) {
+            // Use the already parsed structure
+            localStorage.setItem('lyricsEditorData', JSON.stringify(songData.parsedLyrics));
+            loadState();
+          } else if (songData.lyrics) {
+            // Parse the raw lyrics and load
+            const parsedData = parseLyricsToEditorFormat(songData.lyrics);
+            localStorage.setItem('lyricsEditorData', JSON.stringify(parsedData));
+            loadState();
+          }
+          
+          // Clear the editSongData after loading
+          localStorage.removeItem('editSongData');
+          
+          console.log('✅ Song loaded successfully for editing');
+        } catch (error) {
+          console.error('❌ Error loading edit data:', error);
+          alert('Error loading song for editing. Please try again.');
+          localStorage.removeItem('editSongData');
+        }
+      }
+    });
+    
+    // Function to parse raw lyrics into editor format
+    function parseLyricsToEditorFormat(lyrics) {
+      const lines = lyrics.split('\n');
+      const data = [];
+      let currentSection = null;
+      
+      lines.forEach((line) => {
+        const trimmedLine = line.trim();
+        
+        // Check if it's a section marker
+        if (trimmedLine.startsWith('#') || trimmedLine.startsWith('$')) {
+          // Save previous section if exists
+          if (currentSection && currentSection.lines.length > 0) {
+            data.push(currentSection);
+          }
+          
+          // Start new section
+          currentSection = {
+            type: 'section',
+            title: trimmedLine,
+            lines: []
+          };
+        }
+        // Check if it's a break
+        else if (trimmedLine === '---') {
+          // Save previous section if exists
+          if (currentSection && currentSection.lines.length > 0) {
+            data.push(currentSection);
+            currentSection = null;
+          }
+          data.push({ type: 'break' });
+        }
+        // Regular line
+        else if (trimmedLine.length > 0) {
+          // If no section yet, create a default one
+          if (!currentSection) {
+            currentSection = {
+              type: 'section',
+              title: '',
+              lines: []
+            };
+          }
+          
+          // Check if line is starred (starts with *)
+          const isStarred = trimmedLine.startsWith('*');
+          const lineText = isStarred ? trimmedLine.substring(1).trim() : trimmedLine;
+          
+          currentSection.lines.push({
+            text: lineText,
+            starred: isStarred
+          });
+        }
+      });
+      
+      // Don't forget the last section
+      if (currentSection && currentSection.lines.length > 0) {
+        data.push(currentSection);
+      }
+      
+      return data;
+    }
+    
     // Submit to Firebase function
     async function submitToFirebase() {
       const songName = document.getElementById('song-name-input').value.trim();
