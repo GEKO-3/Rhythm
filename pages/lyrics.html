@@ -677,12 +677,13 @@
       // 🚀 PREVENT FLASH: Make page visible once DOM is ready
       document.body.classList.add('loaded');
       
-      // Initialize Firebase transliteration data
+      // Initialize auth first (which initializes Firebase)
+      await initializeUnifiedAuth();
+      
+      // Then initialize Firebase transliteration data after Firebase is ready
       if (typeof transliterationFirebase !== 'undefined') {
         await transliterationFirebase.initialize();
       }
-      
-      initializeUnifiedAuth();
     });
 
     // Unified authentication system using RhythmUnifiedAuth

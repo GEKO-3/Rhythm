@@ -515,12 +515,12 @@ class TransliterationFirebaseManager {
 const transliterationFirebase = new TransliterationFirebaseManager();
 
 // Auto-initialize when Firebase is ready
-if (typeof firebase !== 'undefined' && firebase.database) {
+if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
     transliterationFirebase.initialize();
 } else {
     // Wait for Firebase to be ready
     document.addEventListener('DOMContentLoaded', () => {
-        if (typeof firebase !== 'undefined' && firebase.database) {
+        if (typeof firebase !== 'undefined' && firebase.apps && firebase.apps.length > 0) {
             transliterationFirebase.initialize();
         }
     });
