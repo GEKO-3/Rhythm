@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transliteration Data Migration - Rhythm Boduberu</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .warning-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .warning-text {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .info-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0c5460;
+            margin-bottom: 10px;
+        }
+
+        .info-text {
+            color: #0c5460;
+            line-height: 1.6;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #dee2e6;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            display: block;
+            width: 100%;
+            font-weight: bold;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .progress-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-container.active {
+            display: block;
+        }
+
+        .progress-bar-container {
+            background: #e9ecef;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .log {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .log-entry.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .log-entry.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .log-entry.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .firebase-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .firebase-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .firebase-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .success-message {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .success-message.active {
+            display: block;
+        }
+
+        .success-message h2 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+
+        .success-message p {
+            color: #155724;
+        }
+
+        .success-message a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .success-message a:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            Transliteration Data Migration
+            <span id="firebaseStatus" class="firebase-status disconnected">Connecting...</span>
+        </h1>
+        <p class="subtitle">Upload existing transliteration data to Firebase</p>
+
+        <div class="warning">
+            <div class="warning-title">⚠️ Important Warning</div>
+            <div class="warning-text">
+                This will <strong>replace ALL existing data</strong> in Firebase with the hardcoded data from transliteration.js. 
+                This action cannot be undone. Make sure you understand what you're doing before proceeding.
+            </div>
+        </div>
+
+        <div class="info">
+            <div class="info-title">ℹ️ What will be migrated?</div>
+            <div class="info-text">
+                <ul>
+                    <li><strong>Special Cases:</strong> All word/phrase exceptions</li>
+                    <li><strong>Transliteration Map:</strong> All Latin to Thaana consonant mappings</li>
+                    <li><strong>Vowel Diacritics:</strong> All vowel diacritic marks</li>
+                    <li><strong>Vowel Consonants:</strong> All vowel consonant forms</li>
+                    <li><strong>Shaviyanisukun:</strong> All shaviyanisukun consonants</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Select Source File</div>
+            <div style="margin-bottom: 20px;">
+                <input type="file" id="fileSelector" accept=".js" style="display: none;" onchange="loadCustomFile(event)">
+                <button class="btn" onclick="document.getElementById('fileSelector').click()" style="background: #17a2b8; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px;">
+                    📁 Select Custom transliteration.js File
+                </button>
+                <div id="fileInfo" style="margin-top: 10px; color: #666; font-style: italic;"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title">Data to Migrate</div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="statSpecialCases">0</div>
+                    <div class="stat-label">Special Cases</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statTransliterationMap">0</div>
+                    <div class="stat-label">Transliteration Mappings</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statVowelDiacritics">0</div>
+                    <div class="stat-label">Vowel Diacritics</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statVowelConsonants">0</div>
+                    <div class="stat-label">Vowel Consonants</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="statShaviyanisukun">0</div>
+                    <div class="stat-label">Shaviyanisukun</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <button id="migrateBtn" class="btn btn-primary" onclick="startMigration()" disabled>
+                🚀 Start Migration
+            </button>
+        </div>
+
+        <div id="progressContainer" class="progress-container">
+            <div class="progress-bar-container">
+                <div id="progressBar" class="progress-bar">0%</div>
+            </div>
+            <div id="log" class="log"></div>
+        </div>
+
+        <div id="successMessage" class="success-message">
+            <h2>✅ Migration Completed Successfully!</h2>
+            <p>All transliteration data has been uploaded to Firebase.</p>
+            <a href="transliteration-manager.html">Go to Transliteration Manager</a>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
+    
+    <script src="../js/transliteration-firebase.js"></script>
+
+    <script>
+        // Store loaded data from custom file
+        let customData = null;
+
+        // Wait for everything to load
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check if Firebase is initialized
+            if (typeof transliterationFirebase !== 'undefined') {
+                await transliterationFirebase.initialize();
+                updateFirebaseStatus(true);
+            } else {
+                updateFirebaseStatus(false);
+            }
+        });
+
+        function loadCustomFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    
+                    // Parse the JavaScript file to extract data
+                    customData = parseTransliterationFile(content);
+                    
+                    // Update file info
+                    document.getElementById('fileInfo').textContent = `Loaded: ${file.name}`;
+                    
+                    // Update stats
+                    updateStats(customData);
+                    
+                    // Enable migrate button
+                    document.getElementById('migrateBtn').disabled = false;
+                    
+                    addLog(`Loaded file: ${file.name}`, 'success');
+                } catch (error) {
+                    alert('Error parsing file: ' + error.message);
+                    addLog(`Error parsing file: ${error.message}`, 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function parseTransliterationFile(content) {
+            const data = {
+                specialCases: [],
+                transliterationMap: {},
+                vowelDiacritics: {},
+                vowelConsonants: {},
+                shaviyanisukun: []
+            };
+
+            // Extract specialCases array
+            const specialCasesMatch = content.match(/const specialCases\s*=\s*\[([\s\S]*?)\];/);
+            if (specialCasesMatch) {
+                const casesText = specialCasesMatch[1];
+                const caseMatches = casesText.matchAll(/\{\s*input:\s*['"]([^'"]+)['"]\s*,\s*output:\s*['"]([^'"]+)['"]/g);
+                for (const match of caseMatches) {
+                    data.specialCases.push({
+                        input: match[1],
+                        output: match[2]
+                    });
+                }
+            }
+
+            // Extract transliterationMap
+            const mapMatch = content.match(/const transliterationMap\s*=\s*\{([\s\S]*?)\};/);
+            if (mapMatch) {
+                const mapText = mapMatch[1];
+                const entries = mapText.matchAll(/['"]([^'"]+)['"]\s*:\s*['"]([^'"]+)['"]/g);
+                for (const entry of entries) {
+                    data.transliterationMap[entry[1]] = entry[2];
+                }
+            }
+
+            // Extract vowelDiacritics
+            const vowelDiacriticsMatch = content.match(/const vowelDiacritics\s*=\s*\{([\s\S]*?)\};/);
+            if (vowelDiacriticsMatch) {
+                const mapText = vowelDiacriticsMatch[1];
+                const entries = mapText.matchAll(/['"]([^'"]+)['"]\s*:\s*['"]([^'"]+)['"]/g);
+                for (const entry of entries) {
+                    data.vowelDiacritics[entry[1]] = entry[2];
+                }
+            }
+
+            // Extract vowelConsonants
+            const vowelConsonantsMatch = content.match(/const vowelConsonants\s*=\s*\{([\s\S]*?)\};/);
+            if (vowelConsonantsMatch) {
+                const mapText = vowelConsonantsMatch[1];
+                const entries = mapText.matchAll(/['"]([^'"]+)['"]\s*:\s*['"]([^'"]+)['"]/g);
+                for (const entry of entries) {
+                    data.vowelConsonants[entry[1]] = entry[2];
+                }
+            }
+
+            // Extract shaviyanisukun array
+            const shaviyanisukunMatch = content.match(/const shaviyanisukun\s*=\s*\[([\s\S]*?)\];/);
+            if (shaviyanisukunMatch) {
+                const arrayText = shaviyanisukunMatch[1];
+                const items = arrayText.matchAll(/['"]([^'"]+)['"]/g);
+                for (const item of items) {
+                    data.shaviyanisukun.push(item[1]);
+                }
+            }
+
+            return data;
+        }
+
+        function updateStats(data) {
+            document.getElementById('statSpecialCases').textContent = data.specialCases.length;
+            document.getElementById('statTransliterationMap').textContent = Object.keys(data.transliterationMap).length;
+            document.getElementById('statVowelDiacritics').textContent = Object.keys(data.vowelDiacritics).length;
+            document.getElementById('statVowelConsonants').textContent = Object.keys(data.vowelConsonants).length;
+            document.getElementById('statShaviyanisukun').textContent = data.shaviyanisukun.length;
+        }
+
+        function updateFirebaseStatus(connected) {
+            const status = document.getElementById('firebaseStatus');
+            if (connected) {
+                status.textContent = 'Connected';
+                status.className = 'firebase-status connected';
+            } else {
+                status.textContent = 'Disconnected';
+                status.className = 'firebase-status disconnected';
+            }
+        }
+
+        function loadStats() {
+            // Access the hardcoded data from transliteration.js
+            // These are the global variables defined in that file
+            if (typeof specialCases !== 'undefined') {
+                document.getElementById('statSpecialCases').textContent = specialCases.length;
+            }
+            if (typeof transliterationMap !== 'undefined') {
+                document.getElementById('statTransliterationMap').textContent = Object.keys(transliterationMap).length;
+            }
+            if (typeof vowelDiacritics !== 'undefined') {
+                document.getElementById('statVowelDiacritics').textContent = Object.keys(vowelDiacritics).length;
+            }
+            if (typeof vowelConsonants !== 'undefined') {
+                document.getElementById('statVowelConsonants').textContent = Object.keys(vowelConsonants).length;
+            }
+            if (typeof shaviyanisukun !== 'undefined') {
+                document.getElementById('statShaviyanisukun').textContent = shaviyanisukun.length;
+            }
+        }
+
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateProgress(percent) {
+            const bar = document.getElementById('progressBar');
+            bar.style.width = percent + '%';
+            bar.textContent = Math.round(percent) + '%';
+        }
+
+        async function startMigration() {
+            if (!customData) {
+                alert('Please select a transliteration.js file first!');
+                return;
+            }
+
+            if (!confirm('Are you sure you want to migrate all data? This will replace existing Firebase data!')) {
+                return;
+            }
+
+            // Disable button
+            const btn = document.getElementById('migrateBtn');
+            btn.disabled = true;
+            btn.textContent = 'Migrating...';
+
+            // Show progress container
+            document.getElementById('progressContainer').classList.add('active');
+
+            try {
+                addLog('Starting migration process...', 'info');
+                updateProgress(10);
+
+                // Use custom data
+                const migrationData = {
+                    specialCases: customData.specialCases,
+                    transliterationMap: customData.transliterationMap,
+                    vowelDiacritics: customData.vowelDiacritics,
+                    vowelConsonants: customData.vowelConsonants,
+                    shaviyanisukun: customData.shaviyanisukun
+                };
+
+                addLog(`Prepared ${migrationData.specialCases.length} special cases`, 'success');
+                updateProgress(25);
+
+                addLog(`Prepared ${Object.keys(migrationData.transliterationMap).length} transliteration mappings`, 'success');
+                updateProgress(40);
+
+                addLog(`Prepared ${Object.keys(migrationData.vowelDiacritics).length} vowel diacritics`, 'success');
+                updateProgress(55);
+
+                addLog(`Prepared ${Object.keys(migrationData.vowelConsonants).length} vowel consonants`, 'success');
+                updateProgress(70);
+
+                addLog(`Prepared ${migrationData.shaviyanisukun.length} shaviyanisukun items`, 'success');
+                updateProgress(80);
+
+                // Upload to Firebase with detailed progress
+                addLog('Uploading to Firebase...', 'info');
+                
+                const db = firebase.database();
+                const transliterationRef = db.ref('transliteration');
+                
+                // Upload special cases
+                addLog('Uploading special cases...', 'info');
+                await transliterationRef.child('specialCases').remove();
+                const specialCasesRef = transliterationRef.child('specialCases');
+                for (let i = 0; i < migrationData.specialCases.length; i++) {
+                    await specialCasesRef.push(migrationData.specialCases[i]);
+                    if (i % 50 === 0) {
+                        addLog(`Uploaded ${i + 1}/${migrationData.specialCases.length} special cases...`, 'info');
+                    }
+                }
+                updateProgress(85);
+                addLog('Special cases uploaded!', 'success');
+
+                // Upload transliteration map
+                addLog('Uploading transliteration map...', 'info');
+                await transliterationRef.child('transliterationMap').set(migrationData.transliterationMap);
+                updateProgress(90);
+                addLog('Transliteration map uploaded!', 'success');
+
+                // Upload vowel diacritics
+                addLog('Uploading vowel diacritics...', 'info');
+                await transliterationRef.child('vowelDiacritics').set(migrationData.vowelDiacritics);
+                updateProgress(93);
+                addLog('Vowel diacritics uploaded!', 'success');
+
+                // Upload vowel consonants
+                addLog('Uploading vowel consonants...', 'info');
+                await transliterationRef.child('vowelConsonants').set(migrationData.vowelConsonants);
+                updateProgress(96);
+                addLog('Vowel consonants uploaded!', 'success');
+
+                // Upload shaviyanisukun
+                addLog('Uploading shaviyanisukun...', 'info');
+                await transliterationRef.child('shaviyanisukun').remove();
+                const shaviyanisukunRef = transliterationRef.child('shaviyanisukun');
+                for (const item of migrationData.shaviyanisukun) {
+                    await shaviyanisukunRef.push(item);
+                }
+                updateProgress(100);
+                addLog('Shaviyanisukun uploaded!', 'success');
+
+                addLog('Migration completed successfully!', 'success');
+                
+                // Show success message
+                document.getElementById('successMessage').classList.add('active');
+
+            } catch (error) {
+                addLog(`Error: ${error.message}`, 'error');
+                btn.disabled = false;
+                btn.textContent = '🚀 Start Migration';
+                alert('Migration failed! Check the log for details.');
+            }
+        }
+    </script>
+</body>
+</html>

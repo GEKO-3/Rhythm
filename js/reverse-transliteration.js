@@ -151,8 +151,16 @@ function reverseTransliterate(dhivehiText) {
 
     let result = dhivehiText;
     
+    // Use Firebase data if available, otherwise use hardcoded fallback
+    const useFirebaseData = typeof transliterationFirebase !== 'undefined' && transliterationFirebase.isLoaded;
+    const firebaseDataCache = useFirebaseData ? transliterationFirebase.cache : null;
+    
+    const activeReverseSpecialCases = (useFirebaseData && firebaseDataCache && firebaseDataCache.reverseSpecialCases && firebaseDataCache.reverseSpecialCases.length > 0)
+        ? firebaseDataCache.reverseSpecialCases
+        : reverseSpecialCases;
+    
     // First, handle special cases
-    for (const specialCase of reverseSpecialCases) {
+    for (const specialCase of activeReverseSpecialCases) {
         const regex = new RegExp(specialCase.input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
         result = result.replace(regex, specialCase.output);
     }

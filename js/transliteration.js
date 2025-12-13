@@ -21,6 +21,165 @@
 // - Commas (,) are converted to Arabic commas (،)
 // ==================================================================
 
+// Firebase integration flag
+let useFirebaseData = false;
+let firebaseDataCache = null;
+
+// Initialize Firebase data when available
+if (typeof transliterationFirebase !== 'undefined') {
+    transliterationFirebase.addListener((data) => {
+        firebaseDataCache = data;
+        useFirebaseData = true;
+        console.log('Transliteration using Firebase data');
+        console.log('Firebase cache sentenceEnd:', data.sentenceEnd);
+    });
+}
+
+// Hardcoded husnoonu patterns (fallback)
+const husNoonuPatterns = [
+    { pattern: 'maahingaa', output: 'މާހިނގާ', length: 9 },
+    { pattern: 'chaandha', output: 'ޗާނދަ', length: 8 },
+    { pattern: 'lhindhaa', output: 'ޅިނދާ', length: 8 },
+    { pattern: 'mihindhu', output: 'މިހިނދު', length: 8 },
+    { pattern: 'muhingaa', output: 'މުހިނގާ', length: 8 },
+    { pattern: 'nuhindhu', output: 'ނުހިނދު', length: 8 },
+    { pattern: 'nuhingaa', output: 'ނުހިނގާ', length: 8 },
+    { pattern: 'thaangaa', output: 'ތާނގާ', length: 8 },
+    { pattern: 'thundee', output: 'ތުނޑީ', length: 7 },
+    { pattern: 'thunbaa', output: 'ތުނބާ', length: 7 },
+    { pattern: 'bondhaa', output: 'ބޮނދާ', length: 7 },
+    { pattern: 'bondhai', output: 'ބޮނދައި', length: 7 },
+    { pattern: 'dhandoo', output: 'ދަނޑޫ', length: 7 },
+    { pattern: 'handhaa', output: 'ހަނދާ', length: 7 },
+    { pattern: 'handhah', output: 'ހަނދަށް', length: 7 },
+    { pattern: 'handhey', output: 'ހަނދޭ', length: 7 },
+    { pattern: 'kandhey', output: 'ކަނދޭ', length: 7 },
+    { pattern: 'lhindhu', output: 'ޅިނދު', length: 7 },
+    { pattern: 'thaanga', output: 'ތާނގަ', length: 7 },
+    { pattern: 'thandee', output: 'ތަނޑީ', length: 7 },
+    { pattern: 'yaandhu', output: 'ޔާނދު', length: 7 },
+    { pattern: 'aanhaa', output: 'އާނހާ', length: 6 },
+    { pattern: 'andhaa', output: 'އަނދާ', length: 6 },
+    { pattern: 'bandaa', output: 'ބަނޑާ', length: 6 },
+    { pattern: 'bandha', output: 'ބަނދަ', length: 6 },
+    { pattern: 'bandhe', output: 'ބަނދެ', length: 6 },
+    { pattern: 'bandhi', output: 'ބަނދި', length: 6 },
+    { pattern: 'bindhe', output: 'ބިނދެ', length: 6 },
+    { pattern: 'bindhu', output: 'ބިނދު', length: 6 },
+    { pattern: 'bondee', output: 'ބޮނޑީ', length: 6 },
+    { pattern: 'bondha', output: 'ބޮނދަ', length: 6 },
+    { pattern: 'dhanbi', output: 'ދަނބި', length: 6 },
+    { pattern: 'dhandi', output: 'ދަނޑި', length: 6 },
+    { pattern: 'dhandu', output: 'ދަނޑު', length: 6 },
+    { pattern: 'dhanbu', output: 'ދަނބު', length: 6 },
+    { pattern: 'dhanmu', output: 'ދަނމު', length: 6 },
+    { pattern: 'findha', output: 'ފިނދަ', length: 6 },
+    { pattern: 'findhu', output: 'ފިނދު', length: 6 },
+    { pattern: 'gandaa', output: 'ގަނޑާ', length: 6 },
+    { pattern: 'gandeh', output: 'ގަނޑެއް', length: 6 },
+    { pattern: 'gandey', output: 'ގަނޑޭ', length: 6 },
+    { pattern: 'handha', output: 'ހަނދަ', length: 6 },
+    { pattern: 'handhi', output: 'ހަނދި', length: 6 },
+    { pattern: 'handhu', output: 'ހަނދު', length: 6 },
+    { pattern: 'hendhu', output: 'ހެނދު', length: 6 },
+    { pattern: 'hindha', output: 'ހިނދަ', length: 6 },
+    { pattern: 'hindhu', output: 'ހިނދު', length: 6 },
+    { pattern: 'hingaa', output: 'ހިނގާ', length: 6 },
+    { pattern: 'hingee', output: 'ހިނގީ', length: 6 },
+    { pattern: 'ihinga', output: 'އިހިނގަ', length: 6 },
+    { pattern: 'kanbaa', output: 'ކަނބާ', length: 6 },
+    { pattern: 'kandaa', output: 'ކަނޑާ', length: 6 },
+    { pattern: 'kandeh', output: 'ކަނޑެއް', length: 6 },
+    { pattern: 'kandhi', output: 'ކަނދި', length: 6 },
+    { pattern: 'kandhu', output: 'ކަނދު', length: 6 },
+    { pattern: 'kandoo', output: 'ކަނޑޫ', length: 6 },
+    { pattern: 'kendee', output: 'ކެނޑީ', length: 6 },
+    { pattern: 'kendey', output: 'ކެނޑޭ', length: 6 },
+    { pattern: 'kuriah', output: 'ކުރިޔަށް', length: 6 },
+    { pattern: 'lanbaa', output: 'ލަނބާ', length: 6 },
+    { pattern: 'lenbey', output: 'ލެނބޭ', length: 6 },
+    { pattern: 'lhangi', output: 'ޅަނގި', length: 6 },
+    { pattern: 'lhangu', output: 'ޅަނގު', length: 6 },
+    { pattern: 'rindhu', output: 'ރިނދު', length: 6 },
+    { pattern: 'rondeh', output: 'ރޮނޑެއް', length: 6 },
+    { pattern: 'runbaa', output: 'ރުނބާ', length: 6 },
+    { pattern: 'sandhu', output: 'ސަނދު', length: 6 },
+    { pattern: 'thanbu', output: 'ތަނބު', length: 6 },
+    { pattern: 'thandi', output: 'ތަނޑި', length: 6 },
+    { pattern: 'thunba', output: 'ތުނބަ', length: 6 },
+    { pattern: 'thunbi', output: 'ތުނބި', length: 6 },
+    { pattern: 'thunbu', output: 'ތުނބު', length: 6 },
+    { pattern: 'thundi', output: 'ތުނޑި', length: 6 },
+    { pattern: 'thundu', output: 'ތުނޑު', length: 6 },
+    { pattern: 'vandhu', output: 'ވަނދު', length: 6 },
+    { pattern: 'aanha', output: 'އާނހަ', length: 5 },
+    { pattern: 'anbaa', output: 'އަނބާ', length: 5 },
+    { pattern: 'andhi', output: 'އަނދި', length: 5 },
+    { pattern: 'banda', output: 'ބަނޑަ', length: 5 },
+    { pattern: 'bandi', output: 'ބަނޑި', length: 5 },
+    { pattern: 'bandu', output: 'ބަނޑު', length: 5 },
+    { pattern: 'banbu', output: 'ބަނބު', length: 5 },
+    { pattern: 'binmu', output: 'ބިނމު', length: 5 },
+    { pattern: 'bondi', output: 'ބޮނޑި', length: 5 },
+    { pattern: 'endhe', output: 'އެނދެ', length: 5 },
+    { pattern: 'endhu', output: 'އެނދު', length: 5 },
+    { pattern: 'engey', output: 'އެނގޭ', length: 5 },
+    { pattern: 'fanbu', output: 'ފަނބު', length: 5 },
+    { pattern: 'fandu', output: 'ފަނޑު', length: 5 },
+    { pattern: 'fundu', output: 'ފުނޑު', length: 5 },
+    { pattern: 'ganda', output: 'ގަނޑަ', length: 5 },
+    { pattern: 'gandu', output: 'ގަނޑު', length: 5 },
+    { pattern: 'genbe', output: 'ގެނބެ', length: 5 },
+    { pattern: 'genbi', output: 'ގެނބި', length: 5 },
+    { pattern: 'gondi', output: 'ގޮނޑި', length: 5 },
+    { pattern: 'gondu', output: 'ގޮނޑު', length: 5 },
+    { pattern: 'hendu', output: 'ހެނޑު', length: 5 },
+    { pattern: 'hinga', output: 'ހިނގަ', length: 5 },
+    { pattern: 'hingu', output: 'ހިނގު', length: 5 },
+    { pattern: 'honda', output: 'ހޮނޑަ', length: 5 },
+    { pattern: 'hungu', output: 'ހުނގު', length: 5 },
+    { pattern: 'indhe', output: 'އިނދެ', length: 5 },
+    { pattern: 'ingey', output: 'އިނގޭ', length: 5 },
+    { pattern: 'kanda', output: 'ކަނޑަ', length: 5 },
+    { pattern: 'kandi', output: 'ކަނޑި', length: 5 },
+    { pattern: 'kandu', output: 'ކަނޑު', length: 5 },
+    { pattern: 'kanga', output: 'ކަނގަ', length: 5 },
+    { pattern: 'kanbi', output: 'ކަނބި', length: 5 },
+    { pattern: 'kanbu', output: 'ކަނބު', length: 5 },
+    { pattern: 'kende', output: 'ކެނޑެ', length: 5 },
+    { pattern: 'kendi', output: 'ކެނޑި', length: 5 },
+    { pattern: 'kendu', output: 'ކެނޑު', length: 5 },
+    { pattern: 'kundi', output: 'ކުނޑި', length: 5 },
+    { pattern: 'kunbu', output: 'ކުނބު', length: 5 },
+    { pattern: 'lanbe', output: 'ލަނބެ', length: 5 },
+    { pattern: 'landu', output: 'ލަނޑު', length: 5 },
+    { pattern: 'langi', output: 'ލަނގި', length: 5 },
+    { pattern: 'lenbu', output: 'ލެނބު', length: 5 },
+    { pattern: 'linbe', output: 'ލިނބެ', length: 5 },
+    { pattern: 'randi', output: 'ރަނޑި', length: 5 },
+    { pattern: 'randu', output: 'ރަނޑު', length: 5 },
+    { pattern: 'ranga', output: 'ރަނގަ', length: 5 },
+    { pattern: 'rangi', output: 'ރަނގި', length: 5 },
+    { pattern: 'ringa', output: 'ރިނގަ', length: 5 },
+    { pattern: 'ringu', output: 'ރިނގު', length: 5 },
+    { pattern: 'runba', output: 'ރުނބަ', length: 5 },
+    { pattern: 'undha', output: 'އުނދަ', length: 5 },
+    { pattern: 'undhu', output: 'އުނދު', length: 5 },
+    { pattern: 'yangi', output: 'ޔަނގި', length: 5 },
+    { pattern: 'anbi', output: 'އަނބި', length: 4 },
+    { pattern: 'anbu', output: 'އަނބު', length: 4 },
+    { pattern: 'anga', output: 'އަނގަ', length: 4 },
+    { pattern: 'ango', output: 'އަނގޮ', length: 4 },
+    { pattern: 'enbu', output: 'އެނބު', length: 4 },
+    { pattern: 'engi', output: 'އެނގި', length: 4 },
+    { pattern: 'engu', output: 'އެނގު', length: 4 },
+    { pattern: 'inba', output: 'އިނބަ', length: 4 },
+    { pattern: 'ingi', output: 'އިނގި', length: 4 },
+    { pattern: 'unba', output: 'އުނބަ', length: 4 },
+    { pattern: 'unga', output: 'އުނގަ', length: 4 },
+    { pattern: 'ungu', output: 'އުނގު', length: 4 }
+];
+
 // Dhivehi Latin to Thaana transliteration logic
 // This file contains all the transliteration mappings and logic
 
@@ -73,1841 +232,40 @@ const vowelConsonants = {
 // Shaviyanisukun array - consonants that change "ah" ending to "ަށް"
 const shaviyanisukun = ['m', 'dh', 's', 'd', 'y', 'sh', 'j' ];
 
+// Helper functions to get data from Firebase or fallback to hardcoded
+function getTransliterationMap() {
+    return (useFirebaseData && firebaseDataCache && Object.keys(firebaseDataCache.transliterationMap).length > 0) 
+        ? firebaseDataCache.transliterationMap 
+        : transliterationMap;
+}
+
+function getVowelDiacritics() {
+    return (useFirebaseData && firebaseDataCache && Object.keys(firebaseDataCache.vowelDiacritics).length > 0)
+        ? firebaseDataCache.vowelDiacritics
+        : vowelDiacritics;
+}
+
+function getVowelConsonants() {
+    return (useFirebaseData && firebaseDataCache && Object.keys(firebaseDataCache.vowelConsonants).length > 0)
+        ? firebaseDataCache.vowelConsonants
+        : vowelConsonants;
+}
+
+function getShaviyanisukun() {
+    return (useFirebaseData && firebaseDataCache && firebaseDataCache.shaviyanisukun.length > 0)
+        ? firebaseDataCache.shaviyanisukun
+        : shaviyanisukun;
+}
+
+function getSpecialCases() {
+    return (useFirebaseData && firebaseDataCache && firebaseDataCache.specialCases.length > 0)
+        ? firebaseDataCache.specialCases
+        : specialCases;
+}
+
 // Special cases mapping - words that need exact transliteration
-const specialCases = [
-    // 21 characters
-    { input: 'masthukohlaafaaneyey', output: 'މަސްތުކޮށްލާ ފާނެޔޭ' },
-    { input: 'jahaajahaajahaajaahaa', output: 'ޖަހާޖަހާޖަހާޖަހާ' },
-    { input: 'kihaadheramavaalhahey', output: 'ކިހާދެރަމަވާޅަހޭ' },
-
-    // 20 characters
-    { input: 'ehandhaanthahvaathee', output: 'އެހަނދާންތައްވާތީ' },
-
-    // 19 characters
-    { input: 'annaatheemihaarugaa', output: 'އަންނާތީ މިހާރުގާ' },
-
-    // 18 characters
-    { input: 'keyytherivaashey', output: 'ކެތްތެރިވާށޭ' },
-    { input: 'keiytherivaashey', output: 'ކެތްތެރިވާށޭ' },
-    { input: 'keiitherivaashey', output: 'ކެތްތެރިވާށޭ' },
-    { input: 'heylhithereynnivey', output: 'ހޭޅިތެރޭންއިވޭ' },
-    { input: 'masthuvaashabaabey', output: 'މަސްތުވާޝާބާބޭ' },
-    { input: 'ehmennhingaadhamaa', output: 'އެއްމެންހިނގާދަމާ' },
-
-    // 17 characters
-    { input: 'thakaholhithah', output: 'ތަކަހޮޅިތައް' },
-    { input: 'nimihingaidhaaney', output: 'ނިމިހިނގައިދާނޭ' },
-    { input: 'adhuhunnanvaathee', output: 'އަދުހުންނަންވާތީ' },
-    { input: 'thiyahenhedhoomaa', output: 'ތިޔަހެންހެދޫމާ' },
-    { input: 'naazukuveehiyymey', output: 'ނާޒުކުވީހިތްމޭ' },
-    { input: 'fahayybalaahedhee', output: 'ފަހަތްބަލާހެދީ' },
-    { input: 'hoadheemaachaalhe', output: 'ހޯދީމާޗާލްހެ' },
-    { input: 'varushifaayathuge', output: 'ވަރުޝިފާޔަތުގެ' },
-
-    // 16 characters
-    { input: 'kulhadhunvantha', output: 'ކުޅަދުންވަންތަ' },
-    { input: 'zeenaiytherikan', output: 'ޒީނަތްތެރިކަން' },
-    { input: 'zeenayytherikan', output: 'ޒީނަތްތެރިކަން' },
-    { input: 'zeenaiitherikan', output: 'ޒީނަތްތެރިކަން' },
-    { input: 'naahamathedhekey', output: 'ނާހަމަތެދެކޭ' },
-    { input: 'fahareymaadhooni', output: 'ފަހަރޭމާދޫނި' },
-    { input: 'jahaajahaajaahaa', output: 'ޖަހާޖަހާޖަހާ' },
-    { input: 'reethihaamaathah', output: 'ރީތިހާމާތައް' },
-    { input: 'dhoonihifaadhaan', output: 'ދޫނިހިފާދާން' },
-    { input: 'eedhukulhivaruge', output: 'އީދުކުޅިވަރުގެ' },
-    { input: 'harugilahaavaame', output: 'ހަރުގިލަހާވާމެ' },
-    { input: 'hedhigennaraaney', output: 'ހެދިގެންއަރާނޭ' },
-    { input: 'malugevahunndhoa', output: 'މަލުގެވަހުންދޯ' },
-    { input: 'roohaneegulhumaa', output: 'ރޫހާނީގުޅުމާ' },
-    { input: 'ehandhaannthakey', output: 'އެހަނދާންތަކޭ' },
-    { input: 'ehandhaannthekey', output: 'އެހަނދާންތެކޭ' },
-    { input: 'hiyyheyokamaaeku', output: 'ހިތްހެޔޮކަމާއެކު' },
-    { input: 'mahusharubimugaa', output: 'މަޙުޝަރުބިމުގާ' },
-
-    // 15 characters
-    { input: 'vaadhuvahunkey', output: 'ވާދުވަހުންކޭ' },
-    { input: 'zeenaitherikan', output: 'ޒީނަތްތެރިކަން' },
-    { input: 'zeenaytherikan', output: 'ޒީނަތްތެރިކަން' },
-    { input: 'thibunihenney', output: 'ތިބުނިހެންނޭ' },
-    { input: 'ninmaafaaneyo', output: 'ނިންމާފާނެޔޮ' },
-    { input: 'nuhuruhpaaney', output: 'ނުހޮރުއްޕާނޭ' },
-    { input: 'nohorohpaaney', output: 'ނޮހޮރޮއްޕާނޭ' },
-    { input: 'ihhuthiyaareh', output: 'އިޙުތިޔާރެއް' },
-    { input: 'rahttehinnaa', output: 'ރައްޓެހިންނާ' },
-    { input: 'thiyaeekamugaa', output: 'ތިޔައީކަމުގާ' },
-    { input: 'ishthashigandu', output: 'އިސްތަށިގަނޑު' },
-    { input: 'handhaanunney', output: 'ހަނދާނުންނޭ' },
-    { input: 'javaahirahves', output: 'ޖަވާހިރައްވެސް' },
-    { input: 'zindhageegaa', output: 'ޒިންދަގީގާ' },
-    { input: 'zindhagygaa', output: 'ޒިންދަގީގާ' },
-    { input: 'zindhagigaa', output: 'ޒިންދަގީގާ' },
-    { input: 'zindhagiigaa', output: 'ޒިންދަގީގާ' },
-    { input: 'zindhagiygaa', output: 'ޒިންދަގީގާ' },
-    { input: 'zindhaqeegaa', output: 'ޒިންދަގީގާ' },
-    { input: 'zindhaqygaa', output: 'ޒިންދަގީގާ' },
-    { input: 'zindhaqigaa', output: 'ޒިންދަގީގާ' },
-    { input: 'zindhaqiigaa', output: 'ޒިންދަގީގާ' },
-    { input: 'zindhaqiygaa', output: 'ޒިންދަގީގާ' },
-    { input: 'medhutherean', output: 'މެދުތެރޭން' },
-    { input: 'enkeyolhubey', output: 'އެންކެޔޮޅުބޭ' },
-    { input: 'enkeyolhube', output: 'އެންކެޔޮޅުބެ' },
-    { input: 'dhirihurihaa', output: 'ދިރިހުރިހާ' },
-    { input: 'rashuthereah', output: 'ރަށުތެރެއަށް' },
-    { input: 'ihusaasveemaa', output: 'އިހުސާސްވީމާ' },
-    { input: 'nuruhihjeyey', output: 'ނުރުހިއްޖެޔޭ' },
-    { input: 'neyngeyneyey', output: 'ނޭންގޭނެޔޭ' },
-    { input: 'nuveveyneyey', output: 'ނުވެވޭނެޔޭ' },
-    { input: 'hureveynehey', output: 'ހުރެވޭނެހޭ' },
-    { input: 'kuruvaifiyey', output: 'ކުރުވައިފިޔޭ' },
-    { input: 'ihusaasthakey', output: 'އިހުސާސްތަކޭ' },
-    { input: 'dhushminunnaa', output: 'ދުޝްމިނުންނާ' },
-    { input: 'dhushminunney', output: 'ދުޝްމިނުންނޭ' },
-    { input: 'shoahuvaahaavey', output: 'ޝޯހުވާހާވޭ' },
-    { input: 'dhirunaaveythoa', output: 'ދިރުންއާވޭތޯ' },
-    { input: 'feneythoathahey', output: 'ފެނޭތޯތަހޭ' },
-    { input: 'hingaafennjahaa', output: 'ހިނގާފެންޖަހާ' },
-    { input: 'hiyyviruveythee', output: 'ހިތްވިރުވޭތީ' },
-    { input: 'kiyaadheehedhin', output: 'ކިޔާދީހެދިން' },
-    { input: 'kurehifaavaaney', output: 'ކުރެހިފާވާނޭ' },
-    { input: 'maayoosnuvaahaa', output: 'މާޔޫސްނުވާހާ' },
-    { input: 'mathihashinagaa', output: 'މަތިހަށިނަގާ' },
-    { input: 'dhennefashaalee', output: 'ދެންއެފަށާލީ' },
-    { input: 'faalhuvedhaahaa', output: 'ފާޅުވެދާހާ' },
-    { input: 'fahathulavaigen', output: 'ފަހަތުލަވައިގެން' },
-    { input: 'isjeheneethaaey', output: 'އިސްޖެހެނީތާއޭ' },
-    { input: 'mahusharugaaves', output: 'މަހުޝަރުގާވެސް' },
-    { input: 'ishthashigandun', output: 'އިސްތަށިގަނޑުން' },
-    { input: 'reethikashmeeru', output: 'ރީތިކަޝްމީރު' },
-    { input: 'aashigaayahtakaa', output: 'އާޝިގާޔައްޓަކާ' },
-    { input: 'thakaholhialhaa', output: 'ތަކަހޮޅިއަޅާ' },
-    { input: 'dhalhaalhaathee', output: 'ދަޅައަޅާތީ' },
-
-    // 14 characters
-    { input: 'fathihahttakaa', output: 'ފަތިހައްޓަކާ' },
-    { input: 'kehiveriveemaa', output: 'ކެހިވެރިވީމާ' },
-    { input: 'thiyahenbaakee', output: 'ތިޔަހެންބާކީ' },
-    { input: 'berujahaanamey', output: 'ބެރުޖަހާނަމޭ' },
-    { input: 'magumatheehure', output: 'މަގުމަތީހުރެ' },
-    { input: 'zindhgaaneerey', output: 'ޒިންދުގާނީރޭ' },
-    { input: 'jareevedhaahaa', output: 'ޖަރީވެދާހާ' },
-    { input: 'dhuvahakuviyas', output: 'ދުވަހަކުވިޔަސް' },
-    { input: 'blockthehkeroo', output: 'ބްލޮކުތެއްކެރޫ' },
-    { input: 'dhenndhamaahey', output: 'ދެންދަމާހޭ' },
-    { input: 'eedhukulhivaru', output: 'އީދުކުޅިވަރު' },
-    { input: 'eidkulhivaruge', output: 'އީދުކުޅިވަރުގެ' },
-    { input: 'gaigaajahaanee', output: 'ގައިގާޖަހާނީ' },
-    { input: 'harugilahaavaa', output: 'ހަރުގިލަހާވާ' },
-    { input: 'meyahfinivanee', output: 'މެޔައްފިނިވަނީ' },
-    { input: 'naazukuveehiyy', output: 'ނާޒުކުވީހިތް' },
-    { input: 'shoahukohlaifi', output: 'ޝޯހުކޮއްލައިފި' },
-    { input: 'enaanaathedhey', output: 'އެނާނާތެދޭ' },
-    { input: 'handhaannaavey', output: 'ހަނދާންއާވޭ' },
-    { input: 'ihvaaladheymee', output: 'އިއްވާލަދޭމީ' },
-    { input: 'leygahingaahaa', output: 'ލޭގަހިނގާހާ' },
-    { input: 'ithubaarehneyy', output: 'އިތުބާރެއްނެތް' },
-    { input: 'kuruneesvedhey', output: 'ކުރުނީސްވެދޭ' },
-    { input: 'seariouskohhey', output: 'ސީރިއަސްކޮއްހޭ' },
-    { input: 'thagudheeruhey', output: 'ތަގުދީރުހޭ' },
-    { input: 'fatharaaseehey', output: 'ފަތަރާސީހޭ' },
-    { input: 'fennboahiyyvey', output: 'ފެންބޯހިތްވޭ' },
-    { input: 'haadhahihveyey', output: 'ހާދަހިތްވެޔޭ' },
-    { input: 'ihusaaskohdhey', output: 'އިހުސާސްކޮށްދޭ' },
-    { input: 'umaruahyaaruge', output: 'އުމަރުއައްޔާރުގެ' },
-    { input: 'aashoahuvedhey', output: 'އާޝޯހުވެދޭ' },
-    { input: 'fidhaavamaahey', output: 'ފިދާވަމާހޭ' },
-    { input: 'hithuleyfaamey', output: 'ހިތުލޭފައަމޭ' },
-    { input: 'thalaboabeehge', output: 'ތަލަބޯބެއެއްގެ' },
-
-    // 13 characters
-    { input: 'handhaanuney', output: 'ހަނދާނުނޭ' },
-    { input: 'handhaanvey', output: 'ހަނދާންވޭ' },
-    { input: 'heyohaalugaa', output: 'ހެޔޮހާލުގާ' },
-    { input: 'zindhageega', output: 'ޒިންދަގީގަ' },
-    { input: 'zindhagyga', output: 'ޒިންދަގީގަ' },
-    { input: 'zindhagiga', output: 'ޒިންދަގީގަ' },
-    { input: 'zindhagiiga', output: 'ޒިންދަގީގަ' },
-    { input: 'zindhagiyga', output: 'ޒިންދަގީގަ' },
-    { input: 'zindhaqeega', output: 'ޒިންދަގީގަ' },
-    { input: 'zindhaqyga', output: 'ޒިންދަގީގަ' },
-    { input: 'zindhaqiga', output: 'ޒިންދަގީގަ' },
-    { input: 'zindhaqiiga', output: 'ޒިންދަގީގަ' },
-    { input: 'zindhaqiyga', output: 'ޒިންދަގީގަ' },
-    { input: 'dhaagoiyvey', output: 'ދާގޮތްވޭ' },
-    { input: 'vaadhuvahekey', output: 'ވާދުވަހެކޭ' },
-    { input: 'vaadhuvasthah', output: 'ވާދުވަސްތައް' },
-    { input: 'maraatheehey', output: 'މަރާތީހޭ' },
-    { input: 'dhushminakaa', output: 'ދުޝްމިނަކާ' },
-    { input: 'vaadhuvahaky', output: 'ވާދުވަހަކީ' },
-    { input: 'ihusaahakee', output: 'އިހުސާހަކީ' },
-    { input: 'ihusaahakii', output: 'އިހުސާހަކީ' },
-    { input: 'ihusaahaky', output: 'އިހުސާހަކީ' },
-    { input: 'ihusaahekey', output: 'އިހުސާހެކޭ' },
-    { input: 'ihusaasthah', output: 'އިހުސާސްތައް' },
-    { input: 'thihireethi', output: 'ތިހިރީތި' },
-    { input: 'thihureethi', output: 'ތިހުރީތި' },
-    { input: 'neyngeyhen', output: 'ނޭންގޭހެން' },
-    { input: 'zeenaiytheri', output: 'ޒީނަތްތެރި' },
-    { input: 'zeenayytheri', output: 'ޒީނަތްތެރި' },
-    { input: 'zeenaiitheri', output: 'ޒީނަތްތެރި' },
-    { input: 'zeenaitheri', output: 'ޒީނަތްތެރި' },
-    { input: 'zeenaytheri', output: 'ޒީނަތްތެރި' },
-    { input: 'hashigandah', output: 'ހަށިގަނޑަށް' },
-    { input: 'khidhumaiyy', output: 'ޚިދުމަތް' },
-    { input: 'mulhihithaa', output: 'މުޅިހިތާ' },
-    { input: 'hidhumaiyy', output: 'ޚިދުމަތް' },
-    { input: 'khidhumaii', output: 'ޚިދުމަތް' },
-    { input: 'mihaalathu', output: 'މިހާލަތު' },
-    { input: 'dhehithuge', output: 'ދެހިތުގެ' },
-    { input: 'dhuniyeyge', output: 'ދުނިޔޭގެ' },
-    { input: 'dhuniyege', output: 'ދުނިޔޭގެ' },
-    { input: 'angaidheyshey', output: 'އަންގާދޭށޭ' },
-    { input: 'fathihahtakaa', output: 'ފަތިހައްޓަކާ' },
-    { input: 'aeeaeethoa', output: 'އައީއައީތޯ' },
-    { input: 'beygaraarvee', output: 'ބޭގަރާރުވީ' },
-    { input: 'gulhaaruthah', output: 'ގުލްހާރުތައް' },
-    { input: 'ihhuthiyaaru', output: 'އިޙުތިޔާރު' },
-    { input: 'ihuthiyaareh', output: 'އިޙުތިޔާރެއް' },
-    { input: 'nukiyahchey', output: 'ނުކިޔައްޗޭ' },
-    { input: 'henveruhuri', output: 'ހެންވޭރުހުރި' },
-    { input: 'henveyruhuri', output: 'ހެންވޭރުހުރި' },
-    { input: 'handhaanuney', output: 'ހަނދާނުނޭ' },
-    { input: 'javaahirahves', output: 'ޖަވާހިރައްވެސް' },
-    { input: 'aashiqeegaa', output: 'އާޝިޤީގާ' },
-    { input: 'aashiqygaa', output: 'އާޝިޤީގާ' },
-    { input: 'aashiqigaa', output: 'އާޝިޤީގާ' },
-    { input: 'aashiqiigaa', output: 'އާޝިޤީގާ' },
-    { input: 'aashiqiygaa', output: 'އާޝިޤީގާ' },
-    { input: 'ashiqeegaa', output: 'އާޝިޤީގާ' },
-    { input: 'ashiqygaa', output: 'އާޝިޤީގާ' },
-    { input: 'ashiqigaa', output: 'އާޝިޤީގާ' },
-    { input: 'ashiqiigaa', output: 'އާޝިޤީގާ' },
-    { input: 'ashiqiygaa', output: 'އާޝިޤީގާ' },
-    { input: 'shabaabugaa', output: 'ޝަބާބުގާ' },
-    { input: 'fenijjeyey', output: 'ފެނިއްޖެޔޭ' },
-    { input: 'furihamakan', output: 'ފުރިހަމަކަން' },
-    { input: 'vaagoiyvey', output: 'ވާގޮތްވޭ' },
-    { input: 'dholhuhaas', output: 'ދޮޅުހާސް' },
-    { input: 'ruheynuhey', output: 'ރުހޭނުހޭ' },
-    { input: 'mehefilthah', output: 'މެހެފިލުތައް' },
-    { input: 'meehunaaeku', output: 'މީހުނާއެކު' },
-    { input: 'meehakaaeku', output: 'މީހަކާއެކު' },
-    { input: 'vaatheehey', output: 'ވާތީހޭ' },
-    { input: 'vaadhuvahey', output: 'ވާދުވަހޭ' },
-    { input: 'vaadhuvahun', output: 'ވާދުވަހުން' },
-    { input: 'fohelaafaa', output: 'ފޮހެލާފާ' },
-    { input: 'ihusaahun', output: 'އިހުސާހުން' },
-    { input: 'zakhamuvy', output: 'ޒަޚަމުވީ' },
-    { input: 'zahamuvy', output: 'ޒަޚަމުވީ' },
-    { input: 'ishaaraai', output: 'އިޝާރާތް' },
-    { input: 'isharaii', output: 'އިޝާރާތް' },
-    { input: 'ishaaraiy', output: 'އިޝާރާތް' },
-    { input: 'ishaarayy', output: 'އިޝާރާތް' },
-    { input: 'hidhumaii', output: 'ޚިދުމަތް' },
-    { input: 'khidumayy', output: 'ޚިދުމަތް' },
-    { input: 'neyngenee', output: 'ނޭނގެނީ' },
-    { input: 'neyngeny', output: 'ނޭނގެނީ' },
-    { input: 'neyngeni', output: 'ނޭނގެނީ' },
-    { input: 'neyngenii', output: 'ނޭނގެނީ' },
-    { input: 'vaagothah', output: 'ވާގޮތައް' },
-    { input: 'zakhamvy', output: 'ޒަޚަމުވީ' },
-    { input: 'zakhamvee', output: 'ޒަޚަމުވީ' },
-    { input: 'zakhamvi', output: 'ޒަޚަމުވީ' },
-    { input: 'zakhamvii', output: 'ޒަޚަމުވީ' },
-    { input: 'zahamvy', output: 'ޒަޚަމުވީ' },
-    { input: 'zahamvee', output: 'ޒަޚަމުވީ' },
-    { input: 'zahamvi', output: 'ޒަޚަމުވީ' },
-    { input: 'zahamvii', output: 'ޒަޚަމުވީ' },
-    { input: 'furihama', output: 'ފުރިހަމަ' },
-    { input: 'leyaaeku', output: 'ލެޔާއެކު' },
-    { input: 'ruhenyaa', output: 'ރުހެންޔާ' },
-    { input: 'dhevenyaa', output: 'ދެވެންޔާ' },
-    { input: 'muiythah', output: 'މުތްތައް' },
-    { input: 'muithah', output: 'މުތްތައް' },
-    { input: 'muyythah', output: 'މުތްތައް' },
-    { input: 'bahaareh', output: 'ބަހާރެއް' },
-    { input: 'baihadhaafaa', output: 'ބައިހަދާފާ' },
-    { input: 'neydhenoohey', output: 'ނޭދެނޫހޭ' },
-    { input: 'fisadhuveemaa', output: 'ފިސްއަދުވީމާ' },
-    { input: 'roanjeheneeey', output: 'ރޯންޖެހެނީއޭ' },
-    { input: 'dhivehidharin', output: 'ދިވެހިދަރިން' },
-    { input: 'ehandhaanthah', output: 'އެހަނދާންތައް' },
-    { input: 'heykendeygoyy', output: 'ހޭކެނޑޭގޮތް' },
-    { input: 'milamehijahaa', output: 'މިލަމެހިޖަހާ' },
-    { input: 'aahiyyvarakaa', output: 'އާހިތްވަރަކާ' },
-    { input: 'dhoanidhashah', output: 'ދޯނިދަށަށް' },
-    { input: 'behendhaathee', output: 'ބެހެންދާތީ' },
-    { input: 'engivaatheehe', output: 'އެނގިވާތީހެ' },
-    { input: 'hiyyufaakuraa', output: 'ހިތްއުފާކުރާ' },
-    { input: 'shaharubaalaa', output: 'ޝަހަރުބާލާ' },
-    { input: 'chakamoaluhen', output: 'ޗަކަމޯލުހެން' },
-    { input: 'hiyyhithaavee', output: 'ހިތްހިތާވީ' },
-    { input: 'holhilaajahaa', output: 'ހޮޅިލާޖަހާ' },
-    { input: 'kanmatheehure', output: 'ކަންމަތީހުރެ' },
-    { input: 'kudhiohthakun', output: 'ކުދިއޮއްތަކުން' },
-    { input: 'saafuvaanehen', output: 'ސާފުވާނެހެން' },
-    { input: 'shoahuvevifaa', output: 'ޝޯހުވެވިފާ' },
-    { input: 'uvajahaanamey', output: 'އުވަޖަހާނަމޭ' },
-    { input: 'faheemaajahaa', output: 'ފަހީމާޖަހާ' },
-    { input: 'handhaannthah', output: 'ހަނދާންތައް' },
-    { input: 'kiyeyneymihen', output: 'ކިޔޭނޭމިހެން' },
-    { input: 'ahcheynnbeyre', output: 'އައްޗޭންބޭރެ' },
-    { input: 'dhoganahadhaa', output: 'ދޮގަނަހަދާ' },
-    { input: 'keruveylhahey', output: 'ކެރުވޭޅަހޭ' },
-    { input: 'ehandhaanugaa', output: 'އެހަނދާނުގާ' },
-    { input: 'farudhaaathun', output: 'ފަރުދާއަތުން' },
-    { input: 'hiyyheyokamaa', output: 'ހިތްހެޔޮކަމާ' },
-    { input: 'naanaathedhey', output: 'ނާނާތެދޭ' },
-    { input: 'unnmeedhuthah', output: 'އުންމީދުތައް' },
-    { input: 'heylhiheylhin', output: 'ހޭޅިހޭޅިން' },
-    { input: 'fahtarubaives', output: 'ފައްޓަރުބައިވެސް' },
-    { input: 'foarihifaaney', output: 'ފޯރިހިފާނޭ' },
-    { input: 'isjeheneethaa', output: 'އިސްޖެހެނީތާ' },
-    { input: 'kehidheefatha', output: 'ކެހިދީފަތަ' },
-    { input: 'reyakuaraaney', output: 'ރެޔަކުއަރާނޭ' },
-    { input: 'fasfahathugaa', output: 'ފަސްފަހަތުގާ' },
-    { input: 'haalaathuehen', output: 'ހާލާތުއެހެން' },
-    { input: 'hoadhannedhey', output: 'ހޯދަންއެދޭ' },
-    { input: 'ihthiyaarugaa', output: 'އިހްތިޔާރުގާ' },
-    { input: 'kaalhuthahais', output: 'ކާޅުތައްއައިސް' },
-    { input: 'loayybahtakaa', output: 'ލޯތްބައްޓަކާ' },
-    { input: 'rahalibeythoa', output: 'ރަހަލިބޭތޯ' },
-    { input: 'subuhaanallah', output: 'ސުބުހާނަﷲ' },
-    { input: 'ahsidhamahuga', output: 'އައްސިދަމަހުގަ' },
-    { input: 'ehaavaruveyey', output: 'އެހާވަރުވެޔޭ' },
-    { input: 'ehbandharekey', output: 'އެއްބަނދަރެކޭ' },
-
-    // 12 characters
-    { input: 'konthaakuhey', output: 'ކޮންތާކުހޭ' },
-    { input: 'mekuhahjahaa', output: 'މެކުހައްޖަހާ' },
-    { input: 'vayyfuraigen', output: 'ވަތްފުރައިގެން' },
-    { input: 'kandaalaanee', output: 'ކަނޑާލާނީ' },
-    { input: 'adufahgandeh', output: 'އަޑުފައްގަނޑެއް' },
-    { input: 'ayythilaigaa', output: 'އަތްތިލައިގާ' },
-    { input: 'baaruhamalaa', output: 'ބާރުހަމަލާ' },
-    { input: 'bahaarumiaee', output: 'ބަހާރުމިއައީ' },
-    { input: 'balakeyolhaa', output: 'ބަލަކެޔޮޅާ' },
-    { input: 'dhaaneemahah', output: 'ދާނީމަހަށް' },
-    { input: 'adhumihingaa', output: 'އަދުމިހިނގާ' },
-    { input: 'baruhandhuge', output: 'ބަރުހަނދުގެ' },
-    { input: 'dhamaahingaa', output: 'ދަމާހިނގާ' },
-    { input: 'dheefaanuhey', output: 'ދީފާނުހޭ' },
-    { input: 'heyokuraaney', output: 'ހެޔޮކުރާނޭ' },
-    { input: 'hiyaavahikan', output: 'ހިޔާވަހިކަން' },
-    { input: 'iruohseythee', output: 'އިރުއޮއްސޭތީ' },
-    { input: 'kettvoakugaa', output: 'ކެޓްވޯކުގާ' },
-    { input: 'nubeleynehen', output: 'ނުބެލޭނެހެން' },
-    { input: 'javaaniheree', output: 'ޖަވާނީހެރީ' },
-    { input: 'nahchilhiyaa', output: 'ނައްޗިޅިޔާ' },
-    { input: 'nujahaanehen', output: 'ނުޖަހާނެހެން' },
-    { input: 'sarahahdhaai', output: 'ސަރަހައްދާއި' },
-    { input: 'shehezaadhaa', output: 'ޝެހެޒާދާ' },
-    { input: 'tharuhadhamu', output: 'ތަރުހަދަމު' },
-    { input: 'shaheedhunnaa', output: 'ޝަހީދުންނާ' },
-    { input: 'meahfinivanee', output: 'މެއައްފިނިވަނީ' },
-    { input: 'seennaruvanoo', output: 'ސީންއަރުވަނޫ' },
-    { input: 'unfollowkeroo', output: 'އަންފޮލޯކެރޫ' },
-    { input: 'dhuniyeehgaa', output: 'ދުނިޔެއެއްގާ' },
-    { input: 'heyokamaaeku', output: 'ހެޔޮކަމާއެކު' },
-    { input: 'ihuthiraamaa', output: 'އިހުތިރާމާ' },
-    { input: 'kakeluhulhun', output: 'ކަކެލުހުޅުން' },
-    { input: 'kakuluhulhun', output: 'ކަކުލުހުޅުން' },
-    { input: 'kulajehumuge', output: 'ކުލަޖެހުމުގެ' },
-    { input: 'mahusharugaa', output: 'މަހުޝަރުގާ' },
-    { input: 'muhsandhikan', output: 'މުއްސަނދިކަން' },
-    { input: 'nahadhaashey', output: 'ނަހަދާށޭ' },
-    { input: 'uhmeedhuthah', output: 'އުއްމީދުތައް' },
-    { input: 'thasveeruhey', output: 'ތަސްވީރުހޭ' },
-    { input: 'fenboahihvey', output: 'ފެންބޯހިތްވޭ' },
-    { input: 'gahuthereyga', output: 'ގަހުތެރޭގަ' },
-    { input: 'isjeheneebaa', output: 'އިސްޖެހެނީބާ' },
-    { input: 'isjeheneehey', output: 'އިސްޖެހެނީހޭ' },
-    { input: 'nikagahukuri', output: 'ނިކަގަހުކުރި' },
-    { input: 'unmeedhuthah', output: 'އުންމީދުތައް' },
-    { input: 'vashuvandhey', output: 'ވަސްހުވަނދޭ' },
-    { input: 'zeenayyvegen', output: 'ޒީނަތްވެގެން' },
-    { input: 'asthaaaeehey', output: 'އަސްތާއައީހޭ' },
-    { input: 'beyrunnaineh', output: 'ބޭރުންއައިނެއް' },
-    { input: 'ishaaraathun', output: 'އިޝާރާތުން' },
-    { input: 'meenishaaney', output: 'މީނިޝާނޭ' },
-    { input: 'ahlaahiahlaa', output: 'އައްލާހިއައްލާ' },
-    { input: 'rannkulaaraa', output: 'ރަންކުލައަރާ' },
-
-    // 12 characters
-    { input: 'shaheedhunaa', output: 'ޝަހީދުނާ' },
-    { input: 'eidkulhivaru', output: 'އީދުކުޅިވަރު' },
-    { input: 'ginasaabahey', output: 'ގިނަސާބަހޭ' },
-    { input: 'seenaruvanoo', output: 'ސީންއަރުވަނޫ' },
-    { input: 'hiyyedheykan', output: 'ހިތްއެދޭކަން' },
-
-    // 11 characters
-    { input: 'meegulshan', output: 'މީގުލްޝަން' },
-    { input: 'aashoahuvee', output: 'އާޝޯހުވީ' },
-    { input: 'ehidhaaney', output: 'އެހިދާނޭ' },
-    { input: 'hiyyufaavaa', output: 'ހިތްއުފާވާ' },
-    { input: 'ihuthiyaaru', output: 'އިޙުތިޔާރު' },
-    { input: 'nuhifannyaa', output: 'ނުހިފަންޔާ' },
-    { input: 'nuruhumugaa', output: 'ނުރުހުމުގާ' },
-    { input: 'nuruhehchey', output: 'ނުރުހެއްޗޭ' },
-    { input: 'nukiahchey', output: 'ނުކިއައްޗޭ' },
-    { input: 'nimidhaaney', output: 'ނިމިދާނޭ' },
-    { input: 'handhaanvey', output: 'ހަނދާންވޭ' },
-    { input: 'javaahiruge', output: 'ޖަވާހިރުގެ' },
-    { input: 'fahathugaaa', output: 'ފަހަތުގާ' },
-    { input: 'fahathugaa', output: 'ފަހަތުގާ' },
-    { input: 'shabaabuga', output: 'ޝަބާބުގަ' },
-    { input: 'aashiqeega', output: 'އާޝިޤީގަ' },
-    { input: 'aashiqyga', output: 'އާޝިޤީގަ' },
-    { input: 'aashiqiga', output: 'އާޝިޤީގަ' },
-    { input: 'aashiqiiga', output: 'އާޝިޤީގަ' },
-    { input: 'aashiqiyga', output: 'އާޝިޤީގަ' },
-    { input: 'ashiqeega', output: 'އާޝިޤީގަ' },
-    { input: 'ashiqyga', output: 'އާޝިޤީގަ' },
-    { input: 'ashiqiga', output: 'އާޝިޤީގަ' },
-    { input: 'ashiqiiga', output: 'އާޝިޤީގަ' },
-    { input: 'ashiqiyga', output: 'އާޝިޤީގަ' },
-    { input: 'nishaanuga', output: 'ނިޝާނުގަ' },
-    { input: 'nishaanga', output: 'ނިޝާނުގަ' },
-    { input: 'nuhurumah', output: 'ނުހުރުމަށް' },
-    { input: 'bahaarekey', output: 'ބަހާރެކޭ' },
-    { input: 'fathihashi', output: 'ފަތިހަށި' },
-    { input: 'thihireehi', output: 'ތިހިރީހި' },
-    { input: 'hiyaalugaa', output: 'ހިޔާލުގާ' },
-    { input: 'oiygoiyvey', output: 'އޮތްގޮތްވެސް' },
-    { input: 'oiygoiyves', output: 'އޮތްގޮތްވެސް' },
-    { input: 'oyygoiyvey', output: 'އޮތްގޮތްވެސް' },
-    { input: 'oyygoiyves', output: 'އޮތްގޮތްވެސް' },
-    { input: 'oyygoyyves', output: 'އޮތްގޮތްވެސް' },
-    { input: 'oiygoyyves', output: 'އޮތްގޮތްވެސް' },
-    { input: 'oiygoyyves', output: 'އޮތްގޮތްވެސް' },
-    { input: 'dheynveebaa', output: 'ދޭންވީބާ' },
-    { input: 'dhirihuri', output: 'ދިރިހުރި' },
-    { input: 'dhushminu', output: 'ދުޝްމިނު' },
-    { input: 'vaahithun', output: 'ވާހިތުން' },
-    { input: 'vaadhuvas', output: 'ވާދުވަސް' },
-    { input: 'faseyhain', output: 'ފަސޭހައިން' },
-    { input: 'mihithuge', output: 'މިހިތުގެ' },
-    { input: 'ihusaasvee', output: 'އިހުސާސްވީ' },
-    { input: 'ihusaasaa', output: 'އިހުސާސާ' },
-    { input: 'ihusaasey', output: 'އިހުސާސޭ' },
-    { input: 'dhehithugaa', output: 'ދެހިތުގާ' },
-    { input: 'dhushminaa', output: 'ދުޝްމިނާ' },
-    { input: 'dhushminun', output: 'ދުޝްމިނުން' },
-    { input: 'faseyhakun', output: 'ފަސޭހަކުން' },
-    { input: 'faseyhekey', output: 'ފަސޭހެކޭ' },
-    { input: 'bahaareiy', output: 'ބަހާރެއް' },
-    { input: 'bahaareii', output: 'ބަހާރެއް' },
-    { input: 'haqeeqayy', output: 'ހަޤީގަތް' },
-    { input: 'haqeeqaiy', output: 'ހަޤީގަތް' },
-    { input: 'haqeeqaii', output: 'ހަޤީގަތް' },
-    { input: 'haqeegayy', output: 'ހަޤީގަތް' },
-    { input: 'haqeegaiy', output: 'ހަޤީގަތް' },
-    { input: 'haqeegaii', output: 'ހަޤީގަތް' },
-    { input: 'hageegayy', output: 'ހަޤީގަތް' },
-    { input: 'hageegaiy', output: 'ހަޤީގަތް' },
-    { input: 'hageegaii', output: 'ހަޤީގަތް' },
-    { input: 'hageeqayy', output: 'ހަޤީގަތް' },
-    { input: 'hageeqaiy', output: 'ހަޤީގަތް' },
-    { input: 'hageeqaii', output: 'ހަޤީގަތް' },
-    { input: 'nimidhaaney', output: 'ނިމިދާނޭ' },
-    { input: 'nimidhaanee', output: 'ނިމިދަނީ' },
-    { input: 'nimidhaany', output: 'ނިމިދަނީ' },
-    { input: 'dhaanveehey', output: 'ދާންވީހޭ' },
-    { input: 'bodujaagaeh', output: 'ބޮޑުޖާގައެއް' },
-    { input: 'mavaalhahey', output: 'މަވާޅަހޭ' },
-    { input: 'beykaaruhey', output: 'ބޭކާރުހޭ' },
-    { input: 'eheevaashey', output: 'އެހީވާށޭ' },
-    { input: 'roanjehenee', output: 'ރޯންޖެހެނީ' },
-    { input: 'athuhurilaa', output: 'އަތުހުރިލާ' },
-    { input: 'dhaneefahah', output: 'ދަނީފަހަށް' },
-    { input: 'dhiveheenge', output: 'ދިވެހީންގެ' },
-    { input: 'dhoanihifaa', output: 'ދޯނިހިފާ' },
-    { input: 'ennkeyolhaa', output: 'އެންކެޔޮޅާ' },
-    { input: 'faarayahves', output: 'ފާރަޔައްވެސް' },
-    { input: 'fennthaaheh', output: 'ފެންތާހެއް' },
-    { input: 'hiyyedhemey', output: 'ހިތްއެދެމޭ' },
-    { input: 'hiyyheyokoh', output: 'ހިތްހެޔޮކޮށް' },
-    { input: 'hiyymaveyey', output: 'ހިތްމަވެޔޭ' },
-    { input: 'hiyyvarakaa', output: 'ހިތްވަރަކާ' },
-    { input: 'ihuthiraamu', output: 'އިހުތިރާމު' },
-    { input: 'irushaadhee', output: 'އިރުޝާދީ' },
-    { input: 'islaahuveee', output: 'އިސްލާހުވީއެ' },
-    { input: 'mageyhaaley', output: 'މަގޭހާލޭ' },
-    { input: 'mageyhithaa', output: 'މަގޭހިތާ' },
-    { input: 'naasheedhun', output: 'ނަޝީދުން' },
-    { input: 'biruheevefa', output: 'ބިރުހީވެފަ' },
-    { input: 'boakeyogahu', output: 'ބޯކެޔޮގަހު' },
-    { input: 'dhiyahihkaa', output: 'ދިޔަހިއްކާ' },
-    { input: 'faharuvumun', output: 'ފަހަރުވުމުން' },
-    { input: 'fennaneehey', output: 'ފެންނަނީހޭ' },
-    { input: 'goahehnethi', output: 'ގޯހެއްނެތި' },
-    { input: 'aashoahuvey', output: 'އާޝޯހުވޭ' },
-    { input: 'ahaaleethee', output: 'އަހާލީތީ' },
-    { input: 'ahannmadhaa', output: 'އަހަންމަދާ' },
-    { input: 'balannothee', output: 'ބަލަންއޮތީ' },
-    { input: 'dhakandhaai', output: 'ދަކަނދާއި' },
-    { input: 'eyhameyshaa', output: 'އޭހަމޭޝާ' },
-    { input: 'fahayybalaa', output: 'ފަހަތްބަލާ' },
-    { input: 'fehtihindhu', output: 'ފެއްޓިހިނދު' },
-    { input: 'gulshanugaa', output: 'ގުލްޝަނުގާ' },
-    { input: 'hahsafaharu', output: 'ހައްސަފަހަރު' },
-    { input: 'hassafaharu', output: 'ހައްސަފަހަރު' },
-    { input: 'hiyyedheyey', output: 'ހިތްއެދޭ' },
-    { input: 'hiyyheyokan', output: 'ހިޔްހެޔޮކަން' },
-    { input: 'ihvaaladhey', output: 'އިއްވާލަދޭ' },
-    { input: 'loayybaaeku', output: 'ލޯތްބާއެކު' },
-    { input: 'seariouskoh', output: 'ސީރިއަސްކޮށް' },
-    { input: 'singiribana', output: 'ސިނގިރިބަނަ' },
-    { input: 'thagudheeru', output: 'ތަގުދީރު' },
-    { input: 'vashuvandhu', output: 'ވަސްހުވަނދު' },
-    { input: 'verishaahee', output: 'ވެރިޝާހީ' },
-    { input: 'yaahuvahlaa', output: 'ޔާހުވައްލާ' },
-    { input: 'aduihvaalaa', output: 'އަޑުއިއްވާލާ' },
-    { input: 'dhaaberaaoo', output: 'ދާބެރާއޫ' },
-    { input: 'fasfahathun', output: 'ފަސްފަހަތުން' },
-    { input: 'fenilaaneey', output: 'ފެނިލާނެއޭ' },
-    { input: 'funnefushah', output: 'ފުންއެފުށަށް' },
-    { input: 'hekivaaneey', output: 'ހެކިވާނެއޭ' },
-    { input: 'hithaameyah', output: 'ހިތާމެޔަށް' },
-    { input: 'nukulhedhey', output: 'ނުކުޅެދޭ' },
-    { input: 'aashigaayah', output: 'އާޝިގާޔަށް' },
-    { input: 'alikannaraa', output: 'އަލިކަންއަރާ' },
-    { input: 'eesahureyey', output: 'އީސަހުރެޔޭ' },
-    { input: 'feydheyaraa', output: 'ފޭދޭއަރާ' },
-    { input: 'nishaanaaye', output: 'ނިޝާނާޔެ' },
-
-    { input: 'ihusaasugaa', output: 'އިހުސާސުގާ' },
-
-    // 10 characters
-    { input: 'keyyvaanee', output: 'ކެތްވާނީ' },
-    { input: 'keiyvaanee', output: 'ކެތްވާނީ' },
-    { input: 'keiivaanee', output: 'ކެތްވާނީ' },
-    { input: 'keyyvaany', output: 'ކެތްވާނީ' },
-    { input: 'keiyvaany', output: 'ކެތްވާނީ' },
-    { input: 'keiivaany', output: 'ކެތްވާނީ' },
-    { input: 'keyyvaanii', output: 'ކެތްވާނީ' },
-    { input: 'keiyvaanii', output: 'ކެތްވާނީ' },
-    { input: 'keiivaanii', output: 'ކެތްވާނީ' },
-    { input: 'kihinakun', output: 'ކިހިނަކުން' },
-    { input: 'gulshanun', output: 'ގުލްޝަނުން' },
-    { input: 'udhuhenee', output: 'އުދުހެނީ' },
-    { input: 'udhuheny', output: 'އުދުހެނީ' },
-    { input: 'udhuhunee', output: 'އުދުހުނީ' },
-    { input: 'udhuhuny', output: 'އުދުހުނީ' },
-    { input: 'ahaalanves', output: 'އަހާލަންވެސް' },
-    { input: 'faharehgaa', output: 'ފަހަރެއްގާ' },
-    { input: 'farivaahaa', output: 'ފަރިވާހާ' },
-    { input: 'libaahakaa', output: 'ލިބާހަކާ' },
-    { input: 'bilaahakah', output: 'ބިލާހަކަށް' },
-    { input: 'bilaahekey', output: 'ބިލާހެކޭ' },
-    { input: 'dhaahithun', output: 'ދާހިތުން' },
-    { input: 'handhaanun', output: 'ހަނދާނުން' },
-    { input: 'handhaaney', output: 'ހަނދާނޭ' },
-    { input: 'bahaarugaa', output: 'ބަހާރުގާ' },
-    { input: 'javaahirah', output: 'ޖަވާހިރަށް' },
-    { input: 'fahathun', output: 'ފަހަތުން' },
-    { input: 'shabaabun', output: 'ޝަބާބުން' },
-    { input: 'shabunam', output: 'ޝަބުނަމު' },
-    { input: 'thakaholhi', output: 'ތަކަހޮޅި' },
-    { input: 'thahuniyaa', output: 'ތަހުނިޔާ' },
-    { input: 'nishaanun', output: 'ނިޝާނުން' },
-    { input: 'nishaanaa', output: 'ނިޝާނާ' },
-    { input: 'roohudhey', output: 'ރޫހުދޭ' },
-    { input: 'roohdhey', output: 'ރޫހުދޭ' },
-    { input: 'bahaarun', output: 'ބަހާރުން' },
-    { input: 'kerihure', output: 'ކެރިހުރެ' },
-    { input: 'hurumah', output: 'ހުރުމަށް' },
-    { input: 'kuranvvyy', output: 'ކުރަންވީ' },
-    { input: 'kuranvvii', output: 'ކުރަންވީ' },
-    { input: 'kuranvvee', output: 'ކުރަންވީ' },
-    { input: 'furanvvyy', output: 'ފުރަންވީ' },
-    { input: 'furanvvii', output: 'ފުރަންވީ' },
-    { input: 'furanvvee', output: 'ފުރަންވީ' },
-    { input: 'halheylyy', output: 'ހަޅޭލީ' },
-    { input: 'halheylii', output: 'ހަޅޭލީ' },
-    { input: 'halheylee', output: 'ހަޅޭލީ' },
-    { input: 'jahaalyy', output: 'ޖަހާލީ' },
-    { input: 'jahaalii', output: 'ޖަހާލީ' },
-    { input: 'jahaalee', output: 'ޖަހާލީ' },
-    { input: 'keyolhubey', output: 'ކެޔޮޅުބޭ' },
-    { input: 'keyolhube', output: 'ކެޔޮޅުބެ' },
-    { input: 'bahaareyy', output: 'ބަހާރެއް' },
-    { input: 'bahaarei', output: 'ބަހާރެއް' },
-    { input: 'ummeedhun', output: 'އުންމީދުން' },
-    { input: 'unmeedhun', output: 'އުންމީދުން' },
-    { input: 'mehefilu', output: 'މެހެފިލު' },
-    { input: 'kihineii', output: 'ކިހިނެތް' },
-    { input: 'kihineiy', output: 'ކިހިނެތް' },
-    { input: 'kihineyy', output: 'ކިހިނެތް' },
-    { input: 'fathihashi', output: 'ފަތިހަށި' },
-    { input: 'thihireehi', output: 'ތިހިރީހި' },
-    { input: 'hiyaalugaa', output: 'ހިޔާލުގާ' },
-    { input: 'dhehithuga', output: 'ދެހިތުގަ' },
-    { input: 'hedhihuri', output: 'ހެދިހުރި' },
-    { input: 'edhihuri', output: 'އެދިހުރި' },
-    { input: 'jehilunve', output: 'ޖެހިލުންވެ' },
-    { input: 'libihuri', output: 'ލިބިހުރި' },
-    { input: 'vaagoiyve', output: 'ވާގޮތްވެ' },
-    { input: 'handhaaey', output: 'ހަނދާއޭ' },
-    { input: 'reethihaa', output: 'ރީތިހާ' },
-    { input: 'loaiyhbey', output: 'ލޯތްބޭ' },
-    { input: 'kiivvehey', output: 'ކީއްވެހޭ' },
-    { input: 'keehvehey', output: 'ކީއްވެހޭ' },
-    { input: 'nuruhihje', output: 'ނުރުހިއްޖެ' },
-    { input: 'haadhahaa', output: 'ހާދަހާ' },
-    { input: 'ehindhun', output: 'އެހިނދުން' },
-    { input: 'shakuvaa', output: 'ޝަކުވާ' },
-    { input: 'kaakuhey', output: 'ކާކުހޭ' },
-    { input: 'kiiwehey', output: 'ކީއްވެހޭ' },
-    { input: 'roalumun', output: 'ރޯލުމުން' },
-    { input: 'roalumum', output: 'ރޯލުމުން' },
-    { input: 'roa lumun', output: 'ރޯލުމުން' },
-    { input: 'roa lumum', output: 'ރޯލުމުން' },
-    { input: 'kannfulheh', output: 'ކަންފުޅެއް' },
-    { input: 'hallgaige', output: 'ހަލްގައިގެ' },
-    { input: 'kihaadhera', output: 'ކިހާދެރަ' },
-    { input: 'mahinithun', output: 'މަހިނިތުން' },
-    { input: 'nimeneehey', output: 'ނިމެނީހޭ' },
-    { input: 'vaaneygoii', output: 'ވާނޭގޮތް' },
-    { input: 'vaaneygoiy', output: 'ވާނޭގޮތް' },
-    { input: 'vaaneygoyy', output: 'ވާނޭގޮތް' },
-    { input: 'vaazahamun', output: 'ވާޒަހަމުން' },
-    { input: 'varihamaey', output: 'ވަރިހަމައޭ' },
-    { input: 'adhuhunnan', output: 'އަދުހުންނަން' },
-    { input: 'beeheneeey', output: 'ބީހެނީއޭ' },
-    { input: 'iruohsigen', output: 'އިރުއޮއްސިގެން' },
-    { input: 'kendeygoyy', output: 'ކެނޑޭގޮތް' },
-    { input: 'dhuvahehga', output: 'ދުވަހެއްގަ' },
-    { input: 'enkeyolhaa', output: 'އެންކެޔޮޅާ' },
-    { input: 'foariehvaa', output: 'ފޯރިއެއްވާ' },
-    { input: 'huhtihurin', output: 'ހުއްޓިހުރިން' },
-    { input: 'ihuthiraam', output: 'އިހުތިރާމު' },
-    { input: 'sarahahdhu', output: 'ސަރަހައްދު' },
-    { input: 'thahaaneee', output: 'ތަހާނީއެ' },
-    { input: 'goahehneth', output: 'ގޯހެއްނެތި' },
-    { input: 'udhuhunuhaa', output: 'އުދުހުނުހާ' },
-    { input: 'uthureygoyy', output: 'އުތުރޭގޮތް' },
-    { input: 'varuhashee', output: 'ވަރުހަށީ' },
-    { input: 'aashigaaey', output: 'އާޝިގާއޭ' },
-    { input: 'ayymahchah', output: 'އަތްމައްޗަށް' },
-    { input: 'baruhandhu', output: 'ބަރުހަނދު' },
-    { input: 'ethahethah', output: 'އެތައްއެތައް' },
-    { input: 'hiyyhithaa', output: 'ހިތްހިތާ' },
-    { input: 'hovaakeyoa', output: 'ހޮވާކެޔޯ' },
-    { input: 'ishaaraaiy', output: 'އިޝާރާތް' },
-    { input: 'ishaaraayy', output: 'އިޝާރާތް' },
-    { input: 'jahaaindhe', output: 'ޖަހާއިނދެ' },
-    { input: 'meeruhumun', output: 'މީރުހުމުން' },
-    { input: 'mihenmihen', output: 'މިހެންމިހެން'},
-    { input: 'shoahuvevi', output: 'ޝޯހުވެވި' },
-    { input: 'vihsaaraee', output: 'ވިއްސާރައީ' },
-    { input: 'vihsaaraey', output: 'ވިއްސާރައޭ' },
-    { input: 'vissaaraee', output: 'ވިއްސާރައީ' },
-    { input: 'vissaaraey', output: 'ވިއްސާރައޭ' },
-    { input: 'hiyyvarulaa', output: 'ހިތްވަރުލާ' },
-    { input: 'jahaajaahaa', output: 'ޖަހާޖަހާ' },
-    { input: 'heyovaruvee', output: 'ހެޔޮވަރުވީ' },
-    { input: 'reethivihaa', output: 'ރީތިވިހާ' },
-    { input: 'kiyeyyvehey', output: 'ކިޔެތްވެހޭ' },
-    { input: 'messengerin', output: 'މެސެންޖާއިން' },
-    { input: 'nidheyneyhe', output: 'ނިދޭނޭހެ' },
-    { input: 'searchkeroo', output: 'ސާޗުކެރޫ' },
-    { input: 'avahakerey', output: 'އަވަހަކެރޭ' },
-    { input: 'ahanmadhaa', output: 'އަހަންމަދާ' },
-    { input: 'ahannmadhu', output: 'އަހަންމަދު' },
-    { input: 'bodumahuge', output: 'ބޮޑުމަހުގެ' },
-    { input: 'dhiyaeehey', output: 'ދިޔައީހޭ' },
-    { input: 'eedhumajaa', output: 'އީދުމަޖާ' },
-    { input: 'dhiyaihyaa', output: 'ދިޔައިއްޔާ' },
-    { input: 'ehbaarulaa', output: 'އެއްބާރުލާ' },
-    { input: 'eheevaaney', output: 'އެހީވާނޭ' },
-    { input: 'ehkalagoyy', output: 'އެއްކަލަގޮތް' },
-    { input: 'feyshalves', output: 'ފޭޝަލްވެސް' },
-    { input: 'hendhuthee', output: 'ހެންދުތީ' },
-    { input: 'javaahiraa', output: 'ޖަވާހިރާ' },
-    { input: 'mahuloogeh', output: 'މަހުލޫގެއް' },
-    { input: 'eyhuvahlaa', output: 'އޭހުވައްލާ' },
-    { input: 'bandiyaaah', output: 'ބަނޑިޔާއަށް' },
-    { input: 'boahiyyvey', output: 'ބޯހިތްވޭ' },
-    { input: 'ehindhugaa', output: 'އެހިނދުގާ' },
-    { input: 'fahnihifaa', output: 'ފައްނިހިފާ' },
-    { input: 'fahtarubai', output: 'ފައްޓަރުބައި' },
-    { input: 'foarihifaa', output: 'ފޯރިހިފާ' },
-    { input: 'gahutherey', output: 'ގަހުތެރޭ' },
-    { input: 'hithaharaa', output: 'ހިތައްއަރާ' },
-    { input: 'kehidheefa', output: 'ކެހިދީފަ' },
-    { input: 'keyymashah', output: 'ކެތްމަށަށް' },
-    { input: 'dhuiaaakee', output: 'ދުޢާއަކީ' },
-    { input: 'ehdhuvahun', output: 'އެއްދުވަހުން' },
-    { input: 'ihusaaskoh', output: 'އިހުސާސްކޮށް' },
-    { input: 'mashoadhan', output: 'މަސްހޯދަން' },
-    { input: 'ahaaleemee', output: 'އަހާލީމީ' },
-    { input: 'ehenvihyaa', output: 'އެހެންވިއްޔާ' },
-    { input: 'eyhithaaey', output: 'އޭހިތާއޭ' },
-    { input: 'iabeeruhey', output: 'ޢަބީރުހޭ' },
-    { input: 'ihthiyaaru', output: 'އިހްތިޔާރު' },
-    { input: 'ihvaalihaa', output: 'އިއްވާލިހާ' },
-    { input: 'kuramaahey', output: 'ކުރަމާހޭ' },
-    { input: 'lhiyaalhaa', output: 'ޅިޔައަޅާ' },
-    { input: 'medhugeyah', output: 'މެދުގެޔަށް' },
-    { input: 'ahaalaaney', output: 'އަހާލާނޭ' },
-    { input: 'ihvaanamey', output: 'އިއްވާނަމޭ' },
-    { input: 'maashaahee', output: 'މާޝާހީ' },
-    { input: 'pareeehhey', output: 'ޕަރީއެއްހޭ' },
-    { input: 'restaurant', output: 'ރެސްޓޯރެންޓް' },
-    { input: 'meethedhey', output: 'މީތެދޭ' },
-    { input: 'iruohsumaa', output: 'އިރުއޮއްސުމާ' },
-
-    // 10 characters
-    { input: 'fanihedhee', output: 'ފަނިހެދީ' },
-    { input: 'eahhoadhaa', output: 'އެއައްހޯދާ' },
-    { input: 'bashuhtifa', output: 'ބަސްހުއްޓިފަ' },
-    { input: 'beehilumah', output: 'ބީހިލުމަށް' },
-    { input: 'beehilumun', output: 'ބީހިލުމުން' },
-    { input: 'edhuvahuge', output: 'އެދުވަހުގެ' },
-    { input: 'foohinethi', output: 'ފޫހިނެތި' },
-    { input: 'foohinuvey', output: 'ފޫހިނުވޭ' },
-    { input: 'goyyvedhaa', output: 'ގޮތްވެދާ' },
-    { input: 'gulshanuge', output: 'ގުލްޝަނުގެ' },
-    { input: 'hamahimeyn', output: 'ހަމަހިމޭން' },
-    { input: 'handhaaneh', output: 'ހަނދާނެތް' },
-    { input: 'hashinagaa', output: 'ހަށިނަގާ' },
-    { input: 'islaahuvee', output: 'އިސްލާހުވީ' },
-    { input: 'jahaalaifi', output: 'ޖަހާލައިފި' },
-    { input: 'kukulhuhaa', output: 'ކުކުޅުހާ' },
-    { input: 'mathihashi', output: 'މަތިހަށި' },
-    { input: 'meeruvahaa', output: 'މީރުވަހާ' },
-    { input: 'mekuhugaey', output: 'މެކުހުގައޭ' },
-    { input: 'mihaarugaa', output: 'މިހާރުގާ' },
-    { input: 'neyvaaaraa', output: 'ނޭވާއަރާ' },
-    { input: 'rulhiahove', output: 'ރުޅިއަށްއޮވެ' },
-    { input: 'udhuheyiru', output: 'އުދުހޭއިރު' },
-    { input: 'ukaadheyey', output: 'އުކާދެޔޭ' },
-    { input: 'vahunndhoa', output: 'ވަހުންދޯ' },
-    { input: 'veveynehen', output: 'ވެވޭނެހެން' },
-    { input: 'bolahjahaa', output: 'ބޮލައްޖަހާ' },
-    { input: 'facebookun', output: 'ފޭސްބުކުން' },
-    { input: 'fehikulain', output: 'ފެހިކުލައިން' },
-    { input: 'gayahjahaa', output: 'ގަޔައްޖަހާ' },
-    { input: 'hiyythakun', output: 'ހިތްތަކުން' },
-    { input: 'ilhaamakun', output: 'އިލްހާމަކުން' },
-    { input: 'kandaalhan', output: 'ކަނޑައަޅަން' },
-    { input: 'rayykulain', output: 'ރަތްކުލައިން' },
-    { input: 'shaheedhee', output: 'ޝަހީދީ' },
-    { input: 'thiyahuree', output: 'ތިޔަހުރީ' },
-    { input: 'kieyyvehey', output: 'ކިއެއްވެހޭ' },
-    { input: 'kiyehvehey', output: 'ކިޔެއްވެހޭ' },
-    { input: 'kihinehhey', output: 'ކިހިނެތްހޭ' },
-    { input: 'mihiyyekee', output: 'މިހިތްއެކީ' },
-    { input: 'miihusaasu', output: 'މިއިހުސާސު' },
-    { input: 'mithuraaah', output: 'މިތުރާއަށް' },
-    { input: 'naathedhey', output: 'ނާތެދޭ' },
-    { input: 'raahathuvi', output: 'ރާހަތުވި' },
-    { input: 'ulhemaahey', output: 'އުޅެމާހޭ' },
-
-    // 9 characters
-    { input: 'keyytheri', output: 'ކެތްތެރި' },
-    { input: 'keiytheri', output: 'ކެތްތެރި' },
-    { input: 'keiitheri', output: 'ކެތްތެރި' },
-    { input: 'hiyyheyo', output: 'ހިތްހެޔޮ' },
-    { input: 'jeheyshey', output: 'ޖެހޭށޭ' },
-    { input: 'gulshaney', output: 'ގުލްޝަނޭ' },
-    { input: 'hiyymagey', output: 'ހިތްމަގޭ' },
-    { input: 'rahttehin', output: 'ރައްޓެހިން' },
-    { input: 'thasbeeha', output: 'ތަސްބީހަ' },
-    { input: 'bondibayy', output: 'ބޮނޑިބަތް' },
-    { input: 'bondibaiy', output: 'ބޮނޑިބަތް' },
-    { input: 'bondibaii', output: 'ބޮނޑިބަތް' },
-    { input: 'eyyveemaa', output: 'އެއްވީމާ' },
-    { input: 'eiiveemaa', output: 'އެއްވީމާ' },
-    { input: 'gulhaarun', output: 'ގުލްހާރުން' },
-    { input: 'gulhaarey', output: 'ގުލްހާރޭ' },
-    { input: 'nuruhumun', output: 'ނުރުހުމުން' },
-    { input: 'nuruhunee', output: 'ނުރުހުނީ' },
-    { input: 'raheyngoa', output: 'ރަހޭންގޯ' },
-    { input: 'vehurumaa', output: 'ވެހުރުމާ' },
-    { input: 'nuhurumaa', output: 'ނުހުރުމާ' },
-    { input: 'beygaraar', output: 'ބޭގަރާރު' },
-    { input: 'thinoahaa', output: 'ތިނޯހާ' },
-    { input: 'faleehaiy', output: 'ފަލީހަތް' },
-    { input: 'faleehayy', output: 'ފަލީހަތް' },
-    { input: 'faleehaii', output: 'ފަލީހަތް' },
-    { input: 'eesabeyaa', output: 'އީސަބެޔާ' },
-    { input: 'dhuvahey', output: 'ދުވަހޭ' },
-    { input: 'aashoahey', output: 'އާޝޯހޭ' },
-    { input: 'faruhilan', output: 'ފަރުހިލަން' },
-    { input: 'faruhilun', output: 'ފަރުހިލުން' },
-    { input: 'nuruhuney', output: 'ނުރުހުނޭ' },
-    { input: 'fursatheh', output: 'ފުރުސަތެއް' },
-    { input: 'harakaaiy', output: 'ހަރަކާތް' },
-    { input: 'mihuthuge', output: 'މިހިތުގެ' },
-    { input: 'nimidhaan', output: 'ނިމިދާން' },
-    { input: 'bilaaheh', output: 'ބިލާހެއް' },
-    { input: 'zindhagee', output: 'ޒިންދަގީ' },
-    { input: 'zindhagy', output: 'ޒިންދަގީ' },
-    { input: 'zindhagi', output: 'ޒިންދަގީ' },
-    { input: 'zindhagii', output: 'ޒިންދަގީ' },
-    { input: 'zindhagiy', output: 'ޒިންދަގީ' },
-    { input: 'roohudhiy', output: 'ރޫހުދީ' },
-    { input: 'javaahiru', output: 'ޖަވާހިރު' },
-    { input: 'javaahir', output: 'ޖަވާހިރު' },
-    { input: 'keyolhaku', output: 'ކެޔޮޅަކު' },
-    { input: 'shabaab', output: 'ޝަބާބު' },
-    { input: 'shabaabu', output: 'ޝަބާބު' },
-    { input: 'bahaaru', output: 'ބަހާރު' },
-    { input: 'bahaar', output: 'ބަހާރު' },
-    { input: 'dhivehi', output: 'ދިވެހި' },
-    { input: 'rihiveli', output: 'ރިހިވެލި' },
-    { input: 'fekikan', output: 'ފެހިކަން' },
-    { input: 'roohdhee', output: 'ރޫހުދީ' },
-    { input: 'roohdhy', output: 'ރޫހުދީ' },
-    { input: 'roohdhii', output: 'ރޫހުދީ' },
-    { input: 'roohdhi', output: 'ރޫހުދީ' },
-    { input: 'roohudhii', output: 'ރޫހުދީ' },
-    { input: 'kuranvvy', output: 'ކުރަންވީ' },
-    { input: 'kuranvyy', output: 'ކުރަންވީ' },
-    { input: 'kuranvee', output: 'ކުރަންވީ' },
-    { input: 'kuranvvi', output: 'ކުރަންވީ' },
-    { input: 'furanvvy', output: 'ފުރަންވީ' },
-    { input: 'furanvyy', output: 'ފުރަންވީ' },
-    { input: 'furanvee', output: 'ފުރަންވީ' },
-    { input: 'furanvvi', output: 'ފުރަންވީ' },
-    { input: 'halheyly', output: 'ހަޅޭލީ' },
-    { input: 'jahaaly', output: 'ޖަހާލީ' },
-    { input: 'mahithah', output: 'މަހިތައް' },
-    { input: 'eyaaruge', output: 'އެވަރުގެ' },
-    { input: 'shuoorun', output: 'ޝުއޫރުން' },
-    { input: 'ummeedhu', output: 'އުންމީދު' },
-    { input: 'unmeedhu', output: 'އުންމީދު' },
-    { input: 'baddhalu', output: 'ބައްދަލު' },
-    { input: 'dhelolah', output: 'ދެލޮލަށް' },
-    { input: 'dhuaayaa', output: 'ދުއާޔާ' },
-    { input: 'duaayaa', output: 'ދުއާޔާ' },
-    { input: 'dhuayaa', output: 'ދުއާޔާ' },
-    { input: 'veymeyey', output: 'ވޭމެޔޭ' },
-    { input: 'nethihey', output: 'ނެތިހޭ' },
-    { input: 'ehvedhee', output: 'އެއްވެދީ' },
-    { input: 'feneyhey', output: 'ފެނޭހޭ' },
-    { input: 'hiyyvaru', output: 'ހިތްވަރު' },
-    { input: 'loayybaa', output: 'ލޯތްބާ' },
-    { input: 'loaiybaa', output: 'ލޯތްބާ' },
-    { input: 'loaiibaa', output: 'ލޯތްބާ' },
-    { input: 'saabahey', output: 'ސާބަހޭ' },
-    { input: 'nuveyhey', output: 'ނުވޭހޭ' },
-    { input: 'haahekey', output: 'ހާހެކޭ' },
-    { input: 'meehunaa', output: 'މީހުނާ' },
-    { input: 'meehakaa', output: 'މީހަކާ' },
-    { input: 'meehekey', output: 'މީހެކޭ' },
-    { input: 'shaairu', output: 'ޝާއިރު' },
-    { input: 'kulhelii', output: 'ކުޅެލީ' },
-    { input: 'kulhelee', output: 'ކުޅެލީ' },
-    { input: 'mehefil', output: 'މެހެފިލު' },
-    { input: 'keheynii', output: 'ކެހޭނީ' },
-    { input: 'keheynee', output: 'ކެހޭނީ' },
-    { input: 'jahanee', output: 'ޖަހާނީ' },
-    { input: 'jahanii', output: 'ޖަހާނީ' },
-    { input: 'zeenaiiy', output: 'ޒީނަތް' },
-    { input: 'loiybaa', output: 'ލޯތްބާ' },
-    { input: 'loyybaa', output: 'ލޯތްބާ' },
-    { input: 'loiibaa', output: 'ލޯތްބާ' },
-    { input: 'udhuhey', output: 'އުދުހޭ' },
-    { input: 'ulheyhaa', output: 'އުޅޭހާ' },
-    { input: 'hurihaa', output: 'ހުރިހާ' },
-    { input: 'fathihaa', output: 'ފަތިހާ' },
-    { input: 'midhaahaa', output: 'މިދާހާ' },
-    { input: 'fihijjey', output: 'ފިހިއްޖޭ' },
-    { input: 'afreenneh', output: 'އަފުރީންނެއް' },
-    { input: 'thahithun', output: 'ތަހިތުން' },
-    { input: 'ehandhaan', output: 'އެހަނދާން' },
-    { input: 'dhuvahaku', output: 'ދުވަހަކު' },
-    { input: 'dhuniyeah', output: 'ދުނިޔެއަށް' },
-    { input: 'biruheeve', output: 'ބިރުހީވެ' },
-    { input: 'dhoannyah', output: 'ދޯންޔަށް' },
-    { input: 'enmihuree', output: 'އެންމިހުރީ' },
-    { input: 'goyyvumun', output: 'ގޮތްވުމުން' },
-    { input: 'hamaheyga', output: 'ހަމަހޭގަ' },
-    { input: 'neyngifaa', output: 'ނޭނގިފާ' },
-    { input: 'nujehumaa', output: 'ނުޖެހުމާ' },
-    { input: 'maruhabaa', output: 'މަރުހަބާ' },
-    { input: 'adhuhaalu', output: 'އަދުހާލު' },
-    { input: 'annbeyyge', output: 'އަންބެތްގެ' },
-    { input: 'balaahiyy', output: 'ބަލާހިތް' },
-    { input: 'burujahaa', output: 'ބުރުޖަހާ' },
-    { input: 'fasfahayy', output: 'ފަސްފަހަތް' },
-    { input: 'fathihuge', output: 'ފަތިހުގެ' },
-    { input: 'gehleyhen', output: 'ގެއްލޭހެން' },
-    { input: 'harakaayy', output: 'ހަރަކާތް' },
-    { input: 'hiyyvanee', output: 'ހިތްވަނީ' },
-    { input: 'jahaashey', output: 'ޖަހާށޭ' },
-    { input: 'kunikahaa', output: 'ކުނިކަހާ' },
-    { input: 'kurehifaa', output: 'ކުރެހިފާ' },
-    { input: 'mageyhiyy', output: 'މަގޭހިތް' },
-    { input: 'nuheylevi', output: 'ނުހޭލެވި' },
-    { input: 'rihifazaa', output: 'ރިހިފަޒާ' },
-    { input: 'ruhiehbas', output: 'ރުހިއެއްބަސް' },
-    { input: 'sakaraayy', output: 'ސަކަރާތް' },
-    { input: 'dhiveheen', output: 'ދިވެހީން' },
-    { input: 'heeheefaa', output: 'ހީހީފާ' },
-    { input: 'vaahidhun', output: 'ވާހިނދުން' },
-    { input: 'mihasthee', output: 'މިހަސްތީ' },
-    { input: 'heyofalaa', output: 'ހެޔޮފަލާ' },
-    { input: 'jehevifaa', output: 'ޖެހެވިފާ' },
-    { input: 'thahaanee', output: 'ތަހާނީ' },
-    { input: 'ihvaadhee', output: 'އިއްވާދީ' },
-    { input: 'ruheythee', output: 'ރުހޭތީ' },
-    { input: 'boahooraa', output: 'ބޯހޫރާ' },
-    { input: 'dhehitheh', output: 'ދެހިތެއް' },
-    { input: 'dhonjanbu', output: 'ދޮންޖަންބު' },
-    { input: 'alhaagoyy', output: 'އަޅާގޮތް' },
-    { input: 'fiyajahaa', output: 'ފިޔަޖަހާ' },
-    { input: 'gohorugey', output: 'ގޮހޮރުގޭ' },
-    { input: 'janbumagu', output: 'ޖަންބުމަގު' },
-    { input: 'jeheethaa', output: 'ޖެހީތާ' },
-    { input: 'loahooraa', output: 'ލޯހޫރާ' },
-    { input: 'meysihihi', output: 'މޭސިހިސިހި' },
-    { input: 'oyythanun', output: 'އޮތްތަނުން' },
-    { input: 'thihitheh', output: 'ތިހިތެއް' },
-    { input: 'roashanee', output: 'ރޯޝަނީ' },
-    { input: 'roashaney', output: 'ރޯޝަނޭ' },
-    { input: 'vilaarayy', output: 'ވިލާރަތް' },
-    { input: 'heyovarey', output: 'ހެޔޮވަރޭ' },
-    { input: 'thiyahara', output: 'ތިޔަހަރަ' },
-    { input: 'unnbulbul', output: 'އުންބުލްބުލް' },
-    { input: 'udhuhilaa', output: 'އުދުހިލާ' },
-    { input: 'vahunnves', output: 'ވަހުންވެސް' },
-    { input: 'fashaavaa', output: 'ފަސްހާވާ' },
-    { input: 'dhahkamun', output: 'ދައްކަމުން' },
-    { input: 'ayythakun', output: 'އަތްތަކުން' },
-    { input: 'dhamaahey', output: 'ދަމާހޭ' },
-    { input: 'fennjahaa', output: 'ފެންޖަހާ' },
-    { input: 'hiyyedhey', output: 'ހިތްއެދޭ' },
-    { input: 'hiyygaimu', output: 'ހިތްގައިމު' },
-    { input: 'irushaadh', output: 'އިރުޝާދު' },
-    { input: 'nuhoadhaa', output: 'ނުހޯދާ' },
-    { input: 'nuvadhiha', output: 'ނުވަދިހަ' },
-    { input: 'iihzathaa', output: 'އިއްޒަތާ' },
-    { input: 'kiehvehey', output: 'ކިއެއްވެހޭ' },
-    { input: 'mahuroomu', output: 'މަހުރޫމު' },
-    { input: 'messenger', output: 'މެސެންޖާ' },
-    { input: 'meyaahiyy', output: 'މެޔާހިތް' },
-    { input: 'shoahukoh', output: 'ޝޯހުކޮށް' },
-    { input: 'vaibaaves', output: 'ވައިބާވެސް' },
-    { input: 'ahaaliyey', output: 'އަހާލިޔޭ' },
-    { input: 'ahanmadhu', output: 'އަހަންމަދު' },
-    { input: 'aharudhoa', output: 'އަހަރުދޯ' },
-    { input: 'dhireyhaa', output: 'ދިރޭހާ' },
-    { input: 'eloayybaa', output: 'އެލޯތްބާ' },
-    { input: 'gurahaige', output: 'ގުރަހައިގެ' },
-    { input: 'heyokamaa', output: 'ހެޔޮކަމާ' },
-    { input: 'hiyybuney', output: 'ހިތްބުނޭ' },
-    { input: 'huvandhey', output: 'ހުވަނދޭ' },
-    { input: 'ihvaalaey', output: 'އިއްވާލައޭ' },
-    { input: 'ihvaidhey', output: 'އިއްވައިދޭ' },
-    { input: 'ivvaidhey', output: 'އިއްވައިދޭ' },
-    { input: 'kashikeyo', output: 'ކަށިކެޔޮ' },
-    { input: 'kulajehun', output: 'ކުލަޖެހުން' },
-    { input: 'lahanukoh', output: 'ލަހަނުކޮށް' },
-    { input: 'maavaharu', output: 'މާވަހަރު' },
-    { input: 'mahshooru', output: 'މައްޝޫރު' },
-    { input: 'mahusharu', output: 'މަހުޝަރު' },
-    { input: 'malhaarey', output: 'މަލްހާރޭ' },
-    { input: 'mihaadhen', output: 'މިހާދެން' },
-    { input: 'miihusaas', output: 'މިއިހުސާސް' },
-    { input: 'muhsandhi', output: 'މުއްސަނދި' },
-    { input: 'nannolhun', output: 'ނަންއޮޅުން' },
-    { input: 'rahameeru', output: 'ރަހަމީރު' },
-    { input: 'rangalhah', output: 'ރަނގަޅަށް' },
-    { input: 'vedhaahaa', output: 'ވެދާލާ' },
-    { input: 'mihiyyvee', output: 'މިހިތްވީ' },
-    { input: 'uhmeeedhu', output: 'އުއްމީދު' },
-    { input: 'baruheysa', output: 'ބަރުހޭސަ' },
-    { input: 'boahihvey', output: 'ބޯހިތްވޭ' },
-    { input: 'ahsidhain', output: 'އައްސިދައިން' },
-    { input: 'ahulihain', output: 'އަހުލިހައިން' },
-    { input: 'ahurenaai', output: 'އަހުރެނާއި' },
-    { input: 'ahyaaruge', output: 'އައްޔާރުގެ' },
-    { input: 'buneenngi', output: 'ބުނެއެންގި' },
-    { input: 'dhiyaihey', output: 'ދިޔައިހޭ' },
-    { input: 'dhoonnyaa', output: 'ދޫންޏާ' },
-    { input: 'eheevamaa', output: 'އެހީވަމާ' },
-    { input: 'kashfuvee', output: 'ކަޝްފުވީ' },
-    { input: 'boduahtah', output: 'ބޮޑުއައްޓަށް' },
-    { input: 'dhefiyaah', output: 'ދެފިޔައައް' },
-    { input: 'eesafulhu', output: 'އީސަފުޅު' },
-    { input: 'eythedhey', output: 'އޭތެދޭ' },
-    { input: 'hurahakaa', output: 'ހުރަހަކާ' },
-    { input: 'maaluneyy', output: 'މާލުނެތް' },
-    { input: 'kashmeeru', output: 'ކަޝްމީރު' },
-    { input: 'nishaaney', output: 'ނިޝާނޭ' },
-
-    { input: 'sundhusee', output: 'ސުންދުސީ' },
-
-    // 8 characters
-    { input: 'aeethoa', output: 'އައީތޯ' },
-    { input: 'gulshan', output: 'ގުލްޝަން' },
-    { input: 'aashoahu', output: 'އާޝޯހު' },
-    { input: 'beyhakee', output: 'ބޭހަކީ' },
-    { input: 'beyhakaa', output: 'ބޭހަކާ' },
-    { input: 'beyhekey', output: 'ބޭހެކޭ' },
-    { input: 'ehveemaa', output: 'އެއްވީމާ' },
-    { input: 'gulhaaru', output: 'ގުލްހާރު' },
-    { input: 'meehakee', output: 'މީހަކީ' },
-    { input: 'meehekey', output: 'މީހެކޭ' },
-    { input: 'meehakaa', output: 'މީހަކާ' },
-    { input: 'partygaa', output: 'ޕާޓީގާ' },
-    { input: 'roohakee', output: 'ރޫހަކީ' },
-    { input: 'roohakaa', output: 'ރޫހަކާ' },
-    { input: 'roohekey', output: 'ރޫހެކޭ' },
-    { input: 'roohakun', output: 'ރޫހަކުން' },
-    { input: 'nanbunan', output: 'ނަންބުނަން' },
-    { input: 'thiyahen', output: 'ތިޔަހެން' },
-    { input: 'dhaahiyy', output: 'ދާހިތް' },
-    { input: 'dhaahih', output: 'ދާހިތް' },
-    { input: 'rahengoa', output: 'ރަހެންގޯ' },
-    { input: 'dhenvehi', output: 'ދެންވެހި' },
-    { input: 'ahlaare', output: 'އައްލާރެ' },
-    { input: 'rayyrayy', output: 'ރަތްރަތް' },
-    { input: 'raiyraiy', output: 'ރަތްރަތް' },
-    { input: 'raiiraii', output: 'ރަތްރަތް' },
-    { input: 'beyhakaa', output: 'ބޭހަކާ' },
-    { input: 'kobaahey', output: 'ކޮބާހޭ' },
-    { input: 'ahaashey', output: 'އަހާށޭ' },
-    { input: 'mihithah', output: 'މިހިތައް' },
-    { input: 'henveiru', output: 'ހެންވޭރު' },
-    { input: 'henveyru', output: 'ހެންވޭރު' },
-    { input: 'laahikeh', output: 'ލާހިކެއް' },
-    { input: 'fuhtheyo', output: 'ފުއްތެޔޮ' },
-    { input: 'aashiqee', output: 'އާޝިޤީ' },
-    { input: 'aashiqy', output: 'އާޝިޤީ' },
-    { input: 'aashiqi', output: 'އާޝިޤީ' },
-    { input: 'aashiqii', output: 'އާޝިޤީ' },
-    { input: 'aashiqiy', output: 'އާޝިޤީ' },
-    { input: 'handhaan', output: 'ހަނދާން' },
-    { input: 'suhaanaa', output: 'ސުހާނާ' },
-    { input: 'vedhaane', output: 'ވެދާނެ' },
-    { input: 'fahathu', output: 'ފަހަތު' },
-    { input: 'fathihu', output: 'ފަތިހު' },
-    { input: 'fathihah', output: 'ފަތިހަށް' },
-    { input: 'nerenyy', output: 'ނެރެނީ' },
-    { input: 'nereny', output: 'ނެރެނީ' },
-    { input: 'alhanyy', output: 'އަޅަނީ' },
-    { input: 'alhany', output: 'އަޅަނީ' },
-    { input: 'keyolhaa', output: 'ކެޔޮޅާ' },
-    { input: 'keyolhu', output: 'ކެޔޮޅު' },
-    { input: 'dhushmin', output: 'ދުޝްމިން' },
-    { input: 'eidhugaa', output: 'އީދުގާ' },
-    { input: 'eidhakee', output: 'އީދަކީ' },
-    { input: 'faseyheh', output: 'ފަސޭހެއް' },
-    { input: 'faseyhey', output: 'ފަސޭހޭ' },
-    { input: 'jahamaa', output: 'ޖަހަމާ' },
-    { input: 'faseyhun', output: 'ފަސޭހުން' },
-    { input: 'faseyha', output: 'ފަސޭހަ' },
-    { input: 'thihiree', output: 'ތިހިރީ' },
-    { input: 'thihirii', output: 'ތިހިރީ' },
-    { input: 'thihuree', output: 'ތިހުރީ' },
-    { input: 'thihurii', output: 'ތިހުރީ' },
-    { input: 'ihusaas', output: 'އިހުސާސް' },
-    { input: 'goiyvey', output: 'ގޮތްވޭ' },
-    { input: 'janbekey', output: 'ޖަންބެކޭ' },
-    { input: 'janbeke', output: 'ޖަންބެކެ' },
-    { input: 'vaagoiy', output: 'ވާގޮތް' },
-    { input: 'oiygoiy', output: 'އޮތްގޮތް' },
-    { input: 'oiygoyy', output: 'އޮތްގޮތް' },
-    { input: 'oyygoiy', output: 'އޮތްގޮތް' },
-    { input: 'oyygoyy', output: 'އޮތްގޮތް' },
-    { input: 'raahathu', output: 'ރާހަތު' },
-    { input: 'raahath', output: 'ރާހަތު' },
-    { input: 'thihiry', output: 'ތިހިރީ' },
-    { input: 'thihury', output: 'ތިހުރީ' },
-    { input: 'feneyey', output: 'ފެނެޔޭ' },
-    { input: 'handhaa', output: 'ހަނދާ' },
-    { input: 'raahayy', output: 'ރާހަތް' },
-    { input: 'raahaiy', output: 'ރާހަތް' },
-    { input: 'kuranvy', output: 'ކުރަންވީ' },
-    { input: 'kuranvi', output: 'ކުރަންވީ' },
-    { input: 'furanvy', output: 'ފުރަންވީ' },
-    { input: 'furanvi', output: 'ފުރަންވީ' },
-    { input: 'thiyaee', output: 'ތިޔައީ' },
-    { input: 'thiyaii', output: 'ތިޔައީ' },
-    { input: 'hiyvaru', output: 'ހިތްވަރު' },
-    { input: 'hihvaru', output: 'ހިތްވަރު' },
-    { input: 'ohsemun', output: 'އޮއްސެމުން' },
-    { input: 'ohsumun', output: 'އޮއްސުމުން' },
-    { input: 'hidumayy', output: 'ޚިދުމަތް' },
-    { input: 'mihaaru', output: 'މިހާރު' },
-    { input: 'jehumah', output: 'ޖެހުމަށް' },
-    { input: 'kihineh', output: 'ކިހިނެތް' },
-    { input: 'keheyny', output: 'ކެހޭނީ' },
-    { input: 'keheyni', output: 'ކެހޭނީ' },
-    { input: 'meehaku', output: 'މީހަކު' },
-    { input: 'rihumaa', output: 'ރިހުމާ' },
-    { input: 'shaahee', output: 'ޝާހީ' },
-    { input: 'zeenayy', output: 'ޒީނަތް' },
-    { input: 'zeenaii', output: 'ޒީނަތް' },
-    { input: 'aharun', output: 'އަހަރުން' },
-    { input: 'gahanaa', output: 'ގަހަނާ' },
-    { input: 'shahii', output: 'ޝާހީ' },
-    { input: 'mihiyy', output: 'މިހިތް' },
-    { input: 'eyaaru', output: 'އެޔާރު' },
-    { input: 'saabas', output: 'ސާބަސް' },
-    { input: 'maaiivi', output: 'މާތްވި' },
-    { input: 'maayyvi', output: 'މާތްވި' },
-    { input: 'maaiyvi', output: 'މާތްވި' },
-    { input: 'kulhely', output: 'ކުޅެލީ' },
-    { input: 'dhanvaan', output: 'ދަންވާން' },
-    { input: 'kanmeelu', output: 'ކަންމީލު' },
-    { input: 'baithuge', output: 'ބައިތުގެ' },
-    { input: 'gothakaa', output: 'ގޮތަކާ' },
-    { input: 'goyykaa', output: 'ގޮތަކާ' },
-    { input: 'loabakah', output: 'ލޯބަކަށް' },
-    { input: 'samaakaa', output: 'ސަމާކާ' },
-    { input: 'hevesgun', output: 'ހެވެސްގުން' },
-    { input: 'nuruhun', output: 'ނުރުހުން' },
-    { input: 'rahumeh', output: 'ރަހުމެއް' },
-    { input: 'beeheyey', output: 'ބީހެޔޭ' },
-    { input: 'ahumadhu', output: 'އަހުމަދު' },
-    { input: 'gardeneh', output: 'ގާރޑެންއެއް' },
-    { input: 'hiyyadhu', output: 'ހިތްއަދު' },
-    { input: 'hooreyey', output: 'ހޫރެޔޭ' },
-    { input: 'neyngifa', output: 'ނޭނގިފަ' },
-    { input: 'milamehi', output: 'މިލަމެހި' },
-    { input: 'nuvanyaa', output: 'ނުވަންޔާ' },
-    { input: 'shifaaeh', output: 'ޝިފާއެއް' },   
-    { input: 'udhaahey', output: 'އުދާހޭ' },
-    { input: 'behihjey', output: 'ބެހިއްޖޭ' },
-    { input: 'bihehgaa', output: 'ބިހެއްގާ' },
-    { input: 'ariahove', output: 'އަރިއަށްއޮވެ' },
-    { input: 'athuhuri', output: 'އަތުހުރި' },
-    { input: 'ayyfaige', output: 'އަތްފައިގެ' },
-    { input: 'bashuhti', output: 'ބަސްހުއްޓި' },
-    { input: 'boduvayy', output: 'ބޮޑުވަތް' },
-    { input: 'dhivehin', output: 'ދިވެހިން' },
-    { input: 'dhonnihi', output: 'ދޮންއިހި' },
-    { input: 'edhaahen', output: 'އެދާހެން' },
-    { input: 'fahathah', output: 'ފަހަތަށް' },
-    { input: 'fenjahaa', output: 'ފެންޖަހާ' },    
-    { input: 'heyovaru', output: 'ހެޔޮވަރު' },
-    { input: 'mifarihi', output: 'މިފަރިހި' },
-    { input: 'vahaaeku', output: 'ވަހާއެކު' },
-    { input: 'himaadun', output: 'ހިމައަޑުން' },
-    { input: 'feshanah', output: 'ފެޝަނަށް' },
-    { input: 'dhuvahah', output: 'ދުވަހަށް' },
-    { input: 'ejahanee', output: 'އެޖަހަނީ' },
-    { input: 'ehmennah', output: 'އެންމެންނަށް' },
-    { input: 'faheemaa', output: 'ފަހީމާ' },
-    { input: 'fannvayy', output: 'ފަންވަތް' },
-    { input: 'habargaa', output: 'ހަބަރްގާ' },
-    { input: 'ihvaalee', output: 'އިއްވާލީ' },
-    { input: 'irushaad', output: 'އިރުޝާދު' },
-    { input: 'kahaalee', output: 'ކަހާލީ' },
-    { input: 'kahkamun', output: 'ކައްކަމުން' },
-    { input: 'kulaehge', output: 'ކުލައެއްގެ' },
-    { input: 'libaahaa', output: 'ލިބާހާ' },
-    { input: 'mageyhih', output: 'މަގޭހިތް' },
-    { input: 'nuhithaa', output: 'ނުހިތާ' },
-    { input: 'nuvaahaa', output: 'ނުވާހާ' },
-    { input: 'nuvaahen', output: 'ނުވާހެން' },
-    { input: 'roohanee', output: 'ރޫހާނީ' },
-    { input: 'shuoorey', output: 'ޝުއޫރޭ' },
-    { input: 'aashigaa', output: 'އާޝިގާ' },
-    { input: 'aavaaeee', output: 'އާވާއެއީ' },
-    { input: 'ehleemaa', output: 'އެއްލީމާ' },
-    { input: 'eidmajaa', output: 'އީދުމަޖާ' },
-    { input: 'gahukuri', output: 'ގަހުކުރި' },
-    { input: 'edhiyaee', output: 'އެދިޔައީ' },
-    { input: 'heylhiah', output: 'ހޭޅީއަށް' },
-    { input: 'hihveyey', output: 'ހިތްވެޔޭ' },
-    { input: 'hiyyekee', output: 'ހިތްއެކީ' },
-    { input: 'hiyyufaa', output: 'ހިތްއުފާ' },
-    { input: 'hunnahen', output: 'ހުންނަހެން' },
-    { input: 'huvandhu', output: 'ހުވަނދު' },
-    { input: 'ihvaalaa', output: 'އިއްވާލާ' },
-    { input: 'huvahlaa', output: 'ހުވައްލާ' },
-    { input: 'jahaanee', output: 'ޖަހަނީ' },
-    { input: 'kehidhee', output: 'ކެހިދީ' },
-    { input: 'kurafayy', output: 'ކުރަފަތް' },
-    { input: 'hiyythah', output: 'ހިތްތައް' },
-    { input: 'loayybey', output: 'ލޯތްބޭ' },
-    { input: 'loayybun', output: 'ލޯތްބުން' },
-    { input: 'maahaulu', output: 'މާހައުލު' },
-    { input: 'mahshoor', output: 'މައްޝޫރު' },
-    { input: 'nahadhaa', output: 'ނަހަދާ' },
-    { input: 'searious', output: 'ސީރިއަސް' },
-    { input: 'uhmeedhu', output: 'އުއްމީދު' },
-    { input: 'veeruhey', output: 'ވީރުހޭ' },
-    { input: 'uhmeeedh', output: 'އުއްމީދު' },
-    { input: 'aashigee', output: 'އާޝިޤީ' },
-    { input: 'ahpaayaa', output: 'އައްޕާޔާ' },
-    { input: 'aishaage', output: 'އައިޝާގެ' },
-    { input: 'ayyathaa', output: 'އަތްއަތާ' },
-    { input: 'bunedhey', output: 'ބުނެދޭ' },
-    { input: 'dhihleey', output: 'ދިއްލެއޭ' },
-    { input: 'eheethee', output: 'އެހީތީ' },
-    { input: 'eheevaan', output: 'އެހީވާން' },
-    { input: 'ehithuge', output: 'އެހިތުގެ' },
-    { input: 'ehlihyoa', output: 'އެއްލިއްޔޯ' },
-    { input: 'ethakeyy', output: 'އެތަކެތް' },
-    { input: 'ihusaasu', output: 'އިހުސާސު' },
-    { input: 'iruohsey', output: 'އިރުއޮއްސޭ' },
-    { input: 'ishqakee', output: 'އިޝްޤަކީ' },
-    { input: 'lhakeyas', output: 'ޅަކެޔަސް' },
-    { input: 'oahoahoa', output: 'އޯހޯހޯ' },
-    { input: 'ohelumaa', output: 'އޮހެލުމާ' },
-    { input: 'ohennyaa', output: 'އޮހެންޏާ' },
-    { input: 'sangalaa', output: 'ސަނގަލާ' },
-    { input: 'readykoh', output: 'ރެޑީކޮށް' },
-    { input: 'vaaalhaa', output: 'ވާއަޅާ' },
-    { input: 'carehgaa', output: 'ކާރެއްގާ' },
-    { input: 'dhushman', output: 'ދުޝްމަން' },
-    { input: 'dollarun', output: 'ޑޮލަރުން' },
-    { input: 'ehaavaru', output: 'އެހާވަރު' },
-    { input: 'new york', output: 'ނިއުޔޯކް' },
-    { input: 'nishaane', output: 'ނިޝާނެ' },
-    { input: 'nujeheey', output: 'ނުޖެހެއޭ' },
-    { input: 'raajjeey', output: 'ރާއްޖެއޭ' },
-    { input: 'thibaaah', output: 'ތިބާއަށް' },
-
-    { input: 'ishqugaa', output: 'އިޝްޤުގާ' },
-
-    { input: 'thieeyey', output: 'ތިއީޔޭ' },
-
-
-    // 7 characters
-    { input: 'mihithu', output: 'މިހިތު' },
-    { input: 'aanekey', output: 'އާނއެކޭ' },
-    { input: 'aashoah', output: 'އާޝޯހު' },
-    { input: 'vahumeh', output: 'ވަހުމެއް' },
-    { input: 'veegoyy', output: 'ވީގޮތް' },
-    { input: 'veegoiy', output: 'ވީގޮތް' },
-    { input: 'veegoii', output: 'ވީގޮތް' },
-    { input: 'kanfayy', output: 'ކަންފަތް' },
-    { input: 'kanfaiy', output: 'ކަންފަތް' },
-    { input: 'kanfaii', output: 'ކަންފަތް' },
-    { input: 'partyah', output: 'ޕާޓީއަށް' },
-    { input: 'partyga', output: 'ޕާޓީގަ' },
-    { input: 'iveyhen', output: 'އިވޭހެން' },
-    { input: 'nuruhun', output: 'ނުރުހުން' },
-    { input: 'fenvehi', output: 'ފެންވެހި' },
-    { input: 'chuhare', output: 'ޗުހަރެ' },
-    { input: 'fahtaru', output: 'ފައްޓަރު' },
-    { input: 'eesabey', output: 'އީސަބޭ' },
-    { input: 'loayybe', output: 'ލޯތްބޭ' },
-    { input: 'shaahil', output: 'ޝާހިލް' },
-    { input: 'nuhurey', output: 'ނުހުރޭ' },
-    { input: 'henveru', output: 'ހެންވޭރު' },
-    { input: 'laahiku', output: 'ލާހިކު' },
-    { input: 'dhashah', output: 'ދަށަށް' },
-    { input: 'dhoshah', output: 'ދޮށަށް' },
-    { input: 'ehthaan', output: 'އެއްތާން' },
-    { input: 'koamahu', output: 'ކޯމަހު' },
-    { input: 'ahdhoih', output: 'އައްދޯތް' },
-    { input: 'eidhuge', output: 'އީދުގެ' },
-    { input: 'eidhuga', output: 'އީދުގަ' },
-    { input: 'fahayy', output: 'ފަހަތް' },
-    { input: 'fahaiy', output: 'ފަހަތް' },
-    { input: 'fahaii', output: 'ފަހަތް' },
-    { input: 'fehikula', output: 'ފެހިކުލަ' },
-    { input: 'neyy', output: 'ނެތް' },
-    { input: 'nishan', output: 'ނިޝާން' },
-    { input: 'vaheh', output: 'ވަހެއް' },
-    { input: 'raajje', output: 'ރާއްޖެ' },
-    { input: 'rajje', output: 'ރާއްޖެ' },
-    { input: 'raahje', output: 'ރާއްޖެ' },
-    { input: 'rahje', output: 'ރާއްޖެ' },
-    { input: 'ready', output: 'ރެޑީ' },
-    { input: 'handhu', output: 'ހަނދު' },
-    { input: 'feney', output: 'ފެނޭ' },
-    { input: 'janbu', output: 'ޖަންބު' },
-    { input: 'asarrr', output: 'އަސަރު' },
-    { input: 'beehen', output: 'ބީހެން' },
-    { input: 'edheny', output: 'އެދެނީ' },
-    { input: 'asarr', output: 'އަސަރު' },
-    { input: 'asaru', output: 'އަސަރު' },
-    { input: 'igraar', output: 'އިގުރާރު' },
-    { input: 'annga', output: 'އަންގަ' },
-    { input: 'ishgee', output: 'އިޝްޤީ' },
-    { input: 'ishgii', output: 'އިޝްޤީ' },
-    { input: 'ishgiy', output: 'އިޝްޤީ' },
-    { input: 'ishgy', output: 'އިޝްޤީ' },
-    { input: 'ishgi', output: 'އިޝްޤީ' },
-    { input: 'ishqee', output: 'އިޝްޤީ' },
-    { input: 'ishqii', output: 'އިޝްޤީ' },
-    { input: 'ishqiy', output: 'އިޝްޤީ' },
-    { input: 'ishqy', output: 'އިޝްޤީ' },
-    { input: 'ishqi', output: 'އިޝްޤީ' },
-    { input: 'kiyaa', output: 'ކިޔާ' },
-    { input: 'jahaa', output: 'ޖަހާ' },
-    { input: 'yagyn', output: 'ޔަގީން' },
-    { input: 'kihaa', output: 'ކިހާ' },
-    { input: 'ruhey', output: 'ރުހޭ' },
-    { input: 'mihen', output: 'މިހެން' },
-    { input: 'mahah', output: 'މަހަށް' },
-    { input: 'adah', output: 'އަޑަށް' },
-    { input: 'thihiyy', output: 'ތިހިތް' },
-    { input: 'million', output: 'މިލިއަން' },
-    { input: 'billion', output: 'ބިލިއަން' },
-    { input: 'zaeemun', output: 'ޒަޢީމުން' },
-    { input: 'zaeemaa', output: 'ޒަޢީމާ' },
-    { input: 'zaeemey', output: 'ޒަޢީމޭ' },
-    { input: 'maiivi', output: 'މާތްވި' },
-    { input: 'maiyvi', output: 'މާތްވި' },
-    { input: 'mayyvi', output: 'މާތްވި' },
-    { input: 'aharen', output: 'އަހަރެން' },
-    { input: 'ahuren', output: 'އަހުރެން' },
-    { input: 'meehun', output: 'މީހުން' },
-    { input: 'meeheh', output: 'މީހެއް' },
-    { input: 'jahany', output: 'ޖަހާނީ' },
-    { input: 'jahani', output: 'ޖަހާނީ' },
-    { input: 'zeenai', output: 'ޒީނަތް' },
-    { input: 'zeenay', output: 'ޒީނަތް' },
-    { input: 'haaheh', output: 'ހާހެއް' },
-    { input: 'innan', output: 'އިންނަން' },
-    { input: 'hajjah', output: 'ހައްޖަށް' },
-    { input: 'leyaai', output: 'ލެޔާއި' },
-    { input: 'zakham', output: 'ޒަޚަމު' },
-    { input: 'duayaa', output: 'ދުއާޔާ' },
-    { input: 'veyhey', output: 'ވޭހޭ' },
-    { input: 'hanvaah', output: 'ހަންވާހް' },
-    { input: 'jareebu', output: 'ޖަރީބު' },
-    { input: 'vashitu', output: 'ވަށީތު' },
-    { input: 'hevesge', output: 'ހެވެސްގެ' },
-    { input: 'hevesgn', output: 'ހެވެސްގުން' },
-    { input: 'vaaheek', output: 'ވާހީކް' },
-    { input: 'hurekey', output: 'ހުރެކޭ' },
-    { input: 'dheykey', output: 'ދެޔްކޭ' },
-    { input: 'dhaahiyy', output: 'ދާހިތް' },
-    { input: 'dhaahiy', output: 'ދާހިތް' },
-    { input: 'rahumaa', output: 'ރަހުމާ' },
-    { input: 'rahumey', output: 'ރަހުމޭ' },
-    { input: 'jaagaeh', output: 'ޖާގައެއް' },
-    { input: 'heyaraa', output: 'ހޭއަރާ' },
-    { input: 'baaraah', output: 'ބާރަށް' },
-    { input: 'bayypen', output: 'ބަތްޕެން' },
-    { input: 'ishkuge', output: 'އިޝްކުގެ' },
-    { input: 'mekuhah', output: 'މެކުހަށް' },
-    { input: 'naahama', output: 'ނާހަމަ' },
-    { input: 'ohsigen', output: 'އޮއްސިގެން' },
-    { input: 'ridakah', output: 'ރައިޑަކަށް' },
-    { input: 'ruhigen', output: 'ރުހިގެން' },
-    { input: 'saharoa', output: 'ސަހަރޯ' },
-    { input: 'sihunee', output: 'ސިހުނީ' },
-    { input: 'jahamun', output: 'ޖަހަމުން' },
-    { input: 'faharey', output: 'ފަހަރޭ' },
-    { input: 'nishaan', output: 'ނިޝާން' },
-    { input: 'bahaarey', output: 'ބަހާރޭ' },
-    { input: 'dhaneehe', output: 'ދަނީހެ' },
-    { input: 'thibeyey', output: 'ތިބެޔޭ' },
-    { input: 'nahtaali', output: 'ނައްޓާލި' },
-    { input: 'hurehure', output: 'ހުރެހުރެ' },
-    { input: 'eroohuve', output: 'އެރޫހުވެ' },
-    { input: 'bisalhaa', output: 'ބިސްއަޅާ' },
-    { input: 'ehjismeh', output: 'އެއްޖިސްމެއް' },
-    { input: 'keyogahu', output: 'ކެޔޮގަހު' },
-    { input: 'mihingaa', output: 'މިހިނގާ' },
-    { input: 'laajahaa', output: 'ލާޖަހާ' },
-    { input: 'mihitheh', output: 'މިހިތެއް' },
-    { input: 'nalafehi', output: 'ނަލަފެހި' },
-    { input: 'odiahlaa', output: 'އޮޑިއަށްލާ' },
-    { input: 'rakihini', output: 'ރަކިހިނި' },
-    { input: 'ruheythy', output: 'ރުހޭތީ' },
-    { input: 'ulheyhen', output: 'އުޅޭހެން' },
-    { input: 'ulheyiru', output: 'އުޅޭއިރު' },
-    { input: 'vihsaali', output: 'ވިއްސާލި' },
-    { input: 'vihsaara', output: 'ވިއްސާރަ' },
-    { input: 'sihisihi', output: 'ސިހިސިހި' },
-    { input: 'ohthakun', output: 'އޮއްތަކުން' },
-    { input: 'rayykula', output: 'ރަތްކުލަ' },
-    { input: 'vissaara', output: 'ވިއްސާރަ' },
-    { input: 'netheehe', output: 'ނެތީހެ' },
-    { input: 'rahayaai', output: 'ރަހަޔާއި' },
-    { input: 'facebook', output: 'ފޭސްބުކް' },
-    { input: 'fathihey', output: 'ފަތިހޭ' },
-    { input: 'haijahaa', output: 'ހައިޖަހާ' },
-    { input: 'hiyydhee', output: 'ހިތްދީ' },
-    { input: 'hureehey', output: 'ހުރީހޭ' },
-    { input: 'loayybah', output: 'ލޯތްބަށް' },
-    { input: 'mahuroom', output: 'މަހުރޫމު' },
-    { input: 'unfollow', output: 'އަންފޮލޯ' },
-    { input: 'viberves', output: 'ވައިބާވެސް' },
-    { input: 'ahaalee', output: 'އަހާލީ' },
-    { input: 'ahaashe', output: 'އަހާށެ' },
-    { input: 'ahifalu', output: 'އަހިފަލު' },
-    { input: 'chaalhe', output: 'ޗާލްހެ' },
-    { input: 'dhahtha', output: 'ދައްތަ' },
-    { input: 'dheyeba', output: 'ދޭއެބަ' },
-    { input: 'ehbaaru', output: 'އެއްބާރު' },
-    { input: 'ehithaa', output: 'އެހިތާ' },
-    { input: 'gahakun', output: 'ގަހަކުން' },
-    { input: 'heyokan', output: 'ހެޔޮކަން' },
-    { input: 'ihvaala', output: 'އިއްވާލަ' },
-    { input: 'jehumun', output: 'ޖެހުމުން' },
-    { input: 'ahsidha', output: 'އައްސިދަ' },
-    { input: 'ehindhu', output: 'އެހިނދު' },
-    { input: 'engeyey', output: 'އެނގެއޭ' },
-    { input: 'faihama', output: 'ފައިހަމަ' },
-    { input: 'hiyyvey', output: 'ހިތްވޭ' },
-    { input: 'hureyey', output: 'ހުރެޔޭ' },
-    { input: 'ishguga', output: 'އިޝްގުގަ' },
-    { input: 'ishguge', output: 'އިޝްޤުގެ' },
-    { input: 'miaahun', output: 'މިއާހުން' },
-    { input: 'thedhey', output: 'ތެދޭ' },
-    { input: 'mulhiin', output: 'މުޅިއިން' },
-    { input: 'joashan', output: 'ޖޯޝަން' },
-    { input: 'aahchaa', output: 'އާއްޗާ' },
-    { input: 'aanhuyy', output: 'އާނހުތް' },
-    { input: 'ehlaali', output: 'އެއްލާލި' },
-    { input: 'falhiin', output: 'ފަޅިއިން' },
-    { input: 'fusaraa', output: 'ފުސްއަރާ' },
-    { input: 'heeveey', output: 'ހީވެއޭ' },
-    { input: 'ihvaane', output: 'އިއްވާނެ' },
-    { input: 'rueemey', output: 'ރުއީމޭ' },
-    { input: 'rulhiin', output: 'ރުޅިއިން' },
-    { input: 'shuooru', output: 'ޝުޢޫރު' },
-    { input: 'ohoreye', output: 'އޮހޮރޭއެ' },
-    { input: 'bunnyey', output: 'ބުންޏޭ' },
-    { input: 'carakaa', output: 'ކާރަކާ' },
-    { input: 'geyakah', output: 'ގެޔަކަށް' },
-    { input: 'ihvumun', output: 'އިއްވުމުން' },
-    { input: 'eheemaa', output: 'އެހީމާ' },
-    { input: 'keeemaa', output: 'ކެއީމާ' },
-    { input: 'rahalaa', output: 'ރަހަލާ' },
-    { input: 'vesekee', output: 'ވެސްއެކީ' },
-
-    // 7 characters
-    { input: 'nanbaru', output: 'ނަންބަރު' },
-    { input: 'annbeyy', output: 'އަންބެތް' },
-    { input: 'bahakun', output: 'ބަހަކުން' },
-    { input: 'boduhaa', output: 'ބޮޑުހާ' },
-    { input: 'dhahkaa', output: 'ދައްކާ' },
-    { input: 'dhonihi', output: 'ދޮންއިހި' },
-    { input: 'eheegaa', output: 'އެހީގާ' },
-    { input: 'fahakaa', output: 'ފަހަކާ' },
-    { input: 'fahakah', output: 'ފަހަކަށް' },
-    { input: 'fahcheh', output: 'ފައްޗެއް' },
-    { input: 'fathaha', output: 'ފަތަހަ' },
-    { input: 'goyyvey', output: 'ގޮތްވޭ' },
-    { input: 'heyokoh', output: 'ހެޔޮކޮށް' },
-    { input: 'hijahaa', output: 'ހައިޖަހާ' },
-    { input: 'hilahaa', output: 'ހިލަހާ' },
-    { input: 'huhtifa', output: 'ހުއްޓިފަ' },
-    { input: 'ihvaali', output: 'އިއްވާލި' },
-    { input: 'instain', output: 'އިންސްޓައިން' },
-    { input: 'islaahu', output: 'އިސްލާހު' },
-    { input: 'iveyhey', output: 'އިވޭހޭ' },
-    { input: 'jahaane', output: 'ޖަހާނެ' },
-    { input: 'kahaaly', output: 'ކަހާލީ' },
-    { input: 'kulaali', output: 'ކުލައަލި' },
-    { input: 'maanaeh', output: 'މާނައެއް' },
-    { input: 'message', output: 'މެސެޖު' },
-    { input: 'mihiree', output: 'މިހިރީ' },
-    { input: 'nambaru', output: 'ނަންބަރު' },
-    { input: 'nighaab', output: 'ނިޣާބް' },
-    { input: 'nihaaee', output: 'ނިހާއީ' },
-    { input: 'offline', output: 'އޮފްލައިން' },
-    { input: 'ohsenee', output: 'އޮއްސެނީ' },
-    { input: 'pareeeh', output: 'ޕަރީއެއް' },
-    { input: 'rulhiah', output: 'ރުޅިއަށް' },
-    { input: 'thibbaa', output: 'ތިއްބާ' },
-    { input: 'boahure', output: 'ބޯހުރެ' },
-    { input: 'dhaahaa', output: 'ދާހާ' },
-    { input: 'goshuri', output: 'ގޮސްހުރި' },
-    { input: 'ishquge', output: 'އިޝްޤުގެ' },
-    { input: 'janbuge', output: 'ޖަންބުގެ' },
-    { input: 'roashan', output: 'ރޯޝަން' },
-    { input: 'roohaai', output: 'ރޫހާއި' },
-    { input: 'roohuve', output: 'ރޫހުވެ' },
-    { input: 'thereah', output: 'ތެރެޔަށް' },
-    { input: 'thihbaa', output: 'ތިއްބާ' },
-    { input: 'rahayaa', output: 'ރަހަޔާ' },
-    { input: 'thihthi', output: 'ތިއްތި' },
-    { input: 'ufedhey', output: 'އުފެދޭ' },
-    { input: 'veehiyy', output: 'ވީހިތް' },
-
-    // 6 characters
-    { input: 'bulbul', output: 'ބުލްބުލް' },
-    { input: 'aeeaee', output: 'އައީއައީ' },
-    { input: 'fihunu', output: 'ފިހުނު' },
-    { input: 'heehee', output: 'ހީހީ' },
-    { input: 'iveyey', output: 'އިވެޔޭ' },
-    { input: 'iveyne', output: 'އިވޭނެ' },
-    { input: 'migoyy', output: 'މިގޮތް' },
-    { input: 'migoiy', output: 'މިގޮތް' },
-    { input: 'vaahaa', output: 'ވާހާ' },
-    { input: 'migoii', output: 'މިގޮތް' },
-    { input: 'roohey', output: 'ރޫހޭ' },
-    { input: 'vigoyy', output: 'ވިގޮތް' },
-    { input: 'vigoiy', output: 'ވިގޮތް' },
-    { input: 'vigoii', output: 'ވިގޮތް' },
-    { input: 'suhare', output: 'ސުހަރެ' },
-    { input: 'vahumu', output: 'ވަހުމު' },
-    { input: 'chaahe', output: 'ޗާހެ' },
-    { input: 'udhuhi', output: 'އުދުހި' },
-    { input: 'goaheh', output: 'ގޯހެއް' },
-    { input: 'nuhure', output: 'ނުހުރެ' },
-    { input: 'dhihun', output: 'ދިހުން' },
-    { input: 'adhoih', output: 'އައްދޯތް' },
-    { input: 'ehthan', output: 'އެއްތަން' },
-    { input: 'koamas', output: 'ކޯމަސް' },
-    { input: 'bandah', output: 'ބަނޑަށް' },
-    { input: 'farulu', output: 'ފަރުޟު' },
-    { input: 'farihi', output: 'ފަރިހި' },
-    { input: 'lwbyge', output: 'ލޯބީގެ' },
-    { input: 'henney', output: 'ހެންނޭ' },
-    { input: 'hithah', output: 'ހިތަށް' },
-    { input: 'thihih', output: 'ތިހިތް' },
-    { input: 'thihiy', output: 'ތިހިތް' },
-    { input: 'gothah', output: 'ގޮތައް' },
-    { input: 'mashah', output: 'މަށަށް' },
-    { input: 'eyhen', output: 'އޭހެން' },
-    { input: 'shahy', output: 'ޝާހީ' },
-    { input: 'mihiy', output: 'މިހިތް' },
-    { input: 'mihih', output: 'މިހިތް' },
-    { input: 'aalam', output: 'އާލަމް' },
-    { input: 'lolah', output: 'ލޮލަށް' },
-    { input: 'eyaar', output: 'އެޔާރު' },
-    { input: 'veyey', output: 'ވެޔޭ' },
-    { input: 'zaeeme', output: 'ޒަޢީމެ' },
-    { input: 'zaeemu', output: 'ޒަޢީމު' },
-    { input: 'zaeem', output: 'ޒަޢީމު' },
-    { input: 'zahamu', output: 'ޒަހަމު' },
-    { input: 'shaair', output: 'ޝާއިރު' },
-    { input: 'veshey', output: 'ވެޝޭ' },
-    { input: 'dhokey', output: 'ދޮކޭ' },
-    { input: 'thaafy', output: 'ތާފީ' },
-    { input: 'huveed', output: 'ހުވީދު' },
-    { input: 'beyrum', output: 'ބޭރުން' },
-    { input: 'bavana', output: 'ބަވަނަ' },
-    { input: 'henaan', output: 'ހެނާން' },
-    { input: 'nuvaiy', output: 'ނުވަތް' },
-    { input: 'hendhey', output: 'ހެންދޭ' },
-    { input: 'dhaskey', output: 'ދަސްކޭ' },
-    { input: 'mahure', output: 'މަހުރެ' },
-    { input: 'veehey', output: 'ވީހޭ' },
-    { input: 'gammge', output: 'ގަމްގެ' },
-    { input: 'avahah', output: 'އަވަހަށް' },
-    { input: 'adiyah', output: 'އަޑިޔަށް' },
-    { input: 'aeemaa', output: 'އައީމާ' },
-    { input: 'afreen', output: 'އަފުރީން' },
-    { input: 'roohaa', output: 'ރޫހާ' },
-    { input: 'castle', output: 'ކާސަލް' },
-    { input: 'garden', output: 'ގާރޑެން' },
-    { input: 'aineyy', output: 'އައިނެތް' },
-    { input: 'eedhey', output: 'އީދޭ' },
-    { input: 'aaihaa', output: 'އައިހާ' },
-    { input: 'ahchaa', output: 'އައްޗާ' },
-    { input: 'arihah', output: 'އަރިހަށް' },
-    { input: 'ehkala', output: 'އެއްކަލަ' },
-    { input: 'ehuree', output: 'އެހުރީ' },
-    { input: 'emahah', output: 'އެމަހަށް' },
-    { input: 'gahuga', output: 'ގަހުގަ' },
-    { input: 'heefaa', output: 'ހީފާ' },
-    { input: 'jahvah', output: 'ޖައްވަށް' },
-    { input: 'ehmenn', output: 'އެއްމެން' },
-    { input: 'ehunna', output: 'އެހުންނަ' },
-    { input: 'fahkaa', output: 'ފައްކާ' },
-    { input: 'fahuge', output: 'ފަހުގެ' },
-    { input: 'rahkaa', output: 'ރައްކާ' },
-    { input: 'yoobil', output: 'ޔޫބިލް' },
-    { input: 'zaharu', output: 'ޒަހަރު' },
-    { input: 'ayyfai', output: 'އަތްފައި' },
-    { input: 'ahamey', output: 'އަހަމޭ' },
-    { input: 'ehanda', output: 'އެހަނޑަ' },
-    { input: 'ehgoyy', output: 'އެއްގޮތް' },
-    { input: 'goahee', output: 'ގޯހީ' },
-    { input: 'goahey', output: 'ގޯހޭ' },
-    { input: 'gohoru', output: 'ގޮހޮރު' },
-    { input: 'hitheh', output: 'ހިތެއް' },
-    { input: 'number', output: 'ނަންބަރު' },
-    { input: 'mushah', output: 'މުށަށް' },
-    { input: 'oflain', output: 'އޮފްލައިން' },
-    { input: 'online', output: 'އޮންލައިން' },
-    { input: 'oyybey', output: 'އޮތްބޭ' },
-    { input: 'roohun', output: 'ރޫހުން' },
-    { input: 'search', output: 'ސާޗް' },
-    { input: 'shoahu', output: 'ޝޯހު' },
-    { input: 'thahey', output: 'ތަހޭ' },
-    { input: 'namaee', output: 'ނަމައީ' },
-    { input: 'ehenas', output: 'އެހެނަސް' },
-    { input: 'facial', output: 'ފޭޝަލް' },
-    { input: 'hedhey', output: 'ހެދޭ' },
-    { input: 'ihsaas', output: 'އިހުސާސް' },
-    { input: 'indhey', output: 'އިނދޭ' },
-    { input: 'kandeh', output: 'ކަނޑެއް' },
-    { input: 'nafsaa', output: 'ނަފުސާ' },
-    { input: 'nuhanu', output: 'ނުހަނު' },
-    { input: 'reyaku', output: 'ރެޔަކު' },
-    { input: 'rondeh', output: 'ރޮނޑެއް' },
-    { input: 'roohee', output: 'ރޫހީ' },
-    { input: 'vihyaa', output: 'ވިއްޔާ' },
-    { input: 'aanbas', output: 'އާނބަސް' },
-    { input: 'aishaa', output: 'އައިޝާ' },
-    { input: 'ishqun', output: 'އިޝްޤުން' },
-    { input: 'bedhey', output: 'ބެދޭ' },
-    { input: 'eheeah', output: 'އެހީއަށް' },
-    { input: 'ehuney', output: 'އެހުނޭ' },
-    { input: 'ehvana', output: 'އެއްވަނަ' },
-    { input: 'kahala', output: 'ކަހަލަ' },
-    { input: 'kashfu', output: 'ކަޝްފު' },
-    { input: 'maathu', output: 'މައަތު' },
-    { input: 'beehge', output: 'ބެއެއްގެ' },
-    { input: 'eeevaa', output: 'އެއީވާ' },
-    { input: 'eeeves', output: 'އެއީވެސް' },
-    { input: 'ohorey', output: 'އޮހޮރޭ' },
-
-    { input: 'faharu', output: 'ފަހަރު' },
-
-    { input: 'lenbey', output: 'ލެނބޭ' },
-
-
-    { input: 'tattoo', output: 'ޓެޓޫ' },
-
-    // 5 characters
-    { input: 'bahaa', output: 'ބަހާ' },
-    { input: 'cream', output: 'ކުރީމު' },
-    { input: 'ehgaa', output: 'އެއްގާ' },
-    { input: 'foohi', output: 'ފޫހި' },
-    { input: 'juice', output: 'ޖޫސް' },
-    { input: 'mahaa', output: 'މަހާ' },
-    { input: 'party', output: 'ޕާޓީ' },
-    { input: 'vahum', output: 'ވަހުމު' },
-    { input: 'beyaa', output: 'ބެޔާ' },
-    { input: 'hoaho', output: 'ހޯހޮ' },
-    { input: 'dhahi', output: 'ދަހި' },
-    { input: 'theyo', output: 'ތެޔޮ' },
-    { input: 'oihaa', output: 'އޮތްހާ' },
-    { input: 'oyyhaa', output: 'އޮތްހާ' },
-    { input: 'oiyhaa', output: 'އޮތްހާ' },
-    { input: 'eidhu', output: 'އީދު' },
-    { input: 'hilmy', output: 'ހިލްމީ' },
-    { input: 'hilmee', output: 'ހިލްމީ' },
-    { input: 'hilmii', output: 'ހިލްމީ' },
-    { input: 'lwbin', output: 'ލޯބިން' },
-    { input: 'kihen', output: 'ކިހެން' },
-    { input: 'eyhey', output: 'އޭހޭ' },
-    { input: 'leyaa', output: 'ލެޔާ' },
-    { input: 'roohu', output: 'ރޫހު' },
-    { input: 'thiee', output: 'ތިއީ' },
-    { input: 'dhuaa', output: 'ދުއާ' },
-    { input: 'maaii', output: 'މާތް' },
-    { input: 'maayy', output: 'މާތް' },
-    { input: 'maaiy', output: 'މާތް' },
-    { input: 'maii', output: 'މާތް' },
-    { input: 'maiy', output: 'މާތް' },
-    { input: 'mayy', output: 'މާތް' },
-    { input: 'zaham', output: 'ޒަހަމު' },
-    { input: 'hureh', output: 'ހުރެއް' },
-    { input: 'huvah', output: 'ހުވަށް' },
-    { input: 'beyru', output: 'ބޭރު' },
-    { input: 'shedu', output: 'ޝެދު' },
-    { input: 'bayah', output: 'ބަޔަށް' },
-    { input: 'rangu', output: 'ރަނގު' },
-    { input: 'dhen', output: 'ދެން' },
-    { input: 'ekan', output: 'އެކަން' },
-    { input: 'elhey', output: 'އެޅޭ' },
-    { input: 'dhuva', output: 'ދުވަހު' },
-    { input: 'vegen', output: 'ވެގެން' },
-    { input: 'huvee', output: 'ހުވީ' },
-    { input: 'huvii', output: 'ހުވީ' },
-    { input: 'huviy', output: 'ހުވީ' },
-    { input: 'huvee', output: 'ހުވީ' },
-    { input: 'huvii', output: 'ހުވީ' },
-    { input: 'huviy', output: 'ހުވީ' },
-    { input: 'huvyy', output: 'ހުވީ' },
-    { input: 'nurun', output: 'ނޫރުން' },
-    { input: 'anhen', output: 'އަންހެން' },
-    { input: 'anhen', output: 'އަންހެން' },
-    { input: 'henon', output: 'ހެނޮން' },
-    { input: 'henonn', output: 'ހެނޮން' },
-    { input: 'henun', output: 'ހެނުން' },
-    { input: 'hennun', output: 'ހެނުން' },
-    { input: 'henaan', output: 'ހެނާން' },
-    { input: 'henaann', output: 'ހެނާން' },
-    { input: 'hengen', output: 'ހެނގެން' },
-    { input: 'hengenn', output: 'ހެނގެން' },
-    { input: 'dhaske', output: 'ދަސްކެ' },
-    { input: 'dhaskun', output: 'ދަސްކުން' },
-    { input: 'dhaskunn', output: 'ދަސްކުން' },
-    { input: 'rahum', output: 'ރަހުމު' },
-    { input: 'araam', output: 'އަރާމު' },
-    { input: 'adiah', output: 'އަޑިއަށް' },
-    { input: 'angaa', output: 'އަންގާ' },
-    { input: 'ehfai', output: 'އެއްފައި' },
-    { input: 'ehkoh', output: 'އެއްކޮށް' },
-    { input: 'geyah', output: 'ގެޔަށް' },
-    { input: 'chips', output: 'ޗިޕްސް' },
-    { input: 'aharu', output: 'އަހަރު' },
-    { input: 'eesaa', output: 'އީސާ' },
-    { input: 'ishqu', output: 'އިޝްޤު' },
-    { input: 'ronde', output: 'ރޮނޑެ' },
-    { input: 'theyy', output: 'ތެއް' },
-    { input: 'ehvas', output: 'އެއްވަސް' },
-    { input: 'eevaa', output: 'އީވާ' },
-    { input: 'rihun', output: 'ރިހުން' },
-    { input: 'ruhun', output: 'ރުހުން' },
-    { input: 'ashee', output: 'އަށީ' },
-    { input: 'ehloa', output: 'އެއްލޯ' },
-    { input: 'iaree', output: 'ޢަރީ' },
-    { input: 'ihvan', output: 'އިއްވަން' },
-    { input: 'preym', output: 'ޕްރޭމް' },
-    { input: 'aaney', output: 'އާނއޭ' },
-    { input: 'aihey', output: 'އައިހޭ' },
-    { input: 'allah', output: 'ﷲ' },
-    { input: 'anhaa', output: 'އަނހާ' },
-    { input: 'heyah', output: 'ހެޔަށް' },
-    { input: 'sorry', output: 'ސޮރީ' },
-    { input: 'tokyo', output: 'ޓޯކިޔޯ' },
-
-    { input: 'jambu', output: 'ޖަންބު' },
-
-    // 4 characters
-    { input: 'bayy', output: 'ބަތް' },
-    { input: 'baiy', output: 'ބަތް' },
-    { input: 'baii', output: 'ބަތް' },
-    { input: 'fayy', output: 'ފަތް' },
-    { input: 'faiy', output: 'ފަތް' },
-    { input: 'faii', output: 'ފަތް' },
-    { input: 'gaii', output: 'ގަތް' },
-    { input: 'gaiy', output: 'ގަތް' },
-    { input: 'heyo', output: 'ހެޔޮ' },
-    { input: 'ivey', output: 'އިވޭ' },
-    { input: 'vehi', output: 'ވެހި' },
-    { input: 'rayy', output: 'ރަތް' },
-    { input: 'raiy', output: 'ރަތް' },
-    { input: 'raii', output: 'ރަތް' },
-    { input: 'muyy', output: 'މުތް' },
-    { input: 'muiy', output: 'މުތް' },
-    { input: 'muii', output: 'މުތް' },
-    { input: 'fayy', output: 'ފަތް' },
-    { input: 'faiy', output: 'ފަތް' },
-    { input: 'faii', output: 'ފަތް' },
-    { input: 'eyah', output: 'އެޔަށް' },
-    { input: 'eesa', output: 'އީސަ' },
-    { input: 'rihi', output: 'ރިހި' },
-    { input: 'male', output: 'މާލެ' },
-    { input: 'aiyy', output: 'އަތް' },
-    { input: 'dhon', output: 'ދޮން' },
-    { input: 'dhil', output: 'ދިލް' },
-    { input: 'duaa', output: 'ދުއާ' },
-    { input: 'rooh', output: 'ރޫހު' },
-    { input: 'ishq', output: 'އިޝްޤު' },
-    { input: 'lhen', output: 'ޅެން' },
-    { input: 'goiy', output: 'ގޮތް' },
-    { input: 'goih', output: 'ގޮތް' },
-    { input: 'hiyy', output: 'ހިތް' },
-    { input: 'hiyh', output: 'ހިތް' },
-    { input: 'lwbi', output: 'ލޯބި' },
-    { input: 'asar', output: 'އަސަރު' },
-    { input: 'goyy', output: 'ގޮތް' },
-    { input: 'goii', output: 'ގޮތް' },
-    { input: 'gioy', output: 'ގޮތް' },
-    { input: 'fehi', output: 'ފެހި' },
-    { input: 'ahen', output: 'އަހެން' },
-    { input: 'ehen', output: 'އެހެން' },
-    { input: 'ihen', output: 'އިހެން' },
-    { input: 'ohen', output: 'އޮހެން' },
-    { input: 'uhen', output: 'އުހެން' },
-    { input: 'ahey', output: 'އަހޭ' },
-    { input: 'ehey', output: 'އެހޭ' },
-    { input: 'ihey', output: 'އިހޭ' },
-    { input: 'ohey', output: 'އޮހޭ' },
-    { input: 'uhey', output: 'އުހޭ' },
-    { input: 'ahan', output: 'އަހަން' },
-    { input: 'ehah', output: 'އެހައް' },
-    { input: 'ehee', output: 'އެހީ' },
-    { input: 'fahe', output: 'ފަހެ' },
-    { input: 'ohsi', output: 'އޮއްސި' },
-    { input: 'haal', output: 'ހާލު' },
-    { input: 'haas', output: 'ހާސް' },
-    { input: 'euro', output: 'ޔޫރޯ' },
-    { input: 'miee', output: 'މިއީ' },
-    { input: 'eyaa', output: 'އެޔާ' },
-    { input: 'baheh', output: 'ބަހެއް' },
-    { input: 'bahey', output: 'ބަހެއް' },
-    { input: 'baheii', output: 'ބަހެއް' },
-    { input: 'gayy', output: 'ގަތް' },
-    { input: 'mioh', output: 'މިއޮށް' },
-    { input: 'rose', output: 'ރޯސް' },
-    { input: 'vayy', output: 'ވަތް' },
-    { input: 'ahvaa', output: 'އައްވާ' },
-    { input: 'ariah', output: 'އަރިއަށް' },
-    { input: 'ahage', output: 'އަހަގެ' },
-    { input: 'biheh', output: 'ބިހެއް' },
-    { input: 'dhiha', output: 'ދިހަ' },
-    { input: 'eedhu', output: 'އީދު' },
-    { input: 'ehbas', output: 'އެއްބަސް' },
-    { input: 'ehera', output: 'އެހެރަ' },
-    { input: 'ehmen', output: 'އެއްމެން' },
-    { input: 'eidey', output: 'އީދޭ' },
-    { input: 'emmen', output: 'އެއްމެން' },
-    { input: 'fahah', output: 'ފަހަށް' },
-    { input: 'huhti', output: 'ހުއްޓި' },
-    { input: 'jehee', output: 'ޖެހީ' },
-    { input: 'kendi', output: 'ކެނޑި' },
-    { input: 'mehi', output: 'މެހި' },
-    { input: 'ethah', output: 'އެތައް' },
-    { input: 'fahsi', output: 'ފައްސި' },
-    { input: 'miaee', output: 'މިއައީ' },
-    { input: 'mioyy', output: 'މިއޮތް' },
-    { input: 'ohsey', output: 'އޮއްސޭ' },
-    { input: 'vahaa', output: 'ވަހާ' },
-    { input: 'veehe', output: 'ވީހެ' },
-    { input: 'vehey', output: 'ވެހޭ' },
-    { input: 'viber', output: 'ވައިބާ' },
-    { input: 'block', output: 'ބުލޮކް' },
-    { input: 'meyaa', output: 'މެޔާ' },
-    { input: 'meyah', output: 'މެޔަށް' },
-    { input: 'ehaa', output: 'އެހާ' },
-    { input: 'ehme', output: 'އެއްމެ' },
-    { input: 'keii', output: 'ކެތް' },
-    { input: 'alah', output: 'އަލަށް' },
-    { input: 'kehi', output: 'ކެހި' },
-    { input: 'keyy', output: 'ކެތް' },
-    { input: 'miah', output: 'މިއަށް' },
-    { input: 'haan', output: 'ހާނ' },
-    { input: 'anha', output: 'އަނހަ' },
-    { input: 'ashi', output: 'އަށި' },
-    { input: 'ehli', output: 'އެއްލި' },
-
-    // 4 characters
-    { input: 'sihi', output: 'ސިހި' },
-    { input: 'aahu', output: 'އާހު' },
-    { input: 'haeh', output: 'ހައެއް' },
-    { input: 'hieh', output: 'ހިއެއް' },
-    { input: 'huyy', output: 'ހުތް' },
-    { input: 'ruhi', output: 'ރުހި' },
-    { input: 'meah', output: 'މެއަށް' },
-
-    // 3 characters
-    { input: 'gay', output: 'ގަތް' },
-    { input: 'ice', output: 'އައިސް' },
-    { input: 'aee', output: 'އައީ' },
-    { input: 'eee', output: 'އެއީ' },
-    { input: 'oiy', output: 'އޮތް' },
-    { input: 'hiy', output: 'ހިތް' },
-    { input: 'aii', output: 'އަތް' },
-    { input: 'ayy', output: 'އަތް' },
-    { input: 'eid', output: 'އީދު' },
-    { input: 'enn', output: 'އެން' },
-    { input: 'dil', output: 'ދިލް' },
-    { input: 'eyy', output: 'އޭ' },
-    { input: 'loa', output: 'ލޯ' },
-    { input: 'ehy', output: 'އެހީ' },
-    { input: 'goy', output: 'ގޮތް' },
-    { input: 'oyy', output: 'އޮތް' },
-    { input: 'ahi', output: 'އަހި' },
-    { input: 'kei', output: 'ކެތް' },
-    { input: 'oon', output: 'އޫނ' },
-    { input: 'top', output: 'ޓޮޕް' },
-
-    // 2 characters
-    { input: 'en', output: 'އެން' },
-    { input: 'lo', output: 'ލޯ' },
-    { input: 'hih', output: 'ހިތް' },
-    { input: 'oo', output: 'އޫ' },
-    { input: 'ee', output: 'އީ' },
-    { input: 'ah', output: 'އަށް' },
-    { input: 'hi', output: 'ހައި' },
-    { input: 'am', output: 'އޭމް' },
-];
+// Data now loaded from Firebase - see pages/transliteration-manager.html
+const specialCases = [];
 
 // Helper functions
 function isConsonant(char) {
@@ -1953,11 +311,87 @@ function performTransliteration(latinText) {
     // Convert to lowercase and remove apostrophes and periods completely, but preserve commas
     let processText = latinText.toLowerCase().replace(/[']/g, '');
     
+    // Use Firebase data if available, otherwise use hardcoded fallbacks
+    const activeTransliterationMap = (useFirebaseData && firebaseDataCache && Object.keys(firebaseDataCache.transliterationMap).length > 0) 
+        ? firebaseDataCache.transliterationMap 
+        : transliterationMap;
+    const activeVowelDiacritics = (useFirebaseData && firebaseDataCache && Object.keys(firebaseDataCache.vowelDiacritics).length > 0)
+        ? firebaseDataCache.vowelDiacritics
+        : vowelDiacritics;
+    const activeVowelConsonants = (useFirebaseData && firebaseDataCache && Object.keys(firebaseDataCache.vowelConsonants).length > 0)
+        ? firebaseDataCache.vowelConsonants
+        : vowelConsonants;
+    const activeShaviyanisukun = (useFirebaseData && firebaseDataCache && firebaseDataCache.shaviyanisukun.length > 0)
+        ? firebaseDataCache.shaviyanisukun
+        : shaviyanisukun;
+    const activeSpecialCases = (useFirebaseData && firebaseDataCache && firebaseDataCache.specialCases.length > 0)
+        ? firebaseDataCache.specialCases
+        : specialCases;
+    const activeEnglishWords = (useFirebaseData && firebaseDataCache && firebaseDataCache.englishWords && firebaseDataCache.englishWords.length > 0)
+        ? firebaseDataCache.englishWords
+        : [];
+    const activeSentenceEnd = (useFirebaseData && firebaseDataCache && firebaseDataCache.sentenceEnd && firebaseDataCache.sentenceEnd.length > 0)
+        ? firebaseDataCache.sentenceEnd
+        : [{ input: 'keve', output: 'ކެވެ' }, { input: 'eve', output: 'އެވެ' }];
+    
+    // Debug: Log sentence end patterns
+    if (activeSentenceEnd && activeSentenceEnd.length > 0) {
+        console.log('Sentence end patterns loaded:', activeSentenceEnd.length, activeSentenceEnd);
+    }
+    
+    // Check for sentence end patterns (always with period, longest first)
+    for (const pattern of activeSentenceEnd) {
+        const escaped = pattern.input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp(escaped + '\\.', 'gi');
+        const beforeReplace = processText;
+        processText = processText.replace(regex, '⟪' + pattern.output + '.⟫');
+        if (beforeReplace !== processText) {
+            console.log(`Sentence end pattern matched: "${pattern.input}." -> "${pattern.output}."`);
+        }
+    }
+    
+    // Check for special cases first (whole word or phrase matches)
+    // Process special cases from longest to shortest
+    for (const specialCase of activeSpecialCases) {
+        const pattern = specialCase.input;
+        const replacement = specialCase.output;
+        
+        // Create regex to match whole words/phrases (not parts of words)
+        const regex = new RegExp('\\b' + pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
+        processText = processText.replace(regex, '⟪' + replacement + '⟫');
+    }
+    
+    // Check for English words (can be part of a word)
+    // Process from longest to shortest
+    for (const englishWord of activeEnglishWords) {
+        const pattern = englishWord.input;
+        const replacement = englishWord.output;
+        
+        // Create case-insensitive regex that matches the pattern anywhere
+        const regex = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        processText = processText.replace(regex, '⟪' + replacement + '⟫');
+    }
+    
     let dhivehiText = '';
+
+
     let i = 0;
     
     while (i < processText.length) {
         let matched = false;
+        
+        // Check if we're at a special case marker
+        if (processText.substring(i, i + 1) === '⟪') {
+            // Find the closing marker
+            const endMarker = processText.indexOf('⟫', i);
+            if (endMarker !== -1) {
+                // Extract and add the special case output
+                dhivehiText += processText.substring(i + 1, endMarker);
+                i = endMarker + 1;
+                matched = true;
+                continue;
+            }
+        }
         
         // Special case: check for "nnuvaa" at end of word EARLY (before other processing)
         if (processText.substring(i, i + 6) === 'nnuvaa') {
@@ -2714,14 +1148,14 @@ function performTransliteration(latinText) {
                 let nextChar = processText[i + 2];
                 
                 // Check if next character is a consonant (single or start of multi-char) but not 'n'
-                if (transliterationMap[nextChar] && nextChar !== 'n') {
+                if (activeTransliterationMap[nextChar] && nextChar !== 'n') {
                     isFollowedByConsonant = true;
                 } else if (nextChar !== 'n') {
                     // Check if it's the start of a multi-character consonant
                     for (let len = 3; len >= 2; len--) {
                         if (i + 2 + len <= processText.length) {
                             let nextSubstring = processText.substring(i + 2, i + 2 + len);
-                            if (transliterationMap[nextSubstring]) {
+                            if (activeTransliterationMap[nextSubstring]) {
                                 isFollowedByConsonant = true;
                                 break;
                             }
@@ -2739,163 +1173,11 @@ function performTransliteration(latinText) {
         }
 
         // Special case: "hus noonu" patterns - n without sukun in specific combinations
-        const husNoonuPatterns = [
-
-            // 13-letter patterns// 10-letter patterns// 10-letter patterns// 9-letter patterns// 8-letter patterns// 10-letter patterns// 9-letter patterns// 8-letter patterns// 7-letter patterns{ pattern: 'handhah', output: 'ހަނދަށް', length: 7 },{ pattern: 'lhindhu', output: 'ޅިނދު', length: 7 },// 10-letter patterns// 10-letter patterns// 8-letter patterns// 7-letter patterns
-            { pattern: 'thundee', output: 'ތުނޑީ', length: 7 },
-
-            // 9-letter patterns
-            { pattern: 'maahingaa', output: 'މާހިނގާ', length: 9 },
-            // 8-letter patterns
-            { pattern: 'chaandha', output: 'ޗާނދަ', length: 8 },
-            { pattern: 'lhindhaa', output: 'ޅިނދާ', length: 8 },
-            { pattern: 'mihindhu', output: 'މިހިނދު', length: 8 },
-            { pattern: 'muhingaa', output: 'މުހިނގާ', length: 8 },
-            { pattern: 'nuhindhu', output: 'ނުހިނދު', length: 8 },
-            { pattern: 'nuhingaa', output: 'ނުހިނގާ', length: 8 },
-            { pattern: 'thaangaa', output: 'ތާނގާ', length: 8 },
-
-            // 7-letter patterns{ pattern: 'thunbaa', output: 'ތުނބާ', length: 7 },
-
-            // 7-letter patterns
-            { pattern: 'bondhaa', output: 'ބޮނދާ', length: 7 },
-            { pattern: 'bondhai', output: 'ބޮނދައި', length: 7 },
-            { pattern: 'dhandoo', output: 'ދަނޑޫ', length: 7 },
-            { pattern: 'handhaa', output: 'ހަނދާ', length: 7 },
-            { pattern: 'handhey', output: 'ހަނދޭ', length: 7 },
-            { pattern: 'kandhey', output: 'ކަނދޭ', length: 7 },
-            { pattern: 'thaanga', output: 'ތާނގަ', length: 7 },
-
-            // 7-letter patterns
-            { pattern: 'thandee', output: 'ތަނޑީ', length: 7 },
-            { pattern: 'yaandhu', output: 'ޔާނދު', length: 7 },
-            // 6-letter patterns{ pattern: 'bondha', output: 'ބޮނދަ', length: 6 },
-            { pattern: 'aanhaa', output: 'އާނހާ', length: 6 },
-            { pattern: 'andhaa', output: 'އަނދާ', length: 6 },
-            { pattern: 'bandaa', output: 'ބަނޑާ', length: 6 },
-            { pattern: 'bandha', output: 'ބަނދަ', length: 6 },
-            { pattern: 'bandhe', output: 'ބަނދެ', length: 6 },
-            { pattern: 'bindhe', output: 'ބިނދެ', length: 6 },
-            { pattern: 'bondee', output: 'ބޮނޑީ', length: 6 },
-            { pattern: 'dhanbi', output: 'ދަނބި', length: 6 },
-            { pattern: 'dhandu', output: 'ދަނޑު', length: 6 },
-            { pattern: 'dhanbu', output: 'ދަނބު', length: 6 },
-            { pattern: 'dhandi', output: 'ދަނޑި', length: 6 },
-            { pattern: 'dhanmu', output: 'ދަނމު', length: 6 },
-            { pattern: 'findha', output: 'ފިނދަ', length: 6 },
-            { pattern: 'gandey', output: 'ގަނޑޭ', length: 6 },
-            { pattern: 'hendhu', output: 'ހެނދު', length: 6 },
-            { pattern: 'hindha', output: 'ހިނދަ', length: 6 },
-            { pattern: 'hingee', output: 'ހިނގީ', length: 6 },
-            { pattern: 'ihinga', output: 'ިހިނގަ', length: 6 },
-            { pattern: 'kanbaa', output: 'ކަނބާ', length: 6 },
-            { pattern: 'kandaa', output: 'ކަނޑާ', length: 6 },
-            { pattern: 'kandeh', output: 'ކަނޑެއް', length: 6 },
-            { pattern: 'kandoo', output: 'ކަނޑޫ', length: 6 },
-            { pattern: 'kendee', output: 'ކެނޑީ', length: 6 },
-            { pattern: 'kendey', output: 'ކެނޑޭ', length: 6 },
-            { pattern: 'kuriah', output: 'ކުރިޔަށް', length: 6 },
-            { pattern: 'lanbaa', output: 'ލަނބާ', length: 6 },
-            { pattern: 'lenbey', output: 'ލެނބޭ', length: 6 },
-            { pattern: 'lhangu', output: 'ޅަނގު', length: 6 },
-            { pattern: 'rondeh', output: 'ރޮނޑެއް', length: 6 },
-            { pattern: 'runbaa', output: 'ރުނބާ', length: 6 },
-            { pattern: 'thandi', output: 'ތަނޑި', length: 6 },
-            { pattern: 'thundi', output: 'ތުނޑި', length: 6 },
-            { pattern: 'thundu', output: 'ތުނޑު', length: 6 },
-            { pattern: 'thunbu', output: 'ތުނބު', length: 6 },
-            { pattern: 'thunbi', output: 'ތުނބި', length: 6 },
-            { pattern: 'thunba', output: 'ތުނބަ', length: 6 },
-            { pattern: 'thanbu', output: 'ތަނބު', length: 6 },
-            { pattern: 'kandhi', output: 'ކަނދި', length: 6 },
-            { pattern: 'bandhi', output: 'ބަނދި', length: 6 },
-            { pattern: 'handhi', output: 'ހަނދި', length: 6 },
-            { pattern: 'handhu', output: 'ހަނދު', length: 6 },
-            { pattern: 'handha', output: 'ހަނދަ', length: 6 },
-            { pattern: 'sandhu', output: 'ސަނދު', length: 6 },
-            { pattern: 'kandhu', output: 'ކަނދު', length: 6 },
-            { pattern: 'hindhu', output: 'ހިނދު', length: 6 },
-            { pattern: 'rindhu', output: 'ރިނދު', length: 6 },
-            { pattern: 'bindhu', output: 'ބިނދު', length: 6 },
-            { pattern: 'findhu', output: 'ފިނދު', length: 6 },
-            { pattern: 'hingaa', output: 'ހިނގާ', length: 6 },
-            { pattern: 'lhangi', output: 'ޅަނގި', length: 6 },
-            { pattern: 'gandeh', output: 'ގަނޑެއް', length: 6 },
-            { pattern: 'gandaa', output: 'ގަނޑާ', length: 6 },
-            
-            // 6-letter patterns
-            { pattern: 'vandhu', output: 'ވަނދު', length: 6 },
-            // 5-letter patterns
-            { pattern: 'aanha', output: 'އާނހަ', length: 5 },
-            { pattern: 'anbaa', output: 'އަނބާ', length: 5 },
-            { pattern: 'andhi', output: 'އަނދި', length: 5 },
-            { pattern: 'binmu', output: 'ބިނމު', length: 5 },
-            { pattern: 'bondi', output: 'ބޮނޑި', length: 5 },
-            { pattern: 'endhe', output: 'އެނދެ', length: 5 },
-            { pattern: 'endhu', output: 'އެނދު', length: 5 },
-            { pattern: 'fundu', output: 'ފުނޑު', length: 5 },{ pattern: 'honda', output: 'ހޮނޑަ', length: 5 },
-            { pattern: 'genbi', output: 'ގެނބި', length: 5 },
-            { pattern: 'hendu', output: 'ހެނޑު', length: 5 },
-            { pattern: 'hingu', output: 'ހިނގު', length: 5 },
-            { pattern: 'hungu', output: 'ހުނގު', length: 5 },
-            { pattern: 'indhe', output: 'އިނދެ', length: 5 },
-            { pattern: 'kanbi', output: 'ކަނބި', length: 5 },
-            { pattern: 'kandu', output: 'ކަނޑު', length: 5 },
-            { pattern: 'fandu', output: 'ފަނޑު', length: 5 },
-            { pattern: 'kende', output: 'ކެނޑެ', length: 5 },
-            { pattern: 'kendi', output: 'ކެނޑި', length: 5 },
-            { pattern: 'kendu', output: 'ކެނޑު', length: 5 },
-            { pattern: 'kunbu', output: 'ކުނބު', length: 5 },
-            { pattern: 'kundi', output: 'ކުނޑި', length: 5 },
-            { pattern: 'lanbe', output: 'ލަނބެ', length: 5 },
-            { pattern: 'landu', output: 'ލަނޑު', length: 5 },
-            { pattern: 'bandu', output: 'ބަނޑު', length: 5 },
-            { pattern: 'gandu', output: 'ގަނޑު', length: 5 },
-            { pattern: 'gondu', output: 'ގޮނޑު', length: 5 },
-            { pattern: 'gondi', output: 'ގޮނޑި', length: 5 },
-            { pattern: 'ganda', output: 'ގަނޑަ', length: 5 },
-            { pattern: 'genbe', output: 'ގެނބެ', length: 5 },
-            { pattern: 'langi', output: 'ލަނގި', length: 5 },
-            { pattern: 'lenbu', output: 'ލެނބު', length: 5 },
-            { pattern: 'linbe', output: 'ލިނބެ', length: 5 },
-            { pattern: 'randi', output: 'ރަނޑި', length: 5 },
-            { pattern: 'ranga', output: 'ރަނގަ', length: 5 },
-            { pattern: 'rangi', output: 'ރަނގި', length: 5 },
-            { pattern: 'randu', output: 'ރަނޑު', length: 5 },
-            { pattern: 'kanbu', output: 'ކަނބު', length: 5 },
-            { pattern: 'banbu', output: 'ބަނބު', length: 5 },
-            { pattern: 'fanbu', output: 'ފަނބު', length: 5 },
-            { pattern: 'bandi', output: 'ބަނޑި', length: 5 },
-            { pattern: 'banda', output: 'ބަނޑަ', length: 5 },
-            { pattern: 'kanda', output: 'ކަނޑަ', length: 5 },
-            { pattern: 'kandi', output: 'ކަނޑި', length: 5 },
-            { pattern: 'kanga', output: 'ކަނގަ', length: 5 },
-            { pattern: 'hinga', output: 'ހިނގަ', length: 5 },
-            { pattern: 'engey', output: 'އެނގޭ', length: 5 },
-            { pattern: 'ingey', output: 'އިނގޭ', length: 5 },
-            { pattern: 'ringa', output: 'ރިނގަ', length: 5 },
-            { pattern: 'ringu', output: 'ރިނގު', length: 5 },
-            { pattern: 'undha', output: 'އުނދަ', length: 5 },
-            { pattern: 'undhu', output: 'އުނދު', length: 5 },
-            { pattern: 'yangi', output: 'ޔަނގި', length: 5 },
-            { pattern: 'runba', output: 'ރުނބަ', length: 5 },
-            
-            // 4-letter patterns
-            { pattern: 'anbi', output: 'އަނބި', length: 4 },
-            { pattern: 'anga', output: 'އަނގަ', length: 4 },
-            { pattern: 'anbu', output: 'އަނބު', length: 4 },
-            { pattern: 'ango', output: 'އަނގޮ', length: 4 },
-            { pattern: 'enbu', output: 'އެނބު', length: 4 },
+        const activeHusNoonuPatterns = (useFirebaseData && firebaseDataCache && firebaseDataCache.husNoonuPatterns && firebaseDataCache.husNoonuPatterns.length > 0)
+            ? firebaseDataCache.husNoonuPatterns
+            : husNoonuPatterns;
         
-            { pattern: 'engi', output: 'އެނގި', length: 4 },
-            { pattern: 'engu', output: 'އެނގު', length: 4 },
-            { pattern: 'inba', output: 'އިނބަ', length: 4 },
-            { pattern: 'ingi', output: 'އިނގި', length: 4 },
-            { pattern: 'unba', output: 'އުނބަ', length: 4 },
-            { pattern: 'unga', output: 'އުނގަ', length: 4 },
-            { pattern: 'ungu', output: 'އުނގު', length: 4 },];
-        
-        for (let husPattern of husNoonuPatterns) {
+        for (let husPattern of activeHusNoonuPatterns) {
             if (processText.substring(i, i + husPattern.pattern.length) === husPattern.pattern) {
                 dhivehiText += husPattern.output;
                 i += husPattern.pattern.length;
@@ -2930,14 +1212,14 @@ function performTransliteration(latinText) {
                     let nextChar = processText[i + 1];
                     
                     // Check if next character is a single consonant
-                    if (transliterationMap[nextChar]) {
+                    if (activeTransliterationMap[nextChar]) {
                         nextIsConsonant = true;
                     } else {
                         // Check if it's the start of a multi-character consonant
                         for (let len = 3; len >= 2; len--) {
                             if (i + 1 + len <= processText.length) {
                                 let nextSubstring = processText.substring(i + 1, i + 1 + len);
-                                if (transliterationMap[nextSubstring]) {
+                                if (activeTransliterationMap[nextSubstring]) {
                                     nextIsConsonant = true;
                                     break;
                                 }
@@ -3046,7 +1328,7 @@ function performTransliteration(latinText) {
         for (let len = 3; len >= 2; len--) {
             if (i + len <= processText.length) {
                 let substring = processText.substring(i, i + len);
-                if (transliterationMap[substring]) {
+                if (activeTransliterationMap[substring]) {
                     // Special case: 'sh' at start of word should be 'ޝ' instead of 'ށ'
                     if (substring === 'sh') {
                         // Check if this 'sh' is at the start of a word
@@ -3067,7 +1349,7 @@ function performTransliteration(latinText) {
                         if (isStartOfWord) {
                             dhivehiText += 'ޝ'; // shaviyani for word-initial 'sh'
                         } else {
-                            dhivehiText += transliterationMap[substring]; // regular seenu
+                            dhivehiText += activeTransliterationMap[substring]; // regular seenu
                         }
                     } 
                     // Special case: 'ny' at end of word should be 'ނީ' instead of 'ޏ'
@@ -3090,10 +1372,10 @@ function performTransliteration(latinText) {
                         if (isEndOfWord) {
                             dhivehiText += 'ނީ'; // nun + long kasra for word-final 'ny'
                         } else {
-                            dhivehiText += transliterationMap[substring]; // regular gnaviyani
+                            dhivehiText += activeTransliterationMap[substring]; // regular gnaviyani
                         }
                     } else {
-                        dhivehiText += transliterationMap[substring];
+                        dhivehiText += activeTransliterationMap[substring];
                     }
                     i += len;
                     matched = true;
@@ -3163,8 +1445,8 @@ function performTransliteration(latinText) {
                 let substring1 = processText.substring(i, i + len);
                 let substring2 = processText.substring(i + len, i + len * 2);
                 
-                if (transliterationMap[substring1] && substring1 === substring2) {
-                    dhivehiText += 'އް' + transliterationMap[substring1]; // alif + sukun + consonant
+                if (activeTransliterationMap[substring1] && substring1 === substring2) {
+                    dhivehiText += 'އް' + activeTransliterationMap[substring1]; // alif + sukun + consonant
                     i += len * 2; // skip both occurrences
                     foundDoubledConsonant = true;
                     matched = true;
@@ -3178,12 +1460,12 @@ function performTransliteration(latinText) {
             let char1 = processText[i];
             let char2 = processText[i + 1];
             
-            if (transliterationMap[char1] && char1 === char2) {
+            if (activeTransliterationMap[char1] && char1 === char2) {
                 // Special case: doubled 'nn' should be 'ންނ' instead of 'އް' + consonant
                 if (char1 === 'n') {
                     dhivehiText += 'ންނ'; // sukun + nun + nun for doubled 'nn'
                 } else {
-                    dhivehiText += 'އް' + transliterationMap[char1]; // alif + sukun + consonant for other doubled consonants
+                    dhivehiText += 'އް' + activeTransliterationMap[char1]; // alif + sukun + consonant for other doubled consonants
                 }
                 i += 2; // skip both occurrences
                 foundDoubledConsonant = true;
@@ -3271,7 +1553,7 @@ function performTransliteration(latinText) {
                     for (let prevLen = 3; prevLen >= 1; prevLen--) {
                         if (i - prevLen >= 0) {
                             let prevSubstring = processText.substring(i - prevLen, i);
-                            if (transliterationMap[prevSubstring] && shaviyanisukun.includes(prevSubstring)) {
+                            if (activeTransliterationMap[prevSubstring] && activeShaviyanisukun.includes(prevSubstring)) {
                                 prevIsShaviyanisukunConsonant = true;
                                 prevConsonant = prevSubstring;
                                 foundPrevConsonant = true;
@@ -3281,7 +1563,7 @@ function performTransliteration(latinText) {
                     }
                     
                     // If no multi-char consonant found, check single char
-                    if (!foundPrevConsonant && transliterationMap[processText[i - 1]] && shaviyanisukun.includes(processText[i - 1])) {
+                    if (!foundPrevConsonant && activeTransliterationMap[processText[i - 1]] && activeShaviyanisukun.includes(processText[i - 1])) {
                         prevIsShaviyanisukunConsonant = true;
                         prevConsonant = processText[i - 1];
                     }
@@ -3352,7 +1634,7 @@ function performTransliteration(latinText) {
                         for (let prevLen = 3; prevLen >= 1; prevLen--) {
                             if (i - prevLen >= 0) {
                                 let prevSubstring = processText.substring(i - prevLen, i);
-                                if (transliterationMap[prevSubstring]) {
+                                if (activeTransliterationMap[prevSubstring]) {
                                     prevIsConsonant = true;
                                     prevConsonant = prevSubstring;
                                     foundPrevConsonant = true;
@@ -3362,7 +1644,7 @@ function performTransliteration(latinText) {
                         }
                         
                         // If no multi-char consonant found, check single char
-                        if (!foundPrevConsonant && transliterationMap[processText[i - 1]]) {
+                        if (!foundPrevConsonant && activeTransliterationMap[processText[i - 1]]) {
                             prevIsConsonant = true;
                             prevConsonant = processText[i - 1];
                         }
@@ -3415,8 +1697,8 @@ function performTransliteration(latinText) {
                         break;
                     } else {
                         // At word start or after punctuation, treat as vowel
-                        if (vowelConsonants[sukunSound]) {
-                            dhivehiText += vowelConsonants[sukunSound];
+                        if (activeVowelConsonants[sukunSound]) {
+                            dhivehiText += activeVowelConsonants[sukunSound];
                             i += sukunSound.length;
                             foundSukunSound = true;
                             matched = true;
@@ -3469,7 +1751,7 @@ function performTransliteration(latinText) {
                 for (let prevLen = 3; prevLen >= 1; prevLen--) {
                     if (i - prevLen >= 0) {
                         let prevSubstring = processText.substring(i - prevLen, i);
-                        if (transliterationMap[prevSubstring]) {
+                        if (activeTransliterationMap[prevSubstring]) {
                             // Previous was a consonant, so use diacritic form
                             foundPrevConsonant = true;
                             break;
@@ -3478,7 +1760,7 @@ function performTransliteration(latinText) {
                 }
                 
                 // If no multi-char consonant found, check single char
-                if (!foundPrevConsonant && transliterationMap[processText[i - 1]]) {
+                if (!foundPrevConsonant && activeTransliterationMap[processText[i - 1]]) {
                     foundPrevConsonant = true;
                 }
                 
@@ -3506,13 +1788,13 @@ function performTransliteration(latinText) {
                 }
             }
             
-            if (useAsConsonant && vowelConsonants[vowelSound]) {
-                dhivehiText += vowelConsonants[vowelSound];
-            } else if (!useAsConsonant && vowelDiacritics[vowelSound]) {
-                dhivehiText += vowelDiacritics[vowelSound];
+            if (useAsConsonant && activeVowelConsonants[vowelSound]) {
+                dhivehiText += activeVowelConsonants[vowelSound];
+            } else if (!useAsConsonant && activeVowelDiacritics[vowelSound]) {
+                dhivehiText += activeVowelDiacritics[vowelSound];
             } else {
                 // Fallback to consonant form
-                dhivehiText += vowelConsonants[vowelSound] || vowelDiacritics[vowelSound];
+                dhivehiText += activeVowelConsonants[vowelSound] || activeVowelDiacritics[vowelSound];
             }
             
             i += skipLength; // Use skipLength instead of vowelSound.length
@@ -3521,7 +1803,7 @@ function performTransliteration(latinText) {
         }
         
         // Check single character consonants
-        if (transliterationMap[processText[i]]) {
+        if (activeTransliterationMap[processText[i]]) {
             // Special case: 'l' followed by consonant should be 'ލް' instead of 'ލ'
             // Also: 'l' at end of word should be 'ލު' instead of 'ލ'
             if (processText[i] === 'l') {
@@ -3550,14 +1832,14 @@ function performTransliteration(latinText) {
                         let nextChar = processText[i + 1];
                         
                         // Check if next character is a consonant (single or start of multi-char)
-                        if (transliterationMap[nextChar]) {
+                        if (activeTransliterationMap[nextChar]) {
                             isFollowedByConsonant = true;
                         } else {
                             // Check if it's the start of a multi-character consonant
                             for (let len = 3; len >= 2; len--) {
                                 if (i + 1 + len <= processText.length) {
                                     let nextSubstring = processText.substring(i + 1, i + 1 + len);
-                                    if (transliterationMap[nextSubstring]) {
+                                    if (activeTransliterationMap[nextSubstring]) {
                                         isFollowedByConsonant = true;
                                         break;
                                     }
@@ -3569,7 +1851,7 @@ function performTransliteration(latinText) {
                     if (isFollowedByConsonant) {
                         dhivehiText += 'ލް'; // laamal + sukun when followed by consonant
                     } else {
-                        dhivehiText += transliterationMap[processText[i]]; // regular laamal
+                        dhivehiText += activeTransliterationMap[processText[i]]; // regular laamal
                     }
                 }
             }
@@ -3583,14 +1865,14 @@ function performTransliteration(latinText) {
                     let nextChar = processText[i + 1];
                     
                     // Check if next character is a consonant (single or start of multi-char)
-                    if (transliterationMap[nextChar]) {
+                    if (activeTransliterationMap[nextChar]) {
                         isFollowedByConsonant = true;
                     } else {
                         // Check if it's the start of a multi-character consonant
                         for (let len = 3; len >= 2; len--) {
                             if (i + 1 + len <= processText.length) {
                                 let nextSubstring = processText.substring(i + 1, i + 1 + len);
-                                if (transliterationMap[nextSubstring]) {
+                                if (activeTransliterationMap[nextSubstring]) {
                                     isFollowedByConsonant = true;
                                     break;
                                 }
@@ -3632,7 +1914,7 @@ function performTransliteration(latinText) {
                 if (isFollowedByConsonant || isEndOfWordWithVowel) {
                     dhivehiText += 'ސް'; // seenu + sukun when followed by consonant or at end with vowel
                 } else {
-                    dhivehiText += transliterationMap[processText[i]]; // regular seenu
+                    dhivehiText += activeTransliterationMap[processText[i]]; // regular seenu
                 }
             }
             // Special case: 'n' uses sukun only when followed by consonant or at end of word
@@ -3659,14 +1941,14 @@ function performTransliteration(latinText) {
                     let nextChar = processText[i + 1];
                     
                     // Check if next character is a consonant (single or start of multi-char)
-                    if (transliterationMap[nextChar]) {
+                    if (activeTransliterationMap[nextChar]) {
                         isFollowedByConsonant = true;
                     } else {
                         // Check if it's the start of a multi-character consonant
                         for (let len = 3; len >= 2; len--) {
                             if (i + 1 + len <= processText.length) {
                                 let nextSubstring = processText.substring(i + 1, i + 1 + len);
-                                if (transliterationMap[nextSubstring]) {
+                                if (activeTransliterationMap[nextSubstring]) {
                                     isFollowedByConsonant = true;
                                     break;
                                 }
@@ -3678,7 +1960,7 @@ function performTransliteration(latinText) {
                 if (isEndOfWord || isFollowedByConsonant) {
                     dhivehiText += 'ން'; // sukun + nun when at end of word or followed by consonant
                 } else {
-                    dhivehiText += transliterationMap[processText[i]]; // regular nun when followed by vowel
+                    dhivehiText += activeTransliterationMap[processText[i]]; // regular nun when followed by vowel
                 }
             }
             // Special case: 'r' at end of word after vowel should be 'ރު' instead of 'ރ'
@@ -3723,7 +2005,7 @@ function performTransliteration(latinText) {
                 if (isEndOfWord && prevIsVowel) {
                     dhivehiText += 'ރު'; // raa + damma for word-final 'r' after vowel
                 } else {
-                    dhivehiText += transliterationMap[processText[i]]; // regular raa
+                    dhivehiText += activeTransliterationMap[processText[i]]; // regular raa
                 }
             }
             // Special case: 'm' without vowel after should be 'މް' instead of 'މ'
@@ -3750,14 +2032,14 @@ function performTransliteration(latinText) {
                     let nextChar = processText[i + 1];
                     
                     // Check if next character is a consonant (single or start of multi-char)
-                    if (transliterationMap[nextChar]) {
+                    if (activeTransliterationMap[nextChar]) {
                         isFollowedByConsonant = true;
                     } else {
                         // Check if it's the start of a multi-character consonant
                         for (let len = 3; len >= 2; len--) {
                             if (i + 1 + len <= processText.length) {
                                 let nextSubstring = processText.substring(i + 1, i + 1 + len);
-                                if (transliterationMap[nextSubstring]) {
+                                if (activeTransliterationMap[nextSubstring]) {
                                     isFollowedByConsonant = true;
                                     break;
                                 }
@@ -3769,11 +2051,11 @@ function performTransliteration(latinText) {
                 if (isEndOfWord || isFollowedByConsonant) {
                     dhivehiText += 'މް'; // meem + sukun when at end of word or followed by consonant (no vowel)
                 } else {
-                    dhivehiText += transliterationMap[processText[i]]; // regular meem when followed by vowel
+                    dhivehiText += activeTransliterationMap[processText[i]]; // regular meem when followed by vowel
                 }
             }
             else {
-                dhivehiText += transliterationMap[processText[i]];
+                dhivehiText += activeTransliterationMap[processText[i]];
             }
             i++;
             matched = true;

@@ -420,13 +420,37 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Firebase transliteration manager -->
+    <script src="../../js/transliteration-firebase.js"></script>
+    
     <script src="transliteration.js"></script>
     <script src="reverse-transliteration.js"></script>
     <script>
-        // Initialize Thaana transliteration for Dhivehi input
-        document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Firebase and transliteration data
+        async function initializeApp() {
+            if (typeof transliterationFirebase !== 'undefined') {
+                await transliterationFirebase.initialize();
+                
+                // Setup real-time listener for data changes
+                transliterationFirebase.addListener((cache) => {
+                    console.log('Reverse special cases updated, re-transliterating...');
+                    // Re-transliterate if there's text in the input
+                    const dhivehiInput = document.getElementById('dhivehiInput');
+                    if (dhivehiInput && dhivehiInput.value.trim()) {
+                        transliterate();
+                    }
+                });
+            }
+            
+            // Setup Thaana transliteration for Dhivehi input
             setupThaanaTransliteration(document.getElementById('dhivehiInput'));
-        });
+        }
+        
+        document.addEventListener('DOMContentLoaded', initializeApp);
 
         function setupThaanaTransliteration(input) {
             let isTransliterating = false;

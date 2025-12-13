@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migrate Reverse Special Cases to Firebase</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 12px 24px;
+            font-size: 16px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button.danger {
+            background: #dc3545;
+        }
+        button.danger:hover {
+            background: #c82333;
+        }
+        #status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Migrate Reverse Special Cases to Firebase</h1>
+        <p>This tool will migrate the reverse special cases (Thaana to Latin) from the hardcoded array to Firebase.</p>
+        
+        <button onclick="migrateCases()">Migrate Cases</button>
+        <button class="danger" onclick="clearCases()">Clear All Cases</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const reverseCasesRef = db.ref('transliteration/reverseSpecialCases');
+
+        // Hardcoded reverse special cases from reverse-transliteration.js
+        const reverseSpecialCases = [
+            // Handle ޢ (waw) with vowel diacritics
+            { input: 'ޢޫ', output: 'oo' },
+            { input: 'ޢާ', output: 'aa' },
+            { input: 'ޢީ', output: 'ee' },
+            { input: 'ޢޭ', output: 'ey' },
+            { input: 'ޢޯ', output: 'oa' },
+            { input: 'ޢު', output: 'u' },
+            { input: 'ޢި', output: 'i' },
+            { input: 'ޢެ', output: 'e' },
+            { input: 'ޢޮ', output: 'o' },
+            { input: 'ޢަ', output: 'a' },
+            { input: 'ޢް', output: 'h' },
+            { input: 'ނިއުޔޯކް', output: 'new york' },
+            { input: 'ޓޯކިޔޯ', output: 'tokyo' },
+            { input: 'ރެސްޓޯރެންޓް', output: 'restaurant' },
+            { input: 'އާނއޭ', output: 'aaney' },
+            { input: 'ރާއްޖެ', output: 'raajje' },
+            { input: 'ޑޮލަރުން', output: 'dollarun' },
+            { input: 'ޑޮލަރު', output: 'dollar' },
+            { input: 'ޔޫރޯ', output: 'euro' },
+            { input: 'ކާރެއްގާ', output: 'carehgaa' },
+            { input: 'ކާރަކާ', output: 'carakaa' },
+            { input: 'ބިލިއަން', output: 'billion' },
+            { input: 'މިލިއަން', output: 'million' },
+            { input: 'ﷲ', output: 'allah' },
+            { input: 'ސުބުހާނަﷲ', output: 'subuhaanallah' },
+            { input: 'ބިންނަން', output: 'binnan' },
+            { input: 'ރެޑީކޮށް', output: 'readykoh' },
+            { input: 'މަސްތުކޮށްލާ ފާނެޔޭ', output: 'masthukohlaafaaneyey' },
+            { input: 'ތަކަހޮޅިތައް', output: 'thakaholhithah' },
+            { input: 'ނިމިހިނގައިދާނޭ', output: 'nimihingaidhaaney' },
+            { input: 'ކުޅަދުންވަންތަ', output: 'kulhadhunvantha' },
+            { input: 'ޒީނަތްތެރިކަން', output: 'zeenaitherikan' },
+            { input: 'ވާދުވަހުންކޭ', output: 'vaadhuvahunkey' },
+            { input: 'ތިބުނިހެންނޭ', output: 'thibunihenney' },
+            { input: 'ނިންމާފާނެޔޮ', output: 'ninmaafaaneyo' },
+            { input: 'ނުހޮރުއްޕާނޭ', output: 'nuhuruhpaaney' },
+            { input: 'ނޮހޮރޮއްޕާނޭ', output: 'nohorohpaaney' },
+            { input: 'އާނއެކޭ', output: 'aanekey' },
+            { input: 'އިސްތަށިގަނޑު', output: 'ishthashigandu' },
+            { input: 'ހަނދާނުންނޭ', output: 'handhaanunney' },
+            { input: 'ޖަވާހިރައްވެސް', output: 'javaahirahves' },
+            { input: 'ޒިންދަގީގާ', output: 'zindhageegaa' },
+            { input: 'މެދުތެރޭން', output: 'medhutherean' },
+            { input: 'އެންކެޔޮޅުބޭ', output: 'enkeyolhubey' },
+            { input: 'ދިރިހުރިހާ', output: 'dhirihurihaa' },
+            { input: 'ރަށުތެރެއަށް', output: 'rashuthereah' },
+            { input: 'އިހުސާސްވީމާ', output: 'ihusaasveemaa' },
+            { input: 'ނުރުހިއްޖެޔޭ', output: 'nuruhihjeyey' },
+            { input: 'ނޭންގޭނެޔޭ', output: 'neyngeyneyey' },
+            { input: 'ނުވެވޭނެޔޭ', output: 'nuveveyneyey' },
+            { input: 'ހުރެވޭނެހޭ', output: 'hureveynehey' },
+            { input: 'ކުރުވައިފިޔޭ', output: 'kuruvaifiyey' },
+            { input: 'އިހުސާސްތަކޭ', output: 'ihusaasthakey' },
+            { input: 'ދުޝްމިނުންނާ', output: 'dhushminunnaa' },
+            { input: 'ދުޝްމިނުންނޭ', output: 'dhushminunney' },
+            { input: 'ހަނދާނުނޭ', output: 'handhaanuney' },
+            { input: 'ހަނދާންވޭ', output: 'handhaanvey' },
+            { input: 'ދާގޮތްވޭ', output: 'dhaagoiyvey' },
+            { input: 'ވާދުވަހެކޭ', output: 'vaadhuvahekey' },
+            { input: 'ވާދުވަސްތައް', output: 'vaadhuvasthah' },
+            { input: 'މަރާތީހޭ', output: 'maraatheehey' },
+            { input: 'ދުޝްމިނަކާ', output: 'dhushminakaa' },
+            { input: 'ވާދުވަހަކީ', output: 'vaadhuvahaky' },
+            { input: 'އިހުސާހަކީ', output: 'ihusaahakii' },
+            { input: 'އިހުސާހެކޭ', output: 'ihusaahekey' },
+            { input: 'އިހުސާސްތައް', output: 'ihusaasthah' },
+            { input: 'ތިހިރީތި', output: 'thihireethi' },
+            { input: 'ތިހުރީތި', output: 'thihureethi' },
+            { input: 'ނޭންގޭހެން', output: 'neyngeyhen' },
+            { input: 'ލެޕްޓޮޕް', output: 'laptop' },
+            { input: 'ހެން', output: 'hen' },
+            { input: 'ހޭ', output: 'hey' },
+            { input: 'ނަ', output: 'na' },
+            { input: 'ނެޔޭ', output: 'neyey' },
+            { input: 'ޖެހޭ', output: 'jehey' },
+            { input: 'ޖެޔޭ', output: 'jeyey' },
+            { input: 'ނުވާ', output: 'nuvaa' },
+            { input: 'ޖެހިއްޖޭ', output: 'jehihjey' },
+            { input: 'ވެއްޖެއޭ', output: 'vehje ey' },
+            { input: 'ޕާޓީ', output: 'party' },
+            { input: 'ޕާޓީގާ', output: 'partygaa' },
+            { input: 'ޕާޓީއަށް', output: 'partyah' },
+            { input: 'ސޮރީ', output: 'sorry' },
+            { input: 'އޭމް', output: 'am' },
+            { input: 'ންނުވާ', output: 'nnuvaa' }
+        ];
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = type;
+        }
+
+        async function migrateCases() {
+            showStatus('Starting migration...', 'info');
+            
+            try {
+                let count = 0;
+                const total = reverseSpecialCases.length;
+                
+                // Upload cases in batches
+                for (const specialCase of reverseSpecialCases) {
+                    await reverseCasesRef.push(specialCase);
+                    count++;
+                    
+                    if (count % 10 === 0) {
+                        showStatus(`Migrated ${count} / ${total} cases...`, 'info');
+                    }
+                }
+                
+                showStatus(`✓ Successfully migrated all ${total} reverse special cases to Firebase!`, 'success');
+            } catch (error) {
+                showStatus(`✗ Error migrating cases: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function clearCases() {
+            if (!confirm('Are you sure you want to delete ALL reverse special cases from Firebase?')) {
+                return;
+            }
+            
+            showStatus('Clearing all cases...', 'warning');
+            
+            try {
+                await reverseCasesRef.remove();
+                showStatus('✓ All reverse special cases have been cleared from Firebase', 'success');
+            } catch (error) {
+                showStatus(`✗ Error clearing cases: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+    </script>
+</body>
+</html>

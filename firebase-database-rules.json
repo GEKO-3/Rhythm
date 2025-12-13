@@ -167,6 +167,35 @@
         ".read": true,
         ".write": true
       }
+    },
+    
+    "transliteration": {
+      ".read": true,
+      ".write": true,
+      "specialCases": {
+        ".read": true,
+        ".write": true,
+        "$caseId": {
+          ".read": true,
+          ".write": true
+        }
+      },
+      "transliterationMap": {
+        ".read": true,
+        ".write": true
+      },
+      "vowelDiacritics": {
+        ".read": true,
+        ".write": true
+      },
+      "vowelConsonants": {
+        ".read": true,
+        ".write": true
+      },
+      "shaviyanisukun": {
+        ".read": true,
+        ".write": true
+      }
     }
   }
 }

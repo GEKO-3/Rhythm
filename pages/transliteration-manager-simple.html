@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transliteration Manager - Simple</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            background: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        button:hover {
+            background: #f0f0f0;
+        }
+
+        button.primary {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+
+        button.primary:hover {
+            background: #0056b3;
+        }
+
+        button.danger {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        button.danger:hover {
+            background: #c82333;
+        }
+
+        input[type="text"], input[type="search"] {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .thaana {
+            font-family: 'Faruma', 'MV Faseyha', 'Noto Sans Thaana', sans-serif;
+            font-size: 18px;
+            direction: rtl;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            max-width: none;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .stats {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-buttons button {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Transliteration Manager</h1>
+        
+        <div class="controls">
+            <select id="categorySelect" onchange="changeCategory()">
+                <option value="specialCases">Special Cases</option>
+                <option value="englishWords">English Words</option>
+                <option value="sentenceEnd">Sentence End</option>
+                <option value="transliterationMap">Transliteration Map</option>
+                <option value="vowelDiacritics">Vowel Diacritics</option>
+                <option value="vowelConsonants">Vowel Consonants</option>
+                <option value="shaviyanisukun">Shaviyanisukun</option>
+                <option value="husNoonuPatterns">Husnoonu Patterns</option>
+                <option value="reverseSpecialCases">Reverse Special Cases</option>
+            </select>
+            <button class="primary" onclick="openAddModal()">+ Add</button>
+            <input type="search" class="search-box" id="searchInput" placeholder="Search..." oninput="filterTable()">
+            <button onclick="loadPage()">Refresh</button>
+        </div>
+
+        <div class="stats" id="stats">Loading...</div>
+
+        <div id="tableContainer">
+            <div class="loading">Loading data...</div>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Add Item</h2>
+            <div class="form-group" id="inputGroup">
+                <label id="inputLabel">Input</label>
+                <input type="text" id="inputField" placeholder="">
+            </div>
+            <div class="form-group" id="outputGroup">
+                <label id="outputLabel">Output</label>
+                <input type="text" id="outputField" class="thaana" placeholder="">
+            </div>
+            <div class="modal-buttons">
+                <button onclick="closeModal()">Cancel</button>
+                <button class="primary" onclick="saveItem()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Reverse transliteration for Thaana input -->
+    <script src="../js/reverse-transliteration.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const transliterationRef = db.ref('transliteration');
+
+        let currentCategory = 'specialCases';
+        let allData = [];
+        let filteredData = [];
+        let currentPage = 0;
+        const itemsPerPage = 50;
+        let currentEditId = null;
+
+        // Category configurations
+        const categoryConfig = {
+            specialCases: {
+                title: 'Special Cases',
+                inputLabel: 'Latin Input',
+                outputLabel: 'Thaana Output',
+                hasOutput: true,
+                isList: false
+            },
+            englishWords: {
+                title: 'English Words',
+                inputLabel: 'English Word',
+                outputLabel: 'Thaana Output',
+                hasOutput: true,
+                isList: false
+            },
+            sentenceEnd: {
+                title: 'Sentence End',
+                inputLabel: 'Latin Input (no period)',
+                outputLabel: 'Thaana Output (no period)',
+                hasOutput: true,
+                isList: false
+            },
+            transliterationMap: {
+                title: 'Transliteration Map',
+                inputLabel: 'Latin Key',
+                outputLabel: 'Thaana Value',
+                hasOutput: true,
+                isList: false
+            },
+            vowelDiacritics: {
+                title: 'Vowel Diacritics',
+                inputLabel: 'Latin Key',
+                outputLabel: 'Thaana Value',
+                hasOutput: true,
+                isList: false
+            },
+            vowelConsonants: {
+                title: 'Vowel Consonants',
+                inputLabel: 'Latin Key',
+                outputLabel: 'Thaana Value',
+                hasOutput: true,
+                isList: false
+            },
+            shaviyanisukun: {
+                title: 'Shaviyanisukun',
+                inputLabel: 'Consonant',
+                outputLabel: null,
+                hasOutput: false,
+                isList: true
+            },
+            husNoonuPatterns: {
+                title: 'Husnoonu Patterns',
+                inputLabel: 'Latin Pattern',
+                outputLabel: 'Thaana Output',
+                hasOutput: true,
+                isList: false,
+                hasLength: true
+            },
+            reverseSpecialCases: {
+                title: 'Reverse Special Cases',
+                inputLabel: 'Thaana Input',
+                outputLabel: 'Latin Output',
+                hasOutput: true,
+                isList: false
+            }
+        };
+
+        function changeCategory() {
+            currentCategory = document.getElementById('categorySelect').value;
+            loadData();
+        }
+
+        // Load data
+        async function loadData() {
+            const config = categoryConfig[currentCategory];
+            try {
+                const snapshot = await transliterationRef.child(currentCategory).once('value');
+                const data = snapshot.val();
+                
+                if (config.isList) {
+                    // Handle array-based data (shaviyanisukun)
+                    if (data) {
+                        allData = Object.keys(data).map(key => ({
+                            id: key,
+                            value: data[key]
+                        }));
+                    } else {
+                        allData = [];
+                    }
+                } else if (config.hasOutput) {
+                    // Handle key-value pairs with both input and output
+                    if (data) {
+                        if (currentCategory === 'specialCases' || currentCategory === 'reverseSpecialCases' || currentCategory === 'englishWords' || currentCategory === 'sentenceEnd') {
+                            // Special cases, reverse special cases, English words, and sentence end have {input, output} structure
+                            allData = Object.keys(data).map(key => ({
+                                id: key,
+                                input: data[key].input,
+                                output: data[key].output
+                            })).sort((a, b) => b.input.length - a.input.length);
+                        } else if (currentCategory === 'husNoonuPatterns') {
+                            // Husnoonu patterns have {pattern, output, length} structure
+                            allData = Object.keys(data).map(key => ({
+                                id: key,
+                                input: data[key].pattern,
+                                output: data[key].output,
+                                length: data[key].length
+                            })).sort((a, b) => b.length - a.length);
+                        } else {
+                            // Maps have key: value structure
+                            allData = Object.keys(data).map(key => ({
+                                id: key,
+                                input: key,
+                                output: data[key]
+                            }));
+                        }
+                    } else {
+                        allData = [];
+                    }
+                }
+                
+                filteredData = [...allData];
+                currentPage = 0;
+                updateStats();
+                renderPage();
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('tableContainer').innerHTML = '<div class="loading">Error loading data</div>';
+            }
+        }
+
+        // Render current page
+        function renderPage() {
+            const config = categoryConfig[currentCategory];
+            const start = currentPage * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageData = filteredData.slice(start, end);
+
+            if (pageData.length === 0) {
+                document.getElementById('tableContainer').innerHTML = `<div class="loading">No ${config.title.toLowerCase()} found</div>`;
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            let html = '<table><thead><tr>';
+            
+            if (config.isList) {
+                html += '<th>Value</th>';
+            } else {
+                html += `<th>${config.inputLabel}</th>`;
+                if (config.hasOutput) {
+                    html += `<th>${config.outputLabel}</th>`;
+                }
+            }
+            html += '<th style="width: 150px;">Actions</th></tr></thead><tbody>';
+
+            pageData.forEach(item => {
+                html += '<tr>';
+                if (config.isList) {
+                    html += `<td class="thaana">${escapeHtml(item.value)}</td>`;
+                } else {
+                    // For reverse special cases, input is Thaana
+                    if (currentCategory === 'reverseSpecialCases') {
+                        html += `<td class="thaana">${escapeHtml(item.input)}</td>`;
+                    } else {
+                        html += `<td>${escapeHtml(item.input)}</td>`;
+                    }
+                    
+                    if (config.hasOutput) {
+                        // For reverse special cases, output is Latin
+                        // For sentence end, show period appended to both input and output
+                        if (currentCategory === 'reverseSpecialCases') {
+                            html += `<td>${escapeHtml(item.output)}</td>`;
+                        } else if (currentCategory === 'sentenceEnd') {
+                            html += `<td class="thaana">${escapeHtml(item.output)}.</td>`;
+                        } else {
+                            html += `<td class="thaana">${escapeHtml(item.output)}</td>`;
+                        }
+                    }
+                }
+                
+                html += '<td><div class="action-buttons">';
+                if (config.isList) {
+                    html += `<button class="danger" onclick="deleteItem('${item.id}', '${escapeHtml(item.value)}')">Delete</button>`;
+                } else {
+                    html += `<button onclick="editItem('${item.id}', '${escapeHtml(item.input)}', '${escapeHtml(item.output || '')}')">Edit</button>`;
+                    html += `<button class="danger" onclick="deleteItem('${item.id}', '${escapeHtml(item.input)}')">Delete</button>`;
+                }
+                html += '</div></td></tr>';
+            });
+
+            html += '</tbody></table>';
+            document.getElementById('tableContainer').innerHTML = html;
+
+            // Render pagination
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            if (totalPages <= 1) {
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            if (currentPage > 0) {
+                html += `<button onclick="changePage(${currentPage - 1})">Previous</button>`;
+            }
+
+            html += `<span>Page ${currentPage + 1} of ${totalPages}</span>`;
+
+            if (currentPage < totalPages - 1) {
+                html += `<button onclick="changePage(${currentPage + 1})">Next</button>`;
+            }
+
+            document.getElementById('pagination').innerHTML = html;
+        }
+
+        function changePage(page) {
+            currentPage = page;
+            renderPage();
+            window.scrollTo(0, 0);
+        }
+
+        function updateStats() {
+            const config = categoryConfig[currentCategory];
+            document.getElementById('stats').textContent = 
+                `Total: ${allData.length} ${config.title.toLowerCase()} | Showing: ${filteredData.length}`;
+        }
+
+        function filterTable() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const config = categoryConfig[currentCategory];
+            
+            if (query.trim() === '') {
+                filteredData = [...allData];
+            } else {
+                filteredData = allData.filter(item => {
+                    if (config.isList) {
+                        return item.value.toLowerCase().includes(query);
+                    } else {
+                        return item.input.toLowerCase().includes(query) || 
+                               (item.output && item.output.includes(query));
+                    }
+                });
+            }
+            currentPage = 0;
+            updateStats();
+            renderPage();
+        }
+
+        // Modal functions
+        function openAddModal() {
+            const config = categoryConfig[currentCategory];
+            currentEditId = null;
+            document.getElementById('modalTitle').textContent = `Add ${config.title}`;
+            
+            const inputField = document.getElementById('inputField');
+            const outputField = document.getElementById('outputField');
+            
+            if (config.isList) {
+                document.getElementById('inputLabel').textContent = config.inputLabel;
+                inputField.value = '';
+                document.getElementById('outputGroup').style.display = 'none';
+                inputField.className = '';
+            } else {
+                document.getElementById('inputLabel').textContent = config.inputLabel;
+                document.getElementById('outputLabel').textContent = config.outputLabel;
+                inputField.value = '';
+                outputField.value = '';
+                document.getElementById('outputGroup').style.display = 'block';
+                
+                // For reverse special cases, input is Thaana, output is Latin
+                if (currentCategory === 'reverseSpecialCases') {
+                    inputField.className = 'thaana';
+                    outputField.className = '';
+                } else {
+                    // For other categories, input is Latin, output is Thaana
+                    inputField.className = '';
+                    outputField.className = 'thaana';
+                }
+            }
+            
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function editItem(id, input, output) {
+            const config = categoryConfig[currentCategory];
+            currentEditId = id;
+            document.getElementById('modalTitle').textContent = `Edit ${config.title}`;
+            
+            const inputField = document.getElementById('inputField');
+            const outputField = document.getElementById('outputField');
+            
+            if (config.isList) {
+                document.getElementById('inputLabel').textContent = config.inputLabel;
+                inputField.value = unescapeHtml(input);
+                document.getElementById('outputGroup').style.display = 'none';
+                inputField.className = '';
+            } else {
+                document.getElementById('inputLabel').textContent = config.inputLabel;
+                document.getElementById('outputLabel').textContent = config.outputLabel;
+                inputField.value = unescapeHtml(input);
+                outputField.value = unescapeHtml(output);
+                document.getElementById('outputGroup').style.display = 'block';
+                
+                // For reverse special cases, input is Thaana, output is Latin
+                if (currentCategory === 'reverseSpecialCases') {
+                    inputField.className = 'thaana';
+                    outputField.className = '';
+                } else {
+                    // For other categories, input is Latin, output is Thaana
+                    inputField.className = '';
+                    outputField.className = 'thaana';
+                }
+            }
+            
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        async function saveItem() {
+            const config = categoryConfig[currentCategory];
+            const input = document.getElementById('inputField').value.trim();
+            const output = config.hasOutput ? document.getElementById('outputField').value.trim() : null;
+
+            if (!input) {
+                alert('Please fill in the required field');
+                return;
+            }
+
+            if (config.hasOutput && !output) {
+                alert('Please fill in both fields');
+                return;
+            }
+
+            try {
+                const ref = transliterationRef.child(currentCategory);
+                
+                if (config.isList) {
+                    // For shaviyanisukun (list-based)
+                    if (currentEditId) {
+                        await ref.child(currentEditId).set(input);
+                    } else {
+                        await ref.push(input);
+                    }
+                } else if (currentCategory === 'specialCases' || currentCategory === 'reverseSpecialCases' || currentCategory === 'englishWords' || currentCategory === 'sentenceEnd') {
+                    // For special cases, reverse special cases, English words, and sentence end with {input, output} structure
+                    if (currentEditId) {
+                        await ref.child(currentEditId).update({ input, output });
+                    } else {
+                        await ref.push({ input, output });
+                    }
+                    
+                    // If adding/editing English word, automatically add/update reverse special case
+                    if (currentCategory === 'englishWords') {
+                        const reverseRef = transliterationRef.child('reverseSpecialCases');
+                        
+                        // Check if reverse case already exists with this Thaana output
+                        const reverseSnapshot = await reverseRef.orderByChild('input').equalTo(output).once('value');
+                        
+                        if (reverseSnapshot.exists()) {
+                            // Update existing reverse case
+                            reverseSnapshot.forEach((childSnapshot) => {
+                                reverseRef.child(childSnapshot.key).update({ input: output, output: input });
+                            });
+                        } else {
+                            // Add new reverse case
+                            await reverseRef.push({ input: output, output: input });
+                        }
+                    }
+                } else if (currentCategory === 'husNoonuPatterns') {
+                    // For husnoonu patterns with {pattern, output, length} structure
+                    const length = input.length;
+                    if (currentEditId) {
+                        await ref.child(currentEditId).update({ pattern: input, output, length });
+                    } else {
+                        await ref.push({ pattern: input, output, length });
+                    }
+                } else {
+                    // For maps (transliterationMap, vowelDiacritics, vowelConsonants)
+                    await ref.child(input).set(output);
+                    if (currentEditId && currentEditId !== input) {
+                        // If key changed, delete old key
+                        await ref.child(currentEditId).remove();
+                    }
+                }
+                
+                closeModal();
+                loadData();
+            } catch (error) {
+                alert('Error saving: ' + error.message);
+            }
+        }
+
+        async function deleteItem(id, displayValue) {
+            const config = categoryConfig[currentCategory];
+            if (!confirm(`Delete "${displayValue}"?`)) return;
+
+            try {
+                await transliterationRef.child(currentCategory).child(id).remove();
+                loadData();
+            } catch (error) {
+                alert('Error deleting: ' + error.message);
+            }
+        }
+
+        function loadPage() {
+            loadData();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function unescapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerHTML = text;
+            return div.textContent;
+        }
+
+        // Close modal on outside click
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+
+        // Setup Thaana input conversion for both fields
+        function setupThaanaConversion() {
+            const inputField = document.getElementById('inputField');
+            const outputField = document.getElementById('outputField');
+            
+            // Handler for input field
+            inputField.addEventListener('input', function(e) {
+                // Only convert to Thaana if reverseSpecialCases
+                if (currentCategory === 'reverseSpecialCases' && typeof transliterateToThaana === 'function') {
+                    const cursorPos = e.target.selectionStart;
+                    const converted = transliterateToThaana(e.target.value);
+                    if (e.target.value !== converted) {
+                        e.target.value = converted;
+                        e.target.setSelectionRange(cursorPos, cursorPos);
+                    }
+                }
+            });
+            
+            // Handler for output field
+            outputField.addEventListener('input', function(e) {
+                // Convert to Thaana for all categories EXCEPT reverseSpecialCases
+                if (currentCategory !== 'reverseSpecialCases' && typeof transliterateToThaana === 'function') {
+                    const cursorPos = e.target.selectionStart;
+                    const converted = transliterateToThaana(e.target.value);
+                    if (e.target.value !== converted) {
+                        e.target.value = converted;
+                        e.target.setSelectionRange(cursorPos, cursorPos);
+                    }
+                }
+            });
+        }
+
+        // Call setup
+        setupThaanaConversion();
+
+        // Initialize
+        loadData();
+    </script>
+</body>
+</html>

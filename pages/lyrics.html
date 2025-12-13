@@ -45,6 +45,9 @@
   <link rel="preload" href="../js/reverse-transliteration.js" as="script">
   
   <!-- Import reverse transliteration for auto-generated English lyrics -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="../js/transliteration-firebase.js"></script>
   <script src="../js/reverse-transliteration.js"></script>
   
   <style>
@@ -670,9 +673,14 @@
   </div>
   <script>
     // Initialize unified authentication system on page load
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', async function() {
       // 🚀 PREVENT FLASH: Make page visible once DOM is ready
       document.body.classList.add('loaded');
+      
+      // Initialize Firebase transliteration data
+      if (typeof transliterationFirebase !== 'undefined') {
+        await transliterationFirebase.initialize();
+      }
       
       initializeUnifiedAuth();
     });

@@ -448,8 +448,46 @@
 
     <!-- Include Tesseract.js for OCR functionality -->
     <script src="https://unpkg.com/tesseract.js@v4.1.1/dist/tesseract.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
+    
+    <script src="../../js/transliteration-firebase.js"></script>
     <script src="../../js/transliteration.js"></script>
     <script>
+        // Setup Firebase listener for real-time updates
+        function setupFirebaseListener() {
+            if (typeof transliterationFirebase !== 'undefined') {
+                transliterationFirebase.addListener(() => {
+                    // Re-transliterate automatically when any transliteration data changes
+                    const inputDisplay = document.getElementById('inputDisplay');
+                    if (inputDisplay && inputDisplay.value.trim()) {
+                        transliterate();
+                    }
+                });
+            }
+        }
+        
         function transliterate() {
             const inputDisplay = document.getElementById('inputDisplay');
             const output = document.getElementById('dhivehiOutput');
@@ -1520,7 +1558,12 @@
             }
         }
           // Load saved input text on page load
-        window.addEventListener('load', function() {
+        window.addEventListener('load', async function() {
+            // Wait for Firebase data to load before doing initial transliteration
+            if (typeof transliterationFirebase !== 'undefined') {
+                await transliterationFirebase.initialize();
+            }
+            
             const savedText = loadInputText();
             document.getElementById('inputDisplay').value = savedText;
             
@@ -1531,10 +1574,18 @@
             
             // Load saved scroll positions
             loadScrollPositions();
+            
+            // Setup Firebase listener for real-time updates
+            setupFirebaseListener();
         });
         
         // Load saved input text when page loads
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Wait for Firebase data to load
+            if (typeof transliterationFirebase !== 'undefined') {
+                await transliterationFirebase.initialize();
+            }
+            
             const savedText = loadInputText();
             if (savedText) {
                 const inputDisplay = document.getElementById('inputDisplay');

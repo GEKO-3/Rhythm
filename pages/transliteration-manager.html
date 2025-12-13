@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: auto;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transliteration Manager - Rhythm Boduberu</title>
+    <link rel="stylesheet" href="../assets/styles.css">
+    <style>
+        * {
+        }
+        
+        html, body {
+            overflow-x: hidden;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .thaana {
+            font-size: 18px;
+            font-family: 'Faruma', 'MV Waheed', Arial;
+            direction: rtl;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #667eea;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: flex-end;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .firebase-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .firebase-status.connected {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .firebase-status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            Transliteration Manager
+            <span id="firebaseStatus" class="firebase-status disconnected">Connecting...</span>
+        </h1>
+        <p class="subtitle">Manage all transliteration data stored in Firebase</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="statSpecialCases">0</div>
+                <div class="stat-label">Special Cases</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statTransliterationMap">0</div>
+                <div class="stat-label">Transliteration Mappings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statVowelDiacritics">0</div>
+                <div class="stat-label">Vowel Diacritics</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statVowelConsonants">0</div>
+                <div class="stat-label">Vowel Consonants</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="statShaviyanisukun">0</div>
+                <div class="stat-label">Shaviyanisukun</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="special-cases">Special Cases</button>
+            <button class="tab" data-tab="transliteration-map">Transliteration Map</button>
+            <button class="tab" data-tab="vowel-diacritics">Vowel Diacritics</button>
+            <button class="tab" data-tab="vowel-consonants">Vowel Consonants</button>
+            <button class="tab" data-tab="shaviyanisukun">Shaviyanisukun</button>
+        </div>
+
+        <!-- Special Cases Tab -->
+        <div id="special-cases" class="tab-content active">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">Special Cases</div>
+                    <button class="btn btn-primary" onclick="openAddSpecialCaseModal()">+ Add Special Case</button>
+                </div>
+                <input type="text" class="search-box" id="searchSpecialCases" placeholder="Search special cases...">
+                <div id="specialCasesList" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Transliteration Map Tab -->
+        <div id="transliteration-map" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">Transliteration Map</div>
+                    <button class="btn btn-primary" onclick="openAddMappingModal('transliterationMap')">+ Add Mapping</button>
+                </div>
+                <input type="text" class="search-box" id="searchTransliterationMap" placeholder="Search mappings...">
+                <div id="transliterationMapList" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Vowel Diacritics Tab -->
+        <div id="vowel-diacritics" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">Vowel Diacritics</div>
+                    <button class="btn btn-primary" onclick="openAddMappingModal('vowelDiacritics')">+ Add Diacritic</button>
+                </div>
+                <input type="text" class="search-box" id="searchVowelDiacritics" placeholder="Search diacritics...">
+                <div id="vowelDiacriticsList" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Vowel Consonants Tab -->
+        <div id="vowel-consonants" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">Vowel Consonants</div>
+                    <button class="btn btn-primary" onclick="openAddMappingModal('vowelConsonants')">+ Add Vowel Consonant</button>
+                </div>
+                <input type="text" class="search-box" id="searchVowelConsonants" placeholder="Search vowel consonants...">
+                <div id="vowelConsonantsList" class="loading">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Shaviyanisukun Tab -->
+        <div id="shaviyanisukun" class="tab-content">
+            <div class="section">
+                <div class="section-header">
+                    <div class="section-title">Shaviyanisukun</div>
+                    <button class="btn btn-primary" onclick="openAddShaviyaniskunModal()">+ Add Item</button>
+                </div>
+                <input type="text" class="search-box" id="searchShaviyanisukun" placeholder="Search items...">
+                <div id="shaviyaniskunList" class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Special Case -->
+    <div id="specialCaseModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="specialCaseModalTitle">Add Special Case</div>
+            <div class="form-group">
+                <label>Latin Input:</label>
+                <input type="text" id="specialCaseInput" placeholder="e.g., handhaanuney">
+            </div>
+            <div class="form-group">
+                <label>Thaana Output:</label>
+                <input type="text" id="specialCaseOutput" class="thaana" placeholder="e.g., ހަނދާނުނޭ">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+                <button class="btn btn-success" onclick="saveSpecialCase()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Mapping -->
+    <div id="mappingModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="mappingModalTitle">Add Mapping</div>
+            <div class="form-group">
+                <label>Key:</label>
+                <input type="text" id="mappingKey" placeholder="e.g., sh">
+            </div>
+            <div class="form-group">
+                <label>Value:</label>
+                <input type="text" id="mappingValue" class="thaana" placeholder="e.g., ށ">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+                <button class="btn btn-success" onclick="saveMapping()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add Shaviyanisukun -->
+    <div id="shaviyaniskunModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">Add Shaviyanisukun Item</div>
+            <div class="form-group">
+                <label>Consonant:</label>
+                <input type="text" id="shaviyaniskunValue" placeholder="e.g., m">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModals()">Cancel</button>
+                <button class="btn btn-success" onclick="saveShaviyanisukun()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
+    
+    <!-- Transliteration Manager -->
+    <script src="../js/reverse-transliteration.js"></script>
+    <script src="../js/transliteration-firebase.js"></script>
+
+    <script>
+        let currentEditId = null;
+        let currentMappingType = null;
+        let currentEditKey = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Check if Firebase is initialized
+            if (typeof transliterationFirebase !== 'undefined') {
+                await transliterationFirebase.initialize();
+                updateFirebaseStatus(true);
+                loadAllData();
+            } else {
+                updateFirebaseStatus(false);
+            }
+
+            // Setup tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    switchTab(tab.dataset.tab);
+                });
+            });
+
+            // Setup search
+            setupSearch();
+            
+            // Setup Thaana input conversion
+            setupThaanaInputs();
+        });
+
+        function setupThaanaInputs() {
+            // Add event listeners for Thaana input fields to enable reverse transliteration
+            const thaanaInputs = [
+                'specialCaseOutput',
+                'mappingValue'
+            ];
+            
+            thaanaInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.addEventListener('input', function(e) {
+                        if (typeof transliterateToThaana === 'function') {
+                            const cursorPos = e.target.selectionStart;
+                            const originalLength = e.target.value.length;
+                            const converted = transliterateToThaana(e.target.value);
+                            
+                            // Only update if value actually changed
+                            if (e.target.value !== converted) {
+                                e.target.value = converted;
+                                
+                                // Maintain cursor position without triggering scroll
+                                const lengthDiff = converted.length - originalLength;
+                                const newPos = Math.max(0, cursorPos + lengthDiff);
+                                requestAnimationFrame(() => {
+                                    e.target.setSelectionRange(newPos, newPos);
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function updateFirebaseStatus(connected) {
+            const status = document.getElementById('firebaseStatus');
+            if (connected) {
+                status.textContent = 'Connected';
+                status.className = 'firebase-status connected';
+            } else {
+                status.textContent = 'Disconnected';
+                status.className = 'firebase-status disconnected';
+            }
+        }
+
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        async function loadAllData() {
+            await loadSpecialCases();
+            await loadTransliterationMap();
+            await loadVowelDiacritics();
+            await loadVowelConsonants();
+            await loadShaviyanisukun();
+            updateStats();
+        }
+
+        async function loadSpecialCases() {
+            const container = document.getElementById('specialCasesList');
+            const cases = await transliterationFirebase.getSpecialCasesWithKeys();
+            
+            if (cases.length === 0) {
+                container.innerHTML = '<div class="empty-state">No special cases found. Click "Add Special Case" to create one.</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Latin Input</th>
+                            <th>Thaana Output</th>
+                            <th>Length</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            cases.forEach(c => {
+                html += `
+                    <tr data-search="${c.input.toLowerCase()} ${c.output}">
+                        <td>${c.input}</td>
+                        <td class="thaana">${c.output}</td>
+                        <td>${c.input.length}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary btn-small" onclick="editSpecialCase('${c.id}', '${c.input}', '${c.output.replace(/'/g, "\\'")}')">Edit</button>
+                                <button class="btn btn-danger btn-small" onclick="deleteSpecialCase('${c.id}', '${c.input}')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        async function loadTransliterationMap() {
+            const container = document.getElementById('transliterationMapList');
+            const data = transliterationFirebase.getData();
+            const map = data.transliterationMap;
+            
+            if (Object.keys(map).length === 0) {
+                container.innerHTML = '<div class="empty-state">No transliteration mappings found.</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Latin Key</th>
+                            <th>Thaana Value</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.keys(map).sort().forEach(key => {
+                html += `
+                    <tr data-search="${key.toLowerCase()} ${map[key]}">
+                        <td>${key}</td>
+                        <td class="thaana">${map[key]}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary btn-small" onclick="editMapping('transliterationMap', '${key}', '${map[key]}')">Edit</button>
+                                <button class="btn btn-danger btn-small" onclick="deleteMapping('transliterationMap', '${key}')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        async function loadVowelDiacritics() {
+            const container = document.getElementById('vowelDiacriticsList');
+            const data = transliterationFirebase.getData();
+            const map = data.vowelDiacritics;
+            
+            if (Object.keys(map).length === 0) {
+                container.innerHTML = '<div class="empty-state">No vowel diacritics found.</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Latin Key</th>
+                            <th>Thaana Value</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.keys(map).sort().forEach(key => {
+                html += `
+                    <tr data-search="${key.toLowerCase()} ${map[key]}">
+                        <td>${key}</td>
+                        <td class="thaana">${map[key]}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary btn-small" onclick="editMapping('vowelDiacritics', '${key}', '${map[key]}')">Edit</button>
+                                <button class="btn btn-danger btn-small" onclick="deleteMapping('vowelDiacritics', '${key}')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        async function loadVowelConsonants() {
+            const container = document.getElementById('vowelConsonantsList');
+            const data = transliterationFirebase.getData();
+            const map = data.vowelConsonants;
+            
+            if (Object.keys(map).length === 0) {
+                container.innerHTML = '<div class="empty-state">No vowel consonants found.</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Latin Key</th>
+                            <th>Thaana Value</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            Object.keys(map).sort().forEach(key => {
+                html += `
+                    <tr data-search="${key.toLowerCase()} ${map[key]}">
+                        <td>${key}</td>
+                        <td class="thaana">${map[key]}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary btn-small" onclick="editMapping('vowelConsonants', '${key}', '${map[key]}')">Edit</button>
+                                <button class="btn btn-danger btn-small" onclick="deleteMapping('vowelConsonants', '${key}')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        async function loadShaviyanisukun() {
+            const container = document.getElementById('shaviyaniskunList');
+            const data = transliterationFirebase.getData();
+            const items = data.shaviyanisukun;
+            
+            if (items.length === 0) {
+                container.innerHTML = '<div class="empty-state">No shaviyanisukun items found.</div>';
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Consonant</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            items.sort().forEach(item => {
+                html += `
+                    <tr data-search="${item.toLowerCase()}">
+                        <td>${item}</td>
+                        <td>
+                            <button class="btn btn-danger btn-small" onclick="deleteShaviyanisukun('${item}')">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function updateStats() {
+            const data = transliterationFirebase.getData();
+            document.getElementById('statSpecialCases').textContent = data.specialCases.length;
+            document.getElementById('statTransliterationMap').textContent = Object.keys(data.transliterationMap).length;
+            document.getElementById('statVowelDiacritics').textContent = Object.keys(data.vowelDiacritics).length;
+            document.getElementById('statVowelConsonants').textContent = Object.keys(data.vowelConsonants).length;
+            document.getElementById('statShaviyanisukun').textContent = data.shaviyanisukun.length;
+        }
+
+        // Special Cases Functions
+        function openAddSpecialCaseModal() {
+            currentEditId = null;
+            document.getElementById('specialCaseModalTitle').textContent = 'Add Special Case';
+            document.getElementById('specialCaseInput').value = '';
+            document.getElementById('specialCaseOutput').value = '';
+            document.getElementById('specialCaseModal').classList.add('active');
+        }
+
+        function editSpecialCase(id, input, output) {
+            currentEditId = id;
+            document.getElementById('specialCaseModalTitle').textContent = 'Edit Special Case';
+            document.getElementById('specialCaseInput').value = input;
+            document.getElementById('specialCaseOutput').value = output;
+            document.getElementById('specialCaseModal').classList.add('active');
+        }
+
+        async function saveSpecialCase() {
+            const input = document.getElementById('specialCaseInput').value.trim();
+            const output = document.getElementById('specialCaseOutput').value.trim();
+
+            if (!input || !output) {
+                alert('Please fill in both fields');
+                return;
+            }
+
+            let success;
+            if (currentEditId) {
+                success = await transliterationFirebase.updateSpecialCase(currentEditId, input, output);
+            } else {
+                success = await transliterationFirebase.addSpecialCase(input, output);
+            }
+
+            if (success) {
+                closeModals();
+                await loadSpecialCases();
+                updateStats();
+            } else {
+                alert('Failed to save special case');
+            }
+        }
+
+        async function deleteSpecialCase(id, input) {
+            if (!confirm(`Delete special case "${input}"?`)) return;
+
+            const success = await transliterationFirebase.deleteSpecialCase(id);
+            if (success) {
+                await loadSpecialCases();
+                updateStats();
+            } else {
+                alert('Failed to delete special case');
+            }
+        }
+
+        // Mapping Functions
+        function openAddMappingModal(type) {
+            currentMappingType = type;
+            currentEditKey = null;
+            const titles = {
+                'transliterationMap': 'Add Transliteration Mapping',
+                'vowelDiacritics': 'Add Vowel Diacritic',
+                'vowelConsonants': 'Add Vowel Consonant'
+            };
+            document.getElementById('mappingModalTitle').textContent = titles[type];
+            document.getElementById('mappingKey').value = '';
+            document.getElementById('mappingValue').value = '';
+            document.getElementById('mappingModal').classList.add('active');
+        }
+
+        function editMapping(type, key, value) {
+            currentMappingType = type;
+            currentEditKey = key;
+            const titles = {
+                'transliterationMap': 'Edit Transliteration Mapping',
+                'vowelDiacritics': 'Edit Vowel Diacritic',
+                'vowelConsonants': 'Edit Vowel Consonant'
+            };
+            document.getElementById('mappingModalTitle').textContent = titles[type];
+            document.getElementById('mappingKey').value = key;
+            document.getElementById('mappingValue').value = value;
+            document.getElementById('mappingModal').classList.add('active');
+        }
+
+        async function saveMapping() {
+            const key = document.getElementById('mappingKey').value.trim();
+            const value = document.getElementById('mappingValue').value.trim();
+
+            if (!key || !value) {
+                alert('Please fill in both fields');
+                return;
+            }
+
+            let success;
+            const functions = {
+                'transliterationMap': transliterationFirebase.updateTransliterationMap.bind(transliterationFirebase),
+                'vowelDiacritics': transliterationFirebase.updateVowelDiacritic.bind(transliterationFirebase),
+                'vowelConsonants': transliterationFirebase.updateVowelConsonant.bind(transliterationFirebase)
+            };
+
+            success = await functions[currentMappingType](key, value);
+
+            if (success) {
+                closeModals();
+                if (currentMappingType === 'transliterationMap') await loadTransliterationMap();
+                else if (currentMappingType === 'vowelDiacritics') await loadVowelDiacritics();
+                else if (currentMappingType === 'vowelConsonants') await loadVowelConsonants();
+                updateStats();
+            } else {
+                alert('Failed to save mapping');
+            }
+        }
+
+        async function deleteMapping(type, key) {
+            if (!confirm(`Delete mapping "${key}"?`)) return;
+
+            let success;
+            const functions = {
+                'transliterationMap': transliterationFirebase.deleteFromTransliterationMap.bind(transliterationFirebase),
+                'vowelDiacritics': transliterationFirebase.deleteVowelDiacritic.bind(transliterationFirebase),
+                'vowelConsonants': transliterationFirebase.deleteVowelConsonant.bind(transliterationFirebase)
+            };
+
+            success = await functions[type](key);
+
+            if (success) {
+                if (type === 'transliterationMap') await loadTransliterationMap();
+                else if (type === 'vowelDiacritics') await loadVowelDiacritics();
+                else if (type === 'vowelConsonants') await loadVowelConsonants();
+                updateStats();
+            } else {
+                alert('Failed to delete mapping');
+            }
+        }
+
+        // Shaviyanisukun Functions
+        function openAddShaviyaniskunModal() {
+            document.getElementById('shaviyaniskunValue').value = '';
+            document.getElementById('shaviyaniskunModal').classList.add('active');
+        }
+
+        async function saveShaviyanisukun() {
+            const value = document.getElementById('shaviyaniskunValue').value.trim();
+
+            if (!value) {
+                alert('Please enter a value');
+                return;
+            }
+
+            const success = await transliterationFirebase.addShaviyanisukun(value);
+
+            if (success) {
+                closeModals();
+                await loadShaviyanisukun();
+                updateStats();
+            } else {
+                alert('Failed to save item');
+            }
+        }
+
+        async function deleteShaviyanisukun(value) {
+            if (!confirm(`Delete "${value}" from shaviyanisukun?`)) return;
+
+            const success = await transliterationFirebase.removeShaviyanisukun(value);
+
+            if (success) {
+                await loadShaviyanisukun();
+                updateStats();
+            } else {
+                alert('Failed to delete item');
+            }
+        }
+
+        // Modal Functions
+        function closeModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.remove('active');
+            });
+        }
+
+        // Search Functions
+        function setupSearch() {
+            const searches = {
+                'searchSpecialCases': 'specialCasesList',
+                'searchTransliterationMap': 'transliterationMapList',
+                'searchVowelDiacritics': 'vowelDiacriticsList',
+                'searchVowelConsonants': 'vowelConsonantsList',
+                'searchShaviyanisukun': 'shaviyaniskunList'
+            };
+
+            Object.keys(searches).forEach(searchId => {
+                document.getElementById(searchId).addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase();
+                    const container = document.getElementById(searches[searchId]);
+                    const rows = container.querySelectorAll('tbody tr');
+
+                    rows.forEach(row => {
+                        const searchText = row.dataset.search || '';
+                        if (searchText.includes(query)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Close modal on outside click
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModals();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

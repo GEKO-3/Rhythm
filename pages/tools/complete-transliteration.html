@@ -9,7 +9,7 @@
     <style>
         @font-face {
             font-family: 'Faruma';
-            src: url('Fonts/Faruma.ttf') format('truetype');
+            src: url('../../assets/Fonts/Faruma.ttf') format('truetype');
             font-display: swap;
             font-weight: normal;
             font-style: normal;
@@ -17,7 +17,7 @@
         
         @font-face {
             font-family: 'Montserrat';
-            src: url('Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+            src: url('../../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
             font-display: swap;
             font-weight: normal;
             font-style: normal;
@@ -357,8 +357,7 @@
         <div class="controls">
             <button class="clear-btn" onclick="clearAll()">Clear All</button>
             <button id="uploadBtn" onclick="document.getElementById('fileInput').click()">Upload Text File</button>
-            <button onclick="importToEnglishEditor()">Import English Output</button>
-            <button onclick="importToDhivehiEditor()">Import Dhivehi Output</button>
+            <button id="importBtn" onclick="importToDhivehiEditor()">Import to Lyrics Editor</button>
             <input type="file" id="fileInput" accept=".txt,.text" style="display: none;" onchange="handleFileUpload(event)">
         </div>
         
@@ -383,8 +382,32 @@
         </div>
     </div>
 
-    <script src="transliteration.js"></script>
-    <script src="reverse-transliteration.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Initialize Firebase -->
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+    </script>
+    
+    <script src="../../js/transliteration-firebase.js"></script>
+    <script src="../../js/transliteration.js"></script>
+    <script src="../../js/reverse-transliteration.js"></script>
     <script>
         // Transliterate Latin to Thaana function
         function transliterateToThaana(input) {
@@ -479,43 +502,53 @@
             reader.readAsText(file, 'UTF-8');
         }
         
-        // Import to English Lyrics Editor functionality
-        function importToEnglishEditor() {
-            const englishText = document.getElementById('englishOutput').value;
-            if (!englishText.trim()) {
-                return;
-            }
-            
-            // Clear existing English editor data
-            localStorage.removeItem('englishLyricsEditorData');
-            localStorage.removeItem('englishLyricsEditorSongName');
-            
-            // Save the imported text with URL parameter method
-            const encodedText = encodeURIComponent(englishText);
-            const url = `lyrics-submit.html?import=${encodedText}`;
-            
-            // Open the lyrics submitter with the imported text
-            window.open(url, '_blank');
-        }
-        
         // Import to Dhivehi Lyrics Editor functionality
         function importToDhivehiEditor() {
-            const dhivehiText = document.getElementById('dhivehiOutput').value;
-            if (!dhivehiText.trim()) {
+            const dhivehiOutput = document.getElementById('dhivehiOutput');
+            if (!dhivehiOutput.value.trim()) {
+                alert('No text to import! Please enter Dhivehi text first.');
                 return;
             }
             
-            // Clear existing Dhivehi editor data
-            localStorage.removeItem('lyricsEditorData');
-            localStorage.removeItem('lyricsEditorSongName');
-            localStorage.removeItem('lyricsEditorGenre');
+            // Visual feedback
+            const btn = document.getElementById('importBtn');
+            btn.textContent = 'Opening...';
+            btn.style.background = '#218838';
             
-            // Save the imported text with URL parameter method
-            const encodedText = encodeURIComponent(dhivehiText);
-            const url = `lyrics-submit.html?import=${encodedText}`;
+            // Get first 3 words from first line of input field for song name
+            const inputText = document.getElementById('dhivehiInput').value.trim();
+            const firstLine = inputText.split('\n')[0].trim();
             
-            // Open the lyrics submitter with the imported text
+            // Convert Dhivehi to Latin for song name
+            let songName = '';
+            if (firstLine) {
+                const latinFirstLine = reverseTransliterate(firstLine);
+                const words = latinFirstLine.split(/\s+/).filter(word => word.length > 0);
+                
+                // Use up to 3 words, or all words if less than 3
+                const wordsToUse = words.slice(0, Math.min(3, words.length));
+                songName = wordsToUse
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                    .join(' ');
+            }
+            
+            // Prepare the text for import (double encode to handle special characters)
+            const textToImport = encodeURIComponent(dhivehiOutput.value);
+            
+            // Open lyrics editor with imported text and song name
+            let url = `../admin/lyrics-edit.html?import=${textToImport}`;
+            if (songName) {
+                url += `&songName=${encodeURIComponent(songName)}`;
+            }
+            
+            console.log('Opening URL:', url);
             window.open(url, '_blank');
+            
+            // Reset button
+            setTimeout(() => {
+                btn.textContent = 'Import to Lyrics Editor';
+                btn.style.background = '';
+            }, 1000);
         }
         
         // Live transliteration function
@@ -596,7 +629,18 @@
         }
         
         // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Wait for Firebase data to load
+            if (typeof transliterationFirebase !== 'undefined') {
+                await transliterationFirebase.initialize();
+                
+                // Setup real-time listener for data changes
+                transliterationFirebase.addListener((cache) => {
+                    console.log('Firebase data updated, re-transliterating...');
+                    performLiveTransliteration();
+                });
+            }
+            
             loadSavedInputText();
             
             // Setup Latin to Thaana conversion for Dhivehi input
