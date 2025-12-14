@@ -2,7 +2,7 @@
  * UNIFIED RHYTHM AUTHENTICATION SYSTEM
  * This is the single source of truth for all authentication
  * Used by login.html, songlist.html, admin pages, and any other pages
- * @version 2.1.0
+ * @version 2.2.0 - Added My Kits support
  */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -1026,23 +1026,8 @@ class RhythmUnifiedAuth {
             return;
         }
 
-        // Check for stored preference (PWA mode)
-        const storedPreference = localStorage.getItem('rhythm_admin_preference');
-        if (isPWA && storedPreference) {
-            console.log('🔄 [UnifiedAuth] Using stored PWA preference:', storedPreference);
-            if (storedPreference === 'kits') {
-                window.location.href = 'pages/my-kits.html';
-                return;
-            } else if (storedPreference === 'admin') {
-                window.location.href = 'pages/admin/admin.html';
-                return;
-            } else if (storedPreference === 'songlist') {
-                window.location.href = 'pages/songlist.html';
-                return;
-            }
-        }
-
         // Show destination choice for all users (admins get extra option)
+        // Note: Removed auto-redirect for stored preferences to allow users to see new options like "My Kits"
         this.showDestinationChoice(isPWA);
     }
 
@@ -1050,6 +1035,9 @@ class RhythmUnifiedAuth {
      * Show admin destination choice
      */
     showDestinationChoice(isPWA = false) {
+        console.log('🎯 [UnifiedAuth] Showing destination choice dialog (v2.2.0)');
+        console.log('isPWA:', isPWA, 'isAdmin:', this.isAdmin());
+        
         // Remove any existing choice containers
         document.querySelectorAll('.auth-choice-container').forEach(el => el.remove());
         
