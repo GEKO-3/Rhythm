@@ -1,12 +1,13 @@
 // Simple Service Worker for Rhythm Boduberu
 // Provides basic offline functionality without aggressive caching
 
-const CACHE_NAME = 'rhythm-v2.3.10';
+const CACHE_NAME = 'rhythm-v2.4.0'; // Updated for My Kits feature
 const ESSENTIAL_ASSETS = [
   './',
   './pages/songlist.html',
   './pages/lyrics.html',
   './pages/attendance.html',
+  './pages/my-kits.html',
   './login.html',
   './pages/admin/admin.html',
   './js/rhythm-unified-auth.js',
