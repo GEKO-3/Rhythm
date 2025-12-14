@@ -74,6 +74,29 @@ self.addEventListener('fetch', event => {
     return;
   }
   
+  // For critical JavaScript files, always try network first and update cache
+  const isCriticalJS = event.request.url.includes('rhythm-unified-auth.js') ||
+                       event.request.url.includes('rhythm-local-db.js');
+  
+  if (isCriticalJS) {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          // Clone the response and update cache
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+          return response;
+        })
+        .catch(() => {
+          // Fallback to cache if offline
+          return caches.match(event.request);
+        })
+    );
+    return;
+  }
+  
   event.respondWith(
     fetch(event.request)
       .then(response => {
