@@ -287,6 +287,59 @@
             return false;
         });
 
+        // Version checking and update function
+        async function checkForAppUpdate() {
+            try {
+                console.log('🔍 [Version Check] Checking for app updates...');
+                const response = await fetch('./version.json?t=' + Date.now(), { cache: 'no-store' });
+                const serverVersion = await response.json();
+                
+                const localVersion = localStorage.getItem('rhythm_app_version');
+                
+                console.log('📦 [Version Check] Server version:', serverVersion.version);
+                console.log('💾 [Version Check] Local version:', localVersion || 'none');
+                
+                if (localVersion !== serverVersion.version) {
+                    console.log('🆕 [Version Check] New version available:', serverVersion.version);
+                    console.log('📝 [Version Check] Changes:', serverVersion.changes);
+                    
+                    // Clear caches for update
+                    if ('caches' in window) {
+                        const cacheNames = await caches.keys();
+                        await Promise.all(cacheNames.map(name => caches.delete(name)));
+                        console.log('🧹 [Version Check] Cleared all caches');
+                    }
+                    
+                    // Update service worker
+                    if ('serviceWorker' in navigator) {
+                        const registrations = await navigator.serviceWorker.getRegistrations();
+                        for (let registration of registrations) {
+                            await registration.update();
+                            console.log('🔄 [Version Check] Service worker updated');
+                        }
+                    }
+                    
+                    // Store new version
+                    localStorage.setItem('rhythm_app_version', serverVersion.version);
+                    
+                    console.log('✅ [Version Check] App updated to v' + serverVersion.version);
+                    
+                    // Reload page to apply updates
+                    setTimeout(() => {
+                        console.log('🔄 [Version Check] Reloading to apply updates...');
+                        window.location.reload(true);
+                    }, 1000);
+                } else {
+                    console.log('✅ [Version Check] App is up to date');
+                }
+            } catch (error) {
+                console.warn('⚠️ [Version Check] Failed to check for updates:', error);
+            }
+        }
+
+        // Check for updates before authentication
+        checkForAppUpdate();
+
         // Hidden online update mechanism - forces cache refresh when online
         let isOnline = navigator.onLine;
         let updateCheckInterval;
