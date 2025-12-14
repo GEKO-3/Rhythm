@@ -1026,25 +1026,8 @@ class RhythmUnifiedAuth {
             return;
         }
 
-        if (this.isAdmin()) {
-            // Check user preference for admin destination
-            const adminPreference = localStorage.getItem('rhythm_admin_preference');
-            
-            if (isPWA && adminPreference) {
-                // PWA mode with saved preference - direct redirect
-                if (adminPreference === 'admin') {
-                    window.location.href = 'pages/admin/admin.html';
-                } else {
-                    window.location.href = 'pages/songlist.html';
-                }
-                return;
-            }
-            
-            // Show choice (either first time or web mode)
-            this.showDestinationChoice(isPWA);
-        } else {
-            window.location.href = 'pages/songlist.html';
-        }
+        // Show destination choice for all users (admins get extra option)
+        this.showDestinationChoice(isPWA);
     }
 
     /**
@@ -1062,6 +1045,8 @@ class RhythmUnifiedAuth {
         const choiceContainer = document.createElement('div');
         choiceContainer.className = 'login-container auth-choice-container';
         
+        const isAdmin = this.isAdmin();
+        
         const rememberOption = isPWA ? `
             <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
                 <label style="display: flex; align-items: center; gap: 10px; color: #ccc; cursor: pointer;">
@@ -1074,18 +1059,25 @@ class RhythmUnifiedAuth {
             </div>
         ` : '';
         
+        const adminButton = isAdmin ? `
+            <button onclick="rhythmAuth.goToAdmin(${isPWA})" class="submit-btn" style="background: #ff6b6b;">
+                Admin Panel
+            </button>
+        ` : '';
+        
         choiceContainer.innerHTML = `
-            <h2>Welcome, Admin!</h2>
+            <h2>Welcome${isAdmin ? ', Admin' : ''}!</h2>
             <p style="text-align: center; margin-bottom: 30px; color: #ccc;">
                 Choose your destination:
             </p>
             <div style="display: flex; flex-direction: column; gap: 15px;">
+                <button onclick="rhythmAuth.goToMyKits(${isPWA})" class="submit-btn" style="background: #4caf50;">
+                    My Kits
+                </button>
                 <button onclick="rhythmAuth.goToSonglist(${isPWA})" class="submit-btn" style="background: var(--primary-color);">
                     Song List
                 </button>
-                <button onclick="rhythmAuth.goToAdmin(${isPWA})" class="submit-btn" style="background: #ff6b6b;">
-                    Admin Panel
-                </button>
+                ${adminButton}
             </div>
             ${rememberOption}
             
@@ -1098,6 +1090,17 @@ class RhythmUnifiedAuth {
         `;
         
         document.body.appendChild(choiceContainer);
+    }
+
+    goToMyKits(rememberForPWA = false) {
+        if (rememberForPWA) {
+            const rememberCheckbox = document.getElementById('rememberChoice');
+            if (rememberCheckbox && rememberCheckbox.checked) {
+                localStorage.setItem('rhythm_admin_preference', 'kits');
+                localStorage.setItem('rhythm_silent_redirect', 'true');
+            }
+        }
+        window.location.href = 'pages/my-kits.html';
     }
 
     goToSonglist(rememberForPWA = false) {

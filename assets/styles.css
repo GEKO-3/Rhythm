@@ -398,6 +398,386 @@ footer a:hover {
     text-decoration: underline;
 }
 
+/* Booking Section */
+.booking-section {
+    position: relative;
+    min-height: 600px;
+    padding: 80px 40px;
+    background: #1a1a1a;
+    overflow: hidden;
+}
+
+.booking-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../src/s2bg.jpg');
+    background-size: cover;
+    background-position: center;
+    opacity: 0.3;
+    z-index: 0;
+}
+
+.booking-container {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 450px 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+/* Calendar Styles */
+.calendar-container {
+    background: rgba(31, 31, 31, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.calendar-header h3 {
+    color: #f5d000;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.calendar-nav {
+    background: rgba(245, 208, 0, 0.1);
+    border: 2px solid #f5d000;
+    color: #f5d000;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.calendar-nav:hover {
+    background: #f5d000;
+    color: #1f1f1f;
+    transform: scale(1.1);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-day-header {
+    text-align: center;
+    color: #f5d000;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 10px 0;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.calendar-day:hover:not(.booked):not(.empty) {
+    background: rgba(245, 208, 0, 0.2);
+    transform: scale(1.05);
+}
+
+.calendar-day.empty {
+    background: transparent;
+    cursor: default;
+}
+
+.calendar-day.today {
+    border: 2px solid #f5d000;
+    font-weight: 700;
+}
+
+.calendar-day.booked {
+    background: rgba(128, 128, 128, 0.4);
+    color: #888;
+    cursor: pointer;
+    position: relative;
+    border: 2px solid #f5d000;
+}
+
+.calendar-day.booked::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: #888;
+    transform: translateY(-50%);
+}
+
+.calendar-day.past {
+    background: rgba(128, 128, 128, 0.4);
+    color: #666;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.calendar-day.past::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: #666;
+    transform: translateY(-50%);
+}
+
+.calendar-day.special-event {
+    background: linear-gradient(135deg, rgba(245, 208, 0, 0.3) 0%, rgba(255, 165, 0, 0.3) 100%);
+    border: 3px solid #f5d000;
+    color: #f5d000;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(245, 208, 0, 0.5);
+}
+
+.calendar-day.special-event::after {
+    content: '★';
+    position: absolute;
+    top: 3px;
+    right: 5px;
+    font-size: 0.7rem;
+    color: #f5d000;
+    background: none;
+    height: auto;
+    transform: none;
+    left: auto;
+}
+
+.calendar-day.special-event:hover {
+    box-shadow: 0 0 25px rgba(245, 208, 0, 0.8);
+    transform: scale(1.1);
+}
+
+/* Booking Info Styles */
+.booking-info {
+    text-align: left;
+    color: #fff;
+}
+
+.booking-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #f5d000;
+    margin: 0 0 20px 0;
+    line-height: 1.1;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
+}
+
+.booking-subtitle {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #fff;
+    margin: 0 0 15px 0;
+    line-height: 1.4;
+}
+
+.booking-season {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: #ccc;
+    margin: 0 0 35px 0;
+    font-style: italic;
+}
+
+.book-now-btn {
+    background: linear-gradient(135deg, #f5d000 0%, #e6b800 100%);
+    color: #1f1f1f;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    padding: 18px 45px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(245, 208, 0, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.book-now-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(245, 208, 0, 0.6);
+    background: linear-gradient(135deg, #ffd700 0%, #f5d000 100%);
+}
+
+.book-now-btn:active {
+    transform: translateY(-1px);
+}
+
+.booking-contact {
+    margin-top: 20px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+    color: #aaa;
+}
+
+/* Event Details Modal */
+.event-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.event-modal.active {
+    display: flex;
+}
+
+.event-modal-content {
+    background: #1f1f1f;
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    border: 2px solid #f5d000;
+    box-shadow: 0 10px 50px rgba(0, 0, 0, 0.8);
+}
+
+.event-modal-content h3 {
+    color: #f5d000;
+    margin: 0 0 10px 0;
+    font-size: 1.8rem;
+}
+
+.event-modal-content .event-date {
+    color: #aaa;
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+}
+
+.event-modal-content .event-details {
+    color: #fff;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.event-modal-content .close-modal {
+    background: #f5d000;
+    color: #1f1f1f;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.event-modal-content .close-modal:hover {
+    background: #ffd700;
+    transform: translateY(-2px);
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .booking-container {
+        grid-template-columns: 400px 1fr;
+        gap: 40px;
+    }
+    
+    .booking-title {
+        font-size: 3rem;
+    }
+}
+
+@media (max-width: 968px) {
+    .booking-container {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .calendar-container {
+        max-width: 500px;
+        margin: 0 auto;
+        order: 2;
+    }
+    
+    .booking-info {
+        text-align: center;
+        order: 1;
+    }
+    
+    .booking-title {
+        font-size: 2.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .booking-section {
+        padding: 50px 20px;
+    }
+    
+    .calendar-container {
+        padding: 20px;
+    }
+    
+    .booking-title {
+        font-size: 2rem;
+    }
+    
+    .booking-subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .calendar-grid {
+        gap: 5px;
+    }
+    
+    .calendar-day {
+        font-size: 0.85rem;
+    }
+}
+
 /* Music Section */
 .music-section {
     min-height: 70vh;

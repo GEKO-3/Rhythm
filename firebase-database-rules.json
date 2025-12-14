@@ -15,7 +15,20 @@
     
     "members": {
       ".read": true,
-      ".write": true
+      ".write": true,
+      "$memberId": {
+        ".read": true,
+        ".write": true,
+        "kits": {
+          ".read": true,
+          ".write": true,
+          "$kitId": {
+            ".read": true,
+            ".write": true,
+            ".validate": "newData.isString()"
+          }
+        }
+      }
     },
     
     "sponsors": {
@@ -195,6 +208,46 @@
       "shaviyanisukun": {
         ".read": true,
         ".write": true
+      }
+    },
+    
+    "bookings": {
+      ".read": true,
+      ".write": true,
+      "bookedDates": {
+        ".read": true,
+        ".write": true,
+        "$dateId": {
+          ".read": true,
+          ".write": true,
+          ".validate": "newData.isString()"
+        }
+      }
+    },
+    
+    "kits": {
+      ".read": true,
+      ".write": false,
+      "inventory": {
+        ".read": true,
+        ".write": true,
+        "$kitId": {
+          ".read": true,
+          ".write": true,
+          ".validate": "newData.hasChildren(['name'])",
+          "name": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+          },
+          "description": {
+            ".validate": "newData.isString() && newData.val().length <= 500"
+          },
+          "createdAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
       }
     }
   }

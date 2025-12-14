@@ -170,6 +170,42 @@
         </footer>
     </section>
 
+    <!-- Event Details Modal -->
+    <div class="event-modal" id="eventModal">
+        <div class="event-modal-content">
+            <h3>Special Event</h3>
+            <p class="event-date" id="eventDate"></p>
+            <p class="event-details" id="eventDetails"></p>
+            <button class="close-modal" onclick="closeEventModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Booking Section - Event Calendar -->
+    <section class="booking-section">
+        <div class="booking-background"></div>
+        <div class="booking-container">
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <button class="calendar-nav" id="prevMonth">←</button>
+                    <h3 id="currentMonth">December 2025</h3>
+                    <button class="calendar-nav" id="nextMonth">→</button>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="booking-info">
+                <h2 class="booking-title">WE ARE HEADING TO THODDOO</h2>
+                <p class="booking-subtitle">Join us in Thoddoo from 25th December to 2nd January</p>
+                <p class="booking-season">It's Hithanee season - Start booking now!</p>
+                <button class="book-now-btn" onclick="window.location.href='tel:+9607576784'">
+                    📞 BOOK NOW
+                </button>
+                <p class="booking-contact">Call: 7576784 / 9128889</p>
+            </div>
+        </div>
+    </section>
+
     <!-- Section Two - Listen to Our Music -->
     <section class="music-section">
         <div class="section-header">
@@ -1694,6 +1730,211 @@
                         console.log('❌ [ServiceWorker] Registration failed:', error);
                     });
             });
+        }
+    </script>
+    
+    <!-- Firebase SDK for booking calendar -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    
+    <!-- Booking Calendar Script -->
+    <script>
+        // Initialize Firebase for booking calendar
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+        
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        
+        const bookingDb = firebase.database();
+        const bookedDatesRef = bookingDb.ref('bookings/bookedDates');
+        const specialEventsRef = bookingDb.ref('bookings/specialEvents');
+        
+        // Calendar state
+        let currentDate = new Date();
+        let bookedDates = new Set();
+        let specialEvents = new Map(); // date string -> event details
+        let isCalendarReady = false;
+        
+        // Load booked dates from Firebase
+        function loadBookedDates() {
+            bookedDatesRef.on('value', (snapshot) => {
+                bookedDates.clear();
+                const data = snapshot.val();
+                if (data) {
+                    Object.values(data).forEach(dateStr => {
+                        bookedDates.add(dateStr);
+                    });
+                }
+                // Only render if DOM is ready
+                if (isCalendarReady) {
+                    renderCalendar();
+                }
+            });
+            
+            specialEventsRef.on('value', (snapshot) => {
+                specialEvents.clear();
+                const data = snapshot.val();
+                if (data) {
+                    Object.values(data).forEach(event => {
+                        specialEvents.set(event.date, event.details);
+                    });
+                }
+                // Only render if DOM is ready
+                if (isCalendarReady) {
+                    renderCalendar();
+                }
+            });
+        }
+        
+        // Show event details modal
+        function showEventDetails(dateStr, details) {
+            const modal = document.getElementById('eventModal');
+            const dateEl = document.getElementById('eventDate');
+            const detailsEl = document.getElementById('eventDetails');
+            
+            const [year, month, day] = dateStr.split('-');
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            
+            dateEl.textContent = `${monthNames[parseInt(month) - 1]} ${parseInt(day)}, ${year}`;
+            detailsEl.textContent = details;
+            modal.classList.add('active');
+        }
+        
+        // Close event modal
+        function closeEventModal() {
+            document.getElementById('eventModal').classList.remove('active');
+        }
+        
+        // Render calendar
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            if (!grid) {
+                console.error('Calendar grid not found');
+                return;
+            }
+            
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            // Update header
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            const monthHeader = document.getElementById('currentMonth');
+            if (monthHeader) {
+                monthHeader.textContent = `${monthNames[month]} ${year}`;
+            }
+            
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            
+            // Clear and rebuild calendar grid
+            grid.innerHTML = '';
+            
+            // Add day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+            
+            // Add empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                grid.appendChild(emptyDay);
+            }
+            
+            // Add days of the month
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to start of day for accurate comparison
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                
+                // Create date for this day
+                const thisDate = new Date(year, month, day);
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                // Check if this is today
+                if (year === today.getFullYear() && 
+                    month === today.getMonth() && 
+                    day === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+                
+                // Check if this is a special event
+                const isSpecialEvent = specialEvents.has(dateStr);
+                
+                // Gray out current day and all previous days
+                if (thisDate <= today) {
+                    dayElement.classList.add('past');
+                } else {
+                    // Check if this date is a special event or regular booking
+                    if (isSpecialEvent) {
+                        dayElement.classList.add('special-event');
+                        // Add click handler for special events
+                        dayElement.addEventListener('click', () => {
+                            showEventDetails(dateStr, specialEvents.get(dateStr));
+                        });
+                    } else if (bookedDates.has(dateStr)) {
+                        dayElement.classList.add('booked');
+                    }
+                }
+                
+                grid.appendChild(dayElement);
+            }
+        }
+        
+        // Initialize calendar when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCalendar);
+        } else {
+            // DOM already loaded
+            initCalendar();
+        }
+        
+        function initCalendar() {
+            isCalendarReady = true;
+            
+            const prevBtn = document.getElementById('prevMonth');
+            const nextBtn = document.getElementById('nextMonth');
+            
+            if (!prevBtn || !nextBtn) {
+                console.error('Calendar buttons not found');
+                return;
+            }
+            
+            // Navigation
+            prevBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+            
+            // Load booked dates and render calendar
+            loadBookedDates();
+            
+            // Render immediately even if no booked dates yet
+            renderCalendar();
         }
     </script>
 </body>

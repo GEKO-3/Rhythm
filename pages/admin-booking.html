@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Booking Calendar - Rhythm Boduberu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a1a;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #f5d000;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 40px;
+            font-size: 1.1rem;
+        }
+
+        .calendar-section {
+            background: rgba(31, 31, 31, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header h2 {
+            color: #f5d000;
+            font-size: 1.8rem;
+        }
+
+        .calendar-nav {
+            background: rgba(245, 208, 0, 0.1);
+            border: 2px solid #f5d000;
+            color: #f5d000;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav:hover {
+            background: #f5d000;
+            color: #1f1f1f;
+            transform: scale(1.1);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            color: #f5d000;
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 15px 0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            border: 2px solid transparent;
+        }
+
+        .calendar-day:hover:not(.empty):not(.past) {
+            background: rgba(245, 208, 0, 0.2);
+            transform: scale(1.05);
+            border-color: #f5d000;
+        }
+
+        .calendar-day.empty {
+            background: transparent;
+            cursor: default;
+        }
+
+        .calendar-day.past {
+            background: rgba(128, 128, 128, 0.2);
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #f5d000;
+            font-weight: 700;
+        }
+
+        .calendar-day.booked {
+            background: rgba(255, 100, 100, 0.3);
+            border: 2px solid #ff6464;
+            color: #ffaaaa;
+            font-weight: 600;
+        }
+
+        .calendar-day.booked::after {
+            content: '✕';
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 0.8rem;
+            color: #ff6464;
+        }
+        
+        .calendar-day.special-event {
+            background: linear-gradient(135deg, rgba(245, 208, 0, 0.4) 0%, rgba(255, 165, 0, 0.4) 100%);
+            border: 3px solid #f5d000;
+            color: #f5d000;
+            font-weight: 700;
+            box-shadow: 0 0 15px rgba(245, 208, 0, 0.5);
+            position: relative;
+        }
+        
+        .calendar-day .star {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            font-size: 0.9rem;
+        }
+
+        .legend {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+        }
+
+        .legend-box.available {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .legend-box.booked {
+            background: rgba(255, 100, 100, 0.3);
+            border: 2px solid #ff6464;
+        }
+        
+        .legend-box.special {
+            background: linear-gradient(135deg, rgba(245, 208, 0, 0.4) 0%, rgba(255, 165, 0, 0.4) 100%);
+            border: 3px solid #f5d000;
+        }
+
+        .legend-box.past {
+            background: rgba(128, 128, 128, 0.2);
+        }
+        
+        .event-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .event-modal.active {
+            display: flex;
+        }
+        
+        .event-modal-content {
+            background: #1f1f1f;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid #f5d000;
+        }
+        
+        .event-modal-content h3 {
+            color: #f5d000;
+            margin: 0 0 20px 0;
+            font-size: 1.8rem;
+        }
+        
+        .event-modal-content label {
+            display: block;
+            color: #f5d000;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .event-modal-content textarea {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #f5d000;
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            font-size: 1rem;
+            min-height: 120px;
+            margin-bottom: 20px;
+            resize: vertical;
+        }
+        
+        .event-modal-content textarea:focus {
+            outline: none;
+            border-color: #ffd700;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+        
+        .modal-buttons button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-buttons .save-btn {
+            background: #f5d000;
+            color: #1f1f1f;
+        }
+        
+        .modal-buttons .save-btn:hover {
+            background: #ffd700;
+        }
+        
+        .modal-buttons .cancel-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 2px solid #666;
+        }
+        
+        .modal-buttons .cancel-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .modal-buttons .delete-btn {
+            background: #ff6464;
+            color: #fff;
+        }
+        
+        .modal-buttons .delete-btn:hover {
+            background: #ff4444;
+        }
+
+        .info-text {
+            text-align: center;
+            color: #f5d000;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .back-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: rgba(245, 208, 0, 0.1);
+            border: 2px solid #f5d000;
+            color: #f5d000;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #f5d000;
+            color: #1f1f1f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="../index.html" class="back-button">← Back to Home</a>
+        
+        <h1>Admin Booking Calendar</h1>
+        <p class="subtitle">Click on future dates to mark them as booked or available</p>
+
+        <div class="calendar-section">
+            <div class="calendar-header">
+                <button class="calendar-nav" id="prevMonth">←</button>
+                <h2 id="currentMonth">December 2025</h2>
+                <button class="calendar-nav" id="nextMonth">→</button>
+            </div>
+
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Calendar will be populated by JavaScript -->
+            </div>
+
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-box available"></div>
+                    <span>Available</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box booked"></div>
+                    <span>Booked (Regular)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box special"></div>
+                    <span>Special Event ⭐</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box past"></div>
+                    <span>Past/Today (Auto)</span>
+                </div>
+            </div>
+
+            <p class="info-text">Click on a future date to mark as booked/special event. Shift+Click for special events.</p>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="event-modal" id="eventModal">
+        <div class="event-modal-content">
+            <h3>Special Event Details</h3>
+            <p style="color: #aaa; margin-bottom: 20px;" id="eventDate"></p>
+            <label for="eventDetails">Event Description:</label>
+            <textarea id="eventDetails" placeholder="Enter event details (e.g., 'Thoddoo Trip - Join us for an amazing journey!')"></textarea>
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeEventModal()">Cancel</button>
+                <button class="delete-btn" id="deleteEventBtn" onclick="deleteEvent()">Delete Event</button>
+                <button class="save-btn" onclick="saveEvent()">Save Event</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Initialize Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const bookingDb = firebase.database();
+        const bookedDatesRef = bookingDb.ref('bookings/bookedDates');
+        const specialEventsRef = bookingDb.ref('bookings/specialEvents');
+
+        // Calendar state
+        let currentDate = new Date();
+        let bookedDates = new Map(); // date string -> firebase key
+        let specialEvents = new Map(); // date string -> {key, details}
+        let selectedDate = null;
+
+        // Load booked dates from Firebase
+        function loadBookedDates() {
+            bookedDatesRef.on('value', (snapshot) => {
+                bookedDates.clear();
+                const data = snapshot.val();
+                if (data) {
+                    Object.entries(data).forEach(([key, dateStr]) => {
+                        bookedDates.set(dateStr, key);
+                    });
+                }
+                renderCalendar();
+            });
+
+            specialEventsRef.on('value', (snapshot) => {
+                specialEvents.clear();
+                const data = snapshot.val();
+                if (data) {
+                    Object.entries(data).forEach(([key, event]) => {
+                        specialEvents.set(event.date, {key, details: event.details});
+                    });
+                }
+                renderCalendar();
+            });
+        }
+
+        // Toggle booking status
+        async function toggleBooking(dateStr, isShiftClick = false) {
+            // If shift-clicked or clicking special event, open modal
+            if (isShiftClick || specialEvents.has(dateStr)) {
+                openEventModal(dateStr);
+                return;
+            }
+
+            // Regular booking toggle
+            if (bookedDates.has(dateStr)) {
+                // Remove booking
+                const key = bookedDates.get(dateStr);
+                await bookedDatesRef.child(key).remove();
+                console.log('Removed booking for:', dateStr);
+            } else {
+                // Add booking
+                await bookedDatesRef.push(dateStr);
+                console.log('Added booking for:', dateStr);
+            }
+        }
+
+        // Modal functions
+        function openEventModal(dateStr) {
+            selectedDate = dateStr;
+            const modal = document.getElementById('eventModal');
+            const eventDateElem = document.getElementById('eventDate');
+            const eventDetailsElem = document.getElementById('eventDetails');
+            const deleteBtn = document.getElementById('deleteEventBtn');
+
+            // Format date for display
+            const [year, month, day] = dateStr.split('-');
+            const date = new Date(year, month - 1, day);
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            eventDateElem.textContent = `${monthNames[date.getMonth()]} ${day}, ${year}`;
+
+            // If it's an existing special event, load the details
+            if (specialEvents.has(dateStr)) {
+                eventDetailsElem.value = specialEvents.get(dateStr).details;
+                deleteBtn.style.display = 'inline-block';
+            } else {
+                eventDetailsElem.value = '';
+                deleteBtn.style.display = 'none';
+            }
+
+            modal.style.display = 'flex';
+        }
+
+        function closeEventModal() {
+            const modal = document.getElementById('eventModal');
+            modal.style.display = 'none';
+            selectedDate = null;
+        }
+
+        async function saveEvent() {
+            if (!selectedDate) return;
+
+            const eventDetailsElem = document.getElementById('eventDetails');
+            const details = eventDetailsElem.value.trim();
+
+            if (!details) {
+                alert('Please enter event details');
+                return;
+            }
+
+            // If it's already a special event, update it
+            if (specialEvents.has(selectedDate)) {
+                const key = specialEvents.get(selectedDate).key;
+                await specialEventsRef.child(key).update({
+                    date: selectedDate,
+                    details: details
+                });
+                console.log('Updated special event for:', selectedDate);
+            } else {
+                // Remove from regular bookings if it exists
+                if (bookedDates.has(selectedDate)) {
+                    const key = bookedDates.get(selectedDate);
+                    await bookedDatesRef.child(key).remove();
+                }
+
+                // Add as special event
+                await specialEventsRef.push({
+                    date: selectedDate,
+                    details: details
+                });
+                console.log('Added special event for:', selectedDate);
+            }
+
+            closeEventModal();
+        }
+
+        async function deleteEvent() {
+            if (!selectedDate || !specialEvents.has(selectedDate)) return;
+
+            if (confirm('Delete this special event?')) {
+                const key = specialEvents.get(selectedDate).key;
+                await specialEventsRef.child(key).remove();
+                console.log('Deleted special event for:', selectedDate);
+                closeEventModal();
+            }
+        }
+
+        // Render calendar
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            if (!grid) return;
+
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            // Update header
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"];
+            const monthHeader = document.getElementById('currentMonth');
+            if (monthHeader) {
+                monthHeader.textContent = `${monthNames[month]} ${year}`;
+            }
+
+            // Get first day of month and number of days
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Clear and rebuild calendar grid
+            grid.innerHTML = '';
+
+            // Add day headers
+            const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            dayHeaders.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-day-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+
+            // Add empty cells for days before month starts
+            for (let i = 0; i < firstDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day empty';
+                grid.appendChild(emptyDay);
+            }
+
+            // Add days of the month
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+
+                const thisDate = new Date(year, month, day);
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+                // Check if this is today
+                if (year === today.getFullYear() && 
+                    month === today.getMonth() && 
+                    day === today.getDate()) {
+                    dayElement.classList.add('today');
+                }
+
+                // Mark past dates and today as unavailable
+                if (thisDate <= today) {
+                    dayElement.classList.add('past');
+                } else {
+                    // Future dates - check booking status
+                    if (specialEvents.has(dateStr)) {
+                        dayElement.classList.add('special-event');
+                        dayElement.innerHTML = `${day} <span class="star">⭐</span>`;
+                    } else if (bookedDates.has(dateStr)) {
+                        dayElement.classList.add('booked');
+                    }
+
+                    // Add click handler for future dates only
+                    dayElement.addEventListener('click', (e) => {
+                        toggleBooking(dateStr, e.shiftKey);
+                    });
+                }
+
+                grid.appendChild(dayElement);
+            }
+        }
+
+        // Navigation
+        function initCalendar() {
+            const prevBtn = document.getElementById('prevMonth');
+            const nextBtn = document.getElementById('nextMonth');
+
+            if (prevBtn && nextBtn) {
+                prevBtn.addEventListener('click', () => {
+                    currentDate.setMonth(currentDate.getMonth() - 1);
+                    renderCalendar();
+                });
+
+                nextBtn.addEventListener('click', () => {
+                    currentDate.setMonth(currentDate.getMonth() + 1);
+                    renderCalendar();
+                });
+            }
+
+            loadBookedDates();
+            renderCalendar();
+        }
+
+        // Close modal on outside click
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('eventModal');
+            if (e.target === modal) {
+                closeEventModal();
+            }
+        });
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initCalendar);
+        } else {
+            initCalendar();
+        }
+    </script>
+</body>
+</html>
