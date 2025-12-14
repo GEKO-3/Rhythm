@@ -33,22 +33,42 @@
 <link rel="icon" type="image/png" sizes="512x512" href="../assets/favicons/icons-512.png">
 <link rel="manifest" href="../assets/favicons/manifest.webmanifest">
   
-  <!-- Unified Authentication System -->
-  <script type="module" src="../js/rhythm-unified-auth.js"></script>
-  
-  <!-- Local Database System -->
-  <script type="module" src="../js/rhythm-local-db.js"></script>
-  
   <!-- 🚀 PERFORMANCE: Preload critical resources -->
   <link rel="preload" href="../assets/Fonts/Faruma.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="../assets/Fonts/Montserrat-VariableFont_wght.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="../js/reverse-transliteration.js" as="script">
   
-  <!-- Import reverse transliteration for auto-generated English lyrics -->
+  <!-- Load Firebase COMPAT SDK for transliteration-firebase.js -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  
+  <!-- Initialize Firebase for compat SDK (used by transliteration-firebase.js) -->
+  <script>
+    // Firebase configuration for compat SDK
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+      authDomain: "rhythm-ea7a1.firebaseapp.com",
+      databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "rhythm-ea7a1",
+      storageBucket: "rhythm-ea7a1.firebasestorage.app",
+      messagingSenderId: "776053739080",
+      appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+    };
+    
+    // Initialize Firebase compat (rhythm-unified-auth.js uses modular SDK separately)
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+      console.log('✅ Firebase COMPAT initialized for transliteration');
+    }
+  </script>
+  
+  <!-- Load transliteration scripts that use compat SDK -->
   <script src="../js/transliteration-firebase.js"></script>
   <script src="../js/reverse-transliteration.js"></script>
+  
+  <!-- Load modules that use modular SDK (they initialize their own Firebase) -->
+  <script type="module" src="../js/rhythm-unified-auth.js"></script>
+  <script type="module" src="../js/rhythm-local-db.js"></script>
   
   <style>
     /* Load local fonts from Fonts folder */
@@ -677,13 +697,13 @@
       // 🚀 PREVENT FLASH: Make page visible once DOM is ready
       document.body.classList.add('loaded');
       
-      // Initialize auth first (which initializes Firebase)
-      await initializeUnifiedAuth();
-      
-      // Then initialize Firebase transliteration data after Firebase is ready
+      // Initialize Firebase transliteration data (Firebase already initialized above)
       if (typeof transliterationFirebase !== 'undefined') {
         await transliterationFirebase.initialize();
       }
+      
+      // Initialize auth
+      await initializeUnifiedAuth();
     });
 
     // Unified authentication system using RhythmUnifiedAuth
