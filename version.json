@@ -1,13 +1,15 @@
 {
-  "version": "2.3.10",
-  "timestamp": 1727650800000,
-  "description": "Complete notification system overhaul with real-time delivery",
+  "version": "2.4.1",
+  "timestamp": 1734220800000,
+  "description": "Kit tracking system and booking calendar enhancements",
   "changes": [
-    "Fixed CORS policy issues by replacing FCM HTTP API with Firebase Database",
-    "Implemented real-time notification queue and delivery system",
-    "Added automatic notification processing for online users",
-    "Enhanced admin panel with delivery status and user explanation",
-    "Created GitHub Pages compatible notification system",
-    "Improved notification reliability with database persistence"
+    "Added My Kits feature - members can track their owned equipment",
+    "Created admin kit management panel with inventory control",
+    "Added special events support for booking calendar with details modal",
+    "Updated login flow to include My Kits option for all users",
+    "Implemented Firebase database structure for kit tracking",
+    "Enhanced service worker cache management for PWA updates",
+    "Added kit inventory management with add/delete functionality",
+    "Created admin view to see all members' kit ownership"
   ]
 }

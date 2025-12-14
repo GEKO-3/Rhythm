@@ -1,7 +1,8 @@
 // Simple Service Worker for Rhythm Boduberu
 // Provides basic offline functionality without aggressive caching
+// Updated: 2025-12-15 - My Kits Feature
 
-const CACHE_NAME = 'rhythm-v2.4.0'; // Updated for My Kits feature
+const CACHE_NAME = 'rhythm-v2.4.1'; // Updated for My Kits feature - force update
 const ESSENTIAL_ASSETS = [
   './',
   './pages/songlist.html',
@@ -20,7 +21,7 @@ const ESSENTIAL_ASSETS = [
 
 // Install event - cache essential assets
 self.addEventListener('install', event => {
-  console.log('🔧 Service Worker: Installing...');
+  console.log('🔧 Service Worker: Installing v2.4.1...');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -44,12 +45,14 @@ self.addEventListener('install', event => {
       })
   );
   
+  // Force immediate activation
+  console.log('⚡ Service Worker: Skipping waiting to activate immediately');
   self.skipWaiting();
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
-  console.log('✅ Service Worker: Activating...');
+  console.log('✅ Service Worker: Activating v2.4.1...');
   
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -61,10 +64,13 @@ self.addEventListener('activate', event => {
           }
         })
       );
+    }).then(() => {
+      console.log('🎉 Service Worker: v2.4.1 activated successfully!');
     })
   );
   
-  self.clients.claim();
+  // Take control of all clients immediately
+  return self.clients.claim();
 });
 
 // Fetch event - serve from cache when offline
