@@ -1026,6 +1026,22 @@ class RhythmUnifiedAuth {
             return;
         }
 
+        // Check for stored preference (PWA mode)
+        const storedPreference = localStorage.getItem('rhythm_admin_preference');
+        if (isPWA && storedPreference) {
+            console.log('🔄 [UnifiedAuth] Using stored PWA preference:', storedPreference);
+            if (storedPreference === 'kits') {
+                window.location.href = 'pages/my-kits.html';
+                return;
+            } else if (storedPreference === 'admin') {
+                window.location.href = 'pages/admin/admin.html';
+                return;
+            } else if (storedPreference === 'songlist') {
+                window.location.href = 'pages/songlist.html';
+                return;
+            }
+        }
+
         // Show destination choice for all users (admins get extra option)
         this.showDestinationChoice(isPWA);
     }
