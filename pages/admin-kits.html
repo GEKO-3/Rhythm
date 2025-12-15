@@ -734,11 +734,14 @@
                     }).join('')
                     : '<span class="no-kits">No kits selected</span>';
 
+                const tshirtSize = member.tshirtSize ? `<div style="margin-top: 10px; color: #f5d000; font-weight: 600;">👕 T-Shirt: ${member.tshirtSize}</div>` : '';
+
                 memberCard.innerHTML = `
                     <div class="member-header">
                         <div>
                             <div class="member-name">${member.fullName || 'Unknown Member'}</div>
                             <div class="member-email">${member.rhythmIndexNumber || member.role || ''}</div>
+                            ${tshirtSize}
                         </div>
                     </div>
                     <div class="member-kits">

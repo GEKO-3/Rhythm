@@ -225,6 +225,57 @@
             display: block;
         }
 
+        .tshirt-section {
+            background: rgba(31, 31, 31, 0.95);
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .tshirt-section h2 {
+            color: #f5d000;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .size-input-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .size-input-group label {
+            color: #aaa;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .size-input-group select {
+            flex: 1;
+            max-width: 300px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .size-input-group select:focus {
+            outline: none;
+            border-color: #f5d000;
+        }
+
+        .size-input-group select option {
+            background: #1f1f1f;
+            color: #fff;
+        }
+
         @media (max-width: 768px) {
             .kits-grid {
                 grid-template-columns: 1fr;
@@ -232,6 +283,16 @@
 
             .page-header h1 {
                 font-size: 2rem;
+            }
+
+            .size-input-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .size-input-group select {
+                width: 100%;
+                max-width: none;
             }
         }
     </style>
@@ -246,6 +307,23 @@
         </div>
 
         <div id="loadingMessage" class="loading">Loading kits</div>
+        
+        <div class="tshirt-section" id="tshirtSection">
+            <h2>👕 T-Shirt Size</h2>
+            <div class="size-input-group">
+                <label for="tshirtSize">Your T-Shirt Size:</label>
+                <select id="tshirtSize">
+                    <option value="">Select Size</option>
+                    <option value="XS">XS - Extra Small</option>
+                    <option value="S">S - Small</option>
+                    <option value="M">M - Medium</option>
+                    <option value="L">L - Large</option>
+                    <option value="XL">XL - Extra Large</option>
+                    <option value="XXL">XXL - Double XL</option>
+                    <option value="XXXL">XXXL - Triple XL</option>
+                </select>
+            </div>
+        </div>
         
         <div id="kitsGrid" class="kits-grid" style="display: none;"></div>
 
@@ -285,6 +363,7 @@
         let currentUser = null;
         let availableKits = [];
         let selectedKits = new Set();
+        let currentTshirtSize = '';
 
         // Kit icons mapping
         const kitIcons = {
@@ -362,6 +441,14 @@
                     selectedKits = new Set(Object.values(userKits));
                 }
 
+                // Load user's t-shirt size
+                const sizeSnapshot = await db.ref(`members/${memberId}/tshirtSize`).once('value');
+                const tshirtSize = sizeSnapshot.val();
+                if (tshirtSize) {
+                    currentTshirtSize = tshirtSize;
+                    document.getElementById('tshirtSize').value = tshirtSize;
+                }
+
                 renderKits();
                 
             } catch (error) {
@@ -389,10 +476,12 @@
             const grid = document.getElementById('kitsGrid');
             const loading = document.getElementById('loadingMessage');
             const saveSection = document.getElementById('saveSection');
+            const tshirtSection = document.getElementById('tshirtSection');
 
             loading.style.display = 'none';
             grid.style.display = 'grid';
             saveSection.style.display = 'block';
+            tshirtSection.style.display = 'block';
 
             grid.innerHTML = '';
 
@@ -469,6 +558,12 @@
                 // Use RB prefix for member ID (e.g., RB1023)
                 const userId = currentUser.accessCode || currentUser.uid;
                 const memberId = userId.toString().startsWith('RB') ? userId : `RB${userId}`;
+                
+                // Save t-shirt size
+                const tshirtSize = document.getElementById('tshirtSize').value;
+                if (tshirtSize) {
+                    await db.ref(`members/${memberId}/tshirtSize`).set(tshirtSize);
+                }
                 
                 // Clear existing kits
                 await db.ref(`members/${memberId}/kits`).remove();
