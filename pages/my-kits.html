@@ -65,10 +65,13 @@
             background: rgba(31, 31, 31, 0.95);
             border: 2px solid #333;
             border-radius: 12px;
-            padding: 25px;
+            padding: 0;
             cursor: pointer;
             transition: all 0.3s ease;
             position: relative;
+            display: flex;
+            overflow: hidden;
+            min-height: 180px;
         }
 
         .kit-card:hover {
@@ -97,11 +100,34 @@
             justify-content: center;
             font-size: 1.5rem;
             font-weight: bold;
+            z-index: 10;
         }
 
         .kit-icon {
-            font-size: 3rem;
-            margin-bottom: 15px;
+            width: 180px;
+            min-width: 180px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .kit-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .kit-icon-emoji {
+            font-size: 4rem;
+        }
+
+        .kit-content {
+            flex: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .kit-name {
@@ -190,7 +216,7 @@
 </head>
 <body>
     <div class="kits-container">
-        <a href="../index.html" class="back-button">← Back to Home</a>
+        <a href="../login.html" class="back-button">← Back to Login</a>
         
         <div class="page-header">
             <h1>My Kits</h1>
@@ -295,7 +321,8 @@
                     availableKits = Object.entries(kitsData).map(([id, kit]) => ({
                         id,
                         name: kit.name,
-                        description: kit.description || ''
+                        description: kit.description || '',
+                        imageUrl: kit.imageUrl || ''
                     }));
                 } else {
                     // No kits available yet
@@ -350,12 +377,16 @@
                     card.classList.add('selected');
                 }
 
-                const icon = kitIcons[kit.name] || '📦';
+                const iconHTML = kit.imageUrl 
+                    ? `<img src="${kit.imageUrl}" alt="${kit.name}">`
+                    : `<span class="kit-icon-emoji">📦</span>`;
 
                 card.innerHTML = `
-                    <div class="kit-icon">${icon}</div>
-                    <div class="kit-name">${kit.name}</div>
-                    <div class="kit-description">${kit.description}</div>
+                    <div class="kit-icon">${iconHTML}</div>
+                    <div class="kit-content">
+                        <div class="kit-name">${kit.name}</div>
+                        <div class="kit-description">${kit.description}</div>
+                    </div>
                 `;
 
                 card.addEventListener('click', () => {

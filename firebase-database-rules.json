@@ -234,14 +234,20 @@
         "$kitId": {
           ".read": true,
           ".write": true,
-          ".validate": "newData.hasChildren(['name'])",
+          ".validate": "newData.hasChildren(['name', 'imageUrl'])",
           "name": {
             ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
           },
           "description": {
             ".validate": "newData.isString() && newData.val().length <= 500"
           },
+          "imageUrl": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 500"
+          },
           "createdAt": {
+            ".validate": "newData.isNumber()"
+          },
+          "updatedAt": {
             ".validate": "newData.isNumber()"
           },
           "$other": {
