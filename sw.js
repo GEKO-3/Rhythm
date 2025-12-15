@@ -1,8 +1,8 @@
 // Simple Service Worker for Rhythm Boduberu
 // Provides basic offline functionality without aggressive caching
-// Updated: 2025-12-15 - Kit Image Upload
+// Updated: 2025-12-15 - Kit Pages Cache Fix
 
-const CACHE_NAME = 'rhythm-v2.4.2'; // Updated for Kit Image Upload - force update
+const CACHE_NAME = 'rhythm-v2.4.3'; // Updated for Kit Pages Cache Fix - force update
 const ESSENTIAL_ASSETS = [
   './',
   './pages/songlist.html',
@@ -22,7 +22,7 @@ const ESSENTIAL_ASSETS = [
 
 // Install event - cache essential assets
 self.addEventListener('install', event => {
-  console.log('🔧 Service Worker: Installing v2.4.2...');
+  console.log('🔧 Service Worker: Installing v2.4.3...');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -81,11 +81,13 @@ self.addEventListener('fetch', event => {
     return;
   }
   
-  // For critical JavaScript files, always try network first and update cache
-  const isCriticalJS = event.request.url.includes('rhythm-unified-auth.js') ||
-                       event.request.url.includes('rhythm-local-db.js');
+  // For critical files, always try network first and update cache
+  const isCriticalFile = event.request.url.includes('rhythm-unified-auth.js') ||
+                         event.request.url.includes('rhythm-local-db.js') ||
+                         event.request.url.includes('my-kits.html') ||
+                         event.request.url.includes('admin-kits.html');
   
-  if (isCriticalJS) {
+  if (isCriticalFile) {
     event.respondWith(
       fetch(event.request)
         .then(response => {

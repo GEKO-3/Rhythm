@@ -1,15 +1,12 @@
 {
-  "version": "2.4.2",
-  "timestamp": 1734307200000,
-  "description": "Kit image upload and visual enhancements",
+  "version": "2.4.3",
+  "timestamp": 1734307800000,
+  "description": "Kit pages cache fix and network-first strategy",
   "changes": [
-    "Added Cloudinary image upload for kit items",
-    "Kits now display uploaded images instead of emojis",
-    "Added edit functionality to kit management - update name, description, and image",
-    "Enhanced kit card design with full-height images on the left",
-    "PNG images with transparency blend seamlessly with card backgrounds",
-    "Updated Firebase rules to support imageUrl and updatedAt fields",
-    "Improved My Kits page visual layout with horizontal card design",
-    "Added image preview when uploading/editing kits"
+    "Fixed My Kits page not showing updated UI with photos",
+    "Implemented network-first caching strategy for kit pages",
+    "Kit pages now always fetch latest version from server",
+    "Service worker properly updates kit pages HTML",
+    "All previous v2.4.2 features (Cloudinary upload, edit, visual enhancements)"
   ]
 }
