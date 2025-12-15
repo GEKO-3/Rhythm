@@ -110,12 +110,34 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            background: rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
         .kit-icon img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .kit-icon img.loaded {
+            opacity: 1;
+        }
+
+        .kit-icon .loading-spinner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(245, 208, 0, 0.2);
+            border-top-color: #f5d000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
         .kit-icon-emoji {
@@ -330,8 +352,10 @@
                 }
 
                 // Load user's current kit selection
+                // Use RB prefix for member ID (e.g., RB1023)
                 const userId = currentUser.accessCode || currentUser.uid;
-                const userKitsSnapshot = await db.ref(`members/${userId}/kits`).once('value');
+                const memberId = userId.toString().startsWith('RB') ? userId : `RB${userId}`;
+                const userKitsSnapshot = await db.ref(`members/${memberId}/kits`).once('value');
                 const userKits = userKitsSnapshot.val();
                 
                 if (userKits) {
@@ -344,6 +368,20 @@
                 console.error('Error loading kits:', error);
                 document.getElementById('loadingMessage').textContent = 'Error loading kits. Please refresh.';
             }
+        }
+
+        // Optimize Cloudinary image URLs for faster loading
+        function optimizeCloudinaryUrl(url) {
+            if (!url || !url.includes('cloudinary.com')) {
+                return url;
+            }
+            // Add Cloudinary transformations for optimized loading
+            // w_180 = width 180px, q_auto = auto quality, f_auto = auto format (WebP if supported)
+            const parts = url.split('/upload/');
+            if (parts.length === 2) {
+                return `${parts[0]}/upload/w_180,h_180,c_fill,q_auto:good,f_auto/${parts[1]}`;
+            }
+            return url;
         }
 
         // Render kit cards
@@ -378,7 +416,7 @@
                 }
 
                 const iconHTML = kit.imageUrl 
-                    ? `<img src="${kit.imageUrl}" alt="${kit.name}">`
+                    ? `<div class="loading-spinner"></div><img src="${optimizeCloudinaryUrl(kit.imageUrl)}" alt="${kit.name}" loading="lazy" data-kit-id="${kit.id}">`
                     : `<span class="kit-icon-emoji">📦</span>`;
 
                 card.innerHTML = `
@@ -388,6 +426,22 @@
                         <div class="kit-description">${kit.description}</div>
                     </div>
                 `;
+
+                // Handle image loading
+                const img = card.querySelector('img');
+                if (img) {
+                    img.addEventListener('load', () => {
+                        img.classList.add('loaded');
+                        const spinner = card.querySelector('.loading-spinner');
+                        if (spinner) spinner.remove();
+                    });
+                    img.addEventListener('error', () => {
+                        const spinner = card.querySelector('.loading-spinner');
+                        if (spinner) spinner.remove();
+                        img.style.display = 'none';
+                        card.querySelector('.kit-icon').innerHTML = '<span class="kit-icon-emoji">📦</span>';
+                    });
+                }
 
                 card.addEventListener('click', () => {
                     if (selectedKits.has(kit.id)) {
@@ -412,10 +466,12 @@
             saveButton.textContent = 'Saving...';
 
             try {
+                // Use RB prefix for member ID (e.g., RB1023)
                 const userId = currentUser.accessCode || currentUser.uid;
+                const memberId = userId.toString().startsWith('RB') ? userId : `RB${userId}`;
                 
                 // Clear existing kits
-                await db.ref(`members/${userId}/kits`).remove();
+                await db.ref(`members/${memberId}/kits`).remove();
 
                 // Save selected kits
                 if (selectedKits.size > 0) {
@@ -423,7 +479,7 @@
                     selectedKits.forEach(kitId => {
                         kitsObject[kitId] = kitId;
                     });
-                    await db.ref(`members/${userId}/kits`).set(kitsObject);
+                    await db.ref(`members/${memberId}/kits`).set(kitsObject);
                 }
 
                 // Show success message

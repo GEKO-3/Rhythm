@@ -737,8 +737,8 @@
                 memberCard.innerHTML = `
                     <div class="member-header">
                         <div>
-                            <div class="member-name">${member.name || 'Unknown'}</div>
-                            <div class="member-email">${member.email || ''}</div>
+                            <div class="member-name">${member.fullName || 'Unknown Member'}</div>
+                            <div class="member-email">${member.rhythmIndexNumber || member.role || ''}</div>
                         </div>
                     </div>
                     <div class="member-kits">
