@@ -1,12 +1,13 @@
 {
-  "version": "2.4.3",
-  "timestamp": 1734307800000,
-  "description": "Kit pages cache fix and network-first strategy",
+  "version": "2.4.4",
+  "timestamp": 1734308400000,
+  "description": "Always fresh HTML - aggressive cache bypass",
   "changes": [
-    "Fixed My Kits page not showing updated UI with photos",
-    "Implemented network-first caching strategy for kit pages",
-    "Kit pages now always fetch latest version from server",
-    "Service worker properly updates kit pages HTML",
-    "All previous v2.4.2 features (Cloudinary upload, edit, visual enhancements)"
+    "ALL HTML files now ALWAYS fetch from network (never cached unless offline)",
+    "Added cache: 'no-store' to bypass browser HTTP cache completely",
+    "Service worker only serves cached HTML when completely offline",
+    "Ensures users always see the latest version of every page",
+    "My Kits and Admin Kits pages will always show current UI",
+    "Console logs show when serving fresh vs cached HTML"
   ]
 }

@@ -1,8 +1,8 @@
 // Simple Service Worker for Rhythm Boduberu
 // Provides basic offline functionality without aggressive caching
-// Updated: 2025-12-15 - Kit Pages Cache Fix
+// Updated: 2025-12-15 - Always Fresh HTML Strategy
 
-const CACHE_NAME = 'rhythm-v2.4.3'; // Updated for Kit Pages Cache Fix - force update
+const CACHE_NAME = 'rhythm-v2.4.4'; // Always fetch fresh HTML files
 const ESSENTIAL_ASSETS = [
   './',
   './pages/songlist.html',
@@ -22,7 +22,7 @@ const ESSENTIAL_ASSETS = [
 
 // Install event - cache essential assets
 self.addEventListener('install', event => {
-  console.log('🔧 Service Worker: Installing v2.4.3...');
+  console.log('🔧 Service Worker: Installing v2.4.4...');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -74,24 +74,53 @@ self.addEventListener('activate', event => {
   return self.clients.claim();
 });
 
-// Fetch event - serve from cache when offline
+// Fetch event - always fetch HTML files from network
 self.addEventListener('fetch', event => {
   // Skip non-GET requests and external requests
   if (event.request.method !== 'GET' || !event.request.url.startsWith(self.location.origin)) {
     return;
   }
   
-  // For critical files, always try network first and update cache
-  const isCriticalFile = event.request.url.includes('rhythm-unified-auth.js') ||
-                         event.request.url.includes('rhythm-local-db.js') ||
-                         event.request.url.includes('my-kits.html') ||
-                         event.request.url.includes('admin-kits.html');
+  const url = new URL(event.request.url);
+  const isHTMLFile = url.pathname.endsWith('.html') || url.pathname === '/' || url.pathname.endsWith('/');
   
-  if (isCriticalFile) {
+  // For ALL HTML files, ALWAYS fetch from network (never use cache unless offline)
+  if (isHTMLFile) {
+    event.respondWith(
+      fetch(event.request, {
+        cache: 'no-store' // Force fresh fetch, bypass HTTP cache
+      })
+        .then(response => {
+          // Clone the response and update cache for offline use
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseClone);
+          });
+          console.log('🌐 Service Worker: Fresh HTML from network:', url.pathname);
+          return response;
+        })
+        .catch(() => {
+          // Only use cache if offline
+          console.log('📱 Service Worker: Offline - serving cached HTML:', url.pathname);
+          return caches.match(event.request).then(cachedResponse => {
+            if (cachedResponse) {
+              return cachedResponse;
+            }
+            return new Response('Offline', { status: 503 });
+          });
+        })
+    );
+    return;
+  }
+  
+  // For critical JavaScript files, also always try network first
+  const isCriticalJS = event.request.url.includes('rhythm-unified-auth.js') ||
+                       event.request.url.includes('rhythm-local-db.js');
+  
+  if (isCriticalJS) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Clone the response and update cache
           const responseClone = response.clone();
           caches.open(CACHE_NAME).then(cache => {
             cache.put(event.request, responseClone);
@@ -99,33 +128,24 @@ self.addEventListener('fetch', event => {
           return response;
         })
         .catch(() => {
-          // Fallback to cache if offline
           return caches.match(event.request);
         })
     );
     return;
   }
   
+  // For all other resources (CSS, images, etc), try network first, cache fallback
   event.respondWith(
     fetch(event.request)
       .then(response => {
-        // If online, return fresh response
         return response;
       })
       .catch(() => {
-        // If offline, try to serve from cache
         return caches.match(event.request).then(cachedResponse => {
           if (cachedResponse) {
             console.log('📱 Service Worker: Serving from cache:', event.request.url);
             return cachedResponse;
           }
-          
-          // If not in cache and it's a navigation request, serve the main page
-          if (event.request.mode === 'navigate') {
-            return caches.match('./');
-          }
-          
-          // For other requests, just fail gracefully
           return new Response('Offline', { status: 503 });
         });
       })
