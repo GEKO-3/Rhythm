@@ -1,15 +1,15 @@
 {
-  "version": "2.4.1",
-  "timestamp": 1734220800000,
-  "description": "Kit tracking system and booking calendar enhancements",
+  "version": "2.4.2",
+  "timestamp": 1734307200000,
+  "description": "Kit image upload and visual enhancements",
   "changes": [
-    "Added My Kits feature - members can track their owned equipment",
-    "Created admin kit management panel with inventory control",
-    "Added special events support for booking calendar with details modal",
-    "Updated login flow to include My Kits option for all users",
-    "Implemented Firebase database structure for kit tracking",
-    "Enhanced service worker cache management for PWA updates",
-    "Added kit inventory management with add/delete functionality",
-    "Created admin view to see all members' kit ownership"
+    "Added Cloudinary image upload for kit items",
+    "Kits now display uploaded images instead of emojis",
+    "Added edit functionality to kit management - update name, description, and image",
+    "Enhanced kit card design with full-height images on the left",
+    "PNG images with transparency blend seamlessly with card backgrounds",
+    "Updated Firebase rules to support imageUrl and updatedAt fields",
+    "Improved My Kits page visual layout with horizontal card design",
+    "Added image preview when uploading/editing kits"
   ]
 }

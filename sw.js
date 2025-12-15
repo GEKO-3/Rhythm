@@ -1,14 +1,15 @@
 // Simple Service Worker for Rhythm Boduberu
 // Provides basic offline functionality without aggressive caching
-// Updated: 2025-12-15 - My Kits Feature
+// Updated: 2025-12-15 - Kit Image Upload
 
-const CACHE_NAME = 'rhythm-v2.4.1'; // Updated for My Kits feature - force update
+const CACHE_NAME = 'rhythm-v2.4.2'; // Updated for Kit Image Upload - force update
 const ESSENTIAL_ASSETS = [
   './',
   './pages/songlist.html',
   './pages/lyrics.html',
   './pages/attendance.html',
   './pages/my-kits.html',
+  './pages/admin-kits.html',
   './login.html',
   './pages/admin/admin.html',
   './js/rhythm-unified-auth.js',
@@ -21,7 +22,7 @@ const ESSENTIAL_ASSETS = [
 
 // Install event - cache essential assets
 self.addEventListener('install', event => {
-  console.log('🔧 Service Worker: Installing v2.4.1...');
+  console.log('🔧 Service Worker: Installing v2.4.2...');
   
   event.waitUntil(
     caches.open(CACHE_NAME)
