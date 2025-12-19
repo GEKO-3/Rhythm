@@ -1175,6 +1175,25 @@
             STATE.songs = firebaseSongs;
             window.songs = firebaseSongs;
             
+            // Load showlist from localStorage
+            try {
+              const showlistJson = localStorage.getItem('latestShowlist');
+              if (showlistJson) {
+                const showlist = JSON.parse(showlistJson);
+                if (showlist && showlist.songs && Array.isArray(showlist.songs)) {
+                  STATE.currentShowList = showlist.songs;
+                  console.log('📋 Loaded showlist:', showlist.name, 'with', showlist.songs.length, 'songs');
+                } else {
+                  STATE.currentShowList = [];
+                }
+              } else {
+                STATE.currentShowList = [];
+              }
+            } catch (showlistError) {
+              console.warn('Failed to load showlist from localStorage:', showlistError);
+              STATE.currentShowList = [];
+            }
+            
             console.log('🔄 About to call UI.initializeSongList');
             // Initialize UI immediately
             UI.initializeSongList();

@@ -421,7 +421,15 @@
     <!-- Latest Showlist Display -->
     <div id="latest-showlist-section" class="latest-showlist" style="display: none;">
       <div class="latest-showlist-info">
-        <strong>Latest Show List:</strong> <span id="latest-showlist-name"></span>
+        <div style="margin-bottom: 10px;">
+          <strong>Latest Show List:</strong> <span id="latest-showlist-name" style="color: var(--primary-color); font-size: 1.2em;"></span>
+        </div>
+        <div style="margin-bottom: 10px; font-size: 0.9em; color: #aaa;">
+          <strong>Created:</strong> <span id="latest-showlist-date"></span>
+        </div>
+        <div style="margin-bottom: 15px; color: #ccc;">
+          <strong>Songs:</strong> <span id="latest-showlist-songs"></span>
+        </div>
         <button class="btn btn-danger" id="remove-showlist-btn" onclick="removeLatestShowlist()">Remove</button>
       </div>
     </div>
@@ -520,14 +528,35 @@
       }
     }
 
-    // Load latest showlist (simplified - showlist feature disabled for now)
+    // Load latest showlist from localStorage
     async function loadLatestShowlist() {
       try {
-        console.log('ℹ️ Showlist feature currently disabled (migrating from CSV to Firebase)');
-        // Hide the latest showlist section
+        const showlistJson = localStorage.getItem('latestShowlist');
+        if (!showlistJson) {
+          // Hide the latest showlist section if no showlist exists
+          const section = document.getElementById('latest-showlist-section');
+          if (section) {
+            section.style.display = 'none';
+          }
+          return;
+        }
+        
+        latestShowlist = JSON.parse(showlistJson);
+        
+        // Display the showlist
         const section = document.getElementById('latest-showlist-section');
-        if (section) {
-          section.style.display = 'none';
+        const nameDisplay = document.getElementById('latest-showlist-name');
+        const songsDisplay = document.getElementById('latest-showlist-songs');
+        const dateDisplay = document.getElementById('latest-showlist-date');
+        
+        if (section && nameDisplay && songsDisplay) {
+          nameDisplay.textContent = latestShowlist.name;
+          songsDisplay.textContent = latestShowlist.songs.join(', ');
+          if (dateDisplay && latestShowlist.timestamp) {
+            const date = new Date(latestShowlist.timestamp);
+            dateDisplay.textContent = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+          }
+          section.style.display = 'block';
         }
       } catch (error) {
         console.error('Failed to load latest showlist:', error);
@@ -557,21 +586,21 @@
       const showlistData = currentList.join('\n');
       
       try {
-        const formData = new FormData();
-        const entries = window.RhythmLyricsShowConfig.showListEntries;
-        formData.append(entries.uid, uid); // UID field
-        formData.append(entries.data, showlistData); // Showlist field
-        formData.append(entries.name, showName); // Show name field
+        // TODO: Implement Firebase storage for showlists
+        // For now, just save to localStorage
+        const showlist = {
+          uid: uid,
+          name: showName,
+          songs: currentList,
+          data: showlistData,
+          timestamp: new Date().toISOString()
+        };
         
-        await fetch(window.RhythmLyricsShowConfig.showListForm, {
-          method: 'POST',
-          body: formData,
-          mode: 'no-cors'
-        });
+        localStorage.setItem('latestShowlist', JSON.stringify(showlist));
         
         // Show success message
         const feedback = document.getElementById('copy-feedback');
-        feedback.textContent = 'Show list submitted successfully!';
+        feedback.textContent = 'Show list saved successfully!';
         feedback.style.background = '#28a745';
         feedback.classList.add('show');
         setTimeout(() => {
@@ -588,7 +617,7 @@
         // Reload latest showlist after a short delay
         setTimeout(() => {
           loadLatestShowlist();
-        }, 2000);
+        }, 500);
         
       } catch (error) {
         console.error('Error submitting showlist:', error);
@@ -605,16 +634,8 @@
       if (!confirmed) return;
       
       try {
-        const formData = new FormData();
-        const entries = window.RhythmLyricsShowConfig.cancelEntries;
-        formData.append(entries.uid, latestShowlist.uid); // UID field
-        formData.append(entries.status, 'yes'); // Cancel field
-        
-        await fetch(window.RhythmLyricsShowConfig.cancelForm, {
-          method: 'POST',
-          body: formData,
-          mode: 'no-cors'
-        });
+        // Remove from localStorage
+        localStorage.removeItem('latestShowlist');
         
         // Hide the latest showlist section
         document.getElementById('latest-showlist-section').style.display = 'none';
@@ -729,6 +750,10 @@
     // Expose functions to global scope for onclick handlers
     window.addSong = addSong;
     window.removeSong = removeSong;
+    window.submitShowlist = submitShowlist;
+    window.removeLatestShowlist = removeLatestShowlist;
+    window.clearList = clearList;
+    window.copyToClipboard = copyToClipboard;
     
     // Update the display
     function updateDisplay() {
