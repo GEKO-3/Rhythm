@@ -255,6 +255,53 @@
           }
         }
       }
+    },
+    
+    "inventory": {
+      ".read": true,
+      ".write": true,
+      "items": {
+        ".read": true,
+        ".write": true,
+        "$itemId": {
+          ".read": true,
+          ".write": true,
+          ".validate": "newData.hasChildren(['id', 'name', 'quantity', 'totalQuantity'])",
+          "id": {
+            ".validate": "newData.isString() && newData.val().length > 0"
+          },
+          "name": {
+            ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+          },
+          "description": {
+            ".validate": "newData.isString() && newData.val().length <= 1000"
+          },
+          "quantity": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "totalQuantity": {
+            ".validate": "newData.isNumber() && newData.val() >= 1"
+          },
+          "photoUrl": {
+            ".validate": "newData.isString() || newData.val() == null"
+          },
+          "status": {
+            ".validate": "newData.isString() && (newData.val() == 'available' || newData.val() == 'checked-out')"
+          },
+          "checkedOutItems": {
+            ".validate": "newData.hasChildren() || !newData.exists()"
+          },
+          "createdAt": {
+            ".validate": "newData.isString()"
+          },
+          "createdBy": {
+            ".validate": "newData.isString() && newData.val().length > 0"
+          },
+          "$other": {
+            ".validate": false
+          }
+        }
+      }
     }
   }
 }

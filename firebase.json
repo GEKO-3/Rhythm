@@ -1,0 +1,79 @@
+{
+  "hosting": {
+    "public": ".",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.md",
+      "archive/**",
+      ".git/**",
+      ".github/**",
+      "CLEANUP_SUMMARY.md",
+      "AUTHENTICATION_UNIFIED.md",
+      "BIRTHDAY_NOTIFICATIONS_READY.md",
+      "CLOUDINARY_SETUP.md",
+      "DEPLOY_FIREBASE_RULES.md",
+      "FCM_SETUP_GUIDE.md",
+      "FIREBASE_ADMIN_RULES_GUIDE.md",
+      "FIREBASE_PRODUCTION_SETUP.md",
+      "FIREBASE_RULES_IMPACT_ANALYSIS.md",
+      "FIREBASE_SERVER_KEY_SETUP.md",
+      "NOTIFICATIONS_IMPLEMENTATION.md",
+      "OFFLINE_FEATURES.md",
+      "PROJECT-STRUCTURE.md"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**/*.@(jpg|jpeg|gif|png|webp|svg|ico)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=31536000, immutable"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=604800, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(html)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "public, max-age=3600, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "/service-worker.js",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      }
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
+  },
+  "storage": {
+    "rules": "firebase-storage.rules"
+  },
+  "database": {
+    "rules": "firebase-database-rules.json"
+  }
+}
