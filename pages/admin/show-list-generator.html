@@ -726,6 +726,10 @@
       saveProgress();
     }
     
+    // Expose functions to global scope for onclick handlers
+    window.addSong = addSong;
+    window.removeSong = removeSong;
+    
     // Update the display
     function updateDisplay() {
       const songList = document.getElementById('song-list');

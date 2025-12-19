@@ -375,8 +375,19 @@
     <!-- Event Details Modal -->
     <div class="event-modal" id="eventModal">
         <div class="event-modal-content">
-            <h3>Special Event Details</h3>
+            <h3>Event Details</h3>
             <p style="color: #aaa; margin-bottom: 20px;" id="eventDate"></p>
+            
+            <div style="margin-bottom: 20px; padding: 15px; background: rgba(245, 208, 0, 0.1); border-radius: 8px; border: 1px solid rgba(245, 208, 0, 0.3);">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; color: #f5d000;">
+                    <input type="checkbox" id="isSpecialEvent" style="margin: 0; cursor: pointer;">
+                    <span style="font-weight: 600;">✨ Mark as Special Event</span>
+                </label>
+                <small style="color: #aaa; display: block; margin-top: 5px; margin-left: 30px;">
+                    Special events show description to all members. Regular events keep description private (admin only).
+                </small>
+            </div>
+            
             <label for="eventDetails">Event Description:</label>
             <textarea id="eventDetails" placeholder="Enter event details (e.g., 'Thoddoo Trip - Join us for an amazing journey!')"></textarea>
             <div class="modal-buttons">
@@ -423,8 +434,16 @@
                 bookedDates.clear();
                 const data = snapshot.val();
                 if (data) {
-                    Object.entries(data).forEach(([key, dateStr]) => {
-                        bookedDates.set(dateStr, key);
+                    Object.entries(data).forEach(([key, value]) => {
+                        // Handle both old format (string) and new format (object with description)
+                        if (typeof value === 'string') {
+                            bookedDates.set(value, key);
+                        } else if (value && value.date) {
+                            bookedDates.set(value.date, key);
+                            if (value.description) {
+                                bookedDates.set(value.date + '_desc', value.description);
+                            }
+                        }
                     });
                 }
                 renderCalendar();
@@ -479,11 +498,20 @@
             eventDateElem.textContent = `${monthNames[date.getMonth()]} ${day}, ${year}`;
 
             // If it's an existing special event, load the details
+            const isSpecialCheckbox = document.getElementById('isSpecialEvent');
             if (specialEvents.has(dateStr)) {
                 eventDetailsElem.value = specialEvents.get(dateStr).details;
+                isSpecialCheckbox.checked = true;
+                deleteBtn.style.display = 'inline-block';
+            } else if (bookedDates.has(dateStr)) {
+                // Check if regular booking has description
+                const key = bookedDates.get(dateStr);
+                eventDetailsElem.value = bookedDates.get(dateStr + '_desc') || '';
+                isSpecialCheckbox.checked = false;
                 deleteBtn.style.display = 'inline-block';
             } else {
                 eventDetailsElem.value = '';
+                isSpecialCheckbox.checked = false;
                 deleteBtn.style.display = 'none';
             }
 
@@ -501,45 +529,76 @@
 
             const eventDetailsElem = document.getElementById('eventDetails');
             const details = eventDetailsElem.value.trim();
+            const isSpecial = document.getElementById('isSpecialEvent').checked;
 
             if (!details) {
                 alert('Please enter event details');
                 return;
             }
 
-            // If it's already a special event, update it
-            if (specialEvents.has(selectedDate)) {
-                const key = specialEvents.get(selectedDate).key;
-                await specialEventsRef.child(key).update({
-                    date: selectedDate,
-                    details: details
-                });
-                console.log('Updated special event for:', selectedDate);
-            } else {
+            if (isSpecial) {
+                // Save as special event (public description)
                 // Remove from regular bookings if it exists
                 if (bookedDates.has(selectedDate)) {
                     const key = bookedDates.get(selectedDate);
                     await bookedDatesRef.child(key).remove();
                 }
 
-                // Add as special event
-                await specialEventsRef.push({
-                    date: selectedDate,
-                    details: details
-                });
-                console.log('Added special event for:', selectedDate);
+                // Update or create special event
+                if (specialEvents.has(selectedDate)) {
+                    const key = specialEvents.get(selectedDate).key;
+                    await specialEventsRef.child(key).update({
+                        date: selectedDate,
+                        details: details
+                    });
+                    console.log('Updated special event for:', selectedDate);
+                } else {
+                    await specialEventsRef.push({
+                        date: selectedDate,
+                        details: details
+                    });
+                    console.log('Added special event for:', selectedDate);
+                }
+            } else {
+                // Save as regular booking with private description
+                // Remove from special events if it exists
+                if (specialEvents.has(selectedDate)) {
+                    const key = specialEvents.get(selectedDate).key;
+                    await specialEventsRef.child(key).remove();
+                }
+
+                // Update or create regular booking with description
+                if (bookedDates.has(selectedDate)) {
+                    const key = bookedDates.get(selectedDate);
+                    await bookedDatesRef.child(key).update({
+                        date: selectedDate,
+                        description: details
+                    });
+                } else {
+                    await bookedDatesRef.push({
+                        date: selectedDate,
+                        description: details
+                    });
+                }
+                console.log('Saved regular booking with private description for:', selectedDate);
             }
 
             closeEventModal();
         }
 
         async function deleteEvent() {
-            if (!selectedDate || !specialEvents.has(selectedDate)) return;
+            if (!selectedDate) return;
 
-            if (confirm('Delete this special event?')) {
-                const key = specialEvents.get(selectedDate).key;
-                await specialEventsRef.child(key).remove();
-                console.log('Deleted special event for:', selectedDate);
+            if (confirm('Delete this event?')) {
+                if (specialEvents.has(selectedDate)) {
+                    const key = specialEvents.get(selectedDate).key;
+                    await specialEventsRef.child(key).remove();
+                    console.log('Deleted special event for:', selectedDate);
+                } else if (bookedDates.has(selectedDate)) {
+                    const key = bookedDates.get(selectedDate);
+                    await bookedDatesRef.child(key).remove();
+                    console.log('Deleted regular booking for:', selectedDate);
+                }
                 closeEventModal();
             }
         }

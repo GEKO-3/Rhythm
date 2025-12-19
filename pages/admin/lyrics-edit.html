@@ -1099,6 +1099,41 @@
     // Handle imported text from transliteration tool
     function handleImportedText() {
       const urlParams = new URLSearchParams(window.location.search);
+      const fromImport = urlParams.get('fromImport');
+      
+      // Check sessionStorage for imported data (new method - avoids URL length limits)
+      if (fromImport === 'true') {
+        try {
+          const importedText = sessionStorage.getItem('lyricsImportText');
+          const songName = sessionStorage.getItem('lyricsImportSongName');
+          
+          if (importedText) {
+            // Import text and lyrics (this will call resetTool internally)
+            importTextToLyrics(importedText);
+            
+            // Set song name AFTER importTextToLyrics (which calls resetTool)
+            if (songName) {
+              const songNameInput = document.getElementById('song-name-input');
+              songNameInput.value = songName;
+              localStorage.setItem('lyricsEditorSongName', songName);
+            }
+            
+            // Clear sessionStorage after use
+            sessionStorage.removeItem('lyricsImportText');
+            sessionStorage.removeItem('lyricsImportSongName');
+            
+            // Clean up URL
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+          }
+        } catch (error) {
+          console.error('Error processing imported text from sessionStorage:', error);
+          alert('Error processing imported text. Please try again.');
+        }
+        return;
+      }
+      
+      // Fallback: Check URL parameters (old method - kept for backwards compatibility)
       const importedText = urlParams.get('import');
       const songName = urlParams.get('songName');
       

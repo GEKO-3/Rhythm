@@ -1065,7 +1065,7 @@ class RhythmUnifiedAuth {
         
         const adminButton = isAdmin ? `
             <button onclick="rhythmAuth.goToAdmin(${isPWA})" class="submit-btn" style="background: #ff6b6b;">
-                Admin Panel
+                🔧 Admin Panel
             </button>
         ` : '';
         
@@ -1075,11 +1075,20 @@ class RhythmUnifiedAuth {
                 Choose your destination:
             </p>
             <div style="display: flex; flex-direction: column; gap: 15px;">
-                <button onclick="rhythmAuth.goToMyKits(${isPWA})" class="submit-btn" style="background: #4caf50;">
-                    My Kits
+                <button onclick="rhythmAuth.toggleToolsMenu()" class="submit-btn" style="background: #9c27b0; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                    <span>🛠️ Tools</span>
+                    <span id="toolsArrow" style="transition: transform 0.3s ease;">▼</span>
                 </button>
+                <div id="toolsSubmenu" style="display: none; margin-left: 20px; border-left: 3px solid #9c27b0; padding-left: 15px; gap: 10px; flex-direction: column;">
+                    <button onclick="rhythmAuth.goToMyKits(${isPWA})" class="submit-btn" style="background: #4caf50; font-size: 0.95rem;">
+                        🥁 My Kits
+                    </button>
+                    <button onclick="rhythmAuth.goToCalendar(${isPWA})" class="submit-btn" style="background: #2196f3; font-size: 0.95rem;">
+                        📅 Booking Calendar
+                    </button>
+                </div>
                 <button onclick="rhythmAuth.goToSonglist(${isPWA})" class="submit-btn" style="background: var(--primary-color);">
-                    Song List
+                    🎵 Song List
                 </button>
                 ${adminButton}
             </div>
@@ -1127,6 +1136,30 @@ class RhythmUnifiedAuth {
             }
         }
         window.location.href = 'pages/admin/admin.html';
+    }
+
+    toggleToolsMenu() {
+        const submenu = document.getElementById('toolsSubmenu');
+        const arrow = document.getElementById('toolsArrow');
+        
+        if (submenu.style.display === 'none' || submenu.style.display === '') {
+            submenu.style.display = 'flex';
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            submenu.style.display = 'none';
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    goToCalendar(rememberForPWA = false) {
+        if (rememberForPWA) {
+            const rememberCheckbox = document.getElementById('rememberChoice');
+            if (rememberCheckbox && rememberCheckbox.checked) {
+                localStorage.setItem('rhythm_admin_preference', 'calendar');
+                localStorage.setItem('rhythm_silent_redirect', 'true');
+            }
+        }
+        window.location.href = 'pages/booking-calendar.html';
     }
 
     /**

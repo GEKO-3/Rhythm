@@ -393,6 +393,25 @@
   <!-- Firebase SDK for transliteration -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  
+  <!-- Initialize Firebase compat SDK for transliteration -->
+  <script>
+    // Firebase configuration for compat SDK
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+      authDomain: "rhythm-ea7a1.firebaseapp.com",
+      databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "rhythm-ea7a1",
+      storageBucket: "rhythm-ea7a1.firebasestorage.app",
+      messagingSenderId: "776053739080",
+      appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+    };
+    
+    // Initialize Firebase compat app
+    firebase.initializeApp(firebaseConfig);
+    console.log('✅ Firebase compat SDK initialized for transliteration');
+  </script>
+  
   <script src="../../js/transliteration-firebase.js"></script>
   <script src="../../js/reverse-transliteration.js"></script>
 
