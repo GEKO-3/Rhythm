@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Checklist Data Entry</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f5d000">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      background: #1f1f1f;
+      color: #f5f5f5;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      color: #f5d000;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    
+    .tab-buttons {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      justify-content: center;
+    }
+    
+    .tab-btn {
+      background: #2a2a2a;
+      border: 2px solid #444;
+      color: #f5f5f5;
+      padding: 15px 40px;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-btn:hover {
+      border-color: #f5d000;
+      background: #333;
+    }
+    
+    .tab-btn.active {
+      background: #f5d000;
+      color: #1f1f1f;
+      border-color: #f5d000;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .section {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+    }
+    
+    h2 {
+      color: #f5d000;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+    
+    .add-category-section {
+      background: #333;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    
+    .input-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      align-items: center;
+    }
+    
+    input[type="text"],
+    input[type="number"] {
+      flex: 1;
+      padding: 12px;
+      background: #1f1f1f;
+      border: 2px solid #444;
+      border-radius: 8px;
+      color: #f5f5f5;
+      font-size: 1em;
+    }
+    
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      outline: none;
+      border-color: #f5d000;
+    }
+    
+    button {
+      background: #f5d000;
+      color: #1f1f1f;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+    
+    button:hover {
+      background: #ffd700;
+      transform: translateY(-2px);
+    }
+    
+    button.secondary {
+      background: #e74c3c;
+    }
+    
+    button.secondary:hover {
+      background: #c0392b;
+    }
+    
+    button.add-sub {
+      background: #3498db;
+      padding: 8px 16px;
+      font-size: 0.9em;
+    }
+    
+    button.add-sub:hover {
+      background: #2980b9;
+    }
+    
+    .categories-list {
+      margin-top: 20px;
+    }
+    
+    .category-card {
+      background: #333;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 2px solid #444;
+    }
+    
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #444;
+    }
+    
+    .category-name {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #f5d000;
+    }
+    
+    .item-list {
+      margin-top: 10px;
+    }
+    
+    .item {
+      background: #2a2a2a;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .sub-items {
+      margin-left: 30px;
+      margin-top: 8px;
+    }
+    
+    .sub-item {
+      background: #1f1f1f;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9em;
+    }
+    
+    .success {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #2ecc71;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 8px;
+      display: none;
+      z-index: 1000;
+      animation: slideIn 0.3s ease;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-small {
+      padding: 6px 12px;
+      font-size: 0.85em;
+    }
+  </style>
+  
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+      authDomain: "rhythm-ea7a1.firebaseapp.com",
+      databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "rhythm-ea7a1",
+      storageBucket: "rhythm-ea7a1.firebasestorage.app",
+      messagingSenderId: "776053739080",
+      appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    
+    window.checklistDB = { database, ref, set, onValue };
+  </script>
+</head>
+<body>
+  <div class="success" id="successMsg">✓ Saved successfully!</div>
+  
+  <div class="container">
+    <h1>🔧 Checklist Data Entry</h1>
+    
+    <div class="tab-buttons">
+      <button class="tab-btn active" data-tab="equipment">🎵 Equipment</button>
+      <button class="tab-btn" data-tab="itinerary">📅 Itinerary</button>
+    </div>
+    
+    <!-- Equipment Tab -->
+    <div id="equipment-tab" class="tab-content active">
+      <div class="section">
+        <h2>Add New List</h2>
+        <div class="add-category-section">
+          <div class="input-row">
+            <input type="text" id="equipmentCategoryName" placeholder="List Name (e.g., Box 1, Sound Equipment)">
+            <button onclick="addCategory('equipment')">➕ Add List</button>
+          </div>
+        </div>
+        
+        <div id="equipmentCategories" class="categories-list"></div>
+      </div>
+    </div>
+    
+    <!-- Itinerary Tab -->
+    <div id="itinerary-tab" class="tab-content">
+      <div class="section">
+        <h2>Add New List</h2>
+        <div class="add-category-section">
+          <div class="input-row">
+            <input type="text" id="itineraryCategoryName" placeholder="List Name (e.g., Event Preparation)">
+            <button onclick="addCategory('itinerary')">➕ Add List</button>
+          </div>
+        </div>
+        
+        <div id="itineraryCategories" class="categories-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTab = 'equipment';
+    let checklistData = { equipment: {}, itinerary: {} };
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tab = e.target.dataset.tab;
+        currentTab = tab;
+        
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById(`${tab}-tab`).classList.add('active');
+      });
+    });
+
+    // Load existing data
+    async function loadData() {
+      const { database, ref, onValue } = window.checklistDB;
+      const dataRef = ref(database, 'checklistData');
+      
+      onValue(dataRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          checklistData = data;
+          if (!checklistData.equipment) checklistData.equipment = {};
+          if (!checklistData.itinerary) checklistData.itinerary = {};
+        }
+        renderCategories('equipment');
+        renderCategories('itinerary');
+      });
+    }
+
+    async function addCategory(type) {
+      const input = document.getElementById(`${type}CategoryName`);
+      const categoryName = input.value.trim();
+      
+      if (!categoryName) {
+        alert('Please enter a list name');
+        return;
+      }
+      
+      const categoryId = Date.now().toString();
+      
+      if (!checklistData[type]) checklistData[type] = {};
+      
+      checklistData[type][categoryId] = {
+        name: categoryName,
+        items: {}
+      };
+      
+      await saveData();
+      input.value = '';
+      renderCategories(type);
+    }
+
+    function renderCategories(type) {
+      const container = document.getElementById(`${type}Categories`);
+      container.innerHTML = '';
+      
+      const categories = checklistData[type] || {};
+      
+      Object.keys(categories).forEach(categoryId => {
+        const category = categories[categoryId];
+        const categoryCard = createCategoryCard(type, categoryId, category);
+        container.appendChild(categoryCard);
+      });
+    }
+
+    function createCategoryCard(type, categoryId, category) {
+      const card = document.createElement('div');
+      card.className = 'category-card';
+      
+      const items = category.items || {};
+      const itemCount = Object.keys(items).length;
+      
+      card.innerHTML = `
+        <div class="category-header">
+          <div class="category-name">${category.name}</div>
+          <div class="button-group">
+            <button class="add-sub btn-small" onclick="duplicateCategory('${type}', '${categoryId}')">📋 Duplicate</button>
+            <button class="secondary btn-small" onclick="deleteCategory('${type}', '${categoryId}')">🗑️ Delete</button>
+          </div>
+        </div>
+        
+        <div class="add-category-section">
+          <div class="input-row">
+            <input type="text" id="item-${type}-${categoryId}" placeholder="Item name" style="flex: 2;">
+            <input type="number" id="qty-${type}-${categoryId}" placeholder="Qty" min="1" style="width: 70px;">
+            <button onclick="addItem('${type}', '${categoryId}')">➕ Add Item</button>
+          </div>
+        </div>
+        
+        <div class="item-list" id="items-${type}-${categoryId}">
+          ${renderItems(type, categoryId, items)}
+        </div>
+        
+        <div style="margin-top: 15px; color: #888; font-size: 0.9em;">
+          ${itemCount} item${itemCount !== 1 ? 's' : ''}
+        </div>
+      `;
+      
+      return card;
+    }
+
+    function renderItems(type, categoryId, items) {
+      let html = '';
+      
+      Object.keys(items).forEach(itemId => {
+        const item = items[itemId];
+        const hasSubItems = item.subItems && Object.keys(item.subItems).length > 0;
+        
+        html += `
+          <div class="item">
+            <div>${item.name}${item.quantity ? ' <span style="color: #888; font-size: 0.9em;">(×' + item.quantity + ')</span>' : ''}</div>
+            <div class="button-group">
+              <button class="add-sub btn-small" onclick="showAddSubItem('${type}', '${categoryId}', '${itemId}')">+ Sub-item</button>
+              <button class="secondary btn-small" onclick="deleteItem('${type}', '${categoryId}', '${itemId}')">🗑️</button>
+            </div>
+          </div>
+          ${hasSubItems ? renderSubItems(type, categoryId, itemId, item.subItems) : ''}
+          <div id="sub-add-${type}-${categoryId}-${itemId}" style="display: none;" class="sub-items">
+            <div class="input-row" style="margin-top: 8px;">
+              <input type="text" id="subitem-${type}-${categoryId}-${itemId}" placeholder="Sub-item name" style="flex: 2;">
+              <input type="number" id="subqty-${type}-${categoryId}-${itemId}" placeholder="Qty" min="1" style="width: 70px;">
+              <button class="add-sub btn-small" onclick="addSubItem('${type}', '${categoryId}', '${itemId}')">Add</button>
+              <button class="secondary btn-small" onclick="cancelSubItem('${type}', '${categoryId}', '${itemId}')">Cancel</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      return html || '<div style="color: #888; padding: 10px;">No items yet</div>';
+    }
+
+    function renderSubItems(type, categoryId, itemId, subItems) {
+      let html = '<div class="sub-items">';
+      
+      Object.keys(subItems).forEach(subId => {
+        const subItem = subItems[subId];
+        html += `
+          <div class="sub-item">
+            <div>↳ ${subItem.name}${subItem.quantity ? ' <span style="color: #888; font-size: 0.9em;">(×' + subItem.quantity + ')</span>' : ''}</div>
+            <button class="secondary btn-small" onclick="deleteSubItem('${type}', '${categoryId}', '${itemId}', '${subId}')">🗑️</button>
+          </div>
+        `;
+      });
+      
+      html += '</div>';
+      return html;
+    }
+
+    async function addItem(type, categoryId) {
+      const input = document.getElementById(`item-${type}-${categoryId}`);
+      const qtyInput = document.getElementById(`qty-${type}-${categoryId}`);
+      const itemName = input.value.trim();
+      const quantity = parseInt(qtyInput.value) || null;
+      
+      if (!itemName) {
+        alert('Please enter an item name');
+        return;
+      }
+      
+      const itemId = Date.now().toString();
+      
+      if (!checklistData[type][categoryId].items) {
+        checklistData[type][categoryId].items = {};
+      }
+      
+      checklistData[type][categoryId].items[itemId] = {
+        name: itemName,
+        checked: false
+      };
+      
+      if (quantity) {
+        checklistData[type][categoryId].items[itemId].quantity = quantity;
+      }
+      
+      await saveData();
+      input.value = '';
+      qtyInput.value = '';
+    }
+
+    function showAddSubItem(type, categoryId, itemId) {
+      const addSection = document.getElementById(`sub-add-${type}-${categoryId}-${itemId}`);
+      addSection.style.display = 'block';
+      document.getElementById(`subitem-${type}-${categoryId}-${itemId}`).focus();
+    }
+
+    function cancelSubItem(type, categoryId, itemId) {
+      const addSection = document.getElementById(`sub-add-${type}-${categoryId}-${itemId}`);
+      addSection.style.display = 'none';
+      document.getElementById(`subitem-${type}-${categoryId}-${itemId}`).value = '';
+      document.getElementById(`subqty-${type}-${categoryId}-${itemId}`).value = '';
+    }
+
+    async function addSubItem(type, categoryId, itemId) {
+      const input = document.getElementById(`subitem-${type}-${categoryId}-${itemId}`);
+      const qtyInput = document.getElementById(`subqty-${type}-${categoryId}-${itemId}`);
+      const subItemName = input.value.trim();
+      const quantity = parseInt(qtyInput.value) || null;
+      
+      if (!subItemName) {
+        alert('Please enter a sub-item name');
+        return;
+      }
+      
+      const subId = Date.now().toString();
+      
+      if (!checklistData[type][categoryId].items[itemId].subItems) {
+        checklistData[type][categoryId].items[itemId].subItems = {};
+      }
+      
+      checklistData[type][categoryId].items[itemId].subItems[subId] = {
+        name: subItemName,
+        checked: false
+      };
+      
+      if (quantity) {
+        checklistData[type][categoryId].items[itemId].subItems[subId].quantity = quantity;
+      }
+      
+      await saveData();
+      input.value = '';
+      qtyInput.value = '';
+      cancelSubItem(type, categoryId, itemId);
+    }
+
+    async function deleteCategory(type, categoryId) {
+      if (!confirm('Delete this entire list and all its items?')) return;
+      
+      delete checklistData[type][categoryId];
+      await saveData();
+    }
+
+    async function duplicateCategory(type, categoryId) {
+      const originalCategory = checklistData[type][categoryId];
+      if (!originalCategory) return;
+
+      const newName = prompt('Enter name for the duplicated list:', originalCategory.name + ' (Copy)');
+      if (!newName || !newName.trim()) return;
+
+      const newCategoryId = Date.now().toString();
+      
+      // Deep copy the entire category structure including all items and sub-items
+      checklistData[type][newCategoryId] = {
+        name: newName.trim(),
+        items: JSON.parse(JSON.stringify(originalCategory.items || {}))
+      };
+
+      await saveData();
+    }
+
+    async function deleteItem(type, categoryId, itemId) {
+      if (!confirm('Delete this item?')) return;
+      
+      delete checklistData[type][categoryId].items[itemId];
+      await saveData();
+    }
+
+    async function deleteSubItem(type, categoryId, itemId, subId) {
+      if (!confirm('Delete this sub-item?')) return;
+      
+      delete checklistData[type][categoryId].items[itemId].subItems[subId];
+      await saveData();
+    }
+
+    async function saveData() {
+      const { database, ref, set } = window.checklistDB;
+      
+      try {
+        await set(ref(database, 'checklistData'), checklistData);
+        showSuccess();
+        renderCategories(currentTab);
+      } catch (error) {
+        console.error('Error saving:', error);
+        alert('Error saving data. Check console.');
+      }
+    }
+
+    function showSuccess() {
+      const el = document.getElementById('successMsg');
+      el.style.display = 'block';
+      setTimeout(() => { el.style.display = 'none'; }, 2000);
+    }
+
+    // Load data on start
+    setTimeout(loadData, 500);
+  </script>
+</body>
+</html>

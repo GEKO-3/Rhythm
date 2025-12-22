@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Checklist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f5d000">
+  
+  <!-- 🚀 PREVENT FLASH: Immediate dark background -->
+  <style>
+    html, body {
+      background-color: #1f1f1f !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    
+    body {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    body.loaded {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+  
+  <link rel="icon" type="image/png" sizes="192x192" href="../../assets/favicons/icons-192.png">
+  
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, onValue, set, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+      authDomain: "rhythm-ea7a1.firebaseapp.com",
+      databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "rhythm-ea7a1",
+      storageBucket: "rhythm-ea7a1.firebasestorage.app",
+      messagingSenderId: "776053739080",
+      appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    
+    window.checklistDB = { database, ref, onValue, set, update };
+  </script>
+  
+  <script type="module" src="../../js/rhythm-unified-auth.js"></script>
+  
+  <style>
+    @font-face {
+      font-family: 'Montserrat';
+      src: url('../../assets/Fonts/Montserrat-VariableFont_wght.ttf') format('truetype');
+      font-display: swap;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: #1f1f1f;
+      color: #f5f5f5;
+      padding: 20px;
+      padding-bottom: 80px;
+    }
+    
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    
+    .tab-buttons {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 30px;
+      justify-content: center;
+    }
+    
+    .tab-btn {
+      background: #2a2a2a;
+      border: 2px solid #444;
+      color: #f5f5f5;
+      padding: 15px 40px;
+      border-radius: 10px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-btn:hover {
+      border-color: #f5d000;
+      background: #333;
+    }
+    
+    .tab-btn.active {
+      background: #f5d000;
+      color: #1f1f1f;
+      border-color: #f5d000;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .category-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    
+    .category-card {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .category-card:hover {
+      border-color: #f5d000;
+      background: #333;
+    }
+    
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .category-name {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: #f5d000;
+    }
+    
+    .category-count {
+      background: #444;
+      color: #f5d000;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.9em;
+    }
+    
+    .items-container {
+      display: none;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #444;
+    }
+    
+    .items-container.expanded {
+      display: block;
+    }
+    
+    .expand-icon {
+      transition: transform 0.3s ease;
+      font-size: 1.2em;
+    }
+    
+    .expand-icon.rotated {
+      transform: rotate(180deg);
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f5d000;
+    }
+    
+    .back-button {
+      background: rgba(43, 43, 43, 0.9);
+      border: 2px solid #f5d000;
+      color: #f5d000;
+      padding: 10px 20px;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .back-button:hover {
+      background: #f5d000;
+      color: #1f1f1f;
+    }
+    
+    h1 {
+      color: #f5d000;
+      font-size: 2em;
+      text-align: center;
+      flex: 1;
+    }
+    
+    .checklist-section {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .section-title {
+      color: #f5d000;
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #444;
+    }
+    
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #3a3a3a;
+      transition: background 0.2s ease;
+    }
+    
+    .checklist-item:last-child {
+      border-bottom: none;
+    }
+    
+    .checklist-item:hover {
+      background: rgba(245, 208, 0, 0.05);
+      border-radius: 6px;
+    }
+    
+    .checkbox-wrapper {
+      position: relative;
+      margin-right: 15px;
+    }
+    
+    .checkbox {
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border: 2px solid #f5d000;
+      border-radius: 6px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+    
+    .checkbox:checked {
+      background: #f5d000;
+      border-color: #f5d000;
+    }
+    
+    .checkbox:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #1f1f1f;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    
+    .checkbox:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .item-label {
+      flex: 1;
+      font-size: 1em;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .item-label.checked {
+      text-decoration: line-through;
+      opacity: 0.6;
+    }
+    
+    .sub-items {
+      margin-left: 45px;
+      margin-top: 8px;
+    }
+    
+    .sub-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      font-size: 0.9em;
+    }
+    
+    .sub-item .checkbox {
+      width: 20px;
+      height: 20px;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #f5d000;
+      font-size: 1.2em;
+    }
+    
+    .last-updated {
+      text-align: center;
+      color: #888;
+      font-size: 0.85em;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid #3a3a3a;
+    }
+    
+    .sync-indicator {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(46, 204, 113, 0.9);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      display: none;
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+    
+    .sync-indicator.show {
+      display: block;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 1.5em;
+      }
+      
+      .back-button {
+        padding: 8px 16px;
+        font-size: 0.9em;
+      }
+      
+      .section-title {
+        font-size: 1.1em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sync-indicator" id="syncIndicator">✓ Synced</div>
+  
+  <div class="container">
+    <div class="header">
+      <a href="admin.html" class="back-button">← Back</a>
+      <h1>📋 Admin Checklist</h1>
+      <div style="width: 100px;"></div>
+    </div>
+    
+    <div class="tab-buttons">
+      <button class="tab-btn active" onclick="switchTab('equipment')">🎵 Equipment</button>
+      <button class="tab-btn" onclick="switchTab('itinerary')">📅 Itinerary</button>
+    </div>
+    
+    <div id="equipment-tab" class="tab-content active">
+      <div id="equipmentContainer" class="category-list loading">
+        Loading equipment...
+      </div>
+    </div>
+    
+    <div id="itinerary-tab" class="tab-content">
+      <div id="itineraryContainer" class="category-list loading">
+        Loading itinerary...
+      </div>
+    </div>
+    
+    <div class="last-updated" id="lastUpdated"></div>
+  </div>
+
+  <script>
+    let currentTab = 'equipment';
+    let isUpdating = false;
+
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Update tab content
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(`${tab}-tab`).classList.add('active');
+    }
+    setTimeout(() => {
+      if (!document.body.classList.contains('loaded')) {
+        console.warn('⚠️ Force-showing page after timeout');
+        document.body.classList.add('loaded');
+      }
+    }, 2000);
+
+    // Checklist structure (static content)
+    const CHECKLIST_STRUCTURE = {
+      'event-prep': {
+        title: 'Event Preparation',
+        items: [
+          { id: 'venue', label: 'Venue confirmed and booked' },
+          { id: 'equipment', label: 'Equipment check', subItems: [
+            { id: 'drums', label: 'Drums (Bodu Beru)' },
+            { id: 'onugandu', label: 'Onugandu' },
+            { id: 'bell', label: 'Bell' },
+            { id: 'sound', label: 'Sound system' }
+          ]},
+          { id: 'transport', label: 'Transportation arranged' },
+          { id: 'timing', label: 'Performance timing confirmed' }
+        ]
+      },
+      'member-mgmt': {
+        title: 'Member Management',
+        items: [
+          { id: 'attendance', label: 'Attendance recorded' },
+          { id: 'uniforms', label: 'Uniforms distributed', subItems: [
+            { id: 'shirts', label: 'T-shirts' },
+            { id: 'sarong', label: 'Sarongs' },
+            { id: 'caps', label: 'Caps' }
+          ]},
+          { id: 'payments', label: 'Payment records updated' },
+          { id: 'contact', label: 'Contact information verified' }
+        ]
+      },
+      'practice': {
+        title: 'Practice Session',
+        items: [
+          { id: 'schedule', label: 'Practice schedule posted' },
+          { id: 'songs', label: 'Songs selection finalized' },
+          { id: 'rehearsal', label: 'Full rehearsal completed' },
+          { id: 'feedback', label: 'Member feedback collected' }
+        ]
+      },
+      'admin': {
+        title: 'Administrative Tasks',
+        items: [
+          { id: 'finances', label: 'Financial records updated' },
+          { id: 'social', label: 'Social media posts scheduled' },
+          { id: 'photos', label: 'Photos/videos backed up' },
+          { id: 'reports', label: 'Monthly report prepared' }
+        ]
+      }
+    };
+
+    let isUpdating = false;
+
+    async function initializeChecklist() {
+      document.body.classList.add('loaded');
+
+      // Wait for auth
+      let attempts = 0;
+      while (!window.rhythmAuth?.isInitialized && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
+      if (!window.rhythmAuth?.isInitialized) {
+        showError('Authentication failed to initialize');
+        return;
+      }
+
+      const authResult = await window.rhythmAuth.checkAuthentication();
+      if (!authResult.isAuthenticated || !window.rhythmAuth.isAdmin()) {
+        window.location.href = 'admin.html';
+        return;
+      }
+
+      // Wait for Firebase to initialize
+      attempts = 0;
+      while (!window.checklistDB && attempts < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        attempts++;
+      }
+
+      if (!window.checklistDB) {
+        showError('Firebase initialization failed');
+        return;
+      }
+
+      renderChecklist();
+      setupRealtimeSync();
+    }
+
+    function renderChecklist() {
+      const container = document.getElementById('checklistContainer');
+      container.innerHTML = '';
+      container.classList.remove('loading');
+
+      Object.keys(CHECKLIST_STRUCTURE).forEach(sectionKey => {
+        const section = CHECKLIST_STRUCTURE[sectionKey];
+        const sectionDiv = document.createElement('div');
+        sectionDiv.className = 'checklist-section';
+        sectionDiv.innerHTML = `<div class="section-title">${section.title}</div>`;
+
+        section.items.forEach(item => {
+          const itemDiv = createChecklistItem(sectionKey, item);
+          sectionDiv.appendChild(itemDiv);
+        });
+
+        container.appendChild(sectionDiv);
+      });
+    }
+
+    function createChecklistItem(sectionKey, item, isSubItem = false) {
+      const itemDiv = document.createElement('div');
+      itemDiv.className = isSubItem ? 'sub-item' : 'checklist-item';
+
+      const itemPath = `${sectionKey}/${item.id}`;
+      
+      itemDiv.innerHTML = `
+        <div class="checkbox-wrapper">
+          <input type="checkbox" class="checkbox" id="${itemPath}" data-path="${itemPath}">
+        </div>
+        <label class="item-label" for="${itemPath}">${item.label}</label>
+      `;
+
+      const checkbox = itemDiv.querySelector('.checkbox');
+      const label = itemDiv.querySelector('.item-label');
+
+      checkbox.addEventListener('change', (e) => handleCheckboxChange(itemPath, e.target.checked));
+
+      if (item.subItems) {
+        const subItemsDiv = document.createElement('div');
+        subItemsDiv.className = 'sub-items';
+        item.subItems.forEach(subItem => {
+          const subItemElement = createChecklistItem(sectionKey, { 
+            id: `${item.id}_${subItem.id}`, 
+            label: subItem.label 
+          }, true);
+          subItemsDiv.appendChild(subItemElement);
+        });
+        itemDiv.appendChild(subItemsDiv);
+      }
+
+      return itemDiv;
+    }
+
+    async function handleCheckboxChange(path, checked) {
+      if (isUpdating) return;
+
+      const { database, ref, update } = window.checklistDB;
+      const checklistRef = ref(database, `adminChecklist/${path}`);
+
+      try {
+        await update(checklistRef, {
+          checked: checked,
+          lastUpdated: Date.now(),
+          updatedBy: window.rhythmAuth.getCurrentUser()?.fullName || 'Unknown'
+        });
+
+        showSyncIndicator();
+      } catch (error) {
+        console.error('Failed to update checklist:', error);
+        // Revert checkbox on error
+        const checkbox = document.querySelector(`[data-path="${path}"]`);
+        if (checkbox) checkbox.checked = !checked;
+      }
+    }
+
+    function setupRealtimeSync() {
+      const { database, ref, onValue } = window.checklistDB;
+      const checklistRef = ref(database, 'adminChecklist');
+
+      onValue(checklistRef, (snapshot) => {
+        isUpdating = true;
+        const data = snapshot.val() || {};
+
+        Object.keys(data).forEach(path => {
+          const checkbox = document.querySelector(`[data-path="${path}"]`);
+          const label = checkbox?.nextElementSibling;
+          
+          if (checkbox && data[path].checked !== undefined) {
+            checkbox.checked = data[path].checked;
+            if (label) {
+              label.classList.toggle('checked', data[path].checked);
+            }
+          }
+        });
+
+        // Find latest update time
+        let latestUpdate = 0;
+        let updatedBy = '';
+        Object.values(data).forEach(item => {
+          if (item.lastUpdated > latestUpdate) {
+            latestUpdate = item.lastUpdated;
+            updatedBy = item.updatedBy;
+          }
+        });
+
+        if (latestUpdate) {
+          const lastUpdatedEl = document.getElementById('lastUpdated');
+          const date = new Date(latestUpdate);
+          lastUpdatedEl.textContent = `Last updated by ${updatedBy} at ${date.toLocaleString()}`;
+        }
+
+        isUpdating = false;
+        showSyncIndicator();
+      });
+    }
+
+    function showSyncIndicator() {
+      const indicator = document.getElementById('syncIndicator');
+      indicator.classList.add('show');
+      setTimeout(() => {
+        indicator.classList.remove('show');
+      }, 2000);
+    }
+
+    function showError(message) {
+      document.getElementById('checklistContainer').innerHTML = `
+        <div style="text-align: center; color: #e74c3c; padding: 40px;">
+          <h2>❌ Error</h2>
+          <p>${message}</p>
+          <a href="admin.html" class="back-button" style="display: inline-block; margin-top: 20px;">Return to Admin Panel</a>
+        </div>
+      `;
+    }
+
+    // Initialize on load
+    document.addEventListener('DOMContentLoaded', initializeChecklist);
+  </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+{
+  "name": "Rhythm Boduberu",
+  "short_name": "Rhythm",
+  "description": "Rhythm Boduberu - Traditional Maldivian music group management app",
+  "start_url": "/login.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1a1a1a",
+  "theme_color": "#fbc531",
+  "icons": [
+    {
+      "src": "assets/favicons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/favicons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/favicons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["music", "entertainment", "productivity"],
+  "dir": "ltr",
+  "lang": "en",
+  "shortcuts": [
+    {
+      "name": "Song List",
+      "short_name": "Songs",
+      "description": "View all songs",
+      "url": "/pages/songlist.html",
+      "icons": [
+        {
+          "src": "assets/favicons/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Members",
+      "short_name": "Members",
+      "description": "View all members",
+      "url": "/pages/members.html",
+      "icons": [
+        {
+          "src": "assets/favicons/android-chrome-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

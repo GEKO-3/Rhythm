@@ -1,0 +1,14 @@
+{
+  "name": "rhythm-boduberu",
+  "version": "1.0.0",
+  "description": "Rhythm Boduberu Band Management System",
+  "main": "index.html",
+  "scripts": {
+    "test-notification": "node send-test-notification.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^11.11.1"
+  },
+  "author": "Rhythm Boduberu",
+  "license": "ISC"
+}

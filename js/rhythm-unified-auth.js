@@ -1069,28 +1069,45 @@ class RhythmUnifiedAuth {
             </button>
         ` : '';
         
+        const notificationGranted = Notification.permission === 'granted';
+        
         choiceContainer.innerHTML = `
             <h2>Welcome${isAdmin ? ', Admin' : ''}!</h2>
+            ${!notificationGranted ? `
+                <div style="background: rgba(255, 152, 0, 0.15); border: 2px solid #ff9800; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                    <p style="text-align: center; color: #ff9800; font-weight: bold; margin-bottom: 10px;">
+                        🔔 Notifications Required
+                    </p>
+                    <p style="text-align: center; color: #ccc; font-size: 0.9rem;">
+                        Please enable notifications to continue using the app.
+                    </p>
+                </div>
+            ` : ''}
             <p style="text-align: center; margin-bottom: 30px; color: #ccc;">
-                Choose your destination:
+                ${notificationGranted ? 'Choose your destination:' : 'Enable notifications first:'}
             </p>
             <div style="display: flex; flex-direction: column; gap: 15px;">
-                <button onclick="rhythmAuth.toggleToolsMenu()" class="submit-btn" style="background: #9c27b0; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <button id="enableNotificationsBtn" onclick="rhythmAuth.handleEnableNotifications()" class="submit-btn" style="background: #ff9800; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 1.1rem; padding: 18px; border: 3px solid ${notificationGranted ? '#4caf50' : '#ff9800'};">
+                    <span id="notificationBtnText">🔔 Enable Notifications</span>
+                </button>
+                <button onclick="rhythmAuth.toggleToolsMenu()" class="submit-btn" id="toolsBtn" style="background: #9c27b0; display: flex; align-items: center; justify-content: center; gap: 10px;" ${!notificationGranted ? 'disabled' : ''}>
                     <span>🛠️ Tools</span>
                     <span id="toolsArrow" style="transition: transform 0.3s ease;">▼</span>
                 </button>
                 <div id="toolsSubmenu" style="display: none; margin-left: 20px; border-left: 3px solid #9c27b0; padding-left: 15px; gap: 10px; flex-direction: column;">
-                    <button onclick="rhythmAuth.goToMyKits(${isPWA})" class="submit-btn" style="background: #4caf50; font-size: 0.95rem;">
+                    <button onclick="rhythmAuth.goToMyKits(${isPWA})" class="submit-btn" id="kitsBtn" style="background: #4caf50; font-size: 0.95rem;" ${!notificationGranted ? 'disabled' : ''}>
                         🥁 My Kits
                     </button>
-                    <button onclick="rhythmAuth.goToCalendar(${isPWA})" class="submit-btn" style="background: #2196f3; font-size: 0.95rem;">
+                    <button onclick="rhythmAuth.goToCalendar(${isPWA})" class="submit-btn" id="calendarBtn" style="background: #2196f3; font-size: 0.95rem;" ${!notificationGranted ? 'disabled' : ''}>
                         📅 Booking Calendar
                     </button>
                 </div>
-                <button onclick="rhythmAuth.goToSonglist(${isPWA})" class="submit-btn" style="background: var(--primary-color);">
+                <button onclick="rhythmAuth.goToSonglist(${isPWA})" class="submit-btn" id="songlistBtn" style="background: var(--primary-color);" ${!notificationGranted ? 'disabled' : ''}>
                     🎵 Song List
                 </button>
-                ${adminButton}
+                ${isAdmin ? `<button onclick="rhythmAuth.goToAdmin(${isPWA})" class="submit-btn" id="adminBtn" style="background: #ff6b6b;" ${!notificationGranted ? 'disabled' : ''}>
+                    🔧 Admin Panel
+                </button>` : ''}
             </div>
             ${rememberOption}
             
@@ -1103,6 +1120,9 @@ class RhythmUnifiedAuth {
         `;
         
         document.body.appendChild(choiceContainer);
+        
+        // Update notification button state after a brief delay to ensure button is rendered
+        setTimeout(() => this.updateNotificationButtonState(), 100);
     }
 
     goToMyKits(rememberForPWA = false) {
@@ -1149,6 +1169,173 @@ class RhythmUnifiedAuth {
             submenu.style.display = 'none';
             arrow.style.transform = 'rotate(0deg)';
         }
+    }
+
+    async handleEnableNotifications() {
+        const button = document.getElementById('enableNotificationsBtn');
+        const buttonText = document.getElementById('notificationBtnText');
+        
+        if (!button || !buttonText) return;
+        
+        try {
+            // Check if notifications are supported
+            if (!('Notification' in window)) {
+                alert('❌ Your browser does not support notifications');
+                return;
+            }
+
+            // Check current permission state
+            const currentPermission = Notification.permission;
+            
+            if (currentPermission === 'granted') {
+                // Already granted, enable navigation
+                buttonText.textContent = '✅ Notifications Enabled';
+                button.style.background = '#4caf50';
+                button.style.border = '3px solid #4caf50';
+                this.enableNavigationButtons();
+                
+                // Try to get FCM token in background
+                if (window.rhythmNotifications) {
+                    window.rhythmNotifications.requestPermission().catch(err => {
+                        console.log('Background token generation:', err);
+                    });
+                }
+                return;
+            }
+            
+            if (currentPermission === 'denied') {
+                // Permission denied, show message
+                buttonText.textContent = '❌ Notifications Blocked';
+                button.style.background = '#ff6b6b';
+                button.style.border = '3px solid #ff6b6b';
+                alert('⚠️ Notifications are blocked.\n\nTo enable:\n1. Click the lock/info icon in your address bar\n2. Find "Notifications" settings\n3. Change to "Allow"\n4. Refresh the page');
+                return;
+            }
+            
+            // Request permission directly from browser
+            console.log('🔔 Requesting notification permission...');
+            buttonText.textContent = '⏳ Click "Allow" in the popup...';
+            button.disabled = true;
+            
+            // Direct browser API call - this triggers the permission prompt
+            const permission = await Notification.requestPermission();
+            
+            console.log('Permission result:', permission);
+            
+            if (permission === 'granted') {
+                console.log('✅ Notification permission granted!');
+                
+                buttonText.textContent = '✅ Notifications Enabled';
+                button.style.background = '#4caf50';
+                button.style.border = '3px solid #4caf50';
+                
+                // Enable all navigation buttons
+                this.enableNavigationButtons();
+                
+                // Hide the requirement message
+                const requirementMsg = document.querySelector('[style*="background: rgba(255, 152, 0, 0.15)"]');
+                if (requirementMsg) {
+                    requirementMsg.style.display = 'none';
+                }
+                
+                // Update the subtitle
+                const subtitles = document.querySelectorAll('.auth-choice-container p');
+                subtitles.forEach(subtitle => {
+                    if (subtitle.textContent.includes('Enable notifications first')) {
+                        subtitle.textContent = 'Choose your destination:';
+                    }
+                });
+                
+                // Show success message
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(76, 175, 80, 0.95);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 8px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                    z-index: 10000;
+                    font-family: var(--font-family);
+                    font-size: 14px;
+                `;
+                toast.textContent = '🔔 Notifications enabled! You can now access the app.';
+                document.body.appendChild(toast);
+                
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 4000);
+                
+                // Try to register FCM token in background (optional)
+                if (window.rhythmNotifications) {
+                    setTimeout(() => {
+                        window.rhythmNotifications.requestPermission().catch(err => {
+                            console.log('Background FCM token registration:', err);
+                        });
+                    }, 1000);
+                }
+                
+            } else {
+                console.log('❌ Notification permission denied');
+                buttonText.textContent = '❌ Permission Denied';
+                button.style.background = '#ff6b6b';
+                button.style.border = '3px solid #ff6b6b';
+                
+                alert('⚠️ Notifications are required to use this app.\n\nPlease click "Enable Notifications" and select "Allow" when prompted.');
+            }
+            
+            button.disabled = false;
+            
+        } catch (error) {
+            console.error('❌ Error enabling notifications:', error);
+            buttonText.textContent = '🔔 Try Again';
+            button.style.background = '#ff9800';
+            button.style.border = '3px solid #ff9800';
+            button.disabled = false;
+            
+            alert('Error requesting notifications. Please try again.');
+        }
+    }
+
+    updateNotificationButtonState() {
+        const button = document.getElementById('enableNotificationsBtn');
+        const buttonText = document.getElementById('notificationBtnText');
+        
+        if (!button || !buttonText) return;
+        
+        const permission = Notification.permission;
+        
+        if (permission === 'granted') {
+            buttonText.textContent = '✅ Notifications Enabled';
+            button.style.background = '#4caf50';
+            button.style.border = '3px solid #4caf50';
+            this.enableNavigationButtons();
+        } else if (permission === 'denied') {
+            buttonText.textContent = '❌ Notifications Blocked';
+            button.style.background = '#ff6b6b';
+            button.style.border = '3px solid #ff6b6b';
+        } else {
+            buttonText.textContent = '🔔 Enable Notifications';
+            button.style.background = '#ff9800';
+            button.style.border = '3px solid #ff9800';
+        }
+    }
+
+    enableNavigationButtons() {
+        const buttons = ['toolsBtn', 'kitsBtn', 'calendarBtn', 'songlistBtn', 'adminBtn'];
+        buttons.forEach(btnId => {
+            const btn = document.getElementById(btnId);
+            if (btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+            }
+        });
     }
 
     goToCalendar(rememberForPWA = false) {

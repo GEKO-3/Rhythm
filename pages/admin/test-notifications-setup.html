@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Notifications Setup - Rhythm</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicons/favicon-32x32.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #f5d000;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #fbc531;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            color: #fbc531;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        .back-button {
+            padding: 10px 20px;
+            background: rgba(251, 197, 49, 0.1);
+            color: #fbc531;
+            border: 2px solid #fbc531;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: #fbc531;
+            color: #1a1a1a;
+        }
+
+        .card {
+            background: rgba(43, 43, 43, 0.9);
+            border: 2px solid rgba(251, 197, 49, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: rgba(251, 197, 49, 0.1);
+            border-left: 4px solid #fbc531;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: rgba(231, 76, 60, 0.1);
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: #e74c3c;
+        }
+
+        .success-box {
+            background: rgba(46, 204, 113, 0.1);
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: #2ecc71;
+        }
+
+        p {
+            color: #ccc;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .step {
+            background: rgba(251, 197, 49, 0.05);
+            border: 1px solid rgba(251, 197, 49, 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 35px;
+            height: 35px;
+            background: #fbc531;
+            color: #000;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .step-title {
+            font-size: 1.2em;
+            color: #fbc531;
+            margin-bottom: 10px;
+        }
+
+        .code-block {
+            background: #1a1a1a;
+            border: 1px solid rgba(251, 197, 49, 0.3);
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            color: #2ecc71;
+            overflow-x: auto;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #fbc531 0%, #e1b12c 100%);
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(251, 197, 49, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(251, 197, 49, 0.1);
+            color: #fbc531;
+            border: 2px solid #fbc531;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(251, 197, 49, 0.2);
+        }
+
+        ul {
+            margin-left: 20px;
+            color: #ccc;
+            line-height: 1.8;
+        }
+
+        ul li {
+            margin-bottom: 8px;
+        }
+
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .checklist li::before {
+            content: "☐ ";
+            color: #fbc531;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        strong {
+            color: #fbc531;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 Test Push Notifications</h1>
+            <a href="admin.html" class="back-button">← Back to Admin</a>
+        </div>
+
+        <div class="success-box">
+            <p><strong>✅ Setup is ready!</strong> Follow the steps below to start sending test notifications.</p>
+        </div>
+
+        <div class="card">
+            <h2>📋 Quick Setup (5 minutes)</h2>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">1</span>
+                    Download Service Account Key
+                </div>
+                <p>You need a Firebase service account key to send notifications from your computer.</p>
+                <ol>
+                    <li>Click the button below to open Firebase Console</li>
+                    <li>Click <strong>"Generate New Private Key"</strong></li>
+                    <li>Save the file as <strong>serviceAccountKey.json</strong> in your project root folder</li>
+                    <li>Location: <code>/Users/ahmedjazlaanshareef/Dev/Rhythm/serviceAccountKey.json</code></li>
+                </ol>
+                <a href="https://console.firebase.google.com/project/rhythm-ea7a1/settings/serviceaccounts/adminsdk" target="_blank" class="btn">
+                    Open Firebase Console →
+                </a>
+            </div>
+
+            <div class="warning-box">
+                <p><strong>⚠️ SECURITY WARNING:</strong></p>
+                <ul>
+                    <li>This file gives <strong>full admin access</strong> to your Firebase project</li>
+                    <li><strong>Never commit</strong> it to git (already in .gitignore)</li>
+                    <li><strong>Never share</strong> it with anyone</li>
+                    <li>Keep it secure on your computer only</li>
+                </ul>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">2</span>
+                    Run the Test Script
+                </div>
+                <p>Open Terminal and run:</p>
+                <div class="code-block">cd /Users/ahmedjazlaanshareef/Dev/Rhythm<br>npm run test-notification</div>
+                <p>Or directly:</p>
+                <div class="code-block">node send-test-notification.js</div>
+            </div>
+
+            <div class="step">
+                <div class="step-title">
+                    <span class="step-number">3</span>
+                    Follow Interactive Prompts
+                </div>
+                <p>The script will:</p>
+                <ul>
+                    <li>📋 Load all members from database</li>
+                    <li>✓ Show which members can receive notifications</li>
+                    <li>👤 Let you select a member</li>
+                    <li>✍️ Ask for notification title and body</li>
+                    <li>📤 Send the notification immediately!</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>✅ Pre-Testing Checklist</h2>
+            <ul class="checklist">
+                <li>User has the PWA app installed</li>
+                <li>User has logged in at least once</li>
+                <li>User clicked "Allow" for notifications</li>
+                <li>User's FCM token exists in database</li>
+                <li>serviceAccountKey.json downloaded and placed in project root</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🔍 How to Check if User Has Token</h2>
+            <ol>
+                <li>Go to <a href="https://console.firebase.google.com/project/rhythm-ea7a1/database" target="_blank" style="color: #fbc531;">Firebase Database Console</a></li>
+                <li>Navigate to: <code>members</code> → <code>{memberId}</code> → <code>fcmToken</code></li>
+                <li>If <code>fcmToken</code> exists → User can receive notifications ✅</li>
+                <li>If no <code>fcmToken</code> → User needs to enable notifications ❌</li>
+            </ol>
+        </div>
+
+        <div class="card">
+            <h2>🐛 Common Issues</h2>
+            
+            <div class="info-box">
+                <strong>Cannot find module 'firebase-admin'</strong>
+                <div class="code-block">npm install</div>
+            </div>
+
+            <div class="info-box">
+                <strong>Cannot find serviceAccountKey.json</strong>
+                <p>Download it from step 1 above. Must be named exactly <code>serviceAccountKey.json</code> in project root.</p>
+            </div>
+
+            <div class="info-box">
+                <strong>This member cannot receive notifications</strong>
+                <p>User needs to:</p>
+                <ol>
+                    <li>Open the app (login.html)</li>
+                    <li>Log in</li>
+                    <li>Click "Allow" when asked for notifications</li>
+                    <li>Token will be saved automatically</li>
+                </ol>
+            </div>
+
+            <div class="info-box">
+                <strong>Notification not received</strong>
+                <ul>
+                    <li>Check device notification settings</li>
+                    <li>Make sure app has notification permissions</li>
+                    <li>Try closing and reopening the app</li>
+                    <li>Check internet connection</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📚 Documentation</h2>
+            <p>For more detailed information:</p>
+            <ul>
+                <li><strong>TEST_NOTIFICATIONS_README.md</strong> - Quick start guide</li>
+                <li><strong>PUSH_NOTIFICATIONS_SIMPLE_GUIDE.md</strong> - Detailed setup guide</li>
+                <li><strong>FCM_SETUP_GUIDE.md</strong> - FCM configuration</li>
+                <li><strong>NOTIFICATIONS_IMPLEMENTATION.md</strong> - Technical details</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🎉 Ready to Test!</h2>
+            <p>Once you've completed the setup, run this command:</p>
+            <div class="code-block">npm run test-notification</div>
+            <p style="margin-top: 20px;">Good luck! 🎵</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,13 +1,13 @@
 {
   "name": "Rhythm Boduberu - Traditional Maldivian Music",
   "short_name": "Rhythm",
-  "description": "Traditional Maldivian Boduberu music group - Contact us for bookings and performances",
-  "start_url": "/login.html?v=2.1&update=20241221",
+  "description": "Traditional Maldivian Boduberu music group - Contact us for bookings and performances. Receive notifications for events, shows, and updates.",
+  "start_url": "/login.html?source=pwa",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#f5d000",
-  "background_color": "#2b2b2b",
+  "background_color": "#000000",
   "lang": "en",
   "categories": ["music", "entertainment", "lifestyle"],
   "icons": [
@@ -29,5 +29,32 @@
       "type": "image/png",
       "purpose": "any"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Song List",
+      "short_name": "Songs",
+      "description": "View all Boduberu songs",
+      "url": "/pages/songlist.html?source=pwa",
+      "icons": [{ "src": "icons-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Members",
+      "short_name": "Members",
+      "description": "View Rhythm members",
+      "url": "/pages/members.html?source=pwa",
+      "icons": [{ "src": "icons-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }

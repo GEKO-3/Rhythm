@@ -1,13 +1,12 @@
 {
-  "version": "2.4.4",
-  "timestamp": 1734308400000,
-  "description": "Always fresh HTML - aggressive cache bypass",
+  "version": "2.6.5",
+  "timestamp": 1734806000000,
+  "description": "Robust loading system with diagnostics",
   "changes": [
-    "ALL HTML files now ALWAYS fetch from network (never cached unless offline)",
-    "Added cache: 'no-store' to bypass browser HTTP cache completely",
-    "Service worker only serves cached HTML when completely offline",
-    "Ensures users always see the latest version of every page",
-    "My Kits and Admin Kits pages will always show current UI",
-    "Console logs show when serving fresh vs cached HTML"
+    "Added emergency 500ms timeout at top of songlist and lyrics pages",
+    "Added comprehensive diagnostic logging to track load stages",
+    "Added error handlers to all script tags to detect load failures",
+    "Added try-catch around Firebase initialization",
+    "Pages now guaranteed to show within 500ms even if scripts fail"
   ]
 }

@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Push Notification - Rhythm Boduberu Admin</title>
+    
+    <!-- Unified Authentication System -->
+    <script type="module" src="../../js/rhythm-unified-auth.js"></script>
+    
     <link rel="stylesheet" href="../../assets/styles.css">
     <style>
         .notification-form {
@@ -238,11 +242,19 @@
                     <span style="font-size: 18px;">ℹ️</span>
                     <strong>How Notifications Work</strong>
                 </div>
-                <p style="margin: 0; font-size: 14px; line-height: 1.4;">
-                    Notifications are queued in Firebase Database and delivered when recipients are online. 
-                    Users will receive notifications immediately if they're currently using the app, or when they next visit.
-                    This system works with GitHub Pages without requiring a backend server.
+                <p style="margin: 0 0 10px 0; font-size: 14px; line-height: 1.4;">
+                    This interface helps you send real push notifications to users via Firebase Cloud Messaging (FCM).
                 </p>
+                <div style="background: rgba(255, 152, 0, 0.15); border: 1px solid rgba(255, 152, 0, 0.3); padding: 10px; border-radius: 5px; margin-top: 10px;">
+                    <strong style="color: #ff9800;">📱 To Send Notifications:</strong>
+                    <ol style="margin: 8px 0 0 20px; font-size: 13px; line-height: 1.6;">
+                        <li>Fill out the form below with your notification details</li>
+                        <li>Load recipients to see who will receive it</li>
+                        <li>Click "Generate Script Command" to get the terminal command</li>
+                        <li>Copy the command and run it in your terminal</li>
+                        <li>Notifications will be sent immediately to all recipients</li>
+                    </ol>
+                </div>
             </div>
             <p>Send custom push notifications to approved users</p>
         </div>
@@ -321,7 +333,22 @@
 
             <div class="form-group">
                 <button class="btn" onclick="loadRecipients()" id="loadRecipientsBtn">Load Recipients</button>
-                <button class="btn" onclick="sendNotification()" id="sendBtn" disabled>Send Notification</button>
+                <button class="btn" onclick="generateNotificationScript()" id="sendBtn" disabled>📋 Generate Script Command</button>
+            </div>
+            
+            <div id="scriptOutput" style="display: none; margin-top: 20px; padding: 15px; background: #1a1a1a; border: 1px solid #f5d000; border-radius: 5px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong style="color: #f5d000;">Terminal Command:</strong>
+                    <button class="btn" onclick="copyScriptCommand()" style="padding: 6px 12px; font-size: 12px;">📋 Copy Command</button>
+                </div>
+                <pre id="scriptCommand" style="background: #000; padding: 12px; border-radius: 4px; color: #4CAF50; overflow-x: auto; font-size: 12px; font-family: 'Courier New', monospace; white-space: pre-wrap; word-wrap: break-word;"></pre>
+                <div style="margin-top: 10px; padding: 10px; background: rgba(76, 175, 80, 0.1); border-left: 3px solid #4CAF50; color: #4CAF50; font-size: 13px;">
+                    <strong>📝 Instructions:</strong><br>
+                    1. Copy the command above<br>
+                    2. Open Terminal and navigate to your project: <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 3px;">cd /Users/ahmedjazlaanshareef/Dev/Rhythm</code><br>
+                    3. Paste and run the command<br>
+                    4. Notifications will be sent to all recipients immediately!
+                </div>
             </div>
 
             <div id="recipientsList" class="recipient-list" style="display: none;"></div>
@@ -468,8 +495,13 @@
                 document.getElementById('authStatus').style.display = 'none';
                 document.getElementById('notificationForm').style.display = 'block';
                 
-                showResult(`Welcome ${currentUser.fullName}! You can now send notifications.`, 'success');
+                showResult(`Welcome ${currentUser.fullName}! Loading recipients...`, 'info');
                 console.log('✅ Admin authenticated:', currentUser.fullName);
+                
+                // Auto-load recipients
+                setTimeout(() => {
+                    loadRecipients();
+                }, 500);
                 
             } catch (error) {
                 console.error('❌ Authentication check failed:', error);
@@ -704,13 +736,18 @@
                 displayRecipients(recipientTokens);
                 
                 if (recipientCount > 0) {
-                    const hasMockTokens = recipientTokens.some(r => r.token.startsWith('mock_token_'));
-                    if (hasMockTokens) {
-                        showResult(`Found ${recipientCount} approved users, but FCM tokens not available. Please ensure users have enabled notifications.`, 'info');
+                    const hasMockTokens = recipientTokens.some(r => r.token && r.token.startsWith('mock_token_'));
+                    const hasRealTokens = recipientTokens.some(r => r.token && !r.token.startsWith('mock_token_'));
+                    
+                    if (hasMockTokens && !hasRealTokens) {
+                        showResult(`Found ${recipientCount} approved users, but FCM tokens not available. Users need to enable notifications first.`, 'error');
                         document.getElementById('sendBtn').disabled = true;
+                    } else if (hasMockTokens && hasRealTokens) {
+                        showResult(`Found ${recipientCount} recipients (${recipientTokens.filter(r => !r.token.startsWith('mock_token_')).length} with tokens, ${recipientTokens.filter(r => r.token.startsWith('mock_token_')).length} without). Will only send to users with tokens.`, 'info');
+                        document.getElementById('sendBtn').disabled = false;
                     } else {
                         const recipientTypeText = recipientType === 'specific' ? 'selected' : recipientType;
-                        showResult(`Found ${recipientCount} ${recipientTypeText} recipients with notification tokens`, 'success');
+                        showResult(`✅ Found ${recipientCount} ${recipientTypeText} recipients with notification tokens`, 'success');
                         document.getElementById('sendBtn').disabled = false;
                     }
                 } else {
@@ -764,6 +801,70 @@
                 ).join('');
             
             container.style.display = 'block';
+        }
+
+        async function generateNotificationScript() {
+            if (!currentUser) {
+                showResult('Please authenticate first', 'error');
+                await initializeAuth();
+                return;
+            }
+
+            const recipientType = document.getElementById('recipients').value;
+            
+            // For specific selection, get currently selected users
+            if (recipientType === 'specific') {
+                const selectedUserIds = getSelectedUsers();
+                if (selectedUserIds.length === 0) {
+                    showResult('Please select at least one user to send notifications to', 'error');
+                    return;
+                }
+                recipientTokens = allAvailableUsers.filter(user => selectedUserIds.includes(user.userId));
+            }
+            
+            if (recipientTokens.length === 0) {
+                showResult('Please load recipients first', 'error');
+                return;
+            }
+
+            const title = document.getElementById('notificationTitle').value.trim();
+            const body = document.getElementById('notificationBody').value.trim();
+
+            if (!title || !body) {
+                showResult('Please fill in title and message', 'error');
+                return;
+            }
+
+            // Escape quotes for shell command
+            const escapeShell = (str) => str.replace(/'/g, "'\\''");
+            
+            // Build the node command with proper escaping
+            const command = `node send-test-notification.js --title '${escapeShell(title)}' --body '${escapeShell(body)}' --recipients '${recipientType}'`;
+            
+            // Show the command
+            document.getElementById('scriptCommand').textContent = command;
+            document.getElementById('scriptOutput').style.display = 'block';
+            
+            showResult(`✅ Script command generated for ${recipientTokens.length} recipients. Copy and run the command in your terminal.`, 'success');
+        }
+
+        function copyScriptCommand() {
+            const command = document.getElementById('scriptCommand').textContent;
+            navigator.clipboard.writeText(command).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                btn.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 2000);
+                
+                showResult('Command copied to clipboard! Paste it in your terminal.', 'success');
+            }).catch(err => {
+                showResult('Failed to copy to clipboard. Please copy manually.', 'error');
+            });
         }
 
         async function sendNotification() {

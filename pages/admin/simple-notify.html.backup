@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Notifications - Rhythm</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicons/favicon-32x32.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #f5d000;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #fbc531;
+        }
+
+        .back-button {
+            padding: 10px 20px;
+            background: rgba(251, 197, 49, 0.1);
+            color: #fbc531;
+            border: 2px solid #fbc531;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: #fbc531;
+            color: #1a1a1a;
+        }
+
+        .card {
+            background: rgba(43, 43, 43, 0.9);
+            border: 2px solid rgba(251, 197, 49, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fbc531;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            background: #2b2b2b;
+            border: 2px solid rgba(251, 197, 49, 0.3);
+            border-radius: 5px;
+            color: #f5d000;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #fbc531;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .recipient-section {
+            margin-bottom: 25px;
+        }
+
+        .recipient-options {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(251, 197, 49, 0.1);
+            border: 2px solid rgba(251, 197, 49, 0.3);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .radio-option:hover {
+            border-color: #fbc531;
+        }
+
+        .radio-option input[type="radio"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .radio-option.active {
+            background: rgba(251, 197, 49, 0.2);
+            border-color: #fbc531;
+        }
+
+        .member-list {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #2b2b2b;
+            border: 2px solid rgba(251, 197, 49, 0.3);
+            border-radius: 5px;
+            padding: 15px;
+            display: none;
+        }
+
+        .member-list.visible {
+            display: block;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: rgba(251, 197, 49, 0.05);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .member-item:hover {
+            background: rgba(251, 197, 49, 0.15);
+        }
+
+        .member-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+
+        .member-name {
+            flex: 1;
+            color: #f5d000;
+        }
+
+        .token-badge {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .no-token-badge {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .selection-summary {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(251, 197, 49, 0.1);
+            border-radius: 5px;
+            color: #fbc531;
+            font-size: 13px;
+        }
+
+        .btn {
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #fbc531 0%, #e1b12c 100%);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(251, 197, 49, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .result-message.success {
+            background: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid #2ecc71;
+            color: #2ecc71;
+        }
+
+        .result-message.error {
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid rgba(251, 197, 49, 0.3);
+            border-top: 4px solid #fbc531;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            padding: 6px 12px;
+            background: rgba(251, 197, 49, 0.1);
+            color: #fbc531;
+            border: 1px solid rgba(251, 197, 49, 0.3);
+            border-radius: 3px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: rgba(251, 197, 49, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <div style="color: #fbc531; font-size: 18px;">Sending notifications...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>📢 Send Notifications</h1>
+            <a href="admin.html" class="back-button">← Back</a>
+        </div>
+
+        <div class="card">
+            <form id="notification-form">
+                <!-- Notification Content -->
+                <div class="form-group">
+                    <label for="notification-title">Notification Title</label>
+                    <input 
+                        type="text" 
+                        id="notification-title" 
+                        placeholder="e.g., Upcoming Event"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="notification-body">Notification Message</label>
+                    <textarea 
+                        id="notification-body" 
+                        placeholder="e.g., Don't forget about practice this Saturday at 7 PM!"
+                        maxlength="500"
+                        required
+                    ></textarea>
+                </div>
+
+                <!-- Recipient Selection -->
+                <div class="recipient-section">
+                    <label>Select Recipients</label>
+                    <div class="recipient-options">
+                        <label class="radio-option active">
+                            <input type="radio" name="recipient-type" value="all" checked>
+                            <span>All Members</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="recipient-type" value="specific">
+                            <span>Select Members</span>
+                        </label>
+                    </div>
+
+                    <div class="member-list" id="member-list">
+                        <div class="quick-actions">
+                            <button type="button" class="quick-btn" id="select-all">Select All</button>
+                            <button type="button" class="quick-btn" id="deselect-all">Deselect All</button>
+                            <button type="button" class="quick-btn" id="select-with-tokens">Select Only With Tokens</button>
+                        </div>
+                        <div id="members-container" style="margin-top: 15px;">
+                            <p style="text-align: center; color: #888;">Loading members...</p>
+                        </div>
+                    </div>
+
+                    <div class="selection-summary" id="selection-summary">
+                        All members with notifications enabled will receive this message
+                    </div>
+                </div>
+
+                <button type="submit" class="btn" id="send-btn">
+                    Send Notification
+                </button>
+            </form>
+
+            <div class="result-message" id="result-message"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        let members = {};
+        let userTokens = {};
+        let selectedMembers = new Set();
+
+        // Authentication check
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                let attempts = 0;
+                while (!window.rhythmAuth && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (!window.rhythmAuth) {
+                    throw new Error('Authentication system not available');
+                }
+
+                const authResult = await window.rhythmAuth.checkAuthentication();
+
+                if (!authResult.isAuthenticated) {
+                    alert('You must be logged in to access this page.');
+                    window.location.href = '../../login.html';
+                    return;
+                }
+
+                if (!window.rhythmAuth.isAdmin()) {
+                    alert('Access denied. Admin permissions required.');
+                    window.location.href = '../songlist.html';
+                    return;
+                }
+
+                console.log('✅ Admin authenticated');
+                await loadData();
+
+            } catch (error) {
+                console.error('Authentication error:', error);
+                alert('Authentication failed. Please log in again.');
+                window.location.href = '../../login.html';
+            }
+        });
+
+        // Load members and tokens
+        async function loadData() {
+            try {
+                // Load members
+                const membersRef = ref(database, 'members');
+                const membersSnapshot = await get(membersRef);
+
+                if (membersSnapshot.exists()) {
+                    members = membersSnapshot.val();
+                }
+
+                // Load user tokens
+                const tokensRef = ref(database, 'userTokens');
+                const tokensSnapshot = await get(tokensRef);
+
+                if (tokensSnapshot.exists()) {
+                    userTokens = tokensSnapshot.val();
+                }
+
+                console.log('✅ Loaded members:', Object.keys(members).length);
+                console.log('✅ Loaded tokens:', Object.keys(userTokens).length);
+
+                renderMembers();
+
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('members-container').innerHTML = 
+                    '<p style="text-align: center; color: #e74c3c;">Error loading data</p>';
+            }
+        }
+
+        // Render member list
+        function renderMembers() {
+            const container = document.getElementById('members-container');
+            const sortedMembers = Object.values(members).sort((a, b) => 
+                a.fullName.localeCompare(b.fullName)
+            );
+
+            container.innerHTML = '';
+
+            if (sortedMembers.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888;">No members found</p>';
+                return;
+            }
+
+            sortedMembers.forEach(member => {
+                // Check if this member has a token in userTokens
+                const accessCode = member.userId;
+                const token = accessCode ? userTokens[accessCode] : null;
+                const hasToken = token && !token.startsWith('mock_token_');
+                
+                const div = document.createElement('div');
+                div.className = 'member-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="member-${member.id}" data-member-id="${member.id}" data-access-code="${accessCode || ''}">
+                    <label for="member-${member.id}" class="member-name">${member.fullName}</label>
+                    ${hasToken ? 
+                        '<span class="token-badge">✓ Active</span>' : 
+                        '<span class="no-token-badge">No Token</span>'
+                    }
+                `;
+                
+                container.appendChild(div);
+            });
+
+            // Add event listeners to checkboxes
+            container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelection);
+            });
+        }
+
+        // Handle recipient type change
+        document.querySelectorAll('input[name="recipient-type"]').forEach(radio => {
+            radio.parentElement.addEventListener('click', function() {
+                document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                const value = radio.value;
+                const memberList = document.getElementById('member-list');
+                
+                if (value === 'specific') {
+                    memberList.classList.add('visible');
+                } else {
+                    memberList.classList.remove('visible');
+                    selectedMembers.clear();
+                }
+                
+                updateSelectionSummary();
+            });
+        });
+
+        // Quick action buttons
+        document.getElementById('select-all').addEventListener('click', () => {
+            document.querySelectorAll('#members-container input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+                selectedMembers.add(cb.dataset.memberId);
+            });
+            updateSelectionSummary();
+        });
+
+        document.getElementById('deselect-all').addEventListener('click', () => {
+            document.querySelectorAll('#members-container input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            selectedMembers.clear();
+            updateSelectionSummary();
+        });
+
+        document.getElementById('select-with-tokens').addEventListener('click', () => {
+            selectedMembers.clear();
+            document.querySelectorAll('#members-container input[type="checkbox"]').forEach(cb => {
+                const accessCode = cb.dataset.accessCode;
+                const token = accessCode ? userTokens[accessCode] : null;
+                const hasToken = token && !token.startsWith('mock_token_');
+                
+                if (hasToken) {
+                    cb.checked = true;
+                    selectedMembers.add(cb.dataset.memberId);
+                } else {
+                    cb.checked = false;
+                }
+            });
+            updateSelectionSummary();
+        });
+
+        // Update selection
+        function updateSelection(e) {
+            const memberId = e.target.dataset.memberId;
+            if (e.target.checked) {
+                selectedMembers.add(memberId);
+            } else {
+                selectedMembers.delete(memberId);
+            }
+            updateSelectionSummary();
+        }
+
+        // Update selection summary
+        function updateSelectionSummary() {
+            const summary = document.getElementById('selection-summary');
+            const recipientType = document.querySelector('input[name="recipient-type"]:checked').value;
+            
+            if (recipientType === 'all') {
+                const withTokens = Object.values(members).filter(m => {
+                    const token = m.userId ? userTokens[m.userId] : null;
+                    return token && !token.startsWith('mock_token_');
+                }).length;
+                summary.textContent = `All members with notifications enabled will receive this message (~${withTokens} members)`;
+            } else {
+                const selected = Array.from(selectedMembers);
+                const withTokens = selected.filter(id => {
+                    const member = members[id];
+                    const token = member.userId ? userTokens[member.userId] : null;
+                    return token && !token.startsWith('mock_token_');
+                }).length;
+                
+                if (selected.length === 0) {
+                    summary.textContent = 'No members selected';
+                } else {
+                    summary.textContent = `${selected.length} member(s) selected • ${withTokens} with active notifications`;
+                }
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('notification-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('notification-title').value.trim();
+            const body = document.getElementById('notification-body').value.trim();
+            const recipientType = document.querySelector('input[name="recipient-type"]:checked').value;
+
+            if (!title || !body) {
+                showResult('Please fill in all fields', 'error');
+                return;
+            }
+
+            // Prepare recipients (access codes of members with valid tokens)
+            let recipients = [];
+            if (recipientType === 'all') {
+                recipients = Object.values(members)
+                    .filter(m => {
+                        const token = m.userId ? userTokens[m.userId] : null;
+                        return token && !token.startsWith('mock_token_');
+                    })
+                    .map(m => m.userId);
+            } else {
+                if (selectedMembers.size === 0) {
+                    showResult('Please select at least one member', 'error');
+                    return;
+                }
+                recipients = Array.from(selectedMembers)
+                    .map(id => members[id])
+                    .filter(m => {
+                        const token = m.userId ? userTokens[m.userId] : null;
+                        return token && !token.startsWith('mock_token_');
+                    })
+                    .map(m => m.userId);
+            }
+
+            if (recipients.length === 0) {
+                showResult('No recipients have notifications enabled', 'error');
+                return;
+            }
+
+            // Show confirmation
+            const confirmMsg = `Send notification to ${recipients.length} member(s)?`;
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            // Show loading overlay
+            document.getElementById('loading-overlay').classList.add('active');
+            document.getElementById('send-btn').disabled = true;
+
+            try {
+                // Generate the command
+                const recipientList = recipients.join(',');
+                const command = `node send-test-notification.js --title "${title.replace(/"/g, '\\"')}" --body "${body.replace(/"/g, '\\"')}" --recipients "${recipientList}"`;
+                
+                console.log('Generated command:', command);
+                
+                // Show success message with command
+                showResult(
+                    `✓ Command generated successfully!\n\n` +
+                    `Copy and run this command in your terminal:\n\n` +
+                    `${command}\n\n` +
+                    `This will send the notification to ${recipients.length} member(s).`,
+                    'success'
+                );
+
+                // Clear form
+                document.getElementById('notification-title').value = '';
+                document.getElementById('notification-body').value = '';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showResult('Failed to generate notification command: ' + error.message, 'error');
+            } finally {
+                document.getElementById('loading-overlay').classList.remove('active');
+                document.getElementById('send-btn').disabled = false;
+            }
+        });
+
+        // Show result message
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result-message');
+            resultDiv.className = `result-message ${type}`;
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+
+            // Auto-hide after 15 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    resultDiv.style.display = 'none';
+                }, 15000);
+            }
+        }
+    </script>
+
+    <script type="module" src="../../js/rhythm-unified-auth.js"></script>
+</body>
+</html>
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                let attempts = 0;
+                while (!window.rhythmAuth && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (!window.rhythmAuth) {
+                    throw new Error('Authentication system not available');
+                }
+
+                const authResult = await window.rhythmAuth.checkAuthentication();
+
+                if (!authResult.isAuthenticated) {
+                    alert('You must be logged in to access this page.');
+                    window.location.href = '../../login.html';
+                    return;
+                }
+
+                if (!window.rhythmAuth.isAdmin()) {
+                    alert('Access denied. Admin permissions required.');
+                    window.location.href = '../songlist.html';
+                    return;
+                }
+
+                console.log('✅ Admin authenticated');
+                await loadData();
+
+            } catch (error) {
+                console.error('Authentication error:', error);
+                alert('Authentication failed. Please log in again.');
+                window.location.href = '../../login.html';
+            }
+        });
+
+        // Load members and tokens
+        async function loadData() {
+            try {
+                // Load members
+                const membersRef = ref(database, 'members');
+                const membersSnapshot = await get(membersRef);
+
+                if (membersSnapshot.exists()) {
+                    members = membersSnapshot.val();
+                }
+
+                // Load user tokens
+                const tokensRef = ref(database, 'userTokens');
+                const tokensSnapshot = await get(tokensRef);
+
+                if (tokensSnapshot.exists()) {
+                    userTokens = tokensSnapshot.val();
+                }
+
+        // Render member list
+        function renderMembers() {
+            const container = document.getElementById('members-container');
+            const sortedMembers = Object.values(members).sort((a, b) => 
+                a.fullName.localeCompare(b.fullName)
+            );
+
+            container.innerHTML = '';
+
+            if (sortedMembers.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #888;">No members found</p>';
+                return;
+            }
+
+            sortedMembers.forEach(member => {
+                // Check if this member has a token in userTokens
+                const accessCode = member.userId;
+                const token = accessCode ? userTokens[accessCode] : null;
+                const hasToken = token && !token.startsWith('mock_token_');
+                
+                const div = document.createElement('div');
+                div.className = 'member-item';
+                div.innerHTML = `
+                    <input type="checkbox" id="member-${member.id}" data-member-id="${member.id}" data-access-code="${accessCode || ''}">
+                    <label for="member-${member.id}" class="member-name">${member.fullName}</label>
+                    ${hasToken ? 
+                        '<span class="token-badge">✓ Active</span>' : 
+                        '<span class="no-token-badge">No Token</span>'
+                    }
+                `;
+                
+                container.appendChild(div);
+            });
+
+            // Add event listeners to checkboxes
+            container.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', updateSelection);
+            });
+        }
+
+        // Handle recipient type change
+        document.querySelectorAll('input[name="recipient-type"]').forEach(radio => {
+            radio.parentElement.addEventListener('click', function() {
+                document.querySelectorAll('.radio-option').forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                const value = radio.value;
+                const memberList = document.getElementById('member-list');
+                
+                if (value === 'specific') {
+                    memberList.classList.add('visible');
+                } else {
+                    memberList.classList.remove('visible');
+                    selectedMembers.clear();
+                }
+                
+                updateSelectionSummary();
+            });
+        });
+
+        // Quick action buttons
+        document.getElementById('select-all').addEventListener('click', () => {
+            document.querySelectorAll('#members-container input[type="checkbox"]').forEach(cb => {
+                cb.checked = true;
+                selectedMembers.add(cb.dataset.memberId);
+            });
+            updateSelectionSummary();
+        });
+
+        document.getElementById('select-with-tokens').addEventListener('click', () => {
+            selectedMembers.clear();
+            document.querySelectorAll('#members-container input[type="checkbox"]').forEach(cb => {
+                const accessCode = cb.dataset.accessCode;
+                const token = accessCode ? userTokens[accessCode] : null;
+                const hasToken = token && !token.startsWith('mock_token_');
+                
+                if (hasToken) {
+                    cb.checked = true;
+                    selectedMembers.add(cb.dataset.memberId);
+                } else {
+                    cb.checked = false;
+                }
+            });
+            updateSelectionSummary();
+        });     if (hasToken) {
+                    cb.checked = true;
+                    selectedMembers.add(memberId);
+                } else {
+                    cb.checked = false;
+                }
+            });
+            updateSelectionSummary();
+        });
+
+        // Update selection
+        function updateSelection(e) {
+            const memberId = e.target.dataset.memberId;
+        // Update selection summary
+        function updateSelectionSummary() {
+            const summary = document.getElementById('selection-summary');
+            const recipientType = document.querySelector('input[name="recipient-type"]:checked').value;
+            
+            if (recipientType === 'all') {
+                const withTokens = Object.values(members).filter(m => {
+                    const token = m.userId ? userTokens[m.userId] : null;
+                    return token && !token.startsWith('mock_token_');
+                }).length;
+                summary.textContent = `All members with notifications enabled will receive this message (~${withTokens} members)`;
+            } else {
+                const selected = Array.from(selectedMembers);
+                const withTokens = selected.filter(id => {
+                    const member = members[id];
+                    const token = member.userId ? userTokens[member.userId] : null;
+                    return token && !token.startsWith('mock_token_');
+                }).length;
+                
+                if (selected.length === 0) {
+                    summary.textContent = 'No members selected';
+                } else {
+                    summary.textContent = `${selected.length} member(s) selected • ${withTokens} with active notifications`;
+                }
+            }
+        }       }).length;
+                
+                if (selected.length === 0) {
+                    summary.textContent = 'No members selected';
+                } else {
+                    summary.textContent = `${selected.length} member(s) selected • ${withTokens} with active notifications`;
+                }
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('notification-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            // Prepare recipients (access codes of members with valid tokens)
+            let recipients = [];
+            if (recipientType === 'all') {
+                recipients = Object.values(members)
+                    .filter(m => {
+                        const token = m.userId ? userTokens[m.userId] : null;
+                        return token && !token.startsWith('mock_token_');
+                    })
+                    .map(m => m.userId);
+            } else {
+                if (selectedMembers.size === 0) {
+                    showResult('Please select at least one member', 'error');
+                    return;
+                }
+                recipients = Array.from(selectedMembers)
+                    .map(id => members[id])
+                    .filter(m => {
+                        const token = m.userId ? userTokens[m.userId] : null;
+                        return token && !token.startsWith('mock_token_');
+                    })
+                    .map(m => m.userId);
+            }       .map(m => m.memberId);
+            } else {
+                if (selectedMembers.size === 0) {
+                    showResult('Please select at least one member', 'error');
+                    return;
+                }
+                recipients = Array.from(selectedMembers).filter(id => {
+                    const member = members[id];
+                    return member.fcmToken && !member.fcmToken.startsWith('mock_token_');
+                });
+            }
+
+            if (recipients.length === 0) {
+                showResult('No recipients have notifications enabled', 'error');
+                return;
+            }
+
+            // Show confirmation
+            const confirmMsg = `Send notification to ${recipients.length} member(s)?`;
+            if (!confirm(confirmMsg)) {
+                return;
+            }
+
+            // Show loading overlay
+            document.getElementById('loading-overlay').classList.add('active');
+            document.getElementById('send-btn').disabled = true;
+
+            try {
+                // Generate the command
+                const recipientList = recipients.join(',');
+                const command = `node send-test-notification.js --title "${title.replace(/"/g, '\\"')}" --body "${body.replace(/"/g, '\\"')}" --recipients "${recipientList}"`;
+                
+                console.log('Generated command:', command);
+                
+                // Show success message with command
+                showResult(
+                    `✓ Command generated successfully!\n\n` +
+                    `Copy and run this command in your terminal:\n\n` +
+                    `${command}\n\n` +
+                    `This will send the notification to ${recipients.length} member(s).`,
+                    'success'
+                );
+
+                // Clear form
+                document.getElementById('notification-title').value = '';
+                document.getElementById('notification-body').value = '';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showResult('Failed to generate notification command: ' + error.message, 'error');
+            } finally {
+                document.getElementById('loading-overlay').classList.remove('active');
+                document.getElementById('send-btn').disabled = false;
+            }
+        });
+
+        // Show result message
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result-message');
+            resultDiv.className = `result-message ${type}`;
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+
+            // Auto-hide after 15 seconds for success messages
+            if (type === 'success') {
+                setTimeout(() => {
+                    resultDiv.style.display = 'none';
+                }, 15000);
+            }
+        }
+    </script>
+
+    <script type="module" src="../../js/rhythm-unified-auth.js"></script>
+</body>
+</html>

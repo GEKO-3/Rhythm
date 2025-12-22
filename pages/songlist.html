@@ -5,17 +5,65 @@
   <title>Songs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
+  <!-- 🚨 CRITICAL: Emergency visibility timeout - MUST be first script -->
+  <script>
+    // Diagnostic: Track page load stages
+    window.rhythmLoadStages = {
+      emergencyTimeoutSet: Date.now(),
+      scriptsStarted: Date.now(),
+      stages: []
+    };
+    
+    function logStage(stage) {
+      const elapsed = Date.now() - window.rhythmLoadStages.scriptsStarted;
+      console.log(`📊 [Songlist] ${stage} at ${elapsed}ms`);
+      window.rhythmLoadStages.stages.push({ stage, time: elapsed });
+    }
+    
+    logStage('Emergency timeout script executed');
+    
+    // Force page visible after 500ms regardless of what happens
+    console.log('⏰ [Songlist] Emergency timeout set - page will be visible in 500ms');
+    setTimeout(() => {
+      document.body.classList.add('loaded');
+      logStage('Emergency timeout (500ms) - page forced visible');
+      console.warn('🚨 [Songlist] Emergency timeout triggered - forcing page visible');
+    }, 500);
+    
+    // Additional safety net at 2 seconds
+    setTimeout(() => {
+      if (!document.body.classList.contains('loaded')) {
+        document.body.classList.add('loaded');
+        logStage('Secondary timeout (2000ms) - page was still hidden');
+        console.error('🚨 [Songlist] Secondary timeout triggered - page was still hidden!');
+      }
+    }, 2000);
+    
+    // Monitor when DOMContentLoaded fires
+    document.addEventListener('DOMContentLoaded', () => {
+      logStage('DOMContentLoaded event fired');
+    });
+    
+    // Monitor when window loads
+    window.addEventListener('load', () => {
+      logStage('Window load event fired');
+      console.log('📊 [Songlist] Full load timeline:', window.rhythmLoadStages);
+    });
+  </script>
+  
   <!-- Unified Authentication System -->
-  <script type="module" src="../js/rhythm-unified-auth.js"></script>
+  <script type="module" src="../js/rhythm-unified-auth.js" onerror="console.error('❌ Failed to load rhythm-unified-auth.js')"></script>
   
   <!-- Local Database System -->
-  <script type="module" src="../js/rhythm-local-db.js"></script>
+  <script type="module" src="../js/rhythm-local-db.js" onerror="console.error('❌ Failed to load rhythm-local-db.js')"></script>
   
   <!-- Notification Service -->
-  <script type="module" src="../js/rhythm-notifications.js"></script>
+  <script type="module" src="../js/rhythm-notifications.js" onerror="console.error('❌ Failed to load rhythm-notifications.js')"></script>
   
   <!-- Birthday Notification Service -->
-  <script type="module" src="../js/birthday-notifications.js"></script>
+  <script type="module" src="../js/birthday-notifications.js" onerror="console.error('❌ Failed to load birthday-notifications.js')"></script>
+  
+  <!-- Auto-Update Service DISABLED - only runs on login page -->
   
   <style>
     /* Critical CSS - loads immediately to prevent white flash */
@@ -1378,6 +1426,9 @@
         },
 
         updateFilterDropdown() {
+          console.log('🎨 updateFilterDropdown called');
+          console.log('📋 Current showlist:', STATE.currentShowList?.length || 0, 'songs');
+          
           if (!STATE.songs || STATE.songs.length === 0) {
             ELEMENTS.filterContent.innerHTML = '<a data-filter="all">All (0)</a>';
             return;
@@ -1404,8 +1455,20 @@
             genreCounts.showlist = STATE.currentShowList.length;
           }
           
-          // Build dropdown content with data attributes
-          let dropdownContent = `<a data-filter="all" ${STATE.currentGenreFilter === 'all' ? 'class="active"' : ''}>All (${genreCounts.all})</a>`;
+          // Check notification permission status
+          const notificationStatus = Notification.permission;
+          const notificationIcon = notificationStatus === 'granted' ? '✅' : notificationStatus === 'denied' ? '❌' : '🔔';
+          const notificationText = notificationStatus === 'granted' ? 'Notifications Enabled' : notificationStatus === 'denied' ? 'Notifications Blocked' : 'Enable Notifications';
+          const notificationColor = notificationStatus === 'granted' ? '#4caf50' : notificationStatus === 'denied' ? '#ff6b6b' : '#ff9800';
+          
+          // Build dropdown content with notification button at top
+          let dropdownContent = `
+            <a href="#" onclick="App.handleEnableNotifications(event)" style="background: ${notificationColor}; color: white; font-weight: bold; border-radius: 5px; padding: 10px 15px !important;">
+              ${notificationIcon} ${notificationText}
+            </a>
+            <div style="border-top: 1px solid #555; margin: 8px 0;"></div>
+            <a data-filter="all" ${STATE.currentGenreFilter === 'all' ? 'class="active"' : ''}>All (${genreCounts.all})</a>
+          `;
           
           // Only add showlist option if there's an active showlist
           if (STATE.currentShowList && STATE.currentShowList.length > 0) {
@@ -1420,13 +1483,13 @@
               dropdownContent += `<a data-filter="${genre}" ${STATE.currentGenreFilter === genre ? 'class="active"' : ''}>${genre} (${genreCounts[genre]})</a>`;
             });
           
-          // Add separator and offline management options
-          dropdownContent += `
+          // Temporarily hide offline management options
+          /* dropdownContent += `
             <div style="border-top: 1px solid #555; margin: 8px 0;"></div>
             <a href="#" onclick="App.showOfflineStatus(event)">📱 Offline Status</a>
             <a href="#" onclick="App.refreshCache(event)">🔄 Refresh Cache</a>
             <a href="#" onclick="App.preloadForOffline(event)">📥 Download for Offline</a>
-          `;
+          `; */
           
           ELEMENTS.filterContent.innerHTML = dropdownContent;
           
@@ -1901,6 +1964,61 @@
 
         // === OFFLINE MANAGEMENT FUNCTIONS ===
 
+        async handleEnableNotifications(event) {
+          if (event) event.preventDefault();
+          ELEMENTS.filterContent.classList.remove('show');
+          
+          try {
+            // Check if notifications are supported
+            if (!('Notification' in window)) {
+              alert('❌ Your browser does not support notifications');
+              return;
+            }
+
+            const currentPermission = Notification.permission;
+            
+            if (currentPermission === 'granted') {
+              alert('✅ Notifications are already enabled!');
+              return;
+            }
+            
+            if (currentPermission === 'denied') {
+              alert('⚠️ Notifications are blocked.\n\nTo enable:\n1. Click the lock/info icon in your address bar\n2. Find "Notifications" settings\n3. Change to "Allow"\n4. Refresh the page');
+              return;
+            }
+            
+            // Request permission directly
+            console.log('🔔 Requesting notification permission...');
+            const permission = await Notification.requestPermission();
+            
+            if (permission === 'granted') {
+              console.log('✅ Notification permission granted!');
+              
+              // Show success message
+              alert('✅ Notifications enabled successfully!\n\nYou will now receive important updates and reminders.');
+              
+              // Try to register FCM token in background
+              if (window.rhythmNotifications) {
+                setTimeout(() => {
+                  window.rhythmNotifications.requestPermission().catch(err => {
+                    console.log('Background FCM token registration:', err);
+                  });
+                }, 1000);
+              }
+              
+              // Refresh the filter dropdown to update button
+              UI.updateFilterDropdown();
+              
+            } else {
+              alert('⚠️ Notifications are required for the best experience.\n\nPlease enable notifications to receive important updates.');
+            }
+            
+          } catch (error) {
+            console.error('❌ Error enabling notifications:', error);
+            alert('Error requesting notifications. Please try again.');
+          }
+        },
+
         showOfflineStatus(event) {
           if (event) event.preventDefault();
           ELEMENTS.filterContent.classList.remove('show');
@@ -2044,6 +2162,14 @@
 
       // Show the page once everything is loaded
       document.body.classList.add('loaded');
+
+      // Safety timeout to ensure page becomes visible even if something fails
+      setTimeout(() => {
+        if (!document.body.classList.contains('loaded')) {
+          document.body.classList.add('loaded');
+          console.warn('Page visibility forced by safety timeout');
+        }
+      }, 2000);
 
       return App;
     })();

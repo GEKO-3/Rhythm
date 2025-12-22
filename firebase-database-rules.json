@@ -302,6 +302,24 @@
           }
         }
       }
+    },
+    
+    "checklistData": {
+      ".read": true,
+      ".write": true,
+      "equipment": {
+        ".read": true,
+        ".write": true
+      },
+      "itinerary": {
+        ".read": true,
+        ".write": true
+      }
+    },
+    
+    "checklistStates": {
+      ".read": true,
+      ".write": true
     }
   }
 }

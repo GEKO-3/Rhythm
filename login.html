@@ -3,9 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rhythm Boduberu - Login</title>
+    <title>Rhythm Boduberu - Login v2.5.7</title>
     <meta name="description" content="Access Rhythm Boduberu song collection and admin panel. Traditional Maldivian Boduberu music group.">
     <meta name="keywords" content="Rhythm Boduberu, Traditional Maldivian Music, Boduberu, Songs, Admin">
+    
+    <!-- Cache control -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     
     <!-- SEO and social sharing -->
     <meta property="og:title" content="Rhythm Boduberu - Login">
@@ -21,7 +26,12 @@
     <link rel="icon" type="image/png" sizes="192x192" href="assets/favicons/icons-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="assets/favicons/icons-512.png">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/favicons/apple-touch-icon.png">
-    <link rel="manifest" href="assets/favicons/manifest.webmanifest">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#fbc531">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Rhythm">
+    <link rel="apple-touch-icon" href="assets/favicons/apple-touch-icon.png">
     
     <!-- PWA meta tags -->
     <meta name="theme-color" content="#f5d000">
@@ -275,70 +285,353 @@
         </div>
     </div>
 
-    <script type="module">
-        import RhythmUnifiedAuth from './js/rhythm-unified-auth.js?v=2.4.1';
-        import RhythmLocalDB from './js/rhythm-local-db.js';
-        import './js/rhythm-notifications.js';
-        import './js/birthday-notifications.js';
+    <!-- IMMEDIATE VERSION CHECK - Runs before any other scripts -->
+    <script>
+        (async function() {
+            // Fetch version dynamically from version.json
+            let EXPECTED_VERSION = '2.6.3'; // Fallback version
+            
+            try {
+                const versionResponse = await fetch('/version.json?t=' + Date.now(), {
+                    cache: 'no-store'
+                });
+                const versionData = await versionResponse.json();
+                EXPECTED_VERSION = versionData.version;
+                console.log('📌 Loaded version from version.json:', EXPECTED_VERSION);
+            } catch (error) {
+                console.warn('⚠️ Could not load version.json, using fallback:', EXPECTED_VERSION);
+            }
+            
+            const CURRENT_VERSION = EXPECTED_VERSION; // Current should match expected
+            
+            // Check if we just updated (to prevent reload loop)
+            const urlParams = new URLSearchParams(window.location.search);
+            const justUpdated = urlParams.get('v') === EXPECTED_VERSION;
+            
+            if (justUpdated) {
+                console.log('✅ Just updated to version', EXPECTED_VERSION);
+                // Clean URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                // Update stored version
+                localStorage.setItem('rhythm_app_version', EXPECTED_VERSION);
+                return;
+            }
+            
+            // Check stored version
+            const storedVersion = localStorage.getItem('rhythm_app_version');
+            
+            console.log('🔍 Version check:', {
+                stored: storedVersion,
+                expected: EXPECTED_VERSION
+            });
+            
+            // Only update if versions don't match AND we haven't just updated
+            if (storedVersion && storedVersion !== EXPECTED_VERSION) {
+                console.log('⚠️ Version mismatch! Stored:', storedVersion, 'Expected:', EXPECTED_VERSION);
+                console.log('🔄 Clearing cache and updating...');
+                
+                // Clear everything
+                if ('caches' in window) {
+                    caches.keys().then(names => {
+                        names.forEach(name => caches.delete(name));
+                    });
+                }
+                
+                // Unregister service workers
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistrations().then(registrations => {
+                        registrations.forEach(reg => reg.unregister());
+                    });
+                }
+                
+                // Clear cache-related localStorage
+                for (let i = localStorage.length - 1; i >= 0; i--) {
+                    const key = localStorage.key(i);
+                    if (key && (key.includes('cache') || key.includes('offline') || key === 'rhythm_last_prompted_version')) {
+                        localStorage.removeItem(key);
+                    }
+                }
+                
+                // Update version
+                localStorage.setItem('rhythm_app_version', EXPECTED_VERSION);
+                
+                // Force hard reload with cache bypass
+                setTimeout(() => {
+                    window.location.replace(window.location.href.split('?')[0] + '?v=' + EXPECTED_VERSION + '&t=' + Date.now());
+                }, 100);
+                
+                // Show loading message
+                document.body.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #1f1f1f; color: #f5d000; font-family: -apple-system, sans-serif; flex-direction: column; gap: 15px;"><div style="font-size: 24px; font-weight: 600;">🔄 Updating...</div><div style="font-size: 14px; opacity: 0.7;">Loading version ' + EXPECTED_VERSION + '</div></div>';
+                
+                return; // Stop further execution
+            }
+            
+            // Store current version if not set
+            if (!storedVersion) {
+                localStorage.setItem('rhythm_app_version', CURRENT_VERSION);
+                console.log('📌 Version set:', CURRENT_VERSION);
+            }
+            
+            // Update version display
+            const versionInfo = document.getElementById('versionInfo');
+            if (versionInfo) {
+                versionInfo.innerHTML = `<span style="color: rgba(245, 208, 0, 0.5); font-size: 0.75rem; font-family: var(--font-family);">v${EXPECTED_VERSION}</span>`;
+            }
+        })();
+    </script>
 
+    <script type="module">
+        import RhythmUnifiedAuth from './js/rhythm-unified-auth.js?v=2.4.7';
+        import RhythmLocalDB from './js/rhythm-local-db.js?v=2.4.7';
+        import './js/rhythm-notifications.js?v=2.4.7';
+        import './js/birthday-notifications.js?v=2.4.7';
+    </script>
+    
+    <!-- Auto-Update Service - Inline on login page only -->
+    <script>
+/**
+ * Auto-Update Service for Rhythm Boduberu - Inline Version
+ * Checks for new versions and prompts user to update
+ */
+
+class RhythmAutoUpdate {
+    constructor() {
+        this.currentVersion = null;
+        this.checkInterval = 5 * 60 * 1000;
+        this.versionUrl = '/version.json';
+        this.isCheckingUpdate = false;
+        this.init();
+    }
+
+    async init() {
+        console.log('🔄 Auto-update service initialized');
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        if (!urlParams.has('v') || Date.now() - parseInt(urlParams.get('t') || '0') > 5000) {
+            sessionStorage.removeItem('rhythm_update_in_progress');
+            console.log('✅ Page loaded successfully, update flags cleared');
+        }
+        
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (isPWA) console.log('📱 Running as PWA');
+        
+        await this.loadCurrentVersion();
+        setTimeout(() => this.checkForUpdates(), 1000);
+        setInterval(() => this.checkForUpdates(), this.checkInterval);
+    }
+
+    async loadCurrentVersion() {
+        try {
+            const response = await fetch(this.versionUrl, { cache: 'no-store' });
+            const data = await response.json();
+            this.currentVersion = data.version;
+            console.log('📌 Current version:', this.currentVersion);
+            
+            const storedVersion = localStorage.getItem('rhythm_app_version');
+            if (!storedVersion || storedVersion !== this.currentVersion) {
+                localStorage.setItem('rhythm_app_version', this.currentVersion);
+            }
+        } catch (error) {
+            console.error('❌ Failed to load current version:', error);
+            this.currentVersion = localStorage.getItem('rhythm_app_version') || '0.0.0';
+        }
+    }
+
+    async checkForUpdates() {
+        if (this.isCheckingUpdate) return;
+        this.isCheckingUpdate = true;
+
+        try {
+            const response = await fetch(this.versionUrl + '?t=' + Date.now(), {
+                cache: 'no-store',
+                headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+            });
+            
+            if (!response.ok) throw new Error('Failed to fetch version info');
+            
+            const data = await response.json();
+            const latestVersion = data.version;
+            
+            if (this.isNewerVersion(latestVersion, this.currentVersion)) {
+                console.log('🎉 New version available:', latestVersion);
+                this.showUpdatePrompt(data);
+            }
+        } catch (error) {
+            console.error('❌ Update check failed:', error);
+        } finally {
+            this.isCheckingUpdate = false;
+        }
+    }
+
+    isNewerVersion(latest, current) {
+        if (!current) return true;
+        const latestParts = latest.split('.').map(Number);
+        const currentParts = current.split('.').map(Number);
+        
+        for (let i = 0; i < Math.max(latestParts.length, currentParts.length); i++) {
+            const latestPart = latestParts[i] || 0;
+            const currentPart = currentParts[i] || 0;
+            if (latestPart > currentPart) return true;
+            if (latestPart < currentPart) return false;
+        }
+        return false;
+    }
+
+    showUpdatePrompt(versionData) {
+        const banner = document.createElement('div');
+        banner.id = 'update-banner';
+        banner.style.cssText = `
+            position: fixed; top: 0; left: 0; right: 0;
+            background: linear-gradient(135deg, #f5d000 0%, #fbc531 100%);
+            color: #000; padding: 15px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 999999; display: flex; align-items: center;
+            justify-content: space-between;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            animation: slideDown 0.3s ease-out;
+        `;
+
+        banner.innerHTML = `
+            <div style="flex: 1;">
+                <strong style="font-size: 16px;">🎉 New Update Available!</strong>
+                <div style="font-size: 13px; margin-top: 4px; opacity: 0.9;">
+                    Version ${versionData.version} - ${versionData.description}
+                </div>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button id="update-now-btn" style="
+                    padding: 8px 20px; background: #000; color: #f5d000;
+                    border: none; border-radius: 5px; font-weight: 600;
+                    cursor: pointer; font-size: 14px; transition: all 0.2s;
+                ">Update Now</button>
+            </div>
+        `;
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideDown {
+                from { transform: translateY(-100%); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+            #update-now-btn:hover { background: #1a1a1a !important; transform: scale(1.05); }
+        `;
+        document.head.appendChild(style);
+        document.body.insertBefore(banner, document.body.firstChild);
+
+        document.getElementById('update-now-btn').addEventListener('click', () => {
+            this.performUpdate(versionData.version);
+        });
+
+        setTimeout(() => {
+            if (banner.parentNode) {
+                console.log('⏰ Auto-updating after 5 seconds...');
+                this.performUpdate(versionData.version);
+            }
+        }, 5000);
+    }
+
+    async performUpdate(newVersion) {
+        const updateInProgress = sessionStorage.getItem('rhythm_update_in_progress');
+        const lastUpdateAttempt = sessionStorage.getItem('rhythm_last_update_attempt');
+        const now = Date.now();
+        
+        if (lastUpdateAttempt && (now - parseInt(lastUpdateAttempt)) < 10000) {
+            console.error('🚨 Update attempted too recently - preventing infinite loop!');
+            return;
+        }
+        
+        if (updateInProgress === 'true') {
+            console.warn('⚠️ Update already in progress, skipping...');
+            return;
+        }
+        
+        sessionStorage.setItem('rhythm_update_in_progress', 'true');
+        sessionStorage.setItem('rhythm_last_update_attempt', now.toString());
+
+        const banner = document.getElementById('update-banner');
+        if (banner) {
+            banner.innerHTML = `
+                <div style="flex: 1; text-align: center;">
+                    <strong style="font-size: 16px;">⏳ Updating...</strong>
+                    <div style="font-size: 13px; margin-top: 4px;">Please wait</div>
+                </div>
+            `;
+        }
+
+        const safetyTimeout = setTimeout(() => {
+            sessionStorage.removeItem('rhythm_update_in_progress');
+            window.location.replace(window.location.href.split('?')[0] + '?v=' + newVersion + '&t=' + Date.now());
+        }, 5000);
+
+        try {
+            if ('serviceWorker' in navigator) {
+                const registrations = await Promise.race([
+                    navigator.serviceWorker.getRegistrations(),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+                ]).catch(() => []);
+                
+                for (let registration of registrations) {
+                    try { await registration.unregister(); } catch (e) {}
+                }
+            }
+
+            if ('caches' in window) {
+                const cacheNames = await Promise.race([
+                    caches.keys(),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
+                ]).catch(() => []);
+                
+                await Promise.allSettled(cacheNames.map(name => caches.delete(name)));
+            }
+
+            localStorage.setItem('rhythm_app_version', newVersion);
+
+            if (banner) {
+                banner.style.background = 'linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)';
+                banner.innerHTML = `
+                    <div style="flex: 1; text-align: center; color: white;">
+                        <strong style="font-size: 16px;">✅ Update Complete!</strong>
+                        <div style="font-size: 13px; margin-top: 4px;">Reloading app...</div>
+                    </div>
+                `;
+            }
+
+            clearTimeout(safetyTimeout);
+            sessionStorage.removeItem('rhythm_update_in_progress');
+
+            setTimeout(() => {
+                const baseUrl = window.location.href.split('?')[0];
+                window.location.replace(baseUrl + '?v=' + newVersion + '&t=' + Date.now());
+            }, 1000);
+
+        } catch (error) {
+            clearTimeout(safetyTimeout);
+            sessionStorage.removeItem('rhythm_update_in_progress');
+            window.location.reload(true);
+        }
+    }
+}
+
+if (typeof window !== 'undefined') {
+    window.rhythmAutoUpdate = new RhythmAutoUpdate();
+}
+    </script>
+    
+    <script type="module">
         // Disable PWA installation prompts
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             return false;
         });
 
-        // Version checking and update function
+        // Version checking and update function - DISABLED (inline check handles this)
+        // Keeping this commented out to prevent double update checks and reload loops
+        /*
         async function checkForAppUpdate() {
-            try {
-                console.log('🔍 [Version Check] Checking for app updates...');
-                const response = await fetch('./version.json?t=' + Date.now(), { cache: 'no-store' });
-                const serverVersion = await response.json();
-                
-                const localVersion = localStorage.getItem('rhythm_app_version');
-                
-                console.log('📦 [Version Check] Server version:', serverVersion.version);
-                console.log('💾 [Version Check] Local version:', localVersion || 'none');
-                
-                if (localVersion !== serverVersion.version) {
-                    console.log('🆕 [Version Check] New version available:', serverVersion.version);
-                    console.log('📝 [Version Check] Changes:', serverVersion.changes);
-                    
-                    // Clear caches for update
-                    if ('caches' in window) {
-                        const cacheNames = await caches.keys();
-                        await Promise.all(cacheNames.map(name => caches.delete(name)));
-                        console.log('🧹 [Version Check] Cleared all caches');
-                    }
-                    
-                    // Update service worker
-                    if ('serviceWorker' in navigator) {
-                        const registrations = await navigator.serviceWorker.getRegistrations();
-                        for (let registration of registrations) {
-                            await registration.update();
-                            console.log('🔄 [Version Check] Service worker updated');
-                        }
-                    }
-                    
-                    // Store new version
-                    localStorage.setItem('rhythm_app_version', serverVersion.version);
-                    
-                    console.log('✅ [Version Check] App updated to v' + serverVersion.version);
-                    
-                    // Reload page to apply updates
-                    setTimeout(() => {
-                        console.log('🔄 [Version Check] Reloading to apply updates...');
-                        window.location.reload(true);
-                    }, 1000);
-                } else {
-                    console.log('✅ [Version Check] App is up to date');
-                }
-            } catch (error) {
-                console.warn('⚠️ [Version Check] Failed to check for updates:', error);
-            }
+            // This function is disabled - the inline version check at the top of the page handles updates
+            console.log('ℹ️ Version check disabled on login page - inline check handles updates');
         }
-
-        // Check for updates before authentication
-        checkForAppUpdate();
+        */
 
         // Hidden online update mechanism - forces cache refresh when online
         let isOnline = navigator.onLine;
@@ -1164,39 +1457,7 @@
                 
                 if (result.success) {
                     console.log('✅ FCM token auto-generated successfully');
-                    
-                    // Show success notification
-                    const toast = document.createElement('div');
-                    toast.style.cssText = `
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        background: rgba(76, 175, 80, 0.95);
-                        color: white;
-                        padding: 12px 18px;
-                        border-radius: 8px;
-                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-                        z-index: 10000;
-                        font-family: inherit;
-                        font-size: 13px;
-                        animation: slideIn 0.3s ease-out;
-                    `;
-                    
-                    toast.innerHTML = `
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span>🎫</span>
-                            <span>FCM token ready - you can receive notifications!</span>
-                        </div>
-                    `;
-                    
-                    document.body.appendChild(toast);
-                    
-                    setTimeout(() => {
-                        if (toast.parentNode) {
-                            toast.parentNode.removeChild(toast);
-                        }
-                    }, 4000);
-                    
+                    // Token ready - no need to show notification to user
                 } else {
                     console.log('⚠️ Failed to auto-generate FCM token:', result.reason);
                 }
@@ -1276,5 +1537,8 @@
             window.location.href = 'pages/admin/admin.html';
         }
     </script>
+    
+    <!-- PWA Install Handler -->
+    <script src="js/pwa-install.js"></script>
 </body>
 </html>

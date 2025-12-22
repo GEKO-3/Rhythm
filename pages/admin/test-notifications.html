@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Test Notification - Rhythm</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="../../assets/favicons/favicon-32x32.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #f5d000;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2em;
+            color: #fbc531;
+        }
+
+        .back-button {
+            padding: 10px 20px;
+            background: rgba(251, 197, 49, 0.1);
+            color: #fbc531;
+            border: 2px solid #fbc531;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: #fbc531;
+            color: #1a1a1a;
+        }
+
+        .card {
+            background: rgba(43, 43, 43, 0.9);
+            border: 2px solid rgba(251, 197, 49, 0.3);
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fbc531;
+            font-weight: 500;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            background: #2b2b2b;
+            border: 2px solid rgba(251, 197, 49, 0.3);
+            border-radius: 5px;
+            color: #f5d000;
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #fbc531;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #fbc531 0%, #e1b12c 100%);
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(251, 197, 49, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .info-box {
+            background: rgba(251, 197, 49, 0.1);
+            border-left: 4px solid #fbc531;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .info-box p {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #fbc531;
+        }
+
+        .success {
+            background: rgba(46, 204, 113, 0.2);
+            border-left: 4px solid #2ecc71;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            color: #2ecc71;
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            color: #e74c3c;
+        }
+
+        .token-info {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .member-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .token-badge {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .no-token-badge {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📢 Send Test Notification</h1>
+            <a href="admin.html" class="back-button">← Back to Admin</a>
+        </div>
+
+        <div class="info-box">
+            <p>Send a test push notification to a specific user. The user must have notifications enabled and be using the app.</p>
+        </div>
+
+        <div class="card">
+            <form id="notification-form">
+                <div class="form-group">
+                    <label for="user-select">Select User</label>
+                    <select id="user-select" required>
+                        <option value="">Loading users...</option>
+                    </select>
+                    <div class="token-info" id="token-info"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="notification-title">Notification Title</label>
+                    <input type="text" id="notification-title" placeholder="e.g., Test Notification" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="notification-body">Notification Message</label>
+                    <textarea id="notification-body" placeholder="e.g., This is a test notification from Rhythm admin." required></textarea>
+                </div>
+
+                <button type="submit" class="btn" id="send-btn">
+                    Send Notification
+                </button>
+            </form>
+
+            <div id="result-message"></div>
+        </div>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+        import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const functions = getFunctions(app);
+
+        let members = {};
+        let currentUser = null;
+
+        // Check authentication
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Wait for auth to be ready
+                let attempts = 0;
+                while (!window.rhythmAuth && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (!window.rhythmAuth) {
+                    throw new Error('Authentication system not available');
+                }
+
+                const authResult = await window.rhythmAuth.checkAuthentication();
+
+                if (!authResult.isAuthenticated) {
+                    alert('You must be logged in to access this page.');
+                    window.location.href = '../../login.html';
+                    return;
+                }
+
+                if (!window.rhythmAuth.isAdmin()) {
+                    alert('Access denied. Admin permissions required.');
+                    window.location.href = '../songlist.html';
+                    return;
+                }
+
+                currentUser = authResult.user;
+                console.log('✅ Admin authenticated:', currentUser.fullName);
+
+                // Load members
+                await loadMembers();
+
+            } catch (error) {
+                console.error('Authentication error:', error);
+                alert('Authentication failed. Please log in again.');
+                window.location.href = '../../login.html';
+            }
+        });
+
+        // Load all members with their FCM tokens
+        async function loadMembers() {
+            try {
+                const membersRef = ref(database, 'members');
+                const snapshot = await get(membersRef);
+
+                if (snapshot.exists()) {
+                    members = snapshot.val();
+                    populateUserSelect();
+                } else {
+                    document.getElementById('user-select').innerHTML = '<option value="">No members found</option>';
+                }
+            } catch (error) {
+                console.error('Error loading members:', error);
+                document.getElementById('user-select').innerHTML = '<option value="">Error loading members</option>';
+            }
+        }
+
+        // Populate user select dropdown
+        function populateUserSelect() {
+            const select = document.getElementById('user-select');
+            const sortedMembers = Object.values(members).sort((a, b) => 
+                a.fullName.localeCompare(b.fullName)
+            );
+
+            select.innerHTML = '<option value="">-- Select a user --</option>';
+
+            sortedMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.memberId;
+                
+                const hasToken = member.fcmToken ? true : false;
+                option.textContent = `${member.fullName}${hasToken ? ' ✓' : ' (No token)'}`;
+                option.disabled = !hasToken;
+                
+                select.appendChild(option);
+            });
+        }
+
+        // Update token info when user is selected
+        document.getElementById('user-select').addEventListener('change', (e) => {
+            const memberId = e.target.value;
+            const tokenInfo = document.getElementById('token-info');
+
+            if (!memberId) {
+                tokenInfo.textContent = '';
+                return;
+            }
+
+            const member = members[memberId];
+            if (member.fcmToken) {
+                tokenInfo.innerHTML = `<span class="token-badge">✓ Has notification token</span>`;
+            } else {
+                tokenInfo.innerHTML = `<span class="no-token-badge">✗ No notification token (user needs to enable notifications)</span>`;
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('notification-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const memberId = document.getElementById('user-select').value;
+            const title = document.getElementById('notification-title').value.trim();
+            const body = document.getElementById('notification-body').value.trim();
+
+            if (!memberId || !title || !body) {
+                showResult('Please fill in all fields', 'error');
+                return;
+            }
+
+            const member = members[memberId];
+            if (!member.fcmToken) {
+                showResult('This user does not have a notification token. They need to enable notifications in the app.', 'error');
+                return;
+            }
+
+            // Disable button
+            const sendBtn = document.getElementById('send-btn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+
+            try {
+                // Call the Cloud Function to send notification
+                const sendNotification = httpsCallable(functions, 'sendTestNotification');
+                
+                const result = await sendNotification({
+                    token: member.fcmToken,
+                    title: title,
+                    body: body,
+                    type: 'test',
+                    memberId: memberId,
+                    memberName: member.fullName
+                });
+
+                console.log('Notification sent:', result.data);
+
+                showResult(
+                    `✓ ${result.data.message}\n\nMessage ID: ${result.data.messageId}`,
+                    'success'
+                );
+
+                // Clear form
+                document.getElementById('notification-title').value = '';
+                document.getElementById('notification-body').value = '';
+
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                
+                let errorMessage = 'Failed to send notification.';
+                if (error.code === 'functions/unauthenticated') {
+                    errorMessage = 'Authentication error. Please log in again.';
+                } else if (error.code === 'functions/permission-denied') {
+                    errorMessage = 'Permission denied. Admin access required.';
+                } else if (error.code === 'functions/invalid-argument') {
+                    errorMessage = error.message;
+                } else if (error.message) {
+                    errorMessage = error.message;
+                }
+                
+                showResult(errorMessage, 'error');
+            } finally {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send Notification';
+            }
+        });
+
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result-message');
+            resultDiv.className = type;
+            resultDiv.textContent = message;
+            resultDiv.style.display = 'block';
+
+            setTimeout(() => {
+                resultDiv.style.display = 'none';
+            }, 10000);
+        }
+    </script>
+
+    <script type="module" src="../../js/rhythm-unified-auth.js"></script>
+</body>
+</html>

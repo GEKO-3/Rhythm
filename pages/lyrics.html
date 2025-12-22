@@ -29,6 +29,40 @@
     }
   </style>
   
+  <!-- 🚨 EMERGENCY: Force page visible immediately if scripts fail -->
+  <script>
+    // Diagnostic: Track page load stages
+    window.rhythmLoadStages = {
+      emergencyTimeoutSet: Date.now(),
+      scriptsStarted: Date.now(),
+      stages: []
+    };
+    
+    function logStage(stage) {
+      const elapsed = Date.now() - window.rhythmLoadStages.scriptsStarted;
+      console.log(`📊 [Lyrics] ${stage} at ${elapsed}ms`);
+      window.rhythmLoadStages.stages.push({ stage, time: elapsed });
+    }
+    
+    logStage('Emergency timeout script executed');
+    
+    setTimeout(() => {
+      document.body.classList.add('loaded');
+      logStage('Emergency timeout (500ms) - page forced visible');
+      console.warn('⚠️ [Lyrics] Emergency timeout - forcing page visible');
+    }, 500);
+    
+    // Monitor events
+    document.addEventListener('DOMContentLoaded', () => {
+      logStage('DOMContentLoaded event fired');
+    });
+    
+    window.addEventListener('load', () => {
+      logStage('Window load event fired');
+      console.log('📊 [Lyrics] Full load timeline:', window.rhythmLoadStages);
+    });
+  </script>
+  
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicons/icons-192.png">
 <link rel="icon" type="image/png" sizes="512x512" href="../assets/favicons/icons-512.png">
 <link rel="manifest" href="../assets/favicons/manifest.webmanifest">
@@ -39,8 +73,8 @@
   <link rel="preload" href="../js/reverse-transliteration.js" as="script">
   
   <!-- Load Firebase COMPAT SDK for transliteration-firebase.js -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js" onerror="console.error('❌ [Lyrics] Failed to load Firebase app-compat')"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js" onerror="console.error('❌ [Lyrics] Failed to load Firebase database-compat')"></script>
   
   <!-- Initialize Firebase for compat SDK (used by transliteration-firebase.js) -->
   <script>
@@ -56,19 +90,28 @@
     };
     
     // Initialize Firebase compat (rhythm-unified-auth.js uses modular SDK separately)
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-      console.log('✅ Firebase COMPAT initialized for transliteration');
+    try {
+      if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+        console.log('✅ [Lyrics] Firebase COMPAT initialized for transliteration');
+        logStage('Firebase COMPAT initialized');
+      } else if (typeof firebase === 'undefined') {
+        console.error('❌ [Lyrics] Firebase COMPAT SDK failed to load');
+        logStage('Firebase COMPAT SDK missing');
+      }
+    } catch (error) {
+      console.error('❌ [Lyrics] Firebase COMPAT initialization failed:', error);
+      logStage('Firebase COMPAT init error: ' + error.message);
     }
   </script>
   
   <!-- Load transliteration scripts that use compat SDK -->
-  <script src="../js/transliteration-firebase.js"></script>
-  <script src="../js/reverse-transliteration.js"></script>
+  <script src="../js/transliteration-firebase.js" onerror="console.error('❌ [Lyrics] Failed to load transliteration-firebase.js')"></script>
+  <script src="../js/reverse-transliteration.js" onerror="console.error('❌ [Lyrics] Failed to load reverse-transliteration.js')"></script>
   
   <!-- Load modules that use modular SDK (they initialize their own Firebase) -->
-  <script type="module" src="../js/rhythm-unified-auth.js"></script>
-  <script type="module" src="../js/rhythm-local-db.js"></script>
+  <script type="module" src="../js/rhythm-unified-auth.js" onerror="console.error('❌ [Lyrics] Failed to load rhythm-unified-auth.js')"></script>
+  <script type="module" src="../js/rhythm-local-db.js" onerror="console.error('❌ [Lyrics] Failed to load rhythm-local-db.js')"></script>
   
   <style>
     /* Load local fonts from Fonts folder */
@@ -692,6 +735,14 @@
     </div>
   </div>
   <script>
+    // 🚨 SAFETY: Force page visible after 2 seconds regardless of loading state
+    setTimeout(() => {
+      if (!document.body.classList.contains('loaded')) {
+        console.warn('⚠️ [Lyrics] Force-showing page after timeout');
+        document.body.classList.add('loaded');
+      }
+    }, 2000);
+
     // Initialize unified authentication system on page load
     document.addEventListener('DOMContentLoaded', async function() {
       // 🚀 PREVENT FLASH: Make page visible once DOM is ready
@@ -810,28 +861,13 @@
 
         console.log(`🎵 [Lyrics] Loading specific song: ${selectedSongId}`);
 
-        // 🚀 SPEED OPTIMIZATION: Check for prefetched data first
-        const prefetchedDataStr = localStorage.getItem('prefetchedSongData');
+        // 🚨 DISABLED: Prefetch cache to always get fresh data
+        // Check for prefetched data first
+        // const prefetchedDataStr = localStorage.getItem('prefetchedSongData');
         let songData = null;
         
-        if (prefetchedDataStr) {
-          try {
-            const prefetchedData = JSON.parse(prefetchedDataStr);
-            // Check if data is fresh (less than 30 seconds old) and for correct song
-            const isDataFresh = (Date.now() - prefetchedData.timestamp) < 30000;
-            const isCorrectSong = prefetchedData.songId === selectedSongId;
-            
-            if (isDataFresh && isCorrectSong) {
-              songData = prefetchedData.data;
-              console.log('🚀 [Lyrics] Using prefetched song data - INSTANT LOAD!');
-              // Clean up prefetched data
-              localStorage.removeItem('prefetchedSongData');
-            }
-          } catch (e) {
-            console.log('⚠️ [Lyrics] Invalid prefetched data, will load from database');
-            localStorage.removeItem('prefetchedSongData');
-          }
-        }
+        // Always clear prefetched data to force fresh load
+        localStorage.removeItem('prefetchedSongData');
 
         // If no valid prefetched data, load from local database system
         if (!songData) {
@@ -869,9 +905,12 @@
           }
 
           try {
-            // Load the selected song with local database support
-            songData = await window.rhythmDB.getSong(selectedSongId);
-            console.log(`🎵 [Lyrics] Loaded song from local database: ${songData?.title || selectedSongId}`);
+            // Force fresh data from Firebase - pass forceFresh parameter
+            console.log('🔄 [Lyrics] Forcing fresh data from Firebase (bypassing all caches)');
+            
+            // Load the selected song with forceFresh flag
+            songData = await window.rhythmDB.getSong(selectedSongId, true);
+            console.log(`🎵 [Lyrics] Loaded FRESH song data: ${songData?.title || selectedSongId}`);
           } catch (error) {
             console.error(`❌ [Lyrics] Failed to load song ${selectedSongId}:`, error);
             

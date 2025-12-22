@@ -25,9 +25,9 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
     console.log('📱 Background message received:', payload);
     
-    // Extract notification data
-    const notificationTitle = payload.notification?.title || 'Rhythm Boduberu';
-    const notificationBody = payload.notification?.body || 'New notification';
+    // Extract notification data from either notification or data field
+    const notificationTitle = payload.data?.title || payload.notification?.title || 'Rhythm Boduberu';
+    const notificationBody = payload.data?.body || payload.notification?.body || 'New notification';
     const notificationType = payload.data?.type || 'general';
     
     // Customize notification options based on type
@@ -99,44 +99,54 @@ self.addEventListener('notificationclick', (event) => {
     // Handle different notification types and actions
     let urlToOpen = '/';
     
-    switch (notificationData?.type) {
-        case 'birthday':
-            urlToOpen = '/pages/members.html';
-            break;
-            
-        case 'event':
-            urlToOpen = '/pages/attendance.html';
-            break;
-            
-        case 'login_status':
-            if (notificationData?.approved === 'true') {
-                urlToOpen = '/pages/songlist.html';
-            } else {
-                urlToOpen = '/login.html';
-            }
-            break;
-            
-        case 'admin_alert':
-            if (notificationData?.alertType === 'application') {
-                urlToOpen = '/pages/admin/applications-list.html';
-            } else if (notificationData?.alertType === 'sponsor') {
-                urlToOpen = '/pages/admin/sponsors-list.html';
-            } else {
-                urlToOpen = '/pages/admin/admin.html';
-            }
-            break;
-            
-        case 'version_update':
-            if (action === 'update') {
-                // Force page reload to get new version
-                urlToOpen = '/?force_update=true';
-            } else {
-                return; // Don't open anything for "later"
-            }
-            break;
-            
-        default:
-            urlToOpen = '/';
+    // Check if there's a custom URL from admin notification
+    if (notificationData?.clickUrl) {
+        urlToOpen = notificationData.clickUrl;
+    } else {
+        // Default handling for different notification types
+        switch (notificationData?.type) {
+            case 'birthday':
+                urlToOpen = '/pages/members.html';
+                break;
+                
+            case 'event':
+                urlToOpen = '/pages/attendance.html';
+                break;
+                
+            case 'login_status':
+                if (notificationData?.approved === 'true') {
+                    urlToOpen = '/pages/songlist.html';
+                } else {
+                    urlToOpen = '/login.html';
+                }
+                break;
+                
+            case 'admin_alert':
+                if (notificationData?.alertType === 'application') {
+                    urlToOpen = '/pages/admin/applications-list.html';
+                } else if (notificationData?.alertType === 'sponsor') {
+                    urlToOpen = '/pages/admin/sponsors-list.html';
+                } else {
+                    urlToOpen = '/pages/admin/admin.html';
+                }
+                break;
+                
+            case 'version_update':
+                if (action === 'update') {
+                    // Force page reload to get new version
+                    urlToOpen = '/?force_update=true';
+                } else {
+                    return; // Don't open anything for "later"
+                }
+                break;
+                
+            case 'admin_notification':
+                urlToOpen = '/login.html'; // Default for admin notifications
+                break;
+                
+            default:
+                urlToOpen = '/';
+        }
     }
     
     // Focus or open the appropriate page

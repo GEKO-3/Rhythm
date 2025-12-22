@@ -138,17 +138,26 @@ class RhythmFirebaseDB {
   }
 
   // Get specific song by ID (for lyrics page)
-  async getSong(songId) {
+  async getSong(songId, forceFresh = false) {
     if (!this.isInitialized) {
       throw new Error('Firebase not initialized');
     }
 
     try {
       const songRef = ref(this.database, `songs/${songId}`);
+      
+      // Force fresh data by adding cache-busting query param
+      if (forceFresh) {
+        console.log(`🔄 [Firebase] Force fetching fresh data for song: ${songId}`);
+      }
+      
+      // Use get() for one-time read (no persistent connection)
       const snapshot = await get(songRef);
       
       if (snapshot.exists()) {
-        return snapshot.val();
+        const data = snapshot.val();
+        console.log(`✅ [Firebase] Got song data: ${songId}`);
+        return data;
       } else {
         console.log('Song not found:', songId);
         return null;

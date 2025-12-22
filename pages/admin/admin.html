@@ -21,6 +21,28 @@
 <link rel="icon" type="image/png" sizes="512x512" href="../../assets/favicons/icons-512.png">
 <link rel="manifest" href="../../assets/favicons/admin-manifest.webmanifest">
   
+  <!-- 🚀 PREVENT FLASH: Immediate dark background -->
+  <style>
+    /* Critical CSS - loads immediately to prevent white flash */
+    html, body {
+      background-color: #1f1f1f !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    
+    /* Hide content until fully styled */
+    body {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    body.loaded {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
+
   <style>
     /* Local font definitions */
     @font-face {
@@ -298,6 +320,7 @@
 
   <h1 class="page-title">Admin</h1>
   <div class="menu-container">
+    <button class="menu-btn" onclick="navigateToPage('checklist.html')">📋 Admin Checklist</button>
     <button class="menu-btn" onclick="navigateToPage('../members.html')">Members</button>
     <button class="menu-btn" onclick="navigateToPage('../attendance.html')">Attendance</button>
     <button class="menu-btn" onclick="navigateToPage('user-management.html')">User Management</button>
@@ -308,7 +331,6 @@
     <button class="menu-btn" onclick="navigateToPage('../admin-kits.html')">🥁 Kit Management</button>
     <button class="menu-btn" onclick="navigateToPage('inventory.html')">📦 Inventory</button>
     <button class="menu-btn" onclick="navigateToPage('../admin-booking.html')">📅 Booking Calendar</button>
-    <button class="menu-btn" onclick="navigateToPage('send-notification.html')" style="background: rgba(245, 208, 0, 0.1); border: 1px solid #f5d000;">📱 Send Notifications</button>
     <button class="menu-btn" onclick="navigateToPage('applications-list.html')">Applications</button>
     <button class="menu-btn" onclick="navigateToPage('sponsors-list.html')">Sponsor Callbacks</button>
   </div>
@@ -316,7 +338,11 @@
   <script type="module">
     // Import Unified Auth System
     import './../../js/rhythm-unified-auth.js';
-
+  </script>
+  
+  <!-- Auto-Update Service DISABLED - only runs on login page -->
+  
+  <script type="module">
     // Disable PWA installation prompts
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -325,6 +351,17 @@
 
     // Initialize unified authentication check
     document.addEventListener('DOMContentLoaded', async function() {
+      // 🚨 SAFETY: Force page visible after 2 seconds regardless of loading state
+      setTimeout(() => {
+        if (!document.body.classList.contains('loaded')) {
+          console.warn('⚠️ [Admin] Force-showing page after timeout');
+          document.body.classList.add('loaded');
+        }
+      }, 2000);
+
+      // 🚀 PREVENT FLASH: Make page visible once DOM is ready
+      document.body.classList.add('loaded');
+
       // Force cache refresh for updated admin page
       try {
         if ('serviceWorker' in navigator && 'caches' in window) {

@@ -106,8 +106,19 @@ class RhythmFirebaseDBOffline extends RhythmFirebaseDB {
     /**
      * Enhanced getSong with local database integration
      */
-    async getSong(songId) {
-        console.log(`🎵 [OfflineDB] Getting song: ${songId}...`);
+    async getSong(songId, forceFresh = false) {
+        console.log(`🎵 [OfflineDB] Getting song: ${songId}... (forceFresh: ${forceFresh})`);
+
+        // If force fresh, skip local cache entirely
+        if (forceFresh) {
+            console.log(`📡 [OfflineDB] Force fresh mode - bypassing local cache for ${songId}`);
+            try {
+                return await super.getSong(songId, true);
+            } catch (error) {
+                console.error(`❌ [OfflineDB] Failed to fetch fresh song ${songId} from Firebase:`, error);
+                return null;
+            }
+        }
 
         // Ensure we've tried to initialize local database
         if (!this.localDBReady) {
@@ -131,7 +142,7 @@ class RhythmFirebaseDBOffline extends RhythmFirebaseDB {
         // Fallback to direct Firebase access
         console.log(`📡 [OfflineDB] Using Firebase directly for song ${songId}...`);
         try {
-            return await super.getSong(songId);
+            return await super.getSong(songId, false);
         } catch (error) {
             console.error(`❌ [OfflineDB] Failed to fetch song ${songId} from Firebase:`, error);
             return null;
