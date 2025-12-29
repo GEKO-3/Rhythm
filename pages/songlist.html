@@ -22,22 +22,11 @@
     
     logStage('Emergency timeout script executed');
     
-    // Force page visible after 500ms regardless of what happens
-    console.log('⏰ [Songlist] Emergency timeout set - page will be visible in 500ms');
+    // Mark initial load complete after brief delay
     setTimeout(() => {
-      document.body.classList.add('loaded');
-      logStage('Emergency timeout (500ms) - page forced visible');
-      console.warn('🚨 [Songlist] Emergency timeout triggered - forcing page visible');
-    }, 500);
-    
-    // Additional safety net at 2 seconds
-    setTimeout(() => {
-      if (!document.body.classList.contains('loaded')) {
-        document.body.classList.add('loaded');
-        logStage('Secondary timeout (2000ms) - page was still hidden');
-        console.error('🚨 [Songlist] Secondary timeout triggered - page was still hidden!');
-      }
-    }, 2000);
+      document.body.classList.add('initial-load-complete');
+      logStage('Initial load marked complete');
+    }, 300);
     
     // Monitor when DOMContentLoaded fires
     document.addEventListener('DOMContentLoaded', () => {
@@ -74,16 +63,20 @@
       padding: 0 !important;
     }
     
-    /* Hide content until fully styled */
+    /* Show content by default - only hide on initial page load */
     body {
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
-    
-    body.loaded {
       visibility: visible;
       opacity: 1;
+    }
+    
+    /* Initial load animation (optional) */
+    body:not(.initial-load-complete) {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0.7; }
+      to { opacity: 1; }
     }
   </style>
   
@@ -2160,16 +2153,8 @@
       // Initialize the application
       App.init();
 
-      // Show the page once everything is loaded
-      document.body.classList.add('loaded');
-
-      // Safety timeout to ensure page becomes visible even if something fails
-      setTimeout(() => {
-        if (!document.body.classList.contains('loaded')) {
-          document.body.classList.add('loaded');
-          console.warn('Page visibility forced by safety timeout');
-        }
-      }, 2000);
+      // Mark initial load complete for animation purposes
+      document.body.classList.add('initial-load-complete');
 
       return App;
     })();

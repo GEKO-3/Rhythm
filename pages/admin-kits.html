@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kit Management - Admin Panel</title>
+    
+    <!-- 🚨 CRITICAL: Emergency page load script -->
+    <script>
+        window.rhythmLoadStages = { emergencyTimeoutSet: Date.now(), scriptsStarted: Date.now(), stages: [] };
+        function logStage(stage) {
+            const elapsed = Date.now() - window.rhythmLoadStages.scriptsStarted;
+            console.log(`📊 [AdminKits] ${stage} at ${elapsed}ms`);
+            window.rhythmLoadStages.stages.push({ stage, time: elapsed });
+        }
+        logStage('Emergency script loaded');
+        document.addEventListener('DOMContentLoaded', () => logStage('DOMContentLoaded'));
+        window.addEventListener('load', () => {
+            logStage('Window load');
+            console.log('📊 [AdminKits] Timeline:', window.rhythmLoadStages);
+        });
+    </script>
+    
     <link rel="stylesheet" href="../assets/styles.css">
     
     <!-- Cloudinary Upload Widget -->

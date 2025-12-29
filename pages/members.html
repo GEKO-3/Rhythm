@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rhythm Members - Boduberu Group</title>
     
+    <!-- 🚨 CRITICAL: Emergency page load script -->
+    <script>
+        window.rhythmLoadStages = { emergencyTimeoutSet: Date.now(), scriptsStarted: Date.now(), stages: [] };
+        function logStage(stage) {
+            const elapsed = Date.now() - window.rhythmLoadStages.scriptsStarted;
+            console.log(`📊 [Members] ${stage} at ${elapsed}ms`);
+            window.rhythmLoadStages.stages.push({ stage, time: elapsed });
+        }
+        logStage('Emergency script loaded');
+        document.addEventListener('DOMContentLoaded', () => logStage('DOMContentLoaded'));
+        window.addEventListener('load', () => {
+            logStage('Window load');
+            console.log('📊 [Members] Timeline:', window.rhythmLoadStages);
+        });
+    </script>
+    
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicons/icons-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="../assets/favicons/icons-512.png">

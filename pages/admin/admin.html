@@ -42,6 +42,52 @@
       opacity: 1;
     }
   </style>
+  
+  <!-- 🚨 CRITICAL: Emergency visibility timeout - MUST be first script -->
+  <script>
+    // Diagnostic: Track page load stages
+    window.rhythmLoadStages = {
+      emergencyTimeoutSet: Date.now(),
+      scriptsStarted: Date.now(),
+      stages: []
+    };
+    
+    function logStage(stage) {
+      const elapsed = Date.now() - window.rhythmLoadStages.scriptsStarted;
+      console.log(`📊 [Admin] ${stage} at ${elapsed}ms`);
+      window.rhythmLoadStages.stages.push({ stage, time: elapsed });
+    }
+    
+    logStage('Emergency timeout script executed');
+    
+    // Force page visible after 500ms regardless of what happens
+    console.log('⏰ [Admin] Emergency timeout set - page will be visible in 500ms');
+    setTimeout(() => {
+      document.body.classList.add('loaded');
+      logStage('Emergency timeout (500ms) - page forced visible');
+      console.warn('🚨 [Admin] Emergency timeout triggered - forcing page visible');
+    }, 500);
+    
+    // Additional safety net at 2 seconds
+    setTimeout(() => {
+      if (!document.body.classList.contains('loaded')) {
+        document.body.classList.add('loaded');
+        logStage('Secondary timeout (2000ms) - page was still hidden');
+        console.error('🚨 [Admin] Secondary timeout triggered - page was still hidden!');
+      }
+    }, 2000);
+    
+    // Monitor when DOMContentLoaded fires
+    document.addEventListener('DOMContentLoaded', () => {
+      logStage('DOMContentLoaded event fired');
+    });
+    
+    // Monitor when window loads
+    window.addEventListener('load', () => {
+      logStage('Window load event fired');
+      console.log('📊 [Admin] Full load timeline:', window.rhythmLoadStages);
+    });
+  </script>
 
   <style>
     /* Local font definitions */
@@ -342,7 +388,7 @@
   
   <!-- Auto-Update Service DISABLED - only runs on login page -->
   
-  <script type="module">
+  <script type="module" onerror="console.error('❌ [Admin] Failed to load module script')">
     // Disable PWA installation prompts
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
@@ -351,16 +397,11 @@
 
     // Initialize unified authentication check
     document.addEventListener('DOMContentLoaded', async function() {
-      // 🚨 SAFETY: Force page visible after 2 seconds regardless of loading state
-      setTimeout(() => {
-        if (!document.body.classList.contains('loaded')) {
-          console.warn('⚠️ [Admin] Force-showing page after timeout');
-          document.body.classList.add('loaded');
-        }
-      }, 2000);
-
+      logStage('DOMContentLoaded - starting auth check');
+      
       // 🚀 PREVENT FLASH: Make page visible once DOM is ready
       document.body.classList.add('loaded');
+      logStage('Body set to loaded');
 
       // Force cache refresh for updated admin page
       try {
@@ -368,6 +409,11 @@
           const cacheNames = await caches.keys();
           const adminCaches = cacheNames.filter(name => name.includes('admin') || name.includes('rhythm'));
           await Promise.all(adminCaches.map(name => caches.delete(name)));
+          logStage('Admin caches cleared');
+        }
+      } catch (error) {
+        console.error('❌ [Admin] Cache refresh failed:', error);
+      }
           console.log('🔄 Admin page cache cleared');
         }
       } catch (error) {

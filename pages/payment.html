@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Manager - Rhythm</title>
+    
+    <!-- Emergency Diagnostic Script - MUST be first -->
+    <script>
+        window.rhythmLoadStages = { emergencyTimeoutSet: Date.now(), scriptsStarted: Date.now(), stages: [] };
+        function logStage(stage) {
+            const elapsed = Date.now() - window.rhythmLoadStages.scriptsStarted;
+            console.log(`📊 [Payment] ${stage} at ${elapsed}ms`);
+            window.rhythmLoadStages.stages.push({ stage, time: elapsed });
+        }
+        logStage('Emergency script loaded');
+        
+        // Emergency timeout to ensure page is visible even if scripts fail
+        setTimeout(() => {
+            if (!document.body.classList.contains('loaded')) {
+                console.warn('⏰ Emergency timeout triggered - forcing page visibility');
+                document.body.style.visibility = 'visible';
+                document.body.style.opacity = '1';
+                logStage('Emergency timeout forced visibility');
+            }
+        }, 500);
+        
+        // Secondary safety net
+        setTimeout(() => {
+            document.body.style.visibility = 'visible';
+            document.body.style.opacity = '1';
+            logStage('Secondary safety timeout executed');
+        }, 2000);
+        
+        document.addEventListener('DOMContentLoaded', () => logStage('DOMContentLoaded'));
+        window.addEventListener('load', () => {
+            logStage('Window load');
+            console.log('📊 [Payment] Timeline:', window.rhythmLoadStages);
+        });
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #1a1a1a;
+            --bg-light: #2a2a2a;
+            --bg-card: #222222;
+            --primary-color: #f5d000;
+            --text-light: #ffffff;
+            --text-muted: #aaaaaa;
+            --text-dark: #000000;
+            --success-color: #4CAF50;
+            --error-color: #f44336;
+            --warning-color: #ff9800;
+            --border-radius: 16px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.4);
+            --gradient: linear-gradient(135deg, #f5d000, #ffeb3b);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-color), var(--bg-light));
+            color: var(--text-light);
+            min-height: 100vh;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        body.loaded {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--bg-light), var(--bg-color));
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-section img {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 2px solid var(--primary-color);
+            object-fit: cover;
+        }
+
+        .logo-text h1 {
+            color: var(--primary-color);
+            font-size: 1.8em;
+            font-weight: bold;
+            font-family: 'Faruma', serif;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-color);
+            color: var(--text-dark);
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 3em;
+            font-weight: bold;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header h2 {
+            color: var(--primary-color);
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .event-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .event-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid transparent;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .event-item:hover {
+            border-color: rgba(245, 208, 0, 0.3);
+        }
+
+        .event-item.selected {
+            border-color: var(--primary-color);
+            background: rgba(245, 208, 0, 0.1);
+        }
+
+        .event-item label {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+
+        .event-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .event-details {
+            flex: 1;
+        }
+
+        .event-name {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 5px;
+        }
+
+        .event-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9em;
+            color: var(--text-muted);
+        }
+
+        .event-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .event-type.practice { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+        .event-type.recording { background: rgba(156, 39, 176, 0.2); color: #9C27B0; }
+        .event-type.live { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+        .event-type.show { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
+        .event-type.activity { background: rgba(33, 150, 243, 0.2); color: #2196F3; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .form-input, .form-select {
+            background: var(--bg-card);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: var(--text-light);
+            font-size: 1em;
+            transition: var(--transition);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(245, 208, 0, 0.1);
+        }
+
+        .calculation-display {
+            background: rgba(245, 208, 0, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .calc-row.total {
+            border-top: 2px solid var(--primary-color);
+            border-bottom: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-top: 10px;
+        }
+
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .payment-table th,
+        .payment-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .payment-table th {
+            background: rgba(245, 208, 0, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .payment-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .checkbox-large {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+
+        .cost-item {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .cost-item .form-group {
+            flex: 1;
+        }
+
+        .remove-btn {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--error-color);
+            border: 1px solid var(--error-color);
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .remove-btn:hover {
+            background: rgba(244, 67, 54, 0.3);
+        }
+
+        .add-cost-btn {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success-color);
+            border: 1px solid var(--success-color);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .add-cost-btn:hover {
+            background: rgba(76, 175, 80, 0.3);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            color: var(--text-light);
+        }
+
+        .travel-cost-selector {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .travel-event-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .travel-event-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+        }
+
+        .saved-payment-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+        }
+
+        .saved-payment-item:hover {
+            border-color: rgba(245, 208, 0, 0.3);
+        }
+
+        .saved-payment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .saved-payment-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .saved-payment-date {
+            font-size: 0.9em;
+            color: var(--text-muted);
+        }
+
+        .payment-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-item {
+            background: rgba(245, 208, 0, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(245, 208, 0, 0.2);
+        }
+
+        .summary-label {
+            font-size: 0.85em;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+
+        .summary-value {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-title h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="../src/Logo.png" alt="Rhythm Logo" />
+                <div class="logo-text">
+                    <h1>Payment Manager</h1>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <a href="attendance.html" class="nav-btn">📊 Attendance</a>
+                <a href="admin/admin.html" class="nav-btn">⚙️ Admin</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="page-title">
+            <h1>Payment Manager</h1>
+            <p>Calculate and track member payments for events</p>
+        </div>
+
+        <!-- Saved Payments -->
+        <div class="section" id="savedPaymentsSection" style="display: none;">
+            <div class="section-header">
+                <h2>Saved Payments</h2>
+                <button class="btn btn-primary" onclick="showNewPaymentForm()">➕ New Payment</button>
+            </div>
+            <div id="savedPaymentsList"></div>
+        </div>
+
+        <!-- New Payment Form -->
+        <div id="newPaymentForm">
+            <!-- Step 1: Select Events -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Step 1: Select Events</h2>
+                    <span style="color: var(--text-muted); font-size: 0.9em;">Select unpaid events with attendance</span>
+                </div>
+                <div id="eventsList" class="event-list"></div>
+            </div>
+
+            <!-- Step 2: Payment Details -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Step 2: Payment Details</h2>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="currency" class="form-label">Currency</label>
+                        <select id="currency" class="form-select" onchange="handleCurrencyChange()">
+                            <option value="MVR">MVR</option>
+                            <option value="USD">USD</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="paymentAmount" class="form-label">Payment Amount</label>
+                        <input type="number" id="paymentAmount" class="form-input" 
+                               placeholder="Enter amount" min="0" step="0.01" 
+                               oninput="calculatePayment()">
+                    </div>
+                    
+                    <div class="form-group" id="conversionRateGroup" style="display: none;">
+                        <label for="conversionRate" class="form-label">USD to MVR Conversion Rate</label>
+                        <input type="number" id="conversionRate" class="form-input" 
+                               placeholder="e.g., 15.42" min="0" step="0.01" 
+                               oninput="calculatePayment()">
+                    </div>
+                </div>
+
+                <div id="convertedAmountDisplay" style="display: none; margin-bottom: 20px;">
+                    <div class="calculation-display">
+                        <div class="calc-row">
+                            <span>Amount in USD:</span>
+                            <span id="usdAmount">$0.00</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>Conversion Rate:</span>
+                            <span id="displayRate">0.00</span>
+                        </div>
+                        <div class="calc-row total">
+                            <span>Converted to MVR:</span>
+                            <span id="convertedMVR">MVR 0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Travel Cost -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Step 3: Travel Cost</h2>
+                </div>
+                
+                <div class="form-group">
+                    <label for="travelCostPerShow" class="form-label">Travel Cost per Show (MVR)</label>
+                    <input type="number" id="travelCostPerShow" class="form-input" 
+                           placeholder="Enter travel cost per show" min="0" step="0.01" 
+                           oninput="calculatePayment()">
+                </div>
+
+                <div class="travel-cost-selector" id="travelCostSelector" style="display: none;">
+                    <h4 style="color: var(--primary-color); margin-bottom: 15px;">
+                        Select events this travel cost applies to:
+                    </h4>
+                    <div id="travelEventsList"></div>
+                </div>
+            </div>
+
+            <!-- Step 4: Additional Costs -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Step 4: Additional One-time Costs</h2>
+                </div>
+                
+                <div id="additionalCostsList">
+                    <!-- Additional costs will be added here -->
+                </div>
+                
+                <button class="add-cost-btn" onclick="addAdditionalCost()">
+                    ➕ Add Additional Cost
+                </button>
+            </div>
+
+            <!-- Step 5: Calculation & Distribution -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Step 5: Calculation Details</h2>
+                </div>
+                
+                <div class="calculation-display" id="calculationDisplay">
+                    <div class="calc-row">
+                        <span>Total Payment Amount:</span>
+                        <span id="calcTotalAmount">MVR 0.00</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Travel Cost (<span id="calcTravelShows">0</span> shows × MVR <span id="calcTravelRate">0.00</span>):</span>
+                        <span id="calcTravelTotal">- MVR 0.00</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Additional Costs:</span>
+                        <span id="calcAdditionalTotal">- MVR 0.00</span>
+                    </div>
+                    <div class="calc-row total">
+                        <span>Net Amount to Distribute:</span>
+                        <span id="calcNetAmount">MVR 0.00</span>
+                    </div>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <h3 style="color: var(--primary-color); margin-bottom: 15px;">
+                        Payment Distribution per Event
+                    </h3>
+                    <div id="distributionBreakdown"></div>
+                </div>
+            </div>
+
+            <!-- Step 6: Member Payments -->
+            <div class="section">
+                <div class="section-header">
+                    <h2>Step 6: Member Payments</h2>
+                </div>
+                
+                <table class="payment-table">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Events Attended</th>
+                            <th>Payment Amount (MVR)</th>
+                            <th>Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberPaymentsTable">
+                        <!-- Member payment rows will be generated here -->
+                    </tbody>
+                </table>
+
+                <div style="margin-top: 30px; display: flex; gap: 15px; justify-content: flex-end;">
+                    <button class="btn btn-secondary" onclick="resetForm()">Clear All</button>
+                    <button class="btn btn-primary" onclick="savePayment()">Save Payment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="../js/members-data.js"></script>
+    <script>
+        let allMembers = [];
+        let allEvents = [];
+        let selectedEvents = [];
+        let selectedTravelEvents = [];
+        let additionalCosts = [];
+        let memberPayments = {};
+        let savedPayments = [];
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', async function() {
+            logStage('DOMContentLoaded - initializing');
+            await initializeData();
+            await loadMembers();
+            await loadEvents();
+            await loadSavedPayments();
+            renderEventsList();
+            document.body.classList.add('loaded');
+            logStage('Page fully initialized');
+        });
+
+        async function initializeData() {
+            try {
+                console.log('🚀 Initializing payment page...');
+                
+                // Wait for MembersData class
+                while (typeof window.MembersData === 'undefined') {
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                }
+                
+                if (typeof window.membersData === 'undefined') {
+                    window.membersData = new window.MembersData();
+                }
+                
+                // Wait for Firebase
+                while (!window.membersData.isFirebaseReady) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                console.log('✅ Payment page initialized');
+            } catch (error) {
+                console.error('❌ Error initializing:', error);
+            }
+        }
+
+        async function loadMembers() {
+            try {
+                const membersData = await window.membersData.getAllMembers();
+                allMembers = Object.values(membersData);
+                console.log(`✅ Loaded ${allMembers.length} members`);
+            } catch (error) {
+                console.error('❌ Error loading members:', error);
+            }
+        }
+
+        async function loadEvents() {
+            try {
+                const eventsRef = window.membersData.firebaseFunctions.ref(window.membersData.database, 'events');
+                const snapshot = await window.membersData.firebaseFunctions.get(eventsRef);
+                
+                if (snapshot.exists()) {
+                    const eventsData = snapshot.val();
+                    allEvents = Object.keys(eventsData).map(key => ({
+                        ...eventsData[key],
+                        id: key
+                    }));
+                } else {
+                    allEvents = [];
+                }
+                
+                console.log(`✅ Loaded ${allEvents.length} events`);
+            } catch (error) {
+                console.error('❌ Error loading events:', error);
+                const storedEvents = localStorage.getItem('rhythmEvents');
+                allEvents = storedEvents ? JSON.parse(storedEvents) : [];
+            }
+        }
+
+        async function loadSavedPayments() {
+            try {
+                const paymentsRef = window.membersData.firebaseFunctions.ref(window.membersData.database, 'payments');
+                const snapshot = await window.membersData.firebaseFunctions.get(paymentsRef);
+                
+                if (snapshot.exists()) {
+                    const paymentsData = snapshot.val();
+                    savedPayments = Object.keys(paymentsData).map(key => ({
+                        ...paymentsData[key],
+                        id: key
+                    }));
+                    
+                    // Sort by timestamp
+                    savedPayments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    
+                    renderSavedPayments();
+                } else {
+                    savedPayments = [];
+                }
+                
+                console.log(`✅ Loaded ${savedPayments.length} saved payments`);
+            } catch (error) {
+                console.error('❌ Error loading saved payments:', error);
+            }
+        }
+
+        function renderSavedPayments() {
+            const section = document.getElementById('savedPaymentsSection');
+            const list = document.getElementById('savedPaymentsList');
+            
+            if (savedPayments.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            list.innerHTML = savedPayments.map(payment => {
+                const eventNames = payment.selectedEvents.map(id => {
+                    const event = allEvents.find(e => e.id === id);
+                    return event ? event.name : 'Unknown Event';
+                }).join(', ');
+                
+                const totalPaid = Object.values(payment.memberPayments || {}).filter(m => m.paid).length;
+                const totalMembers = Object.keys(payment.memberPayments || {}).length;
+                
+                return `
+                    <div class="saved-payment-item">
+                        <div class="saved-payment-header">
+                            <div>
+                                <div class="saved-payment-title">Payment - ${formatDate(payment.timestamp)}</div>
+                                <div class="saved-payment-date">${eventNames}</div>
+                            </div>
+                            <button class="btn btn-primary" onclick="viewPayment('${payment.id}')">
+                                View Details
+                            </button>
+                        </div>
+                        <div class="payment-summary">
+                            <div class="summary-item">
+                                <div class="summary-label">Total Amount</div>
+                                <div class="summary-value">MVR ${payment.totalAmount.toFixed(2)}</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-label">Events</div>
+                                <div class="summary-value">${payment.selectedEvents.length}</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-label">Members Paid</div>
+                                <div class="summary-value">${totalPaid}/${totalMembers}</div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-label">Net Distributed</div>
+                                <div class="summary-value">MVR ${payment.netAmount.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function viewPayment(paymentId) {
+            const payment = savedPayments.find(p => p.id === paymentId);
+            if (!payment) return;
+            
+            // Load payment data into form
+            selectedEvents = payment.selectedEvents;
+            selectedTravelEvents = payment.selectedTravelEvents || [];
+            additionalCosts = payment.additionalCosts || [];
+            memberPayments = payment.memberPayments || {};
+            
+            document.getElementById('currency').value = payment.currency;
+            document.getElementById('paymentAmount').value = payment.paymentAmount;
+            if (payment.conversionRate) {
+                document.getElementById('conversionRate').value = payment.conversionRate;
+            }
+            document.getElementById('travelCostPerShow').value = payment.travelCostPerShow || 0;
+            
+            renderEventsList();
+            renderTravelEventsList();
+            renderAdditionalCosts();
+            handleCurrencyChange();
+            calculatePayment();
+            
+            // Hide saved payments, show form
+            document.getElementById('savedPaymentsSection').style.display = 'none';
+            document.getElementById('newPaymentForm').style.display = 'block';
+            
+            showNotification('Payment loaded', 'success');
+        }
+
+        function showNewPaymentForm() {
+            resetForm();
+            document.getElementById('savedPaymentsSection').style.display = 'none';
+            document.getElementById('newPaymentForm').style.display = 'block';
+        }
+
+        function renderEventsList() {
+            const container = document.getElementById('eventsList');
+            
+            // Filter events: must have attendance and not be paid
+            const unpaidEvents = allEvents.filter(event => {
+                const hasAttendance = event.attendance && Object.keys(event.attendance).length > 0;
+                const notPaid = !event.paid;
+                return hasAttendance && notPaid;
+            });
+            
+            if (unpaidEvents.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Unpaid Events</h3>
+                        <p>All events with attendance have been marked as paid</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = unpaidEvents.map(event => {
+                const attendanceCount = Object.values(event.attendance || {}).filter(s => s === 'present').length;
+                const isSelected = selectedEvents.includes(event.id);
+                
+                return `
+                    <div class="event-item ${isSelected ? 'selected' : ''}" onclick="toggleEvent('${event.id}')">
+                        <label>
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                                   onclick="event.stopPropagation(); toggleEvent('${event.id}')">
+                            <div class="event-details">
+                                <div class="event-name">${event.name}</div>
+                                <div class="event-meta">
+                                    <span class="event-type ${event.type}">${capitalizeFirst(event.type)}</span>
+                                    <span>${formatDate(event.date)}</span>
+                                    <span>👥 ${attendanceCount} attended</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleEvent(eventId) {
+            const index = selectedEvents.indexOf(eventId);
+            if (index > -1) {
+                selectedEvents.splice(index, 1);
+            } else {
+                selectedEvents.push(eventId);
+            }
+            
+            renderEventsList();
+            renderTravelEventsList();
+            calculatePayment();
+        }
+
+        function handleCurrencyChange() {
+            const currency = document.getElementById('currency').value;
+            const conversionGroup = document.getElementById('conversionRateGroup');
+            const convertedDisplay = document.getElementById('convertedAmountDisplay');
+            
+            if (currency === 'USD') {
+                conversionGroup.style.display = 'block';
+                convertedDisplay.style.display = 'block';
+            } else {
+                conversionGroup.style.display = 'none';
+                convertedDisplay.style.display = 'none';
+            }
+            
+            calculatePayment();
+        }
+
+        function renderTravelEventsList() {
+            const container = document.getElementById('travelEventsList');
+            const selector = document.getElementById('travelCostSelector');
+            
+            if (selectedEvents.length === 0) {
+                selector.style.display = 'none';
+                return;
+            }
+            
+            // Always show the selector if events are selected
+            selector.style.display = 'block';
+            
+            container.innerHTML = selectedEvents.map(eventId => {
+                const event = allEvents.find(e => e.id === eventId);
+                if (!event) return '';
+                
+                const isSelected = selectedTravelEvents.includes(eventId);
+                
+                return `
+                    <div class="travel-event-item">
+                        <input type="checkbox" ${isSelected ? 'checked' : ''} 
+                               onchange="toggleTravelEvent('${eventId}')">
+                        <span>${event.name} - ${formatDate(event.date)}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function toggleTravelEvent(eventId) {
+            const index = selectedTravelEvents.indexOf(eventId);
+            if (index > -1) {
+                selectedTravelEvents.splice(index, 1);
+            } else {
+                selectedTravelEvents.push(eventId);
+            }
+            
+            renderTravelEventsList();
+            calculatePayment();
+        }
+
+        function addAdditionalCost() {
+            additionalCosts.push({ description: '', amount: 0 });
+            renderAdditionalCosts();
+        }
+
+        function renderAdditionalCosts() {
+            const container = document.getElementById('additionalCostsList');
+            
+            if (additionalCosts.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No additional costs added</p>';
+                return;
+            }
+            
+            container.innerHTML = additionalCosts.map((cost, index) => `
+                <div class="cost-item">
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <input type="text" class="form-input" 
+                               value="${cost.description}" 
+                               oninput="updateAdditionalCost(${index}, 'description', this.value)"
+                               placeholder="e.g., Equipment rental">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Amount (MVR)</label>
+                        <input type="number" class="form-input" 
+                               value="${cost.amount}" 
+                               oninput="updateAdditionalCost(${index}, 'amount', this.value)"
+                               placeholder="0.00" min="0" step="0.01">
+                    </div>
+                    <button class="remove-btn" onclick="removeAdditionalCost(${index})">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function updateAdditionalCost(index, field, value) {
+            if (field === 'amount') {
+                additionalCosts[index][field] = parseFloat(value) || 0;
+            } else {
+                additionalCosts[index][field] = value;
+            }
+            calculatePayment();
+        }
+
+        function removeAdditionalCost(index) {
+            additionalCosts.splice(index, 1);
+            renderAdditionalCosts();
+            calculatePayment();
+        }
+
+        function calculatePayment() {
+            const currency = document.getElementById('currency').value;
+            const paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
+            const conversionRate = parseFloat(document.getElementById('conversionRate').value) || 0;
+            const travelCostPerShow = parseFloat(document.getElementById('travelCostPerShow').value) || 0;
+            
+            // Calculate total amount in MVR
+            let totalAmountMVR = paymentAmount;
+            
+            if (currency === 'USD' && conversionRate > 0) {
+                totalAmountMVR = paymentAmount * conversionRate;
+                
+                // Update converted amount display
+                document.getElementById('usdAmount').textContent = `$${paymentAmount.toFixed(2)}`;
+                document.getElementById('displayRate').textContent = `${conversionRate.toFixed(2)}`;
+                document.getElementById('convertedMVR').textContent = `MVR ${totalAmountMVR.toFixed(2)}`;
+            }
+            
+            // Calculate travel costs
+            const travelCostTotal = selectedTravelEvents.length * travelCostPerShow;
+            
+            // Calculate additional costs
+            const additionalCostTotal = additionalCosts.reduce((sum, cost) => sum + (cost.amount || 0), 0);
+            
+            // Calculate net amount
+            const netAmount = totalAmountMVR - travelCostTotal - additionalCostTotal;
+            
+            // Update calculation display
+            document.getElementById('calcTotalAmount').textContent = `MVR ${totalAmountMVR.toFixed(2)}`;
+            document.getElementById('calcTravelShows').textContent = selectedTravelEvents.length;
+            document.getElementById('calcTravelRate').textContent = travelCostPerShow.toFixed(2);
+            document.getElementById('calcTravelTotal').textContent = `- MVR ${travelCostTotal.toFixed(2)}`;
+            document.getElementById('calcAdditionalTotal').textContent = `- MVR ${additionalCostTotal.toFixed(2)}`;
+            document.getElementById('calcNetAmount').textContent = `MVR ${netAmount.toFixed(2)}`;
+            
+            // Calculate distribution breakdown
+            renderDistributionBreakdown(selectedEvents, netAmount);
+            
+            // Calculate member payments
+            calculateMemberPayments(selectedEvents, netAmount);
+        }
+
+        function renderDistributionBreakdown(eventIds, netAmount) {
+            const container = document.getElementById('distributionBreakdown');
+            
+            if (eventIds.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">Select events to see distribution</p>';
+                return;
+            }
+            
+            const amountPerEvent = netAmount / eventIds.length;
+            
+            container.innerHTML = `
+                <div class="calculation-display">
+                    <div class="calc-row">
+                        <span>Net Amount:</span>
+                        <span>MVR ${netAmount.toFixed(2)}</span>
+                    </div>
+                    <div class="calc-row">
+                        <span>Number of Events:</span>
+                        <span>${eventIds.length}</span>
+                    </div>
+                    <div class="calc-row total">
+                        <span>Amount per Event:</span>
+                        <span>MVR ${amountPerEvent.toFixed(2)}</span>
+                    </div>
+                    <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        ${eventIds.map(eventId => {
+                            const event = allEvents.find(e => e.id === eventId);
+                            if (!event) return '';
+                            
+                            const attendeeCount = Object.values(event.attendance || {}).filter(s => s === 'present').length;
+                            const amountPerPerson = attendeeCount > 0 ? amountPerEvent / attendeeCount : 0;
+                            
+                            return `
+                                <div class="calc-row">
+                                    <span>${event.name} (${attendeeCount} attended):</span>
+                                    <span>MVR ${amountPerPerson.toFixed(2)} per person</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateMemberPayments(eventIds, netAmount) {
+            memberPayments = {};
+            
+            if (eventIds.length === 0 || netAmount <= 0) {
+                renderMemberPaymentsTable();
+                return;
+            }
+            
+            const amountPerEvent = netAmount / eventIds.length;
+            
+            // Calculate payment for each member
+            allMembers.forEach(member => {
+                let totalPayment = 0;
+                const attendedEvents = [];
+                
+                eventIds.forEach(eventId => {
+                    const event = allEvents.find(e => e.id === eventId);
+                    if (!event) return;
+                    
+                    const isPresent = event.attendance && event.attendance[member.id] === 'present';
+                    if (isPresent) {
+                        attendedEvents.push(eventId);
+                        const attendeeCount = Object.values(event.attendance).filter(s => s === 'present').length;
+                        const paymentForEvent = attendeeCount > 0 ? amountPerEvent / attendeeCount : 0;
+                        totalPayment += paymentForEvent;
+                    }
+                });
+                
+                if (attendedEvents.length > 0) {
+                    memberPayments[member.id] = {
+                        member: member,
+                        attendedEvents: attendedEvents,
+                        amount: totalPayment,
+                        paid: memberPayments[member.id]?.paid || false
+                    };
+                }
+            });
+            
+            renderMemberPaymentsTable();
+        }
+
+        function renderMemberPaymentsTable() {
+            const tbody = document.getElementById('memberPaymentsTable');
+            
+            const payments = Object.values(memberPayments);
+            
+            if (payments.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 30px;">No payments calculated yet</td></tr>';
+                return;
+            }
+            
+            // Sort by amount descending
+            payments.sort((a, b) => b.amount - a.amount);
+            
+            tbody.innerHTML = payments.map(payment => {
+                const member = payment.member;
+                const photoSrc = member.photo || member.photoPath ? `../${member.photo || member.photoPath}` : '../src/Logo.png';
+                
+                return `
+                    <tr>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <img src="${photoSrc}" alt="${member.fullName}" 
+                                     style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;"
+                                     onerror="this.src='../src/Logo.png'">
+                                <span>${member.fullName}</span>
+                            </div>
+                        </td>
+                        <td>${payment.attendedEvents.length}</td>
+                        <td><strong>MVR ${payment.amount.toFixed(2)}</strong></td>
+                        <td>
+                            <input type="checkbox" class="checkbox-large" 
+                                   ${payment.paid ? 'checked' : ''} 
+                                   onchange="toggleMemberPaid('${member.id}', this.checked)">
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function toggleMemberPaid(memberId, paid) {
+            if (memberPayments[memberId]) {
+                memberPayments[memberId].paid = paid;
+            }
+        }
+
+        async function savePayment() {
+            try {
+                if (selectedEvents.length === 0) {
+                    showNotification('Please select at least one event', 'error');
+                    return;
+                }
+                
+                const paymentAmount = parseFloat(document.getElementById('paymentAmount').value) || 0;
+                if (paymentAmount <= 0) {
+                    showNotification('Please enter a valid payment amount', 'error');
+                    return;
+                }
+                
+                const currency = document.getElementById('currency').value;
+                const conversionRate = currency === 'USD' ? parseFloat(document.getElementById('conversionRate').value) || 0 : 0;
+                const travelCostPerShow = parseFloat(document.getElementById('travelCostPerShow').value) || 0;
+                
+                const totalAmountMVR = currency === 'USD' && conversionRate > 0 
+                    ? paymentAmount * conversionRate 
+                    : paymentAmount;
+                
+                const travelCostTotal = selectedTravelEvents.length * travelCostPerShow;
+                const additionalCostTotal = additionalCosts.reduce((sum, cost) => sum + (cost.amount || 0), 0);
+                const netAmount = totalAmountMVR - travelCostTotal - additionalCostTotal;
+                
+                const paymentData = {
+                    timestamp: new Date().toISOString(),
+                    currency: currency,
+                    paymentAmount: paymentAmount,
+                    conversionRate: conversionRate,
+                    totalAmount: totalAmountMVR,
+                    travelCostPerShow: travelCostPerShow,
+                    selectedTravelEvents: selectedTravelEvents,
+                    travelCostTotal: travelCostTotal,
+                    additionalCosts: additionalCosts,
+                    additionalCostTotal: additionalCostTotal,
+                    netAmount: netAmount,
+                    selectedEvents: selectedEvents,
+                    memberPayments: memberPayments
+                };
+                
+                // Save to Firebase
+                const paymentsRef = window.membersData.firebaseFunctions.ref(
+                    window.membersData.database, 
+                    `payments/${Date.now()}`
+                );
+                await window.membersData.firebaseFunctions.set(paymentsRef, paymentData);
+                
+                showNotification('Payment saved successfully!', 'success');
+                
+                // Reload saved payments
+                await loadSavedPayments();
+                
+                // Show saved payments section
+                document.getElementById('savedPaymentsSection').style.display = 'block';
+                document.getElementById('newPaymentForm').style.display = 'none';
+                
+            } catch (error) {
+                console.error('❌ Error saving payment:', error);
+                showNotification('Error saving payment: ' + error.message, 'error');
+            }
+        }
+
+        function resetForm() {
+            selectedEvents = [];
+            selectedTravelEvents = [];
+            additionalCosts = [];
+            memberPayments = {};
+            
+            document.getElementById('currency').value = 'MVR';
+            document.getElementById('paymentAmount').value = '';
+            document.getElementById('conversionRate').value = '';
+            document.getElementById('travelCostPerShow').value = '';
+            
+            renderEventsList();
+            renderTravelEventsList();
+            renderAdditionalCosts();
+            handleCurrencyChange();
+            calculatePayment();
+        }
+
+        // Utility functions
+        function capitalizeFirst(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            let backgroundColor;
+            switch(type) {
+                case 'success': backgroundColor = '#4CAF50'; break;
+                case 'error': backgroundColor = '#f44336'; break;
+                default: backgroundColor = '#2196F3'; break;
+            }
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                transition: all 0.3s ease;
+                background: ${backgroundColor};
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

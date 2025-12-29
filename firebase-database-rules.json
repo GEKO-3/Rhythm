@@ -27,6 +27,20 @@
             ".write": true,
             ".validate": "newData.isString()"
           }
+        },
+        "tshirtSize": {
+          ".read": true,
+          ".write": true,
+          ".validate": "newData.isString()"
+        },
+        "thoddooChecklist": {
+          ".read": true,
+          ".write": true,
+          "$itemId": {
+            ".read": true,
+            ".write": true,
+            ".validate": "newData.isString()"
+          }
         }
       }
     },
@@ -52,6 +66,15 @@
     "events": {
       ".read": true,
       ".write": true
+    },
+    
+    "payments": {
+      ".read": true,
+      ".write": true,
+      "$paymentId": {
+        ".read": true,
+        ".write": true
+      }
     },
     
     "approvedUsers": {

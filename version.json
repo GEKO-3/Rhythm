@@ -1,12 +1,11 @@
 {
-  "version": "2.6.5",
-  "timestamp": 1734806000000,
-  "description": "Robust loading system with diagnostics",
+  "version": "3.2.6",
+  "timestamp": 1735040460000,
+  "description": "Fixed white screen issue when navigating to songlist",
   "changes": [
-    "Added emergency 500ms timeout at top of songlist and lyrics pages",
-    "Added comprehensive diagnostic logging to track load stages",
-    "Added error handlers to all script tags to detect load failures",
-    "Added try-catch around Firebase initialization",
-    "Pages now guaranteed to show within 500ms even if scripts fail"
+    "Removed visibility:hidden pattern that caused white screen on navigation",
+    "Page now visible by default for instant display",
+    "Fixed browser back/forward navigation showing white screen",
+    "Improved page load performance"
   ]
 }

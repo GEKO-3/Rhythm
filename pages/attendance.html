@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance - Rhythm Boduberu</title>
     
+    <!-- 🚨 CRITICAL: Emergency page load script -->
+    <script>
+        window.rhythmLoadStages = { emergencyTimeoutSet: Date.now(), scriptsStarted: Date.now(), stages: [] };
+        function logStage(stage) {
+            const elapsed = Date.now() - window.rhythmLoadStages.scriptsStarted;
+            console.log(`📊 [Attendance] ${stage} at ${elapsed}ms`);
+            window.rhythmLoadStages.stages.push({ stage, time: elapsed });
+        }
+        logStage('Emergency script loaded');
+        // Even if page doesn't use body.loaded, this ensures scripts can log
+        document.addEventListener('DOMContentLoaded', () => logStage('DOMContentLoaded'));
+        window.addEventListener('load', () => {
+            logStage('Window load');
+            console.log('📊 [Attendance] Timeline:', window.rhythmLoadStages);
+        });
+    </script>
+    
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="192x192" href="../assets/favicons/icons-192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="../assets/favicons/icons-512.png">
@@ -835,6 +852,7 @@
                 </div>
                 <a href="members.html" class="nav-btn">👥 Members</a>
                 <a href="admin/member-input.html" class="nav-btn">➕ Add Member</a>
+                <a href="payment.html" class="nav-btn">💰 Payment</a>
                 <a href="admin/admin.html" class="nav-btn">⚙️ Admin</a>
             </div>
         </div>

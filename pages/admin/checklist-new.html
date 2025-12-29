@@ -26,10 +26,47 @@
     }
   </style>
   
+  <!-- 🚨 CRITICAL: Emergency visibility timeout - MUST be first script -->
+  <script>
+    window.rhythmLoadStages = {
+      emergencyTimeoutSet: Date.now(),
+      scriptsStarted: Date.now(),
+      stages: []
+    };
+    
+    function logStage(stage) {
+      const elapsed = Date.now() - window.rhythmLoadStages.scriptsStarted;
+      console.log(`📊 [Checklist] ${stage} at ${elapsed}ms`);
+      window.rhythmLoadStages.stages.push({ stage, time: elapsed });
+    }
+    
+    logStage('Emergency timeout script executed');
+    
+    setTimeout(() => {
+      document.body.classList.add('loaded');
+      logStage('Emergency timeout (500ms) - page forced visible');
+      console.warn('🚨 [Checklist] Emergency timeout triggered');
+    }, 500);
+    
+    setTimeout(() => {
+      if (!document.body.classList.contains('loaded')) {
+        document.body.classList.add('loaded');
+        logStage('Secondary timeout (2000ms)');
+        console.error('🚨 [Checklist] Secondary timeout triggered');
+      }
+    }, 2000);
+    
+    document.addEventListener('DOMContentLoaded', () => logStage('DOMContentLoaded'));
+    window.addEventListener('load', () => {
+      logStage('Window load');
+      console.log('📊 [Checklist] Timeline:', window.rhythmLoadStages);
+    });
+  </script>
+  
   <link rel="icon" type="image/png" sizes="192x192" href="../../assets/favicons/icons-192.png">
   
   <!-- Firebase -->
-  <script type="module">
+  <script type="module" onerror="console.error('❌ [Checklist] Failed to load Firebase module')">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getDatabase, ref, onValue, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
     

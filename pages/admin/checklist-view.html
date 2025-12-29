@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Checklist - Admin View</title>
+    
+    <!-- Emergency Diagnostic Script -->
+    <script>
+        window.rhythmLoadStages = { emergencyTimeoutSet: Date.now(), scriptsStarted: Date.now(), stages: [] };
+        function logStage(stage) {
+            const elapsed = Date.now() - window.rhythmLoadStages.scriptsStarted;
+            console.log(`📊 [ChecklistAdmin] ${stage} at ${elapsed}ms`);
+            window.rhythmLoadStages.stages.push({ stage, time: elapsed });
+        }
+        logStage('Emergency script loaded');
+        
+        setTimeout(() => {
+            if (!document.body.classList.contains('loaded')) {
+                console.warn('⏰ Emergency timeout triggered');
+                document.body.style.visibility = 'visible';
+                document.body.style.opacity = '1';
+                logStage('Emergency timeout forced visibility');
+            }
+        }, 500);
+        
+        document.addEventListener('DOMContentLoaded', () => logStage('DOMContentLoaded'));
+        window.addEventListener('load', () => {
+            logStage('Window load');
+            console.log('📊 [ChecklistAdmin] Timeline:', window.rhythmLoadStages);
+        });
+    </script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #1a1a1a;
+            --bg-light: #2a2a2a;
+            --bg-card: #222222;
+            --primary-color: #f5d000;
+            --text-light: #ffffff;
+            --text-muted: #aaaaaa;
+            --text-dark: #000000;
+            --success-color: #4CAF50;
+            --border-radius: 16px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-color), var(--bg-light));
+            color: var(--text-light);
+            min-height: 100vh;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        body.loaded {
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--bg-light), var(--bg-color));
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-text h1 {
+            color: var(--primary-color);
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .nav-btn:hover {
+            background: var(--primary-color);
+            color: var(--text-dark);
+            transform: translateY(-2px);
+        }
+
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .page-title h1 {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #f5d000, #ffeb3b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .page-title p {
+            color: var(--text-muted);
+            font-size: 1.1em;
+        }
+
+        .table-section {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(245, 208, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .checklist-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        .checklist-table th,
+        .checklist-table td {
+            padding: 8px 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            white-space: nowrap;
+        }
+
+        .checklist-table th {
+            background: rgba(245, 208, 0, 0.2);
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.85em;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+        }
+
+        .checklist-table th:first-child {
+            text-align: left;
+            min-width: 150px;
+            left: 0;
+            z-index: 11;
+        }
+
+        .checklist-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            background: rgba(255, 255, 255, 0.03);
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+
+        .checklist-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .checklist-table tbody tr:hover td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .checklist-table td:hover {
+            background: rgba(245, 208, 0, 0.1) !important;
+        }
+
+        .checklist-table tr:hover td:not(:hover) {
+            position: relative;
+        }
+
+        .checklist-table td:hover::before {
+            content: '';
+            position: absolute;
+            top: -5000px;
+            bottom: -5000px;
+            left: 0;
+            right: 0;
+            background: rgba(245, 208, 0, 0.1);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .checklist-table tr.selected-member {
+            background: rgba(245, 208, 0, 0.15);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .checklist-table tr.selected-member td:first-child {
+            background: rgba(245, 208, 0, 0.2);
+        }
+
+        .member-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        .section-divider {
+            height: 3px;
+            background: var(--primary-color);
+        }
+
+        .section-label {
+            background: rgba(245, 208, 0, 0.3);
+            font-weight: bold;
+            color: var(--primary-color);
+            text-align: center !important;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: var(--primary-color);
+            color: var(--text-dark);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .check-mark {
+            color: var(--success-color);
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .filter-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+        }
+
+        .selection-info {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: var(--text-muted);
+        }
+
+        .loading::after {
+            content: '...';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(245, 208, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .page-title h1 {
+                font-size: 2em;
+            }
+
+            .table-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-text">
+                <h1>Members Checklist - Admin View</h1>
+            </div>
+            <a href="admin.html" class="nav-btn">⚙️ Admin Dashboard</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="page-title">
+            <h1>Thoddoo Member's Checklist</h1>
+            <p>View all members' checklist status</p>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-section" id="statsSection" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-value" id="totalMembers">0</div>
+                <div class="stat-label">Total Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="membersWithChecklists">0</div>
+                <div class="stat-label">Members with Checklists</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgCompletion">0%</div>
+                <div class="stat-label">Average Completion</div>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingMessage" class="loading">Loading member checklists</div>
+
+        <!-- Table -->
+        <div class="table-section" id="tableSection" style="display: none;">
+            <div class="filter-controls">
+                <button class="filter-btn secondary" onclick="selectAllMembers()">Select All</button>
+                <button class="filter-btn secondary" onclick="clearSelection()">Clear Selection</button>
+                <button class="filter-btn" onclick="applyFilter()">Apply Filter</button>
+                <span class="selection-info" id="selectionInfo">0 members selected</span>
+            </div>
+            
+            <table class="checklist-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAllCheckbox" class="member-checkbox" onchange="toggleSelectAll(this.checked)">
+                            Member Name
+                        </th>
+                        <th>Rhythm Gamees</th>
+                        <th>Rhythm Feyli (Grey)</th>
+                        <th>Red Bolufothi</th>
+                        <th>Black Gamees</th>
+                        <th>Mundu</th>
+                        <th>shash</th>
+                        <th>New White Showkit</th>
+                        <th>New Pink Travel Kit</th>
+                        <th>Challenge Travel Kit</th>
+                        <th>Real Jersey Kit</th>
+                        <th>White Shoes</th>
+                        <th>Black Jeans</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Member rows will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBM1r1pVGc3QVmKzQOWPJkD9N87FTEnhus",
+            authDomain: "rhythm-ea7a1.firebaseapp.com",
+            databaseURL: "https://rhythm-ea7a1-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "rhythm-ea7a1",
+            storageBucket: "rhythm-ea7a1.firebasestorage.app",
+            messagingSenderId: "776053739080",
+            appId: "1:776053739080:web:bfaf1a208b117faf94927d"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        const db = firebase.database();
+
+        // Checklist items (must match member page)
+        const checklistItems = [
+            'Rhythm Gamees',
+            'Rhythm Feyli (Grey)',
+            'Red Bolufothi',
+            'Black Gamees',
+            'Mundu',
+            'shash',
+            'New White Showkit',
+            'New Pink Travel Kit',
+            'Challenge Travel Kit',
+            'Real Jersey Kit',
+            'White Shoes',
+            'Black Jeans'
+        ];
+
+        let allMembers = [];
+        let selectedMembers = new Set();
+
+        // Load all members and their checklists
+        async function loadMemberChecklists() {
+            try {
+                logStage('Loading members data');
+                
+                const membersSnapshot = await db.ref('members').once('value');
+                const membersData = membersSnapshot.val();
+                
+                if (!membersData) {
+                    document.getElementById('loadingMessage').textContent = 'No members found';
+                    document.body.classList.add('loaded');
+                    return;
+                }
+
+                const members = [];
+                let totalWithChecklists = 0;
+                let totalCompletionSum = 0;
+
+                // Process each member
+                for (const [memberId, memberData] of Object.entries(membersData)) {
+                    const checklist = memberData.thoddooChecklist || {};
+                    const checkedItems = new Set(Object.values(checklist));
+                    const totalChecked = checkedItems.size;
+                    
+                    if (totalChecked > 0) {
+                        totalWithChecklists++;
+                    }
+                    
+                    const completionPercent = (totalChecked / checklistItems.length) * 100;
+                    totalCompletionSum += completionPercent;
+
+                    members.push({
+                        id: memberId,
+                        name: memberData.fullName || memberData.name || memberId,
+                        photo: memberData.photo || memberData.photoPath || '',
+                        checkedItems: checkedItems,
+                        totalChecked: totalChecked,
+                        completionPercent: completionPercent
+                    });
+                }
+
+                // Sort by name
+                members.sort((a, b) => a.name.localeCompare(b.name));
+
+                // Store all members globally
+                allMembers = members;
+
+                // Update statistics
+                document.getElementById('totalMembers').textContent = members.length;
+                document.getElementById('membersWithChecklists').textContent = totalWithChecklists;
+                const avgCompletion = members.length > 0 ? (totalCompletionSum / members.length).toFixed(1) : 0;
+                document.getElementById('avgCompletion').textContent = avgCompletion + '%';
+
+                // Render table
+                renderTable(members);
+
+                // Show content
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('statsSection').style.display = 'grid';
+                document.getElementById('tableSection').style.display = 'block';
+                document.body.classList.add('loaded');
+                
+                logStage('Data loaded and rendered');
+                
+            } catch (error) {
+                console.error('Error loading member checklists:', error);
+                document.getElementById('loadingMessage').textContent = 'Error loading data. Please refresh.';
+                document.body.classList.add('loaded');
+            }
+        }
+
+        // Render table
+        function renderTable(members) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            // Separate selected and non-selected members
+            const selected = members.filter(m => selectedMembers.has(m.id));
+            const notSelected = members.filter(m => !selectedMembers.has(m.id));
+
+            // Render selected members first
+            if (selected.length > 0) {
+                const sectionRow = document.createElement('tr');
+                sectionRow.className = 'section-label';
+                sectionRow.innerHTML = `<td colspan="14">✓ Selected Members (${selected.length})</td>`;
+                tbody.appendChild(sectionRow);
+
+                selected.forEach(member => {
+                    tbody.appendChild(createMemberRow(member, true));
+                });
+
+                // Add divider
+                if (notSelected.length > 0) {
+                    const dividerRow = document.createElement('tr');
+                    dividerRow.className = 'section-divider';
+                    dividerRow.innerHTML = `<td colspan="14"></td>`;
+                    tbody.appendChild(dividerRow);
+                }
+            }
+
+            // Render non-selected members
+            if (notSelected.length > 0) {
+                if (selected.length > 0) {
+                    const sectionRow = document.createElement('tr');
+                    sectionRow.className = 'section-label';
+                    sectionRow.innerHTML = `<td colspan="14">Other Members (${notSelected.length})</td>`;
+                    tbody.appendChild(sectionRow);
+                }
+
+                notSelected.forEach(member => {
+                    tbody.appendChild(createMemberRow(member, false));
+                });
+            }
+
+            updateSelectionInfo();
+        }
+
+        function createMemberRow(member, isSelected) {
+            const row = document.createElement('tr');
+            if (isSelected) {
+                row.className = 'selected-member';
+            }
+            
+            // Member name cell with checkbox (no photo)
+            let nameCell = document.createElement('td');
+            nameCell.innerHTML = `
+                <input type="checkbox" class="member-checkbox" ${isSelected ? 'checked' : ''} 
+                       onchange="toggleMemberSelection('${member.id}', this.checked)">
+                ${member.name}
+            `;
+            row.appendChild(nameCell);
+
+            // Item cells
+            checklistItems.forEach((item, index) => {
+                const itemId = `item-${index}`;
+                const isChecked = member.checkedItems.has(itemId);
+                const cell = document.createElement('td');
+                cell.innerHTML = isChecked ? '<span class="check-mark">✓</span>' : '';
+                row.appendChild(cell);
+            });
+
+            // Total cell
+            const totalCell = document.createElement('td');
+            totalCell.innerHTML = `<strong>${member.totalChecked}/${checklistItems.length}</strong>`;
+            row.appendChild(totalCell);
+
+            return row;
+        }
+
+        function toggleMemberSelection(memberId, checked) {
+            if (checked) {
+                selectedMembers.add(memberId);
+            } else {
+                selectedMembers.delete(memberId);
+            }
+            renderTable(allMembers);
+        }
+
+        function toggleSelectAll(checked) {
+            if (checked) {
+                allMembers.forEach(m => selectedMembers.add(m.id));
+            } else {
+                selectedMembers.clear();
+            }
+            renderTable(allMembers);
+        }
+
+        function selectAllMembers() {
+            allMembers.forEach(m => selectedMembers.add(m.id));
+            document.getElementById('selectAllCheckbox').checked = true;
+            renderTable(allMembers);
+        }
+
+        function clearSelection() {
+            selectedMembers.clear();
+            document.getElementById('selectAllCheckbox').checked = false;
+            renderTable(allMembers);
+        }
+
+        function applyFilter() {
+            // Just re-render with current selection
+            renderTable(allMembers);
+        }
+
+        function updateSelectionInfo() {
+            const info = document.getElementById('selectionInfo');
+            info.textContent = `${selectedMembers.size} member${selectedMembers.size !== 1 ? 's' : ''} selected`;
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadMemberChecklists);
+    </script>
+</body>
+</html>

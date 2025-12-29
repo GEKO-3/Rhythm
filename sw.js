@@ -2,7 +2,7 @@
 // Provides basic offline functionality without aggressive caching
 // Updated: 2025-12-21 - Auto-update system + Force cache clear
 
-const CACHE_NAME = 'rhythm-v2.6.5'; // Robust page loading with diagnostics
+const CACHE_NAME = 'rhythm-v3.2.5'; // Fixed Tools menu toggle
 const ESSENTIAL_ASSETS = [
   './',
   './pages/songlist.html',

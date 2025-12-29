@@ -381,10 +381,10 @@
     </script>
 
     <script type="module">
-        import RhythmUnifiedAuth from './js/rhythm-unified-auth.js?v=2.4.7';
-        import RhythmLocalDB from './js/rhythm-local-db.js?v=2.4.7';
-        import './js/rhythm-notifications.js?v=2.4.7';
-        import './js/birthday-notifications.js?v=2.4.7';
+        import RhythmUnifiedAuth from './js/rhythm-unified-auth.js?v=3.2.5';
+        import RhythmLocalDB from './js/rhythm-local-db.js?v=3.2.5';
+        import './js/rhythm-notifications.js?v=3.2.5';
+        import './js/birthday-notifications.js?v=3.2.5';
     </script>
     
     <!-- Auto-Update Service - Inline on login page only -->
@@ -823,19 +823,10 @@ if (typeof window !== 'undefined') {
                     startPWAPreloading();
                 }
                 
-                if (isPWA || localStorage.getItem('rhythm_silent_redirect') === 'true') {
-                    // Silent redirect for PWA users
-                    console.log('PWA mode detected - silent redirect');
-                    window.rhythmAuth.redirectAfterLogin();
-                    return;
-                } else {
-                    // Show message for web users (optional notification)
-                    showMessage('Already logged in! Redirecting...', 'success');
-                    setTimeout(() => {
-                        window.rhythmAuth.redirectAfterLogin();
-                    }, 1000);
-                    return;
-                }
+                // All users see the choice screen (no silent redirect)
+                console.log('✅ User authenticated - showing choice screen');
+                window.rhythmAuth.redirectAfterLogin();
+                return;
             } else {
                 // User not authenticated - restore form if it was hidden
                 const loginContainer = document.querySelector('.login-container');

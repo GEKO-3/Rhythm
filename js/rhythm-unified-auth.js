@@ -2,11 +2,13 @@
  * UNIFIED RHYTHM AUTHENTICATION SYSTEM
  * This is the single source of truth for all authentication
  * Used by login.html, songlist.html, admin pages, and any other pages
- * @version 2.2.0 - Added My Kits support
+ * @version 3.1.0 - Member checklist rewritten
  */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, get, set, onValue, off } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+console.log('🔧 [RhythmUnifiedAuth] Loading v3.1.0 - Member checklist completely rewritten');
 
 class RhythmUnifiedAuth {
     constructor() {
@@ -1026,8 +1028,8 @@ class RhythmUnifiedAuth {
             return;
         }
 
-        // Show destination choice for all users (admins get extra option)
-        // Note: Removed auto-redirect for stored preferences to allow users to see new options like "My Kits"
+        // Always show destination choice for all users
+        console.log('🎯 [UnifiedAuth] Showing choice screen for all users');
         this.showDestinationChoice(isPWA);
     }
 
@@ -1050,24 +1052,6 @@ class RhythmUnifiedAuth {
         choiceContainer.className = 'login-container auth-choice-container';
         
         const isAdmin = this.isAdmin();
-        
-        const rememberOption = isPWA ? `
-            <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                <label style="display: flex; align-items: center; gap: 10px; color: #ccc; cursor: pointer;">
-                    <input type="checkbox" id="rememberChoice" style="margin: 0;">
-                    <span>Remember my choice for PWA</span>
-                </label>
-                <small style="color: #888; display: block; margin-top: 5px;">
-                    Skip this choice screen in the future
-                </small>
-            </div>
-        ` : '';
-        
-        const adminButton = isAdmin ? `
-            <button onclick="rhythmAuth.goToAdmin(${isPWA})" class="submit-btn" style="background: #ff6b6b;">
-                🔧 Admin Panel
-            </button>
-        ` : '';
         
         const notificationGranted = Notification.permission === 'granted';
         
@@ -1095,21 +1079,23 @@ class RhythmUnifiedAuth {
                     <span id="toolsArrow" style="transition: transform 0.3s ease;">▼</span>
                 </button>
                 <div id="toolsSubmenu" style="display: none; margin-left: 20px; border-left: 3px solid #9c27b0; padding-left: 15px; gap: 10px; flex-direction: column;">
-                    <button onclick="rhythmAuth.goToMyKits(${isPWA})" class="submit-btn" id="kitsBtn" style="background: #4caf50; font-size: 0.95rem;" ${!notificationGranted ? 'disabled' : ''}>
+                    <button onclick="rhythmAuth.goToMyKits()" class="submit-btn" id="kitsBtn" style="background: #4caf50; font-size: 0.95rem;" ${!notificationGranted ? 'disabled' : ''}>
                         🥁 My Kits
                     </button>
-                    <button onclick="rhythmAuth.goToCalendar(${isPWA})" class="submit-btn" id="calendarBtn" style="background: #2196f3; font-size: 0.95rem;" ${!notificationGranted ? 'disabled' : ''}>
+                    <button onclick="rhythmAuth.goToMyChecklist()" class="submit-btn" id="myChecklistBtn" style="background: #00bcd4; font-size: 0.95rem;" ${!notificationGranted ? 'disabled' : ''}>
+                        ✅ My Checklist
+                    </button>
+                    <button onclick="rhythmAuth.goToCalendar()" class="submit-btn" id="calendarBtn" style="background: #2196f3; font-size: 0.95rem;" ${!notificationGranted ? 'disabled' : ''}>
                         📅 Booking Calendar
                     </button>
                 </div>
-                <button onclick="rhythmAuth.goToSonglist(${isPWA})" class="submit-btn" id="songlistBtn" style="background: var(--primary-color);" ${!notificationGranted ? 'disabled' : ''}>
+                <button onclick="rhythmAuth.goToSonglist()" class="submit-btn" id="songlistBtn" style="background: var(--primary-color);" ${!notificationGranted ? 'disabled' : ''}>
                     🎵 Song List
                 </button>
-                ${isAdmin ? `<button onclick="rhythmAuth.goToAdmin(${isPWA})" class="submit-btn" id="adminBtn" style="background: #ff6b6b;" ${!notificationGranted ? 'disabled' : ''}>
+                ${isAdmin ? `<button onclick="rhythmAuth.goToAdmin()" class="submit-btn" id="adminBtn" style="background: #ff6b6b;" ${!notificationGranted ? 'disabled' : ''}>
                     🔧 Admin Panel
                 </button>` : ''}
             </div>
-            ${rememberOption}
             
             <!-- Clear notification settings option -->
             <div style="text-align: center; margin-top: 15px;">
@@ -1124,37 +1110,27 @@ class RhythmUnifiedAuth {
         // Update notification button state after a brief delay to ensure button is rendered
         setTimeout(() => this.updateNotificationButtonState(), 100);
     }
-
-    goToMyKits(rememberForPWA = false) {
-        if (rememberForPWA) {
-            const rememberCheckbox = document.getElementById('rememberChoice');
-            if (rememberCheckbox && rememberCheckbox.checked) {
-                localStorage.setItem('rhythm_admin_preference', 'kits');
-                localStorage.setItem('rhythm_silent_redirect', 'true');
-            }
-        }
+    goToMyKits() {
         window.location.href = 'pages/my-kits.html';
     }
 
-    goToSonglist(rememberForPWA = false) {
-        if (rememberForPWA) {
-            const rememberCheckbox = document.getElementById('rememberChoice');
-            if (rememberCheckbox && rememberCheckbox.checked) {
-                localStorage.setItem('rhythm_admin_preference', 'songlist');
-                localStorage.setItem('rhythm_silent_redirect', 'true');
-            }
-        }
+    goToMyChecklist() {
+        window.location.href = 'pages/my-checklist.html';
+    }
+
+    goToCalendar() {
+        window.location.href = 'pages/booking-calendar.html';
+    }
+
+    goToChecklist() {
+        window.location.href = 'pages/member-checklist.html';
+    }
+
+    goToSonglist() {
         window.location.href = 'pages/songlist.html';
     }
 
-    goToAdmin(rememberForPWA = false) {
-        if (rememberForPWA) {
-            const rememberCheckbox = document.getElementById('rememberChoice');
-            if (rememberCheckbox && rememberCheckbox.checked) {
-                localStorage.setItem('rhythm_admin_preference', 'admin');
-                localStorage.setItem('rhythm_silent_redirect', 'true');
-            }
-        }
+    goToAdmin() {
         window.location.href = 'pages/admin/admin.html';
     }
 
@@ -1162,12 +1138,14 @@ class RhythmUnifiedAuth {
         const submenu = document.getElementById('toolsSubmenu');
         const arrow = document.getElementById('toolsArrow');
         
-        if (submenu.style.display === 'none' || submenu.style.display === '') {
-            submenu.style.display = 'flex';
-            arrow.style.transform = 'rotate(180deg)';
-        } else {
-            submenu.style.display = 'none';
-            arrow.style.transform = 'rotate(0deg)';
+        if (submenu && arrow) {
+            if (submenu.style.display === 'none' || submenu.style.display === '') {
+                submenu.style.display = 'flex';
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                submenu.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
         }
     }
 
@@ -1327,7 +1305,7 @@ class RhythmUnifiedAuth {
     }
 
     enableNavigationButtons() {
-        const buttons = ['toolsBtn', 'kitsBtn', 'calendarBtn', 'songlistBtn', 'adminBtn'];
+        const buttons = ['toolsBtn', 'kitsBtn', 'calendarBtn', 'checklistBtn', 'songlistBtn', 'adminBtn'];
         buttons.forEach(btnId => {
             const btn = document.getElementById(btnId);
             if (btn) {
@@ -1336,17 +1314,6 @@ class RhythmUnifiedAuth {
                 btn.style.cursor = 'pointer';
             }
         });
-    }
-
-    goToCalendar(rememberForPWA = false) {
-        if (rememberForPWA) {
-            const rememberCheckbox = document.getElementById('rememberChoice');
-            if (rememberCheckbox && rememberCheckbox.checked) {
-                localStorage.setItem('rhythm_admin_preference', 'calendar');
-                localStorage.setItem('rhythm_silent_redirect', 'true');
-            }
-        }
-        window.location.href = 'pages/booking-calendar.html';
     }
 
     /**
