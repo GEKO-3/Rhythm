@@ -414,11 +414,6 @@
       } catch (error) {
         console.error('❌ [Admin] Cache refresh failed:', error);
       }
-          console.log('🔄 Admin page cache cleared');
-        }
-      } catch (error) {
-        console.log('ℹ️ Cache clearing not available:', error.message);
-      }
 
       console.group('🛡️ ADMIN PAGE INITIALIZATION');
       console.log('Admin page loading at:', new Date().toISOString());
