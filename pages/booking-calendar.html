@@ -441,7 +441,10 @@
                             bookedDates.set(value, key);
                         } else if (value && value.date) {
                             bookedDates.set(value.date, key);
-                            // Don't store private descriptions for member view
+                            // Store description for member view
+                            if (value.description) {
+                                bookedDates.set(value.date + '_desc', value.description);
+                            }
                         }
                     });
                 }
@@ -549,7 +552,12 @@
                 modal.classList.add('active');
             } else if (bookedDates.has(dateStr)) {
                 modalTitle.textContent = '📅 Booked Date';
-                eventDetailsElem.textContent = 'This date is booked. Contact admin for more details.';
+                const description = bookedDates.get(dateStr + '_desc');
+                if (description) {
+                    eventDetailsElem.textContent = description;
+                } else {
+                    eventDetailsElem.textContent = 'This date is booked. Contact admin for more details.';
+                }
                 modal.classList.add('active');
             }
         }
