@@ -368,7 +368,7 @@
                 </div>
             </div>
 
-            <p class="info-text">Click on a future date to mark as booked/special event. Shift+Click for special events.</p>
+            <p class="info-text">Click on a future date to add/edit event details and descriptions.</p>
         </div>
     </div>
 
@@ -463,23 +463,8 @@
 
         // Toggle booking status
         async function toggleBooking(dateStr, isShiftClick = false) {
-            // If shift-clicked or clicking special event, open modal
-            if (isShiftClick || specialEvents.has(dateStr)) {
-                openEventModal(dateStr);
-                return;
-            }
-
-            // Regular booking toggle
-            if (bookedDates.has(dateStr)) {
-                // Remove booking
-                const key = bookedDates.get(dateStr);
-                await bookedDatesRef.child(key).remove();
-                console.log('Removed booking for:', dateStr);
-            } else {
-                // Add booking
-                await bookedDatesRef.push(dateStr);
-                console.log('Added booking for:', dateStr);
-            }
+            // Always open modal for adding/editing events
+            openEventModal(dateStr);
         }
 
         // Modal functions
