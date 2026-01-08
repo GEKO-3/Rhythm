@@ -364,7 +364,7 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-box past"></div>
-                    <span>Past/Today (Auto)</span>
+                    <span>Past (Auto)</span>
                 </div>
             </div>
 
@@ -646,11 +646,11 @@
                     dayElement.classList.add('today');
                 }
 
-                // Mark past dates and today as unavailable
-                if (thisDate <= today) {
+                // Mark past dates as unavailable (but allow today and future dates)
+                if (thisDate < today) {
                     dayElement.classList.add('past');
                 } else {
-                    // Future dates - check booking status
+                    // Today and future dates - check booking status
                     if (specialEvents.has(dateStr)) {
                         dayElement.classList.add('special-event');
                         dayElement.innerHTML = `${day} <span class="star">⭐</span>`;
@@ -658,7 +658,7 @@
                         dayElement.classList.add('booked');
                     }
 
-                    // Add click handler for future dates only
+                    // Add click handler for today and future dates
                     dayElement.addEventListener('click', (e) => {
                         toggleBooking(dateStr, e.shiftKey);
                     });
