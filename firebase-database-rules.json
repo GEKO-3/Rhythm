@@ -242,8 +242,15 @@
         ".write": true,
         "$dateId": {
           ".read": true,
-          ".write": true,
-          ".validate": "newData.isString()"
+          ".write": true
+        }
+      },
+      "specialEvents": {
+        ".read": true,
+        ".write": true,
+        "$eventId": {
+          ".read": true,
+          ".write": true
         }
       }
     },
