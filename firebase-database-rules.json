@@ -65,7 +65,19 @@
     
     "events": {
       ".read": true,
-      ".write": true
+      ".write": true,
+      "currentEvents": {
+        ".read": true,
+        ".write": true,
+        "$eventId": {
+          ".read": true,
+          ".write": true
+        }
+      },
+      "activeEvent": {
+        ".read": true,
+        ".write": true
+      }
     },
     
     "payments": {

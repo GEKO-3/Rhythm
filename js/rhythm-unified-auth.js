@@ -1088,6 +1088,9 @@ class RhythmUnifiedAuth {
                     <button onclick="rhythmAuth.goToCalendar()" class="submit-btn" id="calendarBtn" style="background: #2196f3; font-size: 0.95rem;" ${!notificationGranted ? 'disabled' : ''}>
                         📅 Booking Calendar
                     </button>
+                    <button onclick="rhythmAuth.goToCurrentEvent()" class="submit-btn" id="currentEventBtn" style="background: #ff5722; font-size: 0.95rem;" ${!notificationGranted ? 'disabled' : ''}>
+                        🎉 Current Event
+                    </button>
                 </div>
                 <button onclick="rhythmAuth.goToSonglist()" class="submit-btn" id="songlistBtn" style="background: var(--primary-color);" ${!notificationGranted ? 'disabled' : ''}>
                     🎵 Song List
@@ -1120,6 +1123,10 @@ class RhythmUnifiedAuth {
 
     goToCalendar() {
         window.location.href = 'pages/booking-calendar.html';
+    }
+
+    goToCurrentEvent() {
+        window.location.href = 'pages/current-event.html';
     }
 
     goToChecklist() {
