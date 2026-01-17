@@ -22,12 +22,6 @@
     
     logStage('Emergency timeout script executed');
     
-    // Mark initial load complete after brief delay
-    setTimeout(() => {
-      document.body.classList.add('initial-load-complete');
-      logStage('Initial load marked complete');
-    }, 300);
-    
     // Monitor when DOMContentLoaded fires
     document.addEventListener('DOMContentLoaded', () => {
       logStage('DOMContentLoaded event fired');
@@ -61,22 +55,6 @@
       color: #f5d000 !important;
       margin: 0 !important;
       padding: 0 !important;
-    }
-    
-    /* Show content by default - only hide on initial page load */
-    body {
-      visibility: visible;
-      opacity: 1;
-    }
-    
-    /* Initial load animation (optional) */
-    body:not(.initial-load-complete) {
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0.7; }
-      to { opacity: 1; }
     }
   </style>
   
@@ -2152,9 +2130,6 @@
 
       // Initialize the application
       App.init();
-
-      // Mark initial load complete for animation purposes
-      document.body.classList.add('initial-load-complete');
 
       return App;
     })();

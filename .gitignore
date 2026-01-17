@@ -30,13 +30,6 @@ build/
 # Temporary files
 *.tmp
 *.temp
-*.backup
-.cleanup-files.txt
 
 # Firebase cache
 .firebase/
-
-# Debug and test files
-auth-debug.html
-test-*.html
-*-debug.html

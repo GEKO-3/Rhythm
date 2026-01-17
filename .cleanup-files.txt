@@ -1,0 +1,39 @@
+# Debug and test files (not used in production)
+auth-debug.html
+test-birthday-notifications.html
+test-notifications.html
+login-dev-admin.html
+
+# Documentation files (keep in docs folder instead)
+AUTHENTICATION_UNIFIED.md
+BIRTHDAY_NOTIFICATIONS_READY.md
+CLEANUP_SUMMARY.md
+CLOUDINARY_MIGRATION_GUIDE.md
+CLOUDINARY_SETUP.md
+DEPLOY_FIREBASE_RULES.md
+FCM_SETUP_GUIDE.md
+FIREBASE_ADMIN_RULES_GUIDE.md
+FIREBASE_HOSTING_DEPLOYMENT.md
+FIREBASE_PRODUCTION_SETUP.md
+FIREBASE_RULES_IMPACT_ANALYSIS.md
+FIREBASE_SERVER_KEY_SETUP.md
+MIGRATION_CHECKLIST.md
+NOTIFICATIONS_IMPLEMENTATION.md
+OFFLINE_FEATURES.md
+PUSH_NOTIFICATIONS_SIMPLE_GUIDE.md
+PUSH_NOTIFICATIONS_TEST_GUIDE.md
+TEST_NOTIFICATIONS_README.md
+
+# Node.js admin scripts (move to scripts folder)
+send-notification.js
+send-quick-test.js
+send-test-notification.js
+cloudinary-upload.js
+firebase-admin-script.js
+validate-firebase-rules.js
+
+# Archive folder (old binary files - can be deleted)
+archive/
+
+# Sensitive files that shouldn't be in repo
+serviceAccountKey.json

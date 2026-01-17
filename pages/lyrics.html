@@ -15,18 +15,6 @@
       margin: 0 !important;
       padding: 0 !important;
     }
-    
-    /* Hide content until fully styled */
-    body {
-      visibility: hidden;
-      opacity: 0;
-      transition: opacity 0.3s ease-in-out;
-    }
-    
-    body.loaded {
-      visibility: visible;
-      opacity: 1;
-    }
   </style>
   
   <!-- 🚨 EMERGENCY: Force page visible immediately if scripts fail -->
@@ -45,12 +33,6 @@
     }
     
     logStage('Emergency timeout script executed');
-    
-    setTimeout(() => {
-      document.body.classList.add('loaded');
-      logStage('Emergency timeout (500ms) - page forced visible');
-      console.warn('⚠️ [Lyrics] Emergency timeout - forcing page visible');
-    }, 500);
     
     // Monitor events
     document.addEventListener('DOMContentLoaded', () => {
@@ -735,18 +717,8 @@
     </div>
   </div>
   <script>
-    // 🚨 SAFETY: Force page visible after 2 seconds regardless of loading state
-    setTimeout(() => {
-      if (!document.body.classList.contains('loaded')) {
-        console.warn('⚠️ [Lyrics] Force-showing page after timeout');
-        document.body.classList.add('loaded');
-      }
-    }, 2000);
-
     // Initialize unified authentication system on page load
     document.addEventListener('DOMContentLoaded', async function() {
-      // 🚀 PREVENT FLASH: Make page visible once DOM is ready
-      document.body.classList.add('loaded');
       
       // Initialize Firebase transliteration data (Firebase already initialized above)
       if (typeof transliterationFirebase !== 'undefined') {
@@ -979,9 +951,6 @@
 
         // Initialize lyrics display
         initializeLyrics();
-        
-        // Show the page once everything is loaded
-        document.body.classList.add('loaded');
         
       } catch (error) {
         console.error('Failed to load song data from Firebase:', error);
